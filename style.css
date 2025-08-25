@@ -563,28 +563,7 @@ body {
     to { opacity: 1; }
 }
 
-/* Dark mode per il loader - SEMPRE TESTO BIANCO SU SFONDO SCURO */
-@media (prefers-color-scheme: dark) {
-    .loader-overlay {
-        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
-    }
-    
-    .loader-container {
-        background: rgba(45, 45, 45, 0.95);
-        border-color: var(--border-color);
-    }
-    
-    .loader-text {
-        color: #ffffff !important; /* SEMPRE BIANCO */
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-    }
-    
-    .loader-subtext {
-        color: #ffffff !important; /* SEMPRE BIANCO */
-        opacity: 0.9;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-    }
-}
+/* Dark mode disabilitato - tema sempre chiaro */
 
 /* Responsive per il loader - OTTIMIZZATO MOBILE */
 @media (max-width: 768px) {
@@ -810,34 +789,7 @@ body {
     }
 }
 
-/* ===== DARK MODE SUPPORT ===== */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --light-bg: #1a1a1a;
-        --dark-text: #ffffff;
-        --border-color: #404040;
-    }
-    
-    body {
-        background-color: var(--light-bg);
-        color: var(--dark-text);
-    }
-    
-    .calendar-section,
-    .sidebar-section,
-    .controls-section,
-    .status-bar,
-    .event-item {
-        background: #2d2d2d;
-        border: 1px solid var(--border-color);
-    }
-    
-    .filter-select {
-        background: #2d2d2d;
-        color: var(--dark-text);
-        border-color: var(--border-color);
-    }
-}
+/* ===== DARK MODE DISABILITATO - TEMA SEMPRE CHIARO ===== */
 
 /* ===== PRINT STYLES ===== */
 @media print {
@@ -1147,4 +1099,67 @@ body {
         width: 10px;
         height: 10px;
     }
+}
+
+/* ===== TEMA SEMPRE CHIARO - NO DARK MODE ===== */
+:root {
+    /* Colori sempre chiari */
+    --bg-color: #ffffff !important;
+    --text-color: #333333 !important;
+    --border-color: #dee2e6 !important;
+    --card-bg: #ffffff !important;
+    --shadow-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Forza tema chiaro su tutto */
+* {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+}
+
+body {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+}
+
+/* Override per elementi specifici */
+.calendar-section,
+.sidebar-section,
+.filters-section,
+.calendar-legend,
+.modal-content,
+.btn {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+}
+
+/* Calendario sempre chiaro */
+.fc {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+}
+
+.fc-daygrid-day {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+}
+
+.fc-daygrid-day-number {
+    color: var(--text-color) !important;
+}
+
+/* Loader sempre chiaro */
+.loader-overlay {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.loader-container {
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: var(--text-color) !important;
+}
+
+.loader-text,
+.loader-subtext {
+    color: var(--text-color) !important;
+    text-shadow: none !important;
 }
