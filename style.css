@@ -816,35 +816,45 @@ body {
     display: none !important;
 }
 
-/* Stili per eventi - 4 CATEGORIE PRINCIPALI */
+/* Stili per eventi - 4 CATEGORIE PRINCIPALI - COLORI FORZATI */
 .fc-event-mercatino {
     background-color: #28a745 !important;
     border-color: #28a745 !important;
     color: white !important;
+    background-image: none !important;
+    box-shadow: none !important;
 }
 
 .fc-event-fiera {
     background-color: #ffc107 !important;
     border-color: #ffc107 !important;
     color: #000 !important;
+    background-image: none !important;
+    box-shadow: none !important;
 }
 
 .fc-event-manifestazione {
     background-color: #6f42c1 !important;
     border-color: #6f42c1 !important;
     color: white !important;
+    background-image: none !important;
+    box-shadow: none !important;
 }
 
 .fc-event-sagra {
     background-color: #dc3545 !important;
     border-color: #dc3545 !important;
     color: white !important;
+    background-image: none !important;
+    box-shadow: none !important;
 }
 
-.fc-event-festa-patronale {
-    background-color: #007bff !important;
-    border-color: #007bff !important;
+.fc-event-altro {
+    background-color: #4e342e !important;
+    border-color: #4e342e !important;
     color: white !important;
+    background-image: none !important;
+    box-shadow: none !important;
 }
 
 /* ===== CALENDARIO MOBILE OTTIMIZZATO ===== */
@@ -884,11 +894,6 @@ body {
     
     .fc-daygrid-event.fc-event-sagra {
         background-color: #dc3545 !important;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    }
-    
-    .fc-daygrid-event.fc-event-festa-patronale {
-        background-color: #007bff !important;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
     
@@ -1010,12 +1015,6 @@ body {
         border-left: 4px solid #dc3545 !important;
     }
     
-    .fc-timeGridWeek-view .fc-event-festa-patronale {
-        background: linear-gradient(135deg, #007bff, #0056b3) !important;
-        color: white !important;
-        border-left: 4px solid #007bff !important;
-    }
-    
     .fc-timeGridWeek-view .fc-event-altro {
         background: linear-gradient(135deg, #4e342e, #3e2723) !important;
         color: white !important;
@@ -1071,10 +1070,6 @@ body {
 
 .legend-dot.sagra {
     background-color: #dc3545;
-}
-
-.legend-dot.festa-patronale {
-    background-color: #007bff;
 }
 
 /* Mobile legend */
@@ -1156,5 +1151,39 @@ body {
 .loader-text,
 .loader-subtext {
     color: var(--text-color) !important;
+    text-shadow: none !important;
+}
+
+/* ===== OVERRIDE COMPLETO PER ELIMINARE BOX BIANCHI ===== */
+.fc-event {
+    background-image: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+.fc-event-title {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+}
+
+.fc-event-main {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+}
+
+.fc-event-main-frame {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+}
+
+/* Forza colori su tutti gli elementi FullCalendar */
+.fc-daygrid-event,
+.fc-timegrid-event,
+.fc-list-event {
+    background-image: none !important;
+    box-shadow: none !important;
     text-shadow: none !important;
 }

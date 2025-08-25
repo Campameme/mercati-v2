@@ -829,7 +829,7 @@ const CalendarManager = {
             const eventiPerTipologia = new Map();
             
             eventi.forEach(evento => {
-                let tipologia = 'manifestazione';
+                let tipologia = 'altro';
                 
                 if (evento.classList.contains('fc-event-mercatino')) {
                     tipologia = 'mercatino';
@@ -839,8 +839,8 @@ const CalendarManager = {
                     tipologia = 'manifestazione';
                 } else if (evento.classList.contains('fc-event-sagra')) {
                     tipologia = 'sagra';
-                } else if (evento.classList.contains('fc-event-festa-patronale')) {
-                    tipologia = 'festa-patronale';
+                } else if (evento.classList.contains('fc-event-altro')) {
+                    tipologia = 'altro';
                 }
                 
                 if (!eventiPerTipologia.has(tipologia)) {
@@ -852,9 +852,9 @@ const CalendarManager = {
             // Pulisci container
             eventsContainer.innerHTML = '';
             
-            // Aggiungi un pallino per ogni tipologia (massimo 5)
+            // Aggiungi un pallino per ogni tipologia (massimo 4)
             let palliniAggiunti = 0;
-            const maxPallini = 5;
+            const maxPallini = 4;
             
             for (const [tipologia, eventi] of eventiPerTipologia) {
                 if (palliniAggiunti >= maxPallini) break;
@@ -871,8 +871,8 @@ const CalendarManager = {
                     pallino.classList.add('fc-event-manifestazione');
                 } else if (tipologia === 'sagra') {
                     pallino.classList.add('fc-event-sagra');
-                } else if (tipologia === 'festa-patronale') {
-                    pallino.classList.add('fc-event-festa-patronale');
+                } else {
+                    pallino.classList.add('fc-event-altro');
                 }
                 
                 // Aggiungi attributo data per il conteggio
@@ -913,8 +913,8 @@ const CalendarManager = {
                         tipoEvento = 'manifestazione';
                     } else if (target.classList.contains('fc-event-sagra')) {
                         tipoEvento = 'sagra';
-                    } else if (target.classList.contains('fc-event-festa-patronale')) {
-                        tipoEvento = 'festa-patronale';
+                    } else if (target.classList.contains('fc-event-altro')) {
+                        tipoEvento = 'altro';
                     }
                     
                     // Mostra solo eventi di quel tipo per quel giorno
@@ -1049,7 +1049,7 @@ const CalendarManager = {
         const giornoSettimana = dataObj.toLocaleDateString('it-IT', { weekday: 'long' });
         
         // Titolo dinamico basato sulla tipologia
-        let tipoLabel = 'Evento';
+        let tipoLabel = 'Altro';
         if (tipoEvento === 'mercatino') {
             tipoLabel = 'Mercatini';
         } else if (tipoEvento === 'fiera') {
@@ -1058,10 +1058,8 @@ const CalendarManager = {
             tipoLabel = 'Manifestazioni';
         } else if (tipoEvento === 'sagra') {
             tipoLabel = 'Sagre';
-        } else if (tipoEvento === 'festa patronale') {
-            tipoLabel = 'Feste Patronali';
         } else {
-            tipoLabel = 'Eventi';
+            tipoLabel = 'Altro';
         }
         
         title.textContent = `${tipoLabel} di ${giornoSettimana} ${Utils.formattaData(data)}`;
@@ -1103,7 +1101,7 @@ const CalendarManager = {
                     else if (evento.className.includes('fiera')) borderColor = '#ffc107';
                     else if (evento.className.includes('manifestazione')) borderColor = '#6f42c1';
                     else if (evento.className.includes('sagra')) borderColor = '#dc3545';
-                    else if (evento.className.includes('festa patronale')) borderColor = '#007bff';
+                    else if (evento.className.includes('altro')) borderColor = '#4e342e';
                 }
                 
                 html += `
@@ -1802,24 +1800,19 @@ const DataLoader = {
                     iconaEvento = '🍷';
                     coloreEvento = '#dc3545';
                     classiCSS = 'sagra';
-                } else if (tipologia.includes('festa patronale') || tipologia.includes('patronale')) {
-                    categoria = 'festa-patronale';
-                    iconaEvento = '⛪';
-                    coloreEvento = '#007bff';
-                    classiCSS = 'festa-patronale';
                 } else {
                     // Default per altre tipologie
-                    categoria = 'manifestazione';
-                    iconaEvento = '🎭';
-                    coloreEvento = '#6f42c1';
-                    classiCSS = 'manifestazione';
+                    categoria = 'altro';
+                    iconaEvento = '🎉';
+                    coloreEvento = '#4e342e';
+                    classiCSS = 'altro';
                 }
             } else {
                 // Default se non c'è tipologia
-                categoria = 'manifestazione';
-                iconaEvento = '🎭';
-                coloreEvento = '#6f42c1';
-                classiCSS = 'manifestazione';
+                categoria = 'altro';
+                iconaEvento = '🎉';
+                coloreEvento = '#4e342e';
+                classiCSS = 'altro';
             }
             
             const eventi = date.map((dataSingola, index) => ({
@@ -2417,7 +2410,7 @@ const EventManager = {
         const giornoSettimana = dataObj.toLocaleDateString('it-IT', { weekday: 'long' });
         
         // Titolo dinamico basato sulla tipologia
-        let tipoLabel = 'Evento';
+        let tipoLabel = 'Altro';
         if (tipoEvento === 'mercatino') {
             tipoLabel = 'Mercatini';
         } else if (tipoEvento === 'fiera') {
@@ -2426,10 +2419,8 @@ const EventManager = {
             tipoLabel = 'Manifestazioni';
         } else if (tipoEvento === 'sagra') {
             tipoLabel = 'Sagre';
-        } else if (tipoEvento === 'festa patronale') {
-            tipoLabel = 'Feste Patronali';
         } else {
-            tipoLabel = 'Eventi';
+            tipoLabel = 'Altro';
         }
         
         title.textContent = `${tipoLabel} di ${giornoSettimana} ${Utils.formattaData(data)}`;
@@ -2471,7 +2462,7 @@ const EventManager = {
                     else if (evento.className.includes('fiera')) borderColor = '#ffc107';
                     else if (evento.className.includes('manifestazione')) borderColor = '#6f42c1';
                     else if (evento.className.includes('sagra')) borderColor = '#dc3545';
-                    else if (evento.className.includes('festa patronale')) borderColor = '#007bff';
+                    else if (evento.className.includes('altro')) borderColor = '#4e342e';
                 }
                 
                 html += `
