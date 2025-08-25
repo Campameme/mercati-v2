@@ -829,7 +829,7 @@ const CalendarManager = {
             const eventiPerTipologia = new Map();
             
             eventi.forEach(evento => {
-                let tipologia = 'altro';
+                let tipologia = 'evento';
                 
                 if (evento.classList.contains('fc-event-mercatino')) {
                     tipologia = 'mercatino';
@@ -839,10 +839,6 @@ const CalendarManager = {
                     tipologia = 'manifestazione';
                 } else if (evento.classList.contains('fc-event-evento')) {
                     tipologia = 'evento';
-                } else if (evento.classList.contains('fc-event-sagra')) {
-                    tipologia = 'sagra';
-                } else if (evento.classList.contains('fc-event-altro')) {
-                    tipologia = 'altro';
                 }
                 
                 if (!eventiPerTipologia.has(tipologia)) {
@@ -854,9 +850,9 @@ const CalendarManager = {
             // Pulisci container
             eventsContainer.innerHTML = '';
             
-            // Aggiungi un pallino per ogni tipologia (massimo 6)
+            // Aggiungi un pallino per ogni tipologia (massimo 4)
             let palliniAggiunti = 0;
-            const maxPallini = 6;
+            const maxPallini = 4;
             
             for (const [tipologia, eventi] of eventiPerTipologia) {
                 if (palliniAggiunti >= maxPallini) break;
@@ -871,12 +867,8 @@ const CalendarManager = {
                     pallino.classList.add('fc-event-fiera');
                 } else if (tipologia === 'manifestazione') {
                     pallino.classList.add('fc-event-manifestazione');
-                } else if (tipologia === 'evento') {
-                    pallino.classList.add('fc-event-evento');
-                } else if (tipologia === 'sagra') {
-                    pallino.classList.add('fc-event-sagra');
                 } else {
-                    pallino.classList.add('fc-event-altro');
+                    pallino.classList.add('fc-event-evento');
                 }
                 
                 // Aggiungi attributo data per il conteggio
@@ -907,7 +899,7 @@ const CalendarManager = {
                 if (dateAttr) {
                     // Determina il tipo di evento dal pallino
                     const isMercatino = target.classList.contains('fc-event-mercatino');
-                    let tipoEvento = 'altro';
+                    let tipoEvento = 'evento';
                     
                     if (isMercatino) {
                         tipoEvento = 'mercatino';
@@ -917,10 +909,6 @@ const CalendarManager = {
                         tipoEvento = 'manifestazione';
                     } else if (target.classList.contains('fc-event-evento')) {
                         tipoEvento = 'evento';
-                    } else if (target.classList.contains('fc-event-sagra')) {
-                        tipoEvento = 'sagra';
-                    } else if (target.classList.contains('fc-event-altro')) {
-                        tipoEvento = 'altro';
                     }
                     
                     // Mostra solo eventi di quel tipo per quel giorno
@@ -1055,19 +1043,15 @@ const CalendarManager = {
         const giornoSettimana = dataObj.toLocaleDateString('it-IT', { weekday: 'long' });
         
         // Titolo dinamico basato sulla tipologia
-        let tipoLabel = 'Altro';
+        let tipoLabel = 'Evento';
         if (tipoEvento === 'mercatino') {
             tipoLabel = 'Mercatini';
         } else if (tipoEvento === 'fiera') {
             tipoLabel = 'Fiere';
         } else if (tipoEvento === 'manifestazione') {
             tipoLabel = 'Manifestazioni';
-        } else if (tipoEvento === 'evento') {
-            tipoLabel = 'Eventi';
-        } else if (tipoEvento === 'sagra') {
-            tipoLabel = 'Sagre';
         } else {
-            tipoLabel = 'Altro';
+            tipoLabel = 'Eventi';
         }
         
         title.textContent = `${tipoLabel} di ${giornoSettimana} ${Utils.formattaData(data)}`;
@@ -1103,14 +1087,12 @@ const CalendarManager = {
                 // Colore del bordo basato sulla tipologia
                 let borderColor = 'var(--border-color)';
                 if (evento.extendedProps.tipo === 'mercatino') {
-                    borderColor = 'var(--primary-color)';
+                    borderColor = '#28a745';
                 } else if (evento.className) {
-                    if (evento.className.includes('mercatino')) borderColor = 'var(--primary-color)';
-                    else if (evento.className.includes('fiera')) borderColor = '#f57f17';
-                    else if (evento.className.includes('manifestazione')) borderColor = '#6a1b9a';
-                    else if (evento.className.includes('evento')) borderColor = '#e65100';
-                    else if (evento.className.includes('sagra')) borderColor = '#c2185b';
-                    else if (evento.className.includes('altro')) borderColor = '#4e342e';
+                    if (evento.className.includes('mercatino')) borderColor = '#28a745';
+                    else if (evento.className.includes('fiera')) borderColor = '#ffc107';
+                    else if (evento.className.includes('manifestazione')) borderColor = '#6f42c1';
+                    else if (evento.className.includes('evento')) borderColor = '#fd7e14';
                 }
                 
                 html += `
@@ -1783,41 +1765,52 @@ const DataLoader = {
         
         // Genera eventi FullCalendar
         if (date && date.length > 0) {
-            const isMercatino = dati.tipologia && dati.tipologia.toLowerCase().includes('mercatino');
-            const iconaEvento = isMercatino ? '🛒' : '🎪';
-            const coloreEvento = isMercatino ? CONFIG.COLORS.MERCATINO : CONFIG.COLORS.FIERA;
-            const tipoEvento = isMercatino ? 'mercatino' : 'fiera';
+            // Determina categoria e icona basandosi sulla tipologia
+            let categoria, iconaEvento, coloreEvento, classiCSS;
             
-            // Determina la classe CSS specifica per la tipologia
-            let classiCSS = tipoEvento;
             if (dati.tipologia) {
                 const tipologia = dati.tipologia.toLowerCase();
+                
                 if (tipologia.includes('mercatino')) {
+                    categoria = 'mercatino';
+                    iconaEvento = '🛒';
+                    coloreEvento = '#28a745';
                     classiCSS = 'mercatino';
                 } else if (tipologia.includes('fiera')) {
+                    categoria = 'fiera';
+                    iconaEvento = '🎪';
+                    coloreEvento = '#ffc107';
                     classiCSS = 'fiera';
                 } else if (tipologia.includes('manifestazione')) {
+                    categoria = 'manifestazione';
+                    iconaEvento = '🎭';
+                    coloreEvento = '#6f42c1';
                     classiCSS = 'manifestazione';
-                } else if (tipologia.includes('evento')) {
-                    classiCSS = 'evento';
-                } else if (tipologia.includes('sagra')) {
-                    classiCSS = 'sagra';
                 } else {
-                    classiCSS = 'altro';
+                    categoria = 'evento';
+                    iconaEvento = '🎉';
+                    coloreEvento = '#fd7e14';
+                    classiCSS = 'evento';
                 }
+            } else {
+                // Default se non c'è tipologia
+                categoria = 'evento';
+                iconaEvento = '🎉';
+                coloreEvento = '#fd7e14';
+                classiCSS = 'evento';
             }
             
             const eventi = date.map((dataSingola, index) => ({
-                id: `${tipoEvento}_${dati.comune}_${dataSingola}_${index}`,
+                id: `${categoria}_${dati.comune}_${dataSingola}_${index}`,
                 title: `${iconaEvento} ${dati.comune}`,
                 start: dataSingola,
                 end: dataSingola,
                 backgroundColor: coloreEvento,
                 borderColor: coloreEvento,
-                textColor: isMercatino ? 'white' : CONFIG.COLORS.FIERA_TEXT,
-                className: classiCSS, // Aggiungi classi CSS per tipologia
+                textColor: categoria === 'fiera' ? '#000' : 'white',
+                className: classiCSS,
                 extendedProps: {
-                    tipo: tipoEvento,
+                    tipo: categoria,
                     comune: dati.comune,
                     tipologia: dati.tipologia || 'N/A',
                     giornoRicorrente: dati.giornoRicorrente || 'N/A',
@@ -2402,19 +2395,15 @@ const EventManager = {
         const giornoSettimana = dataObj.toLocaleDateString('it-IT', { weekday: 'long' });
         
         // Titolo dinamico basato sulla tipologia
-        let tipoLabel = 'Altro';
+        let tipoLabel = 'Evento';
         if (tipoEvento === 'mercatino') {
             tipoLabel = 'Mercatini';
         } else if (tipoEvento === 'fiera') {
             tipoLabel = 'Fiere';
         } else if (tipoEvento === 'manifestazione') {
             tipoLabel = 'Manifestazioni';
-        } else if (tipoEvento === 'evento') {
-            tipoLabel = 'Eventi';
-        } else if (tipoEvento === 'sagra') {
-            tipoLabel = 'Sagre';
         } else {
-            tipoLabel = 'Altro';
+            tipoLabel = 'Eventi';
         }
         
         title.textContent = `${tipoLabel} di ${giornoSettimana} ${Utils.formattaData(data)}`;
@@ -2450,14 +2439,12 @@ const EventManager = {
                 // Colore del bordo basato sulla tipologia
                 let borderColor = 'var(--border-color)';
                 if (evento.extendedProps.tipo === 'mercatino') {
-                    borderColor = 'var(--primary-color)';
+                    borderColor = '#28a745';
                 } else if (evento.className) {
-                    if (evento.className.includes('mercatino')) borderColor = 'var(--primary-color)';
-                    else if (evento.className.includes('fiera')) borderColor = '#f57f17';
-                    else if (evento.className.includes('manifestazione')) borderColor = '#6a1b9a';
-                    else if (evento.className.includes('evento')) borderColor = '#e65100';
-                    else if (evento.className.includes('sagra')) borderColor = '#c2185b';
-                    else if (evento.className.includes('altro')) borderColor = '#4e342e';
+                    if (evento.className.includes('mercatino')) borderColor = '#28a745';
+                    else if (evento.className.includes('fiera')) borderColor = '#ffc107';
+                    else if (evento.className.includes('manifestazione')) borderColor = '#6f42c1';
+                    else if (evento.className.includes('evento')) borderColor = '#fd7e14';
                 }
                 
                 html += `
