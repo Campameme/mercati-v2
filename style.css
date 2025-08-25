@@ -876,15 +876,40 @@ body {
     color: white !important;
 }
 
+/* Colori per diversi tipi di fiere */
 .fc-event-fiera {
-    background-color: var(--accent-color) !important;
     border-color: var(--accent-color) !important;
     color: var(--dark-text) !important;
 }
 
+/* Tipologie fiere con colori specifici */
+.fc-event-fiera.fiera-culturale {
+    background-color: #9c27b0 !important; /* Viola per eventi culturali */
+}
+
+.fc-event-fiera.fiera-commerciale {
+    background-color: #ff9800 !important; /* Arancione per eventi commerciali */
+}
+
+.fc-event-fiera.fiera-enogastronomica {
+    background-color: #e91e63 !important; /* Rosa per eventi enogastronomici */
+}
+
+.fc-event-fiera.fiera-artigianale {
+    background-color: #795548 !important; /* Marrone per eventi artigianali */
+}
+
+.fc-event-fiera.fiera-agricola {
+    background-color: #4caf50 !important; /* Verde per eventi agricoli */
+}
+
+.fc-event-fiera.fiera-generica {
+    background-color: var(--accent-color) !important; /* Giallo default per fiere generiche */
+}
+
 /* ===== CALENDARIO MOBILE OTTIMIZZATO ===== */
 
-/* Pallini per tipo di evento su mobile */
+/* Pallini per tipo di evento su mobile - RAGGRUPPATI PER TIPOLOGIA */
 @media (max-width: 768px) {
     /* Nascondi testo eventi su mobile, mostra solo pallini */
     .fc-daygrid-event {
@@ -907,13 +932,38 @@ body {
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
     
-    /* Pallino fiera */
-    .fc-daygrid-event.fc-event-fiera {
+    /* Pallini fiere per tipologia */
+    .fc-daygrid-event.fc-event-fiera.fiera-culturale {
+        background-color: #9c27b0 !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+    
+    .fc-daygrid-event.fc-event-fiera.fiera-commerciale {
+        background-color: #ff9800 !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+    
+    .fc-daygrid-event.fc-event-fiera.fiera-enogastronomica {
+        background-color: #e91e63 !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+    
+    .fc-daygrid-event.fc-event-fiera.fiera-artigianale {
+        background-color: #795548 !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+    
+    .fc-daygrid-event.fc-event-fiera.fiera-agricola {
+        background-color: #4caf50 !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+    
+    .fc-daygrid-event.fc-event-fiera.fiera-generica {
         background-color: var(--accent-color) !important;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
     
-    /* Container pallini per giorno */
+    /* Container pallini per giorno - RAGGRUPPATI */
     .fc-daygrid-day-events {
         display: flex !important;
         flex-wrap: wrap !important;
@@ -983,7 +1033,63 @@ body {
     }
 }
 
-/* ===== LEGENDA PALLINI ===== */
+/* ===== VIEW SETTIMANALE MOBILE - CARD COLORATE ===== */
+@media (max-width: 768px) {
+    /* View settimanale con card colorate */
+    .fc-timeGridWeek-view .fc-event {
+        border-radius: var(--border-radius) !important;
+        margin: 2px 0 !important;
+        padding: 8px !important;
+        box-shadow: var(--shadow) !important;
+        border: none !important;
+    }
+    
+    /* Card mercatini */
+    .fc-timeGridWeek-view .fc-event-mercatino {
+        background: linear-gradient(135deg, var(--primary-color), #1e7e34) !important;
+        color: white !important;
+        border-left: 4px solid var(--primary-color) !important;
+    }
+    
+    /* Card fiere per tipologia */
+    .fc-timeGridWeek-view .fc-event-fiera.fiera-culturale {
+        background: linear-gradient(135deg, #9c27b0, #7b1fa2) !important;
+        color: white !important;
+        border-left: 4px solid #9c27b0 !important;
+    }
+    
+    .fc-timeGridWeek-view .fc-event-fiera.fiera-commerciale {
+        background: linear-gradient(135deg, #ff9800, #f57c00) !important;
+        color: white !important;
+        border-left: 4px solid #ff9800 !important;
+    }
+    
+    .fc-timeGridWeek-view .fc-event-fiera.fiera-enogastronomica {
+        background: linear-gradient(135deg, #e91e63, #c2185b) !important;
+        color: white !important;
+        border-left: 4px solid #e91e63 !important;
+    }
+    
+    .fc-timeGridWeek-view .fc-event-fiera.fiera-artigianale {
+        background: linear-gradient(135deg, #795548, #5d4037) !important;
+        color: white !important;
+        border-left: 4px solid #795548 !important;
+    }
+    
+    .fc-timeGridWeek-view .fc-event-fiera.fiera-agricola {
+        background: linear-gradient(135deg, #4caf50, #388e3c) !important;
+        color: white !important;
+        border-left: 4px solid #4caf50 !important;
+    }
+    
+    .fc-timeGridWeek-view .fc-event-fiera.fiera-generica {
+        background: linear-gradient(135deg, var(--accent-color), #f57f17) !important;
+        color: var(--dark-text) !important;
+        border-left: 4px solid var(--accent-color) !important;
+    }
+}
+
+/* ===== LEGENDA PALLINI AGGIORNATA ===== */
 .calendar-legend {
     display: flex;
     justify-content: center;
@@ -994,6 +1100,7 @@ body {
     background: rgba(255, 255, 255, 0.8);
     border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
+    flex-wrap: wrap;
 }
 
 .legend-item {
@@ -1015,8 +1122,28 @@ body {
     background-color: var(--primary-color);
 }
 
-.legend-dot.fiera {
+.legend-dot.fiera-generica {
     background-color: var(--accent-color);
+}
+
+.legend-dot.fiera-culturale {
+    background-color: #9c27b0;
+}
+
+.legend-dot.fiera-commerciale {
+    background-color: #ff9800;
+}
+
+.legend-dot.fiera-enogastronomica {
+    background-color: #e91e63;
+}
+
+.legend-dot.fiera-artigianale {
+    background-color: #795548;
+}
+
+.legend-dot.fiera-agricola {
+    background-color: #4caf50;
 }
 
 /* Mobile legend */
