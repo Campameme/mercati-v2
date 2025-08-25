@@ -1350,21 +1350,17 @@ const DataLoader = {
         // Pulisci cache solo se necessario (non sempre)
         Utils.clearCache(false); // Non forzare, solo se vecchia
         
-        // Mostra loader fullscreen
-        this.mostraLoaderFullscreen('Caricamento in corso...', 'Aggiornamento dati da Google Sheets');
-        
         try {
             // Carica dati
             await this.caricaMercatiniSemplice();
             
-            // Nascondi loader
-            this.nascondiLoaderFullscreen();
+            // Aggiorna UI
+            FilterManager.aggiornaFiltri();
+            DataLoader.aggiornaCalendario();
+            EventManager.aggiornaEventiVicini();
             
         } catch (error) {
             Logger.error('❌ Errore durante il caricamento dati:', error);
-            
-            // Nascondi loader e mostra errore
-            this.nascondiLoaderFullscreen();
             
             // Mostra errore temporaneo
             setTimeout(() => {
