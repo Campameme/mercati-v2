@@ -1,0 +1,7 @@
+# Netlify Redirects per SPA
+# Gestisce tutte le route per l'applicazione React/Vue/Angular
+
+/*    /index.html   200
+
+# Redirect specifici se necessario
+/api/sheets/*    https://docs.google.com/spreadsheets/d/:splat    200

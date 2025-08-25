@@ -5,14 +5,15 @@
 [build.environment]
   NODE_VERSION = "18"
 
+# Headers di sicurezza
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
 
+# Cache per file statici
 [[headers]]
   for = "*.js"
   [headers.values]
@@ -23,15 +24,8 @@
   [headers.values]
     Cache-Control = "public, max-age=604800"
 
-[[redirects]]
-  from = "/api/sheets/*"
-  to = "https://docs.google.com/spreadsheets/d/:splat"
-  status = 200
-  force = false
-  headers = {X-From = "Netlify"}
-
+# Redirect per SPA (Single Page Application)
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-  conditions = {Role = ["admin"]}
