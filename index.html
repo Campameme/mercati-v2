@@ -36,6 +36,18 @@
             <p>Mercatini e Fiere</p>
             <small class="d-block mt-2 opacity-75">Scopri i mercatini più vicini a te</small>
         </header>
+
+        <!-- ===== LOADER FULLSCREEN ===== -->
+        <div id="loaderOverlay" class="loader-overlay">
+            <div class="loader-container">
+                <div class="loader-spinner"></div>
+                <div class="loader-text" id="loaderText">Caricamento in corso...</div>
+                <div class="loader-subtext" id="loaderSubtext">Aggiornamento dati da Google Sheets</div>
+                <div class="loader-progress">
+                    <div class="loader-progress-bar"></div>
+                </div>
+            </div>
+        </div>
         
         <!-- Status Bar -->
         <div class="status-bar">
@@ -85,8 +97,8 @@
             </div>
         </section>
         
-        <!-- Loading Spinner -->
-        <div class="loading-spinner" id="loadingSpinner" role="status" aria-live="polite">
+        <!-- Loading Spinner (mantenuto per compatibilità) -->
+        <div class="loading-spinner" id="loadingSpinner" role="status" aria-live="polite" style="display: none;">
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Caricamento...</span>
             </div>

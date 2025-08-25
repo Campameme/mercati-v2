@@ -1029,15 +1029,23 @@ const DataLoader = {
     async caricaMercatiniSemplice() {
         Logger.info('Caricamento eventi da Google Sheet (metodo semplificato)...');
         
-        const urls = [CONFIG.GOOGLE_SHEETS_URL, CONFIG.GOOGLE_SHEETS_FALLBACK];
+        // Aggiorna loader con progresso
+        if (window.app && window.app.aggiornaLoader) {
+            window.app.aggiornaLoader('Connessione a Google Sheets...', 'Verifica disponibilità dati...');
+        }
         
-
+        const urls = [CONFIG.GOOGLE_SHEETS_URL, CONFIG.GOOGLE_SHEETS_FALLBACK];
         
         for (const url of urls) {
             try {
                 // Aggiungi timestamp per forzare bypass cache
                 const urlWithTimestamp = url + (url.includes('?') ? '&' : '?') + '_t=' + Date.now();
                 Logger.info(`📡 Tentativo con URL: ${urlWithTimestamp}`);
+                
+                // Aggiorna loader con progresso
+                if (window.app && window.app.aggiornaLoader) {
+                    window.app.aggiornaLoader('Download dati...', `Tentativo con ${url.includes('export') ? 'endpoint diretto' : 'endpoint alternativo'}...`);
+                }
                 
                 // TIMEOUT ULTRA-CORTO
                 const controller = new AbortController();
@@ -1065,6 +1073,11 @@ const DataLoader = {
                     throw new Error('Dati troppo piccoli, probabilmente errore');
                 }
                 
+                // Aggiorna loader con progresso parsing
+                if (window.app && window.app.aggiornaLoader) {
+                    window.app.aggiornaLoader('Elaborazione dati...', 'Parsing CSV e validazione...');
+                }
+                
                 // Parse con PapaParse
                 return new Promise((resolve, reject) => {
                     Papa.parse(data, {
@@ -1073,6 +1086,12 @@ const DataLoader = {
                         skipEmptyLines: true,
                         complete: (results) => {
                             Logger.success(`✅ Parsing completato: ${results.data.length} righe`);
+                            
+                            // Aggiorna loader con progresso finale
+                            if (window.app && window.app.aggiornaLoader) {
+                                window.app.aggiornaLoader('Generazione calendario...', `Processamento ${results.data.length} eventi...`);
+                            }
+                            
                             this.processResults(results);
                             resolve();
                         },
@@ -1292,6 +1311,11 @@ const DataLoader = {
     aggiornaCalendario() {
         Logger.info('🛒 Aggiornamento calendario con tutti gli eventi...');
         
+        // Aggiorna loader con progresso calendario
+        if (window.app && window.app.aggiornaLoader) {
+            window.app.aggiornaLoader('Aggiornamento calendario...', 'Rimozione eventi esistenti...');
+        }
+        
         // Rimuovi eventi esistenti
         CalendarManager.clearEvents();
         
@@ -1305,10 +1329,26 @@ const DataLoader = {
         const tuttijEventi = [];
         let eventiAggiunti = 0;
         
+        // Aggiorna loader con progresso generazione
+        if (window.app && window.app.aggiornaLoader) {
+            window.app.aggiornaLoader('Generazione eventi...', `Processamento ${this.mercatini.length} mercatini...`);
+        }
+        
         // Processa TUTTI i mercatini con range esteso (6 mesi avanti)
-        this.mercatini.forEach((mercatino) => {
+        this.mercatini.forEach((mercatino, index) => {
+            // Aggiorna progresso ogni 10 eventi
+            if (index % 10 === 0 && window.app && window.app.aggiornaLoader) {
+                const percentuale = Math.round((index / this.mercatini.length) * 100);
+                window.app.aggiornaLoader('Generazione eventi...', `Processamento ${index + 1}/${this.mercatini.length} (${percentuale}%)`);
+            }
+            
             this.processaSingoloEventoEsteso(mercatino, tuttijEventi, anno);
         });
+        
+        // Aggiorna loader con progresso aggiunta
+        if (window.app && window.app.aggiornaLoader) {
+            window.app.aggiornaLoader('Aggiunta al calendario...', `Inserimento ${tuttijEventi.length} eventi...`);
+        }
         
         // BATCH ADD: Aggiungi tutti gli eventi in una volta
         if (tuttijEventi.length > 0) {
@@ -1536,35 +1576,65 @@ const App = {
         
         console.log('🧹 Cache controllata');
         
-        // Mostra indicatore di caricamento
-        const loadingText = document.querySelector('.loading-text');
-        if (loadingText) {
-            loadingText.textContent = '⏳ Aggiornamento dati da Google Sheets...';
-            loadingText.style.display = 'block';
-        }
+        // Mostra loader fullscreen
+        this.mostraLoaderFullscreen('Caricamento in corso...', 'Aggiornamento dati da Google Sheets');
         
         try {
-            // Mostra loading
-            this.mostraLoading(true);
-            this.aggiornaStatus('Caricamento dati in corso...');
-            
             // Carica dati
             await DataLoader.caricaDati();
             
-            // Aggiorna status
+            // Nascondi loader e mostra successo
+            this.nascondiLoaderFullscreen();
             this.aggiornaStatus('Dati caricati con successo', 'success');
             
         } catch (error) {
             Logger.error('❌ Errore durante il caricamento dati:', error);
+            
+            // Nascondi loader e mostra errore
+            this.nascondiLoaderFullscreen();
             this.aggiornaStatus(`Errore nel caricamento dati: ${error.message}`, 'error');
             
             // Mostra errore più dettagliato
             setTimeout(() => {
                 this.aggiornaStatus('Riprova a caricare i dati', 'warning');
             }, 3000);
-        } finally {
-            this.mostraLoading(false);
         }
+    },
+    
+    // Mostra loader fullscreen
+    mostraLoaderFullscreen(testo, sottotesto) {
+        const loader = document.getElementById('loaderOverlay');
+        const loaderText = document.getElementById('loaderText');
+        const loaderSubtext = document.getElementById('loaderSubtext');
+        
+        if (loader && loaderText && loaderSubtext) {
+            loaderText.textContent = testo || 'Caricamento in corso...';
+            loaderSubtext.textContent = sottotesto || 'Aggiornamento dati...';
+            loader.classList.add('show');
+            
+            // Blocca scroll
+            document.body.style.overflow = 'hidden';
+        }
+    },
+    
+    // Nascondi loader fullscreen
+    nascondiLoaderFullscreen() {
+        const loader = document.getElementById('loaderOverlay');
+        if (loader) {
+            loader.classList.remove('show');
+            
+            // Ripristina scroll
+            document.body.style.overflow = '';
+        }
+    },
+    
+    // Aggiorna testo loader
+    aggiornaLoader(testo, sottotesto) {
+        const loaderText = document.getElementById('loaderText');
+        const loaderSubtext = document.getElementById('loaderSubtext');
+        
+        if (loaderText) loaderText.textContent = testo || 'Caricamento in corso...';
+        if (loaderSubtext) loaderSubtext.textContent = sottotesto || 'Aggiornamento dati...';
     },
     
     // Applica filtri
@@ -1605,33 +1675,37 @@ const App = {
         }
     },
     
-    // Mostra/ nasconde loading
+    // Mostra/ nasconde loading (mantenuto per compatibilità)
     mostraLoading(mostra) {
         const spinner = document.getElementById('loadingSpinner');
-        spinner.style.display = mostra ? 'block' : 'none';
+        if (spinner) {
+            spinner.style.display = mostra ? 'block' : 'none';
+        }
     },
     
     // Aggiorna status
     aggiornaStatus(messaggio, tipo = 'info') {
         const status = document.getElementById('loadingStatus');
-        status.textContent = messaggio;
-        
-        // Rimuovi classi precedenti
-        status.className = '';
-        
-        // Aggiungi classe appropriata
-        switch (tipo) {
-            case 'error':
-                status.className = 'text-danger fw-bold';
-                break;
-            case 'warning':
-                status.className = 'text-warning fw-bold';
-                break;
-            case 'success':
-                status.className = 'text-success fw-bold';
-                break;
-            default:
-                status.className = 'text-info';
+        if (status) {
+            status.textContent = messaggio;
+            
+            // Rimuovi classi precedenti
+            status.className = '';
+            
+            // Aggiungi classe appropriata
+            switch (tipo) {
+                case 'error':
+                    status.className = 'text-danger fw-bold';
+                    break;
+                case 'warning':
+                    status.className = 'text-warning fw-bold';
+                    break;
+                case 'success':
+                    status.className = 'text-success fw-bold';
+                    break;
+                default:
+                    status.className = 'text-info';
+            }
         }
     }
 };

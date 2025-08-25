@@ -430,6 +430,186 @@ body {
     pointer-events: none !important;
 }
 
+/* ===== LOADER FULLSCREEN ===== */
+.loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--light-bg) 0%, #f8f9fa 50%, var(--light-bg) 100%);
+    z-index: 9999;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.loader-overlay.show {
+    display: flex;
+}
+
+.loader-container {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    border: 2px solid var(--border-color);
+    max-width: 400px;
+    width: 90%;
+}
+
+.loader-spinner {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    position: relative;
+}
+
+.loader-spinner::before,
+.loader-spinner::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    animation: loaderPulse 2s ease-in-out infinite;
+}
+
+.loader-spinner::before {
+    width: 100%;
+    height: 100%;
+    background: conic-gradient(from 0deg, var(--primary-color), var(--secondary-color), var(--accent-color), var(--primary-color));
+    animation: loaderRotate 1.5s linear infinite;
+}
+
+.loader-spinner::after {
+    width: 70%;
+    height: 70%;
+    background: var(--light-bg);
+    top: 15%;
+    left: 15%;
+    animation: loaderPulse 2s ease-in-out infinite reverse;
+}
+
+.loader-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--dark-text);
+    margin-bottom: 0.5rem;
+    animation: textPulse 2s ease-in-out infinite;
+}
+
+.loader-subtext {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    opacity: 0.8;
+}
+
+.loader-progress {
+    width: 100%;
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+    margin-top: 1rem;
+    overflow: hidden;
+    position: relative;
+}
+
+.loader-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+    border-radius: 2px;
+    width: 0%;
+    animation: progressBar 3s ease-in-out infinite;
+    position: relative;
+}
+
+.loader-progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    animation: progressShine 2s ease-in-out infinite;
+}
+
+/* Animazioni del loader */
+@keyframes loaderRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes loaderPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(0.95); opacity: 0.8; }
+}
+
+@keyframes textPulse {
+    0%, 100% { opacity: 1; transform: translateY(0); }
+    50% { opacity: 0.8; transform: translateY(-2px); }
+}
+
+@keyframes progressBar {
+    0% { width: 0%; }
+    50% { width: 70%; }
+    100% { width: 100%; }
+}
+
+@keyframes progressShine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Dark mode per il loader */
+@media (prefers-color-scheme: dark) {
+    .loader-overlay {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+    }
+    
+    .loader-container {
+        background: rgba(45, 45, 45, 0.95);
+        border-color: var(--border-color);
+    }
+    
+    .loader-text {
+        color: var(--light-text);
+    }
+    
+    .loader-subtext {
+        color: var(--text-muted);
+    }
+}
+
+/* Responsive per il loader */
+@media (max-width: 768px) {
+    .loader-container {
+        padding: 1.5rem;
+        max-width: 320px;
+    }
+    
+    .loader-spinner {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 1rem;
+    }
+    
+    .loader-text {
+        font-size: 1rem;
+    }
+    
+    .loader-subtext {
+        font-size: 0.8rem;
+    }
+}
+
 /* ===== RESPONSIVE DESIGN - MOBILE FIRST ===== */
 
 /* Mobile (fino a 768px) */
