@@ -835,9 +835,15 @@ body {
     color: white !important;
 }
 
-.fc-event-evento {
-    background-color: #fd7e14 !important;
-    border-color: #fd7e14 !important;
+.fc-event-sagra {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: white !important;
+}
+
+.fc-event-festa-patronale {
+    background-color: #007bff !important;
+    border-color: #007bff !important;
     color: white !important;
 }
 
@@ -876,13 +882,13 @@ body {
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
     
-    .fc-daygrid-event.fc-event-evento {
-        background-color: #fd7e14 !important;
+    .fc-daygrid-event.fc-event-sagra {
+        background-color: #dc3545 !important;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
     
-    .fc-daygrid-event.fc-event-sagra {
-        background-color: #c2185b !important;
+    .fc-daygrid-event.fc-event-festa-patronale {
+        background-color: #007bff !important;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
     
@@ -998,16 +1004,16 @@ body {
         border-left: 4px solid #6f42c1 !important;
     }
     
-    .fc-timeGridWeek-view .fc-event-evento {
-        background: linear-gradient(135deg, #fd7e14, #e55a00) !important;
+    .fc-timeGridWeek-view .fc-event-sagra {
+        background: linear-gradient(135deg, #dc3545, #a71d2a) !important;
         color: white !important;
-        border-left: 4px solid #fd7e14 !important;
+        border-left: 4px solid #dc3545 !important;
     }
     
-    .fc-timeGridWeek-view .fc-event-sagra {
-        background: linear-gradient(135deg, #c2185b, #880e4f) !important;
+    .fc-timeGridWeek-view .fc-event-festa-patronale {
+        background: linear-gradient(135deg, #007bff, #0056b3) !important;
         color: white !important;
-        border-left: 4px solid #c2185b !important;
+        border-left: 4px solid #007bff !important;
     }
     
     .fc-timeGridWeek-view .fc-event-altro {
@@ -1063,8 +1069,12 @@ body {
     background-color: #6f42c1;
 }
 
-.legend-dot.evento {
-    background-color: #fd7e14;
+.legend-dot.sagra {
+    background-color: #dc3545;
+}
+
+.legend-dot.festa-patronale {
+    background-color: #007bff;
 }
 
 /* Mobile legend */
