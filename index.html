@@ -51,10 +51,14 @@
         
         <!-- Status Bar -->
         <div class="status-bar">
-            <div class="status-indicator" id="statusIndicator">
-                <span class="status-online">🟢 Online</span>
+            <div class="status-left">
+                <span>📅 Calendario Mercatini e Fiere</span>
             </div>
-            <div id="loadingStatus">Pronto per caricare i dati</div>
+            <div class="status-right">
+                <button class="btn btn-primary btn-sm" onclick="app.caricaDati()">
+                    🔄 Aggiorna Dati
+                </button>
+            </div>
         </div>
         
         <!-- Controls Section -->
@@ -115,31 +119,31 @@
                 <div class="calendar-legend">
                     <div class="legend-item">
                         <span class="legend-dot mercatino"></span>
-                        <span>Mercatino</span>
+                        <span>🛒 Mercatino</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-dot fiera-generica"></span>
-                        <span>Fiera</span>
+                        <span>🎪 Fiera</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-dot fiera-culturale"></span>
-                        <span>Fiera Culturale</span>
+                        <span>🎭 Fiera Culturale</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-dot fiera-commerciale"></span>
-                        <span>Fiera Commerciale</span>
+                        <span>🏪 Fiera Commerciale</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-dot fiera-enogastronomica"></span>
-                        <span>Fiera Enogastronomica</span>
+                        <span>🍷 Fiera Enogastronomica</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-dot fiera-artigianale"></span>
-                        <span>Fiera Artigianale</span>
+                        <span>🔨 Fiera Artigianale</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-dot fiera-agricola"></span>
-                        <span>Fiera Agricola</span>
+                        <span>🌾 Fiera Agricola</span>
                     </div>
                 </div>
                 

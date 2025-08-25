@@ -59,33 +59,28 @@ body {
 
 /* ===== STATUS BAR ===== */
 .status-bar {
-    background: white;
-    padding: 1rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-    margin-bottom: 2rem;
+    background: var(--light-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.5rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
+    font-size: 0.9rem;
+    color: var(--dark-text);
 }
 
+/* Rimuovo simbolo online */
 .status-indicator {
-    font-weight: 600;
+    display: none;
 }
 
-.status-online {
-    color: var(--success-color);
+/* Rimuovo messaggi di successo e logging */
+.loading-status {
+    display: none;
 }
 
-.status-offline {
-    color: var(--danger-color);
-}
-
-#loadingStatus {
-    color: var(--info-color);
-    font-weight: 500;
+.loading-text {
+    display: none;
 }
 
 /* ===== CONTROLS SECTION ===== */
@@ -869,42 +864,48 @@ body {
     display: none !important;
 }
 
-/* Stili per eventi mercatini e fiere */
+/* Stili per eventi mercatini e fiere - COLORI SEMPRE LEGGIBILI */
 .fc-event-mercatino {
     background-color: var(--primary-color) !important;
     border-color: var(--primary-color) !important;
     color: white !important;
 }
 
-/* Colori per diversi tipi di fiere */
+/* Colori per diversi tipi di fiere - SEMPRE LEGGIBILI */
 .fc-event-fiera {
     border-color: var(--accent-color) !important;
-    color: var(--dark-text) !important;
+    color: white !important; /* SEMPRE BIANCO per leggibilità */
 }
 
-/* Tipologie fiere con colori specifici */
+/* Tipologie fiere con colori specifici e testo SEMPRE LEGGIBILE */
 .fc-event-fiera.fiera-culturale {
-    background-color: #9c27b0 !important; /* Viola per eventi culturali */
+    background-color: #6a1b9a !important; /* Viola scuro per eventi culturali */
+    color: white !important;
 }
 
 .fc-event-fiera.fiera-commerciale {
-    background-color: #ff9800 !important; /* Arancione per eventi commerciali */
+    background-color: #e65100 !important; /* Arancione scuro per eventi commerciali */
+    color: white !important;
 }
 
 .fc-event-fiera.fiera-enogastronomica {
-    background-color: #e91e63 !important; /* Rosa per eventi enogastronomici */
+    background-color: #c2185b !important; /* Rosa scuro per eventi enogastronomici */
+    color: white !important;
 }
 
 .fc-event-fiera.fiera-artigianale {
-    background-color: #795548 !important; /* Marrone per eventi artigianali */
+    background-color: #4e342e !important; /* Marrone scuro per eventi artigianali */
+    color: white !important;
 }
 
 .fc-event-fiera.fiera-agricola {
-    background-color: #4caf50 !important; /* Verde per eventi agricoli */
+    background-color: #2e7d32 !important; /* Verde scuro per eventi agricoli */
+    color: white !important;
 }
 
 .fc-event-fiera.fiera-generica {
-    background-color: var(--accent-color) !important; /* Giallo default per fiere generiche */
+    background-color: #f57f17 !important; /* Giallo scuro per fiere generiche */
+    color: #000 !important; /* Testo nero su giallo per contrasto */
 }
 
 /* ===== CALENDARIO MOBILE OTTIMIZZATO ===== */
@@ -932,34 +933,34 @@ body {
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
     
-    /* Pallini fiere per tipologia */
+    /* Pallini fiere per tipologia - COLORI SEMPRE LEGGIBILI */
     .fc-daygrid-event.fc-event-fiera.fiera-culturale {
-        background-color: #9c27b0 !important;
+        background-color: #6a1b9a !important;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
     
     .fc-daygrid-event.fc-event-fiera.fiera-commerciale {
-        background-color: #ff9800 !important;
+        background-color: #e65100 !important;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
     
     .fc-daygrid-event.fc-event-fiera.fiera-enogastronomica {
-        background-color: #e91e63 !important;
+        background-color: #c2185b !important;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
     
     .fc-daygrid-event.fc-event-fiera.fiera-artigianale {
-        background-color: #795548 !important;
+        background-color: #4e342e !important;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
     
     .fc-daygrid-event.fc-event-fiera.fiera-agricola {
-        background-color: #4caf50 !important;
+        background-color: #2e7d32 !important;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
     
     .fc-daygrid-event.fc-event-fiera.fiera-generica {
-        background-color: var(--accent-color) !important;
+        background-color: #f57f17 !important;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
     
@@ -1051,41 +1052,41 @@ body {
         border-left: 4px solid var(--primary-color) !important;
     }
     
-    /* Card fiere per tipologia */
+    /* Card fiere per tipologia - COLORI SEMPRE LEGGIBILI */
     .fc-timeGridWeek-view .fc-event-fiera.fiera-culturale {
-        background: linear-gradient(135deg, #9c27b0, #7b1fa2) !important;
+        background: linear-gradient(135deg, #6a1b9a, #4a148c) !important;
         color: white !important;
-        border-left: 4px solid #9c27b0 !important;
+        border-left: 4px solid #6a1b9a !important;
     }
     
     .fc-timeGridWeek-view .fc-event-fiera.fiera-commerciale {
-        background: linear-gradient(135deg, #ff9800, #f57c00) !important;
+        background: linear-gradient(135deg, #e65100, #bf360c) !important;
         color: white !important;
-        border-left: 4px solid #ff9800 !important;
+        border-left: 4px solid #e65100 !important;
     }
     
     .fc-timeGridWeek-view .fc-event-fiera.fiera-enogastronomica {
-        background: linear-gradient(135deg, #e91e63, #c2185b) !important;
+        background: linear-gradient(135deg, #c2185b, #880e4f) !important;
         color: white !important;
-        border-left: 4px solid #e91e63 !important;
+        border-left: 4px solid #c2185b !important;
     }
     
     .fc-timeGridWeek-view .fc-event-fiera.fiera-artigianale {
-        background: linear-gradient(135deg, #795548, #5d4037) !important;
+        background: linear-gradient(135deg, #4e342e, #3e2723) !important;
         color: white !important;
-        border-left: 4px solid #795548 !important;
+        border-left: 4px solid #4e342e !important;
     }
     
     .fc-timeGridWeek-view .fc-event-fiera.fiera-agricola {
-        background: linear-gradient(135deg, #4caf50, #388e3c) !important;
+        background: linear-gradient(135deg, #2e7d32, #1b5e20) !important;
         color: white !important;
-        border-left: 4px solid #4caf50 !important;
+        border-left: 4px solid #2e7d32 !important;
     }
     
     .fc-timeGridWeek-view .fc-event-fiera.fiera-generica {
-        background: linear-gradient(135deg, var(--accent-color), #f57f17) !important;
-        color: var(--dark-text) !important;
-        border-left: 4px solid var(--accent-color) !important;
+        background: linear-gradient(135deg, #f57f17, #ef6c00) !important;
+        color: #000 !important;
+        border-left: 4px solid #f57f17 !important;
     }
 }
 
@@ -1096,11 +1097,12 @@ body {
     align-items: center;
     gap: 1rem;
     margin: 1rem 0;
-    padding: 0.5rem;
-    background: rgba(255, 255, 255, 0.8);
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.95);
     border-radius: var(--border-radius);
-    border: 1px solid var(--border-color);
+    border: 2px solid var(--border-color);
     flex-wrap: wrap;
+    box-shadow: var(--shadow);
 }
 
 .legend-item {
@@ -1109,13 +1111,16 @@ body {
     gap: 0.5rem;
     font-size: 0.9rem;
     color: var(--dark-text);
+    font-weight: 500;
 }
 
 .legend-dot {
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
     display: inline-block;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .legend-dot.mercatino {
@@ -1123,27 +1128,27 @@ body {
 }
 
 .legend-dot.fiera-generica {
-    background-color: var(--accent-color);
+    background-color: #f57f17;
 }
 
 .legend-dot.fiera-culturale {
-    background-color: #9c27b0;
+    background-color: #6a1b9a;
 }
 
 .legend-dot.fiera-commerciale {
-    background-color: #ff9800;
+    background-color: #e65100;
 }
 
 .legend-dot.fiera-enogastronomica {
-    background-color: #e91e63;
+    background-color: #c2185b;
 }
 
 .legend-dot.fiera-artigianale {
-    background-color: #795548;
+    background-color: #4e342e;
 }
 
 .legend-dot.fiera-agricola {
-    background-color: #4caf50;
+    background-color: #2e7d32;
 }
 
 /* Mobile legend */

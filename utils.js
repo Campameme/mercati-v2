@@ -1347,35 +1347,29 @@ const DataLoader = {
     async caricaDati() {
         Logger.info('🚀 Avvio caricamento dati...');
         
+        // Pulisci cache solo se necessario (non sempre)
+        Utils.clearCache(false); // Non forzare, solo se vecchia
+        
+        // Mostra loader fullscreen
+        this.mostraLoaderFullscreen('Caricamento in corso...', 'Aggiornamento dati da Google Sheets');
+        
         try {
-            // Usa il nuovo metodo semplificato
+            // Carica dati
             await this.caricaMercatiniSemplice();
             
-            Logger.success('✅ Tutti i dati caricati');
-            
-            // Nascondi indicatore di caricamento
-            const loadingText = document.querySelector('.loading-text');
-            if (loadingText) {
-                loadingText.style.display = 'none';
-            }
-            
-            // Aggiorna UI
-            FilterManager.aggiornaFiltri();
-            this.aggiornaCalendario();
-            EventManager.aggiornaEventiVicini();
-            
-            return true;
+            // Nascondi loader
+            this.nascondiLoaderFullscreen();
             
         } catch (error) {
             Logger.error('❌ Errore durante il caricamento dati:', error);
             
-            // Nascondi indicatore di caricamento anche in caso di errore
-            const loadingText = document.querySelector('.loading-text');
-            if (loadingText) {
-                loadingText.style.display = 'none';
-            }
+            // Nascondi loader e mostra errore
+            this.nascondiLoaderFullscreen();
             
-            throw error;
+            // Mostra errore temporaneo
+            setTimeout(() => {
+                // Non mostrare messaggi persistenti
+            }, 3000);
         }
     },
     
@@ -1916,9 +1910,6 @@ const App = {
             // Carica preferiti salvati
             EventManager.caricaPreferiti();
             
-            // Controlla stato online/offline
-            this.controllaStatoOnline();
-            
             // Aggiungi event listeners per i filtri
             this.setupEventListeners();
             
@@ -1935,10 +1926,6 @@ const App = {
         document.getElementById('comuneFilter').addEventListener('change', () => this.applicaFiltri());
         document.getElementById('categoriaFilter').addEventListener('change', () => this.applicaFiltri());
         document.getElementById('tipoFilter').addEventListener('change', () => this.applicaFiltri());
-        
-        // Eventi online/offline
-        window.addEventListener('online', () => this.aggiornaStatoOnline());
-        window.addEventListener('offline', () => this.aggiornaStatoOnline());
     },
     
     // Carica dati
@@ -1948,8 +1935,6 @@ const App = {
         // Pulisci cache solo se necessario (non sempre)
         Utils.clearCache(false); // Non forzare, solo se vecchia
         
-        console.log('🧹 Cache controllata');
-        
         // Mostra loader fullscreen
         this.mostraLoaderFullscreen('Caricamento in corso...', 'Aggiornamento dati da Google Sheets');
         
@@ -1957,20 +1942,18 @@ const App = {
             // Carica dati
             await DataLoader.caricaDati();
             
-            // Nascondi loader e mostra successo
+            // Nascondi loader
             this.nascondiLoaderFullscreen();
-            this.aggiornaStatus('Dati caricati con successo', 'success');
             
         } catch (error) {
             Logger.error('❌ Errore durante il caricamento dati:', error);
             
             // Nascondi loader e mostra errore
             this.nascondiLoaderFullscreen();
-            this.aggiornaStatus(`Errore nel caricamento dati: ${error.message}`, 'error');
             
-            // Mostra errore più dettagliato
+            // Mostra errore temporaneo
             setTimeout(() => {
-                this.aggiornaStatus('Riprova a caricare i dati', 'warning');
+                // Non mostrare messaggi persistenti
             }, 3000);
         }
     },
@@ -2020,7 +2003,7 @@ const App = {
         };
         
         const eventiVisibili = CalendarManager.filterEvents(filtri);
-        this.aggiornaStatus(`Eventi filtrati: ${eventiVisibili} di ${CalendarManager.getEventCount()} totali`);
+        // Non mostrare messaggi di status
     },
     
     // Mostra preferiti
@@ -2033,53 +2016,11 @@ const App = {
         EventManager.aggiornaEventiVicini();
     },
     
-    // Controlla stato online/offline
-    controllaStatoOnline() {
-        this.aggiornaStatoOnline();
-    },
-    
-    // Aggiorna stato online/offline
-    aggiornaStatoOnline() {
-        const indicator = document.getElementById('statusIndicator');
-        
-        if (Utils.isOnline()) {
-            indicator.innerHTML = '<span class="status-online">🟢 Online</span>';
-        } else {
-            indicator.innerHTML = '<span class="status-offline">🔴 Offline</span>';
-        }
-    },
-    
     // Mostra/ nasconde loading (mantenuto per compatibilità)
     mostraLoading(mostra) {
         const spinner = document.getElementById('loadingSpinner');
         if (spinner) {
             spinner.style.display = mostra ? 'block' : 'none';
-        }
-    },
-    
-    // Aggiorna status
-    aggiornaStatus(messaggio, tipo = 'info') {
-        const status = document.getElementById('loadingStatus');
-        if (status) {
-            status.textContent = messaggio;
-            
-            // Rimuovi classi precedenti
-            status.className = '';
-            
-            // Aggiungi classe appropriata
-            switch (tipo) {
-                case 'error':
-                    status.className = 'text-danger fw-bold';
-                    break;
-                case 'warning':
-                    status.className = 'text-warning fw-bold';
-                    break;
-                case 'success':
-                    status.className = 'text-success fw-bold';
-                    break;
-                default:
-                    status.className = 'text-info';
-            }
         }
     }
 };
