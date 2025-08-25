@@ -411,12 +411,12 @@ const Utils = {
         return date;
     },
     
-    // Genera date per mercatini con RANGE FORZATO di 3 mesi (precedente + corrente + successivo)
+    // Genera date per mercatini con RANGE INTELLIGENTE (esteso o limitato)
     generaDateMercatinoRangeEsteso(dati, annoCorrente, meseCorrente) {
         const { dataInizio, dataFine, giornoRicorrente, comune } = dati;
         
         // Cache key per evitare ricalcoli
-        const cacheKey = `${comune}_${giornoRicorrente}_${dataInizio}_${dataFine}_range_esteso_${annoCorrente}_${meseCorrente}`;
+        const cacheKey = `${comune}_${giornoRicorrente}_${dataInizio}_${dataFine}_range_intelligente_${annoCorrente}_${meseCorrente}`;
         if (this._dateCache.has(cacheKey)) {
             return this._dateCache.get(cacheKey);
         }
@@ -427,11 +427,41 @@ const Utils = {
             return [];
         }
         
-        // FORZA RANGE ESTESO: 3 mesi (precedente + corrente + successivo)
-        const dataPartenza = new Date(annoCorrente, meseCorrente - 1, 1);  // 1 mese prima
-        const dataLimite = new Date(annoCorrente, meseCorrente + 2, 0);     // 1 mese dopo
+        // DETERMINA RANGE INTELLIGENTE
+        let dataPartenza, dataLimite;
         
-        Logger.debug(`📅 RANGE FORZATO per ${comune}: da ${dataPartenza.toLocaleDateString()} a ${dataLimite.toLocaleDateString()}`);
+        if (dataInizio && dataInizio !== 'ricorrente' && dataFine && dataFine !== 'ricorrente') {
+            // CASO: Date specifiche (es: "01/01" a "31/12") - USA QUEL RANGE
+            try {
+                const [giornoI, meseI] = dataInizio.split('/').map(Number);
+                const [giornoF, meseF] = dataFine.split('/').map(Number);
+                
+                if (giornoI && meseI && giornoF && meseF) {
+                    dataPartenza = new Date(annoCorrente, meseI - 1, giornoI);
+                    dataLimite = new Date(annoCorrente, meseF - 1, giornoF);
+                    
+                    // Se le date sono nel passato, estendi al futuro
+                    if (dataLimite < new Date()) {
+                        dataLimite = new Date(annoCorrente + 1, meseF - 1, giornoF);
+                    }
+                    
+                    Logger.debug(`📅 RANGE SPECIFICO per ${comune}: da ${dataPartenza.toLocaleDateString()} a ${dataLimite.toLocaleDateString()}`);
+                } else {
+                    throw new Error('Date non valide');
+                }
+            } catch (error) {
+                // Fallback: range esteso
+                dataPartenza = new Date(annoCorrente, meseCorrente - 1, 1);
+                dataLimite = new Date(annoCorrente, meseCorrente + 2, 0);
+                Logger.debug(`📅 RANGE FALLBACK per ${comune}: da ${dataPartenza.toLocaleDateString()} a ${dataLimite.toLocaleDateString()}`);
+            }
+        } else {
+            // CASO: Range esteso (3 mesi)
+            dataPartenza = new Date(annoCorrente, meseCorrente - 1, 1);  // 1 mese prima
+            dataLimite = new Date(annoCorrente, meseCorrente + 2, 0);     // 1 mese dopo
+            Logger.debug(`📅 RANGE ESTESO per ${comune}: da ${dataPartenza.toLocaleDateString()} a ${dataLimite.toLocaleDateString()}`);
+        }
+        
         Logger.debug(`📅 Tipo ricorrenza: "${giornoRicorrente}" per ${comune}`);
         
         // CLASSIFICAZIONE INTELLIGENTE del tipo di ricorrenza
@@ -1300,28 +1330,38 @@ const DataLoader = {
         
         let date = null;
         
-        // PRIORITÀ: Se ha date specifiche, USA SEMPRE quelle (anche se ha giorno ricorrente)
-        if (dati.dataInizio) {
+        // LOGICA INTELLIGENTE per tutti i tipi di eventi
+        if (dati.dataInizio && dati.dataInizio !== 'ricorrente') {
+            // CASO 1: Date specifiche (es: "01/01" a "31/12")
             date = Utils.generaDataFiera(dati.dataInizio, dati.dataFine, anno);
             if (date && !Array.isArray(date)) {
                 date = [date];
             }
             
-            // Se ha ANCHE un giorno ricorrente e le date sono un range, filtra solo per quel giorno
+            // Se ha ANCHE un giorno ricorrente, filtra per quel giorno specifico
             if (date && date.length > 1 && dati.giornoRicorrente && dati.giornoRicorrente.toLowerCase() !== 'ricorrente') {
-                const giorni = ['domenica', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato'];
-                const giornoSettimana = giorni.indexOf(dati.giornoRicorrente.toLowerCase().trim());
-                
-                if (giornoSettimana !== -1) {
-                    // Filtra solo le date che cadono nel giorno specificato
-                    date = date.filter(d => {
-                        const dataEvento = new Date(d);
-                        return dataEvento.getDay() === giornoSettimana;
-                    });
+                // Verifica se è un pattern ordinale (es: "2^ domenica")
+                if (dati.giornoRicorrente.includes('°') || dati.giornoRicorrente.includes('^')) {
+                    // Pattern ordinale: genera date per quel pattern specifico nel range
+                    const oggi = new Date();
+                    const annoCorrente = oggi.getFullYear();
+                    const meseCorrente = oggi.getMonth();
+                    date = Utils.generaDateMercatinoRangeEsteso(dati, annoCorrente, meseCorrente);
+                } else {
+                    // Giorno semplice: filtra le date esistenti
+                    const giorni = ['domenica', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato'];
+                    const giornoSettimana = giorni.indexOf(dati.giornoRicorrente.toLowerCase().trim());
+                    
+                    if (giornoSettimana !== -1) {
+                        date = date.filter(d => {
+                            const dataEvento = new Date(d);
+                            return dataEvento.getDay() === giornoSettimana;
+                        });
+                    }
                 }
             }
         }
-        // SOLO se NON ha date specifiche, analizza il tipo di ricorrenza
+        // CASO 2: Solo giorno ricorrente (senza date specifiche)
         else if (dati.giornoRicorrente && dati.giornoRicorrente.toLowerCase() !== 'ricorrente') {
             // FORZA RANGE ESTESO: 3 mesi (precedente + corrente + successivo)
             const oggi = new Date();
@@ -1331,12 +1371,15 @@ const DataLoader = {
             // Genera date per il range esteso
             date = Utils.generaDateMercatinoRangeEsteso(dati, annoCorrente, meseCorrente);
         }
-        // CASO SPECIALE: Eventi "ricorrenti" generici
-        else if (dati.giornoRicorrente && dati.giornoRicorrente.toLowerCase() === 'ricorrente' && dati.dataInizio) {
-            date = Utils.generaDataFiera(dati.dataInizio, dati.dataFine, anno);
-            if (date && !Array.isArray(date)) {
-                date = [date];
-            }
+        // CASO 3: Eventi "ricorrenti" generici + giorno settimanale
+        else if (dati.giornoRicorrente && dati.giornoRicorrente.toLowerCase() === 'ricorrente' && dati.dataInizio === 'ricorrente') {
+            // Evento ricorrente tutto l'anno con giorno specifico
+            const oggi = new Date();
+            const annoCorrente = oggi.getFullYear();
+            const meseCorrente = oggi.getMonth();
+            
+            // Genera date per il range esteso
+            date = Utils.generaDateMercatinoRangeEsteso(dati, annoCorrente, meseCorrente);
         }
         
         // Debug per vedere le date generate

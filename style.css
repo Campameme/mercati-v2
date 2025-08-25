@@ -486,8 +486,8 @@ body {
         padding: 1rem;
     }
     
-    .sidebar {
-        order: -1; /* Sidebar sopra il calendario su mobile */
+    .calendar-section {
+        order: -1; /* Calendario sopra la sidebar su mobile */
     }
     
     .sidebar-section {
