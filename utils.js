@@ -773,11 +773,93 @@ const CalendarManager = {
                 altezza: calendarEl.offsetHeight,
                 larghezza: calendarEl.offsetWidth
             });
+            
+            // Setup event listeners per pallini su mobile
+            this.setupMobileEventListeners();
         }, 100);
         
         } catch (error) {
             Logger.error('❌ Errore inizializzazione calendario:', error);
             console.error('Stack trace:', error.stack);
+        }
+    },
+    
+    // Setup event listeners per pallini su mobile
+    setupMobileEventListeners() {
+        // Aspetta che il calendario sia completamente renderizzato
+        setTimeout(() => {
+            this.attachMobileEventListeners();
+        }, 500);
+    },
+    
+    // Attacca event listeners per pallini
+    attachMobileEventListeners() {
+        const calendarEl = document.getElementById('calendar');
+        if (!calendarEl) return;
+        
+        // Rimuovi event listeners precedenti
+        calendarEl.removeEventListener('click', this.handleMobileEventClick);
+        
+        // Aggiungi nuovo event listener
+        calendarEl.addEventListener('click', this.handleMobileEventClick.bind(this));
+        
+        Logger.info('📱 Event listeners mobile configurati');
+    },
+    
+    // Gestisce click su pallini e giorni su mobile
+    handleMobileEventClick(event) {
+        const target = event.target;
+        
+        // Se è un pallino evento
+        if (target.classList.contains('fc-daygrid-event')) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Trova il giorno associato
+            const dayCell = target.closest('.fc-daygrid-day');
+            if (dayCell) {
+                const dateAttr = dayCell.getAttribute('data-date');
+                if (dateAttr) {
+                    // Determina il tipo di evento dal pallino
+                    const isMercatino = target.classList.contains('fc-event-mercatino');
+                    const tipoEvento = isMercatino ? 'mercatino' : 'fiera';
+                    
+                    // Mostra solo eventi di quel tipo per quel giorno
+                    this.mostraEventiTipoGiorno(dateAttr, tipoEvento);
+                }
+            }
+        }
+        // Se è un click sul giorno (non su un pallino)
+        else if (target.closest('.fc-daygrid-day') && !target.classList.contains('fc-daygrid-event')) {
+            const dayCell = target.closest('.fc-daygrid-day');
+            const dateAttr = dayCell.getAttribute('data-date');
+            if (dateAttr) {
+                // Mostra tutti gli eventi del giorno
+                EventManager.mostraEventiGiorno(dateAttr);
+            }
+        }
+    },
+    
+    // Mostra eventi di un tipo specifico per un giorno
+    mostraEventiTipoGiorno(data, tipoEvento) {
+        const eventiCalendario = this.calendar ? this.calendar.getEvents() : [];
+        const eventiGiorno = eventiCalendario.filter(evento => {
+            const eventoStart = evento.start;
+            const year = eventoStart.getFullYear();
+            const month = String(eventoStart.getMonth() + 1).padStart(2, '0');
+            const day = String(eventoStart.getDate()).padStart(2, '0');
+            const eventoData = `${year}-${month}-${day}`;
+            
+            // Filtra per data e tipo
+            return eventoData === data && evento.extendedProps.tipo === tipoEvento;
+        });
+        
+        if (eventiGiorno.length === 0) {
+            // Nessun evento di quel tipo per quel giorno
+            EventManager.mostraEventiGiorno(data, tipoEvento);
+        } else {
+            // Mostra solo eventi di quel tipo
+            EventManager.mostraEventiTipo(data, tipoEvento, eventiGiorno);
         }
     },
     
@@ -1939,7 +2021,7 @@ const EventManager = {
     },
     
     // Mostra eventi del giorno
-    mostraEventiGiorno(data) {
+    mostraEventiGiorno(data, tipoFiltro = null) {
         const modal = new bootstrap.Modal(document.getElementById('dailyModal'), {
             backdrop: true,
             keyboard: true
@@ -1949,11 +2031,18 @@ const EventManager = {
         
         const dataObj = new Date(data);
         const giornoSettimana = dataObj.toLocaleDateString('it-IT', { weekday: 'long' });
-        title.textContent = `Eventi di ${giornoSettimana} ${Utils.formattaData(data)}`;
+        
+        // Titolo dinamico basato sul filtro
+        if (tipoFiltro) {
+            const tipoLabel = tipoFiltro === 'mercatino' ? 'Mercatini' : 'Fiere';
+            title.textContent = `${tipoLabel} di ${giornoSettimana} ${Utils.formattaData(data)}`;
+        } else {
+            title.textContent = `Eventi di ${giornoSettimana} ${Utils.formattaData(data)}`;
+        }
         
         // Otteniamo gli eventi dal calendario FullCalendar
         const eventiCalendario = CalendarManager.calendar ? CalendarManager.calendar.getEvents() : [];
-        const eventiGiorno = eventiCalendario.filter(evento => {
+        let eventiGiorno = eventiCalendario.filter(evento => {
             const eventoStart = evento.start;
             const year = eventoStart.getFullYear();
             const month = String(eventoStart.getMonth() + 1).padStart(2, '0');
@@ -1962,20 +2051,30 @@ const EventManager = {
             return eventoData === data;
         });
         
+        // Applica filtro per tipo se specificato
+        if (tipoFiltro) {
+            eventiGiorno = eventiGiorno.filter(evento => evento.extendedProps.tipo === tipoFiltro);
+        }
+        
         console.log(`🔍 DEBUG mostraEventiGiorno:`, {
             data,
+            tipoFiltro,
             eventiCalendarioTotali: eventiCalendario.length,
             eventiGiornoFiltrati: eventiGiorno.length,
-            eventiGiorno: eventiGiorno.map(e => ({ title: e.title, start: e.start.toISOString() }))
+            eventiGiorno: eventiGiorno.map(e => ({ title: e.title, start: e.start.toISOString(), tipo: e.extendedProps.tipo }))
         });
         
         if (eventiGiorno.length === 0) {
-            body.innerHTML = '<p class="text-muted">Nessun evento per questo giorno</p>';
+            const messaggio = tipoFiltro ? 
+                `Nessun ${tipoFiltro === 'mercatino' ? 'mercatino' : 'fiera'} per questo giorno` :
+                'Nessun evento per questo giorno';
+            body.innerHTML = `<p class="text-muted">${messaggio}</p>`;
         } else {
             // Aggiungiamo header con conteggio eventi
+            const tipoLabel = tipoFiltro ? (tipoFiltro === 'mercatino' ? 'mercatini' : 'fiere') : 'eventi';
             let html = `
                 <div class="alert alert-info mb-3">
-                    <strong>📊 Trovati ${eventiGiorno.length} eventi per questo giorno</strong>
+                    <strong>📊 Trovati ${eventiGiorno.length} ${tipoLabel} per questo giorno</strong>
                 </div>
                 <div class="events-container" style="max-height: 400px; overflow-y: auto;">
             `;
@@ -2017,6 +2116,75 @@ const EventManager = {
             });
             
             // Chiudi il container scrollabile
+            html += '</div>';
+            body.innerHTML = html;
+        }
+        
+        modal.show();
+    },
+    
+    // Mostra eventi di un tipo specifico per un giorno
+    mostraEventiTipo(data, tipoEvento, eventiFiltrati) {
+        const modal = new bootstrap.Modal(document.getElementById('dailyModal'), {
+            backdrop: true,
+            keyboard: true
+        });
+        const title = document.getElementById('dailyModalTitle');
+        const body = document.getElementById('dailyModalBody');
+        
+        const dataObj = new Date(data);
+        const giornoSettimana = dataObj.toLocaleDateString('it-IT', { weekday: 'long' });
+        const tipoLabel = tipoEvento === 'mercatino' ? 'Mercatini' : 'Fiere';
+        
+        title.textContent = `${tipoLabel} di ${giornoSettimana} ${Utils.formattaData(data)}`;
+        
+        if (eventiFiltrati.length === 0) {
+            body.innerHTML = `<p class="text-muted">Nessun ${tipoEvento === 'mercatino' ? 'mercatino' : 'fiera'} per questo giorno</p>`;
+        } else {
+            let html = `
+                <div class="alert alert-info mb-3">
+                    <strong>📊 Trovati ${eventiFiltrati.length} ${tipoEvento === 'mercatino' ? 'mercatini' : 'fiere'} per questo giorno</strong>
+                </div>
+                <div class="events-container" style="max-height: 400px; overflow-y: auto;">
+            `;
+            
+            eventiFiltrati.forEach((evento, index) => {
+                let dettagli = `📍 ${evento.extendedProps.comune}`;
+                
+                if (evento.extendedProps.tipologia && evento.extendedProps.tipologia !== 'N/A') {
+                    dettagli += ` | 🏷️ ${evento.extendedProps.tipologia}`;
+                }
+                
+                if (evento.extendedProps.orario && evento.extendedProps.orario !== 'N/A') {
+                    dettagli += ` | 🕐 ${evento.extendedProps.orario}`;
+                }
+                
+                if (evento.extendedProps.luogo && evento.extendedProps.luogo !== 'N/A') {
+                    dettagli += ` | 📍 ${evento.extendedProps.luogo}`;
+                }
+                
+                html += `
+                    <div class="event-item border rounded p-3 mb-3 ${index % 2 === 0 ? 'bg-light' : ''}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="event-title h6 mb-2">${evento.title}</div>
+                                <div class="event-details">
+                                    <small class="text-muted">${dettagli}</small>
+                                </div>
+                            </div>
+                            <div class="btn-group-vertical ms-3" role="group">
+                                <button class="btn btn-sm btn-outline-primary mb-1" onclick="EventManager.mostraDettagliEventoById('${evento.id}')">
+                                    📋 Dettagli
+                                </button>
+                                <button class="btn btn-sm ${this.isPreferito(evento.id) ? 'btn-outline-danger' : 'btn-outline-success'}" onclick="EventManager.togglePreferito('${evento.id}')">
+                                    ${this.isPreferito(evento.id) ? '💔 Rimuovi' : '❤️ Aggiungi'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
             html += '</div>';
             body.innerHTML = html;
         }
