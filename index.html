@@ -61,89 +61,57 @@
             </div>
         </div>
         
-        <!-- Controls Section -->
-        <section class="controls-section">
-            <div class="filters-row">
-                <div class="filter-group">
-                    <label for="comuneFilter">🏘️ Comune</label>
-                    <select id="comuneFilter" class="filter-select" aria-label="Filtra per comune">
+        <!-- Filtri -->
+        <div class="filters-section">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="comuneFilter" class="form-label">🏘️ Comune</label>
+                    <select class="form-select" id="comuneFilter">
                         <option value="">Tutti i comuni</option>
                     </select>
                 </div>
-                
-                <div class="filter-group">
-                    <label for="categoriaFilter">🏷️ Categoria</label>
-                    <select id="categoriaFilter" class="filter-select" aria-label="Filtra per categoria">
-                        <option value="">Tutte le categorie</option>
+                <div class="col-md-4">
+                    <label for="categoriaFilter" class="form-label">🏷️ Tipologia</label>
+                    <select class="form-select" id="categoriaFilter">
+                        <option value="">Tutte le tipologie</option>
                     </select>
                 </div>
-                
-                <div class="filter-group">
-                    <label for="tipoFilter">📋 Tipo Evento</label>
-                    <select id="tipoFilter" class="filter-select" aria-label="Filtra per tipo di evento">
-                        <option value="">Tutti gli eventi</option>
-                        <option value="mercatino">Mercatini</option>
-                        <option value="fiera">Fiere</option>
-                    </select>
+                <div class="col-md-4">
+                    <label for="searchFilter" class="form-label">🔍 Cerca Evento</label>
+                    <input type="text" class="form-control" id="searchFilter" placeholder="Nome evento...">
                 </div>
             </div>
-            
-            <div class="action-buttons">
-                <button class="btn btn-primary" onclick="window.app ? app.caricaDati() : console.error('App non ancora caricata')" aria-label="Ricarica dati da Google Sheets">
-                    🔄 Ricarica Dati
-                </button>
-                <button class="btn btn-success" onclick="window.app ? app.mostraPreferiti() : console.error('App non ancora caricata')" aria-label="Mostra eventi preferiti">
-                    ⭐ I Miei Preferiti
-                </button>
-                <button class="btn btn-info" onclick="window.app ? app.mostraEventiVicini() : console.error('App non ancora caricata')" aria-label="Mostra eventi più vicini">
-                    📍 Eventi Più Vicini
-                </button>
-            </div>
-        </section>
-        
-        <!-- Loading Spinner (mantenuto per compatibilità) -->
-        <div class="loading-spinner" id="loadingSpinner" role="status" aria-live="polite" style="display: none;">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Caricamento...</span>
-            </div>
-            <p class="mt-3">Caricamento dati in corso...</p>
         </div>
         
-        <!-- Main Content -->
-        <main class="responsive-grid">
-            <!-- Calendar Section -->
-            <section class="calendar-section">
+        <!-- Calendar Section -->
+        <section class="calendar-section">
                 <h3 class="section-title">📅 Calendario Eventi</h3>
                 
                 <!-- ===== LEGENDA PALLINI ===== -->
                 <div class="calendar-legend">
                     <div class="legend-item">
                         <span class="legend-dot mercatino"></span>
-                        <span>🛒 Mercatino</span>
+                        <span>Mercatino</span>
                     </div>
                     <div class="legend-item">
-                        <span class="legend-dot fiera-generica"></span>
-                        <span>🎪 Fiera</span>
+                        <span class="legend-dot fiera"></span>
+                        <span>Fiera</span>
                     </div>
                     <div class="legend-item">
-                        <span class="legend-dot fiera-culturale"></span>
-                        <span>🎭 Fiera Culturale</span>
+                        <span class="legend-dot manifestazione"></span>
+                        <span>Manifestazione</span>
                     </div>
                     <div class="legend-item">
-                        <span class="legend-dot fiera-commerciale"></span>
-                        <span>🏪 Fiera Commerciale</span>
+                        <span class="legend-dot evento"></span>
+                        <span>Evento</span>
                     </div>
                     <div class="legend-item">
-                        <span class="legend-dot fiera-enogastronomica"></span>
-                        <span>🍷 Fiera Enogastronomica</span>
+                        <span class="legend-dot sagra"></span>
+                        <span>Sagra</span>
                     </div>
                     <div class="legend-item">
-                        <span class="legend-dot fiera-artigianale"></span>
-                        <span>🔨 Fiera Artigianale</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-dot fiera-agricola"></span>
-                        <span>🌾 Fiera Agricola</span>
+                        <span class="legend-dot altro"></span>
+                        <span>Altro</span>
                     </div>
                 </div>
                 

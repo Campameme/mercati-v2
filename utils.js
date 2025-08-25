@@ -355,7 +355,7 @@ const Utils = {
         while (data <= dataFinale) {
             // Include date passate nel range esteso (per mese corrente e precedente)
             if (data >= dataPartenza && data <= dataFinale) {
-                date.push(new Date(data));
+            date.push(new Date(data));
             }
             data.setDate(data.getDate() + 7);
         }
@@ -543,10 +543,10 @@ const Utils = {
                 if (!isNaN(giorno) && !isNaN(mese)) {
                     const annoUsato = annoData && !isNaN(annoData) ? parseInt(annoData) : anno;
                     const data = new Date(annoUsato, parseInt(mese) - 1, parseInt(giorno));
-                    const year = data.getFullYear();
-                    const month = String(data.getMonth() + 1).padStart(2, '0');
-                    const day = String(data.getDate()).padStart(2, '0');
-                    return `${year}-${month}-${day}`;
+                        const year = data.getFullYear();
+                        const month = String(data.getMonth() + 1).padStart(2, '0');
+                        const day = String(data.getDate()).padStart(2, '0');
+                        return `${year}-${month}-${day}`;
                 }
             }
         }
@@ -560,7 +560,7 @@ const Utils = {
         for (let [meseNome, meseNum] of Object.entries(mesi)) {
             if (dataInizioPulita.toLowerCase().includes(meseNome)) {
                 const data = new Date(anno, meseNum, 1);
-                return Utils.dateToLocalISOString(data);
+                    return Utils.dateToLocalISOString(data);
             }
         }
         
@@ -829,20 +829,20 @@ const CalendarManager = {
             const eventiPerTipologia = new Map();
             
             eventi.forEach(evento => {
-                let tipologia = 'generica';
+                let tipologia = 'altro';
                 
                 if (evento.classList.contains('fc-event-mercatino')) {
                     tipologia = 'mercatino';
-                } else if (evento.classList.contains('fiera-culturale')) {
-                    tipologia = 'culturale';
-                } else if (evento.classList.contains('fiera-commerciale')) {
-                    tipologia = 'commerciale';
-                } else if (evento.classList.contains('fiera-enogastronomica')) {
-                    tipologia = 'enogastronomica';
-                } else if (evento.classList.contains('fiera-artigianale')) {
-                    tipologia = 'artigianale';
-                } else if (evento.classList.contains('fiera-agricola')) {
-                    tipologia = 'agricola';
+                } else if (evento.classList.contains('fc-event-fiera')) {
+                    tipologia = 'fiera';
+                } else if (evento.classList.contains('fc-event-manifestazione')) {
+                    tipologia = 'manifestazione';
+                } else if (evento.classList.contains('fc-event-evento')) {
+                    tipologia = 'evento';
+                } else if (evento.classList.contains('fc-event-sagra')) {
+                    tipologia = 'sagra';
+                } else if (evento.classList.contains('fc-event-altro')) {
+                    tipologia = 'altro';
                 }
                 
                 if (!eventiPerTipologia.has(tipologia)) {
@@ -867,9 +867,16 @@ const CalendarManager = {
                 // Assegna classi CSS appropriate
                 if (tipologia === 'mercatino') {
                     pallino.classList.add('fc-event-mercatino');
-                } else {
+                } else if (tipologia === 'fiera') {
                     pallino.classList.add('fc-event-fiera');
-                    pallino.classList.add(`fiera-${tipologia}`);
+                } else if (tipologia === 'manifestazione') {
+                    pallino.classList.add('fc-event-manifestazione');
+                } else if (tipologia === 'evento') {
+                    pallino.classList.add('fc-event-evento');
+                } else if (tipologia === 'sagra') {
+                    pallino.classList.add('fc-event-sagra');
+                } else {
+                    pallino.classList.add('fc-event-altro');
                 }
                 
                 // Aggiungi attributo data per il conteggio
@@ -900,18 +907,20 @@ const CalendarManager = {
                 if (dateAttr) {
                     // Determina il tipo di evento dal pallino
                     const isMercatino = target.classList.contains('fc-event-mercatino');
-                    let tipoEvento = 'fiera';
+                    let tipoEvento = 'altro';
                     
                     if (isMercatino) {
                         tipoEvento = 'mercatino';
-                    } else {
-                        // Determina la tipologia specifica della fiera
-                        if (target.classList.contains('fiera-culturale')) tipoEvento = 'fiera-culturale';
-                        else if (target.classList.contains('fiera-commerciale')) tipoEvento = 'fiera-commerciale';
-                        else if (target.classList.contains('fiera-enogastronomica')) tipoEvento = 'fiera-enogastronomica';
-                        else if (target.classList.contains('fiera-artigianale')) tipoEvento = 'fiera-artigianale';
-                        else if (target.classList.contains('fiera-agricola')) tipoEvento = 'fiera-agricola';
-                        else tipoEvento = 'fiera-generica';
+                    } else if (target.classList.contains('fc-event-fiera')) {
+                        tipoEvento = 'fiera';
+                    } else if (target.classList.contains('fc-event-manifestazione')) {
+                        tipoEvento = 'manifestazione';
+                    } else if (target.classList.contains('fc-event-evento')) {
+                        tipoEvento = 'evento';
+                    } else if (target.classList.contains('fc-event-sagra')) {
+                        tipoEvento = 'sagra';
+                    } else if (target.classList.contains('fc-event-altro')) {
+                        tipoEvento = 'altro';
                     }
                     
                     // Mostra solo eventi di quel tipo per quel giorno
@@ -1046,21 +1055,19 @@ const CalendarManager = {
         const giornoSettimana = dataObj.toLocaleDateString('it-IT', { weekday: 'long' });
         
         // Titolo dinamico basato sulla tipologia
-        let tipoLabel = 'Fiera';
+        let tipoLabel = 'Altro';
         if (tipoEvento === 'mercatino') {
             tipoLabel = 'Mercatini';
-        } else if (tipoEvento === 'fiera-culturale') {
-            tipoLabel = 'Fiere Culturali';
-        } else if (tipoEvento === 'fiera-commerciale') {
-            tipoLabel = 'Fiere Commerciali';
-        } else if (tipoEvento === 'fiera-enogastronomica') {
-            tipoLabel = 'Fiere Enogastronomiche';
-        } else if (tipoEvento === 'fiera-artigianale') {
-            tipoLabel = 'Fiere Artigianali';
-        } else if (tipoEvento === 'fiera-agricola') {
-            tipoLabel = 'Fiere Agricole';
-        } else {
+        } else if (tipoEvento === 'fiera') {
             tipoLabel = 'Fiere';
+        } else if (tipoEvento === 'manifestazione') {
+            tipoLabel = 'Manifestazioni';
+        } else if (tipoEvento === 'evento') {
+            tipoLabel = 'Eventi';
+        } else if (tipoEvento === 'sagra') {
+            tipoLabel = 'Sagre';
+        } else {
+            tipoLabel = 'Altro';
         }
         
         title.textContent = `${tipoLabel} di ${giornoSettimana} ${Utils.formattaData(data)}`;
@@ -1098,12 +1105,12 @@ const CalendarManager = {
                 if (evento.extendedProps.tipo === 'mercatino') {
                     borderColor = 'var(--primary-color)';
                 } else if (evento.className) {
-                    if (evento.className.includes('fiera-culturale')) borderColor = '#9c27b0';
-                    else if (evento.className.includes('fiera-commerciale')) borderColor = '#ff9800';
-                    else if (evento.className.includes('fiera-enogastronomica')) borderColor = '#e91e63';
-                    else if (evento.className.includes('fiera-artigianale')) borderColor = '#795548';
-                    else if (evento.className.includes('fiera-agricola')) borderColor = '#4caf50';
-                    else borderColor = 'var(--accent-color)';
+                    if (evento.className.includes('mercatino')) borderColor = 'var(--primary-color)';
+                    else if (evento.className.includes('fiera')) borderColor = '#f57f17';
+                    else if (evento.className.includes('manifestazione')) borderColor = '#6a1b9a';
+                    else if (evento.className.includes('evento')) borderColor = '#e65100';
+                    else if (evento.className.includes('sagra')) borderColor = '#c2185b';
+                    else if (evento.className.includes('altro')) borderColor = '#4e342e';
                 }
                 
                 html += `
@@ -1223,7 +1230,7 @@ const CalendarManager = {
             Logger.success(`${successi}/${eventiUnici.length} eventi aggiunti con successo`);
             
             // Render immediato per performance
-            this.calendar.render();
+                this.calendar.render();
         }
     },
     
@@ -1253,7 +1260,7 @@ const CalendarManager = {
                 mostra = false;
             }
             
-            if (filtri.tipo && evento.extendedProps.tipo !== filtri.tipo) {
+            if (filtri.search && evento.title.toLowerCase().indexOf(filtri.search.toLowerCase()) === -1) {
                 mostra = false;
             }
             
@@ -1504,7 +1511,7 @@ const DataLoader = {
             let response;
             try {
                 response = await fetch(urlConCache, {
-                    method: 'GET',
+                method: 'GET',
                     mode: 'cors'
                 });
             } catch (corsError) {
@@ -1705,7 +1712,7 @@ const DataLoader = {
     
     // Processa un singolo evento con range ESTESO (SENZA DUPLICATI)
     processaSingoloEventoEsteso(mercatino, eventiArray, anno) {
-        const dati = Utils.validaDati(mercatino);
+            const dati = Utils.validaDati(mercatino);
         
         // Debug per eventi problematici
         if (dati.comune && dati.comune.toLowerCase().includes('camporosso')) {
@@ -1781,22 +1788,22 @@ const DataLoader = {
             const coloreEvento = isMercatino ? CONFIG.COLORS.MERCATINO : CONFIG.COLORS.FIERA;
             const tipoEvento = isMercatino ? 'mercatino' : 'fiera';
             
-            // Determina la classe CSS specifica per la tipologia fiera
+            // Determina la classe CSS specifica per la tipologia
             let classiCSS = tipoEvento;
-            if (tipoEvento === 'fiera' && dati.tipologia) {
+            if (dati.tipologia) {
                 const tipologia = dati.tipologia.toLowerCase();
-                if (tipologia.includes('culturale') || tipologia.includes('arte') || tipologia.includes('teatro')) {
-                    classiCSS = 'fiera fiera-culturale';
-                } else if (tipologia.includes('commerciale') || tipologia.includes('merci') || tipologia.includes('vendita')) {
-                    classiCSS = 'fiera fiera-commerciale';
-                } else if (tipologia.includes('enogastronomica') || tipologia.includes('cibo') || tipologia.includes('vino') || tipologia.includes('gusto')) {
-                    classiCSS = 'fiera fiera-enogastronomica';
-                } else if (tipologia.includes('artigianale') || tipologia.includes('artigiano') || tipologia.includes('manuale')) {
-                    classiCSS = 'fiera fiera-artigianale';
-                } else if (tipologia.includes('agricola') || tipologia.includes('agricolo') || tipologia.includes('campagna')) {
-                    classiCSS = 'fiera fiera-agricola';
+                if (tipologia.includes('mercatino')) {
+                    classiCSS = 'mercatino';
+                } else if (tipologia.includes('fiera')) {
+                    classiCSS = 'fiera';
+                } else if (tipologia.includes('manifestazione')) {
+                    classiCSS = 'manifestazione';
+                } else if (tipologia.includes('evento')) {
+                    classiCSS = 'evento';
+                } else if (tipologia.includes('sagra')) {
+                    classiCSS = 'sagra';
                 } else {
-                    classiCSS = 'fiera fiera-generica';
+                    classiCSS = 'altro';
                 }
             }
             
@@ -1918,10 +1925,8 @@ const App = {
     
     // Setup event listeners
     setupEventListeners() {
-        // Filtri
-        document.getElementById('comuneFilter').addEventListener('change', () => this.applicaFiltri());
-        document.getElementById('categoriaFilter').addEventListener('change', () => this.applicaFiltri());
-        document.getElementById('tipoFilter').addEventListener('change', () => this.applicaFiltri());
+        // Filtri gestiti dal FilterManager
+        // Non serve più setup manuale qui
     },
     
     // Carica dati
@@ -2016,7 +2021,7 @@ const App = {
     mostraLoading(mostra) {
         const spinner = document.getElementById('loadingSpinner');
         if (spinner) {
-            spinner.style.display = mostra ? 'block' : 'none';
+        spinner.style.display = mostra ? 'block' : 'none';
         }
     }
 };
@@ -2042,7 +2047,7 @@ const FilterManager = {
             comuneSelect.appendChild(option);
         });
         
-        // Categorie/Tipologie
+        // Tipologie dalla colonna tipologia
         const tipologie = [...new Set([
             ...DataLoader.mercatini.map(m => m.Tipologia).filter(Boolean),
             ...DataLoader.fiere.map(f => f.Tipologia).filter(Boolean)
@@ -2056,6 +2061,38 @@ const FilterManager = {
             option.textContent = tipologia;
             categoriaSelect.appendChild(option);
         });
+        
+        // Setup event listeners per filtri
+        this.setupFilterListeners();
+    },
+    
+    // Setup event listeners per filtri
+    setupFilterListeners() {
+        const comuneFilter = document.getElementById('comuneFilter');
+        const categoriaFilter = document.getElementById('categoriaFilter');
+        const searchFilter = document.getElementById('searchFilter');
+        
+        if (comuneFilter) {
+            comuneFilter.addEventListener('change', () => this.applicaFiltri());
+        }
+        if (categoriaFilter) {
+            categoriaFilter.addEventListener('change', () => this.applicaFiltri());
+        }
+        if (searchFilter) {
+            searchFilter.addEventListener('input', () => this.applicaFiltri());
+        }
+    },
+    
+    // Applica filtri
+    applicaFiltri() {
+        const filtri = {
+            comune: document.getElementById('comuneFilter')?.value || '',
+            categoria: document.getElementById('categoriaFilter')?.value || '',
+            search: document.getElementById('searchFilter')?.value || ''
+        };
+        
+        const eventiVisibili = CalendarManager.filterEvents(filtri);
+        // Non mostrare messaggi di status
     }
 };
 
@@ -2266,7 +2303,7 @@ const EventManager = {
             const tipoLabel = tipoFiltro === 'mercatino' ? 'Mercatini' : 'Fiere';
             title.textContent = `${tipoLabel} di ${giornoSettimana} ${Utils.formattaData(data)}`;
         } else {
-            title.textContent = `Eventi di ${giornoSettimana} ${Utils.formattaData(data)}`;
+        title.textContent = `Eventi di ${giornoSettimana} ${Utils.formattaData(data)}`;
         }
         
         // Otteniamo gli eventi dal calendario FullCalendar
@@ -2365,21 +2402,19 @@ const EventManager = {
         const giornoSettimana = dataObj.toLocaleDateString('it-IT', { weekday: 'long' });
         
         // Titolo dinamico basato sulla tipologia
-        let tipoLabel = 'Fiera';
+        let tipoLabel = 'Altro';
         if (tipoEvento === 'mercatino') {
             tipoLabel = 'Mercatini';
-        } else if (tipoEvento === 'fiera-culturale') {
-            tipoLabel = 'Fiere Culturali';
-        } else if (tipoEvento === 'fiera-commerciale') {
-            tipoLabel = 'Fiere Commerciali';
-        } else if (tipoEvento === 'fiera-enogastronomica') {
-            tipoLabel = 'Fiere Enogastronomiche';
-        } else if (tipoEvento === 'fiera-artigianale') {
-            tipoLabel = 'Fiere Artigianali';
-        } else if (tipoEvento === 'fiera-agricola') {
-            tipoLabel = 'Fiere Agricole';
-        } else {
+        } else if (tipoEvento === 'fiera') {
             tipoLabel = 'Fiere';
+        } else if (tipoEvento === 'manifestazione') {
+            tipoLabel = 'Manifestazioni';
+        } else if (tipoEvento === 'evento') {
+            tipoLabel = 'Eventi';
+        } else if (tipoEvento === 'sagra') {
+            tipoLabel = 'Sagre';
+        } else {
+            tipoLabel = 'Altro';
         }
         
         title.textContent = `${tipoLabel} di ${giornoSettimana} ${Utils.formattaData(data)}`;
@@ -2417,12 +2452,12 @@ const EventManager = {
                 if (evento.extendedProps.tipo === 'mercatino') {
                     borderColor = 'var(--primary-color)';
                 } else if (evento.className) {
-                    if (evento.className.includes('fiera-culturale')) borderColor = '#9c27b0';
-                    else if (evento.className.includes('fiera-commerciale')) borderColor = '#ff9800';
-                    else if (evento.className.includes('fiera-enogastronomica')) borderColor = '#e91e63';
-                    else if (evento.className.includes('fiera-artigianale')) borderColor = '#795548';
-                    else if (evento.className.includes('fiera-agricola')) borderColor = '#4caf50';
-                    else borderColor = 'var(--accent-color)';
+                    if (evento.className.includes('mercatino')) borderColor = 'var(--primary-color)';
+                    else if (evento.className.includes('fiera')) borderColor = '#f57f17';
+                    else if (evento.className.includes('manifestazione')) borderColor = '#6a1b9a';
+                    else if (evento.className.includes('evento')) borderColor = '#e65100';
+                    else if (evento.className.includes('sagra')) borderColor = '#c2185b';
+                    else if (evento.className.includes('altro')) borderColor = '#4e342e';
                 }
                 
                 html += `
