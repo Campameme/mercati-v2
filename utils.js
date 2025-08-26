@@ -748,6 +748,10 @@ const CalendarManager = {
                 meridiem: false
             },
             
+            // 🚀 OTTIMIZZAZIONE: Eventi multi-giorno
+            eventDisplay: 'block', // Mostra eventi come blocchi per multi-giorno
+            eventDurationEditable: false, // Non permettere modifica durata
+            
             // CALLBACK per cambio vista/date (SEMPLIFICATO)
             datesSet: (info) => {
                 Logger.info(`📅 Vista cambiata: ${info.view.type}`);
@@ -756,7 +760,7 @@ const CalendarManager = {
                     end: info.end,
                     view: info.view.type
                 };
-                                // Non ricaricare automaticamente - sarà gestito dal caricamento normale
+                // Non ricaricare automaticamente - sarà gestito dal caricamento normale
             }
         });
         
@@ -839,6 +843,8 @@ const CalendarManager = {
                     tipologia = 'manifestazione';
                 } else if (evento.classList.contains('fc-event-sagra')) {
                     tipologia = 'sagra';
+                } else if (evento.classList.contains('fc-event-festa-patronale')) {
+                    tipologia = 'festa-patronale';
                 }
                 
                 if (!eventiPerTipologia.has(tipologia)) {
@@ -850,9 +856,9 @@ const CalendarManager = {
             // Pulisci container
             eventsContainer.innerHTML = '';
             
-            // Aggiungi un pallino per ogni tipologia (massimo 4)
+            // Aggiungi un pallino per ogni tipologia (massimo 5)
             let palliniAggiunti = 0;
-            const maxPallini = 4;
+            const maxPallini = 5;
             
             for (const [tipologia, eventi] of eventiPerTipologia) {
                 if (palliniAggiunti >= maxPallini) break;
@@ -869,6 +875,8 @@ const CalendarManager = {
                     pallino.classList.add('fc-event-manifestazione');
                 } else if (tipologia === 'sagra') {
                     pallino.classList.add('fc-event-sagra');
+                } else if (tipologia === 'festa-patronale') {
+                    pallino.classList.add('fc-event-festa-patronale');
                 }
                 
                 // Aggiungi attributo data per il conteggio
@@ -909,6 +917,8 @@ const CalendarManager = {
                         tipoEvento = 'manifestazione';
                     } else if (target.classList.contains('fc-event-sagra')) {
                         tipoEvento = 'sagra';
+                    } else if (target.classList.contains('fc-event-festa-patronale')) {
+                        tipoEvento = 'festa-patronale';
                     }
                     
                     // Mostra solo eventi di quel tipo per quel giorno
@@ -1052,6 +1062,7 @@ const CalendarManager = {
             tipoLabel = 'Manifestazioni';
         } else if (tipoEvento === 'sagra') {
             tipoLabel = 'Sagre';
+        } else if (tipoEvento === 'festa-patronale') {
             tipoLabel = 'Feste Patronali';
         }
         
@@ -1094,6 +1105,7 @@ const CalendarManager = {
                     else if (evento.className.includes('fiera')) borderColor = '#ffc107';
                     else if (evento.className.includes('manifestazione')) borderColor = '#6f42c1';
                     else if (evento.className.includes('sagra')) borderColor = '#dc3545';
+                    else if (evento.className.includes('festa-patronale')) borderColor = '#007bff';
                 }
                 
                 html += `
@@ -1247,6 +1259,15 @@ const CalendarManager = {
                 mostra = false;
             }
             
+            // 🚀 NUOVO FILTRO DATE
+            if (filtri.date) {
+                const dataFiltro = new Date(filtri.date);
+                const dataEvento = new Date(evento.start);
+                if (dataEvento.toDateString() !== dataFiltro.toDateString()) {
+                    mostra = false;
+                }
+            }
+            
             if (mostra) {
                 evento.setProp('display', 'auto');
                 eventiVisibili++;
@@ -1267,7 +1288,142 @@ const CalendarManager = {
         }
     },
     
-
+    // Aggiorna eventi vicini con filtri avanzati
+    aggiornaEventiVicini() {
+        const container = document.getElementById('eventiVicini');
+        const eventi = CalendarManager.getEvents();
+        
+        if (eventi.length === 0) {
+            container.innerHTML = '<p class="text-muted">Nessun evento trovato</p>';
+            return;
+        }
+        
+        // 🚀 FILTRI AVANZATI per eventi vicini
+        let html = `
+            <div class="mb-3">
+                <h6>🔍 Filtri Eventi Vicini</h6>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <select class="form-select form-select-sm" id="filtroTipologiaVicini">
+                            <option value="">Tutte le tipologie</option>
+                            <option value="mercatino">🛒 Mercatino</option>
+                            <option value="fiera">🎪 Fiera</option>
+                            <option value="manifestazione">🎭 Manifestazione</option>
+                            <option value="sagra">🍷 Sagra</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <select class="form-select form-select-sm" id="filtroComuneVicini">
+                            <option value="">Tutti i comuni</option>
+                            <option value="Camporosso">Camporosso</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="eventiViciniFiltrati">
+        `;
+        
+        // Mostra primi 5 eventi con filtri
+        const eventiFiltrati = eventi.slice(0, 5);
+        eventiFiltrati.forEach(evento => {
+            let dettagli = `📅 ${Utils.formattaData(evento.start)}`;
+            
+            if (evento.extendedProps.comune) {
+                dettagli += ` | 📍 ${evento.extendedProps.comune}`;
+            }
+            
+            if (evento.extendedProps.tipologia && evento.extendedProps.tipologia !== 'N/A') {
+                dettagli += ` | 🏷️ ${evento.extendedProps.tipologia}`;
+            }
+            
+            html += `
+                <div class="event-item">
+                    <div class="event-title">${evento.title}</div>
+                    <div class="event-details">
+                        ${dettagli}
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-sm btn-primary" onclick="EventManager.mostraDettagliEventoById('${evento.id}')">
+                            📋 Dettagli
+                        </button>
+                        <button class="btn btn-sm btn-success" onclick="EventManager.togglePreferito('${evento.id}')">
+                            ${this.isPreferito(evento.id) ? '💔 Rimuovi' : '❤️ Aggiungi'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        container.innerHTML = html;
+        
+        // Setup filtri eventi vicini
+        this.setupFiltriEventiVicini();
+    },
+    
+    // Setup filtri per eventi vicini
+    setupFiltriEventiVicini() {
+        const filtroTipologia = document.getElementById('filtroTipologiaVicini');
+        const filtroComune = document.getElementById('filtroComuneVicini');
+        
+        if (filtroTipologia) {
+            filtroTipologia.addEventListener('change', () => this.filtraEventiVicini());
+        }
+        if (filtroComune) {
+            filtroComune.addEventListener('change', () => this.filtraEventiVicini());
+        }
+    },
+    
+    // Filtra eventi vicini
+    filtraEventiVicini() {
+        const filtroTipologia = document.getElementById('filtroTipologiaVicini')?.value;
+        const filtroComune = document.getElementById('filtroComuneVicini')?.value;
+        const container = document.getElementById('eventiViciniFiltrati');
+        
+        if (!container) return;
+        
+        let eventi = CalendarManager.getEvents();
+        
+        // Applica filtri
+        if (filtroTipologia) {
+            eventi = eventi.filter(e => e.extendedProps.tipo === filtroTipologia);
+        }
+        if (filtroComune) {
+            eventi = eventi.filter(e => e.extendedProps.comune === filtroComune);
+        }
+        
+        // Mostra risultati filtrati
+        if (eventi.length === 0) {
+            container.innerHTML = '<p class="text-muted">Nessun evento trovato con i filtri selezionati</p>';
+        } else {
+            let html = '';
+            eventi.slice(0, 10).forEach(evento => {
+                let dettagli = `📅 ${Utils.formattaData(evento.start)}`;
+                if (evento.extendedProps.comune) {
+                    dettagli += ` | 📍 ${evento.extendedProps.comune}`;
+                }
+                if (evento.extendedProps.tipologia && evento.extendedProps.tipologia !== 'N/A') {
+                    dettagli += ` | 🏷️ ${evento.extendedProps.tipologia}`;
+                }
+                
+                html += `
+                    <div class="event-item">
+                        <div class="event-title">${evento.title}</div>
+                        <div class="event-details">${dettagli}</div>
+                        <div class="event-actions">
+                            <button class="btn btn-sm btn-primary" onclick="EventManager.mostraDettagliEventoById('${evento.id}')">
+                                📋 Dettagli
+                            </button>
+                            <button class="btn btn-sm btn-success" onclick="EventManager.togglePreferito('${evento.id}')">
+                                ${this.isPreferito(evento.id) ? '💔 Rimuovi' : '❤️ Aggiungi'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+    }
 };
 
 console.log('📊 Definizione DataLoader...');
@@ -1782,57 +1938,88 @@ const DataLoader = {
                 } else if (tipologia.includes('fiera')) {
                     categoria = 'fiera';
                     iconaEvento = '🎪';
-                    coloreEvento = '#ffc107';
+                    coloreEvento = '#007bff';  // Blu
                     classiCSS = 'fiera';
                 } else if (tipologia.includes('manifestazione')) {
                     categoria = 'manifestazione';
                     iconaEvento = '🎭';
-                    coloreEvento = '#6f42c1';
+                    coloreEvento = '#dc3545';  // Rosso
                     classiCSS = 'manifestazione';
                 } else if (tipologia.includes('sagra')) {
                     categoria = 'sagra';
                     iconaEvento = '🍷';
-                    coloreEvento = '#dc3545';
+                    coloreEvento = '#6f42c1';  // Viola
                     classiCSS = 'sagra';
                 } else {
                     // Default per altre tipologie
                     categoria = 'manifestazione';
                     iconaEvento = '🎭';
-                    coloreEvento = '#6f42c1';
+                    coloreEvento = '#dc3545';  // Rosso
                     classiCSS = 'manifestazione';
                 }
             } else {
                 // Default se non c'è tipologia
                 categoria = 'manifestazione';
                 iconaEvento = '🎭';
-                coloreEvento = '#6f42c1';
+                coloreEvento = '#dc3545';  // Rosso
                 classiCSS = 'manifestazione';
             }
             
-            const eventi = date.map((dataSingola, index) => ({
-                id: `${categoria}_${dati.comune}_${dataSingola}_${index}`,
-                title: `${iconaEvento} ${dati.comune}`,
-                start: dataSingola,
-                end: dataSingola,
-                backgroundColor: coloreEvento,
-                borderColor: coloreEvento,
-                textColor: 'white',
-                className: classiCSS,
-                extendedProps: {
-                    tipo: categoria,
-                    comune: dati.comune,
-                    tipologia: dati.tipologia || 'N/A',
-                    giornoRicorrente: dati.giornoRicorrente || 'N/A',
-                    orario: dati.orario || 'N/A',
-                    luogo: dati.luogo || 'N/A',
-                    organizzatore: dati.organizzatore || 'N/A',
-                    settori: dati.settori || 'N/A',
-                    dataInizio: dati.dataInizio || 'N/A',
-                    dataFine: dati.dataFine || 'N/A'
-                }
-            }));
-            
-            eventiArray.push(...eventi);
+            // 🚀 OTTIMIZZAZIONE: Genera eventi in batch per performance
+            // 🗓️ SUPPORTO EVENTI MULTI-GIORNO
+            if (dati.dataInizio && dati.dataFine && dati.dataInizio !== dati.dataFine) {
+                // Evento multi-giorno: crea un singolo evento con start e end diversi
+                const eventi = [{
+                    id: `${categoria}_${dati.comune}_multi_${dati.dataInizio}_${dati.dataFine}`,
+                    title: `${iconaEvento} ${dati.comune}`,
+                    start: dati.dataInizio,
+                    end: dati.dataFine,
+                    backgroundColor: coloreEvento,
+                    borderColor: coloreEvento,
+                    textColor: 'white',
+                    className: classiCSS,
+                    extendedProps: {
+                        tipo: categoria,
+                        comune: dati.comune,
+                        tipologia: dati.tipologia || 'N/A',
+                        giornoRicorrente: dati.giornoRicorrente || 'N/A',
+                        orario: dati.orario || 'N/A',
+                        luogo: dati.luogo || 'N/A',
+                        organizzatore: dati.organizzatore || 'N/A',
+                        settori: dati.settori || 'N/A',
+                        dataInizio: dati.dataInizio || 'N/A',
+                        dataFine: dati.dataFine || 'N/A',
+                        multiGiorno: true
+                    }
+                }];
+                eventiArray.push(...eventi);
+            } else {
+                // Eventi singoli: usa le date generate
+                const eventi = date.map((dataSingola, index) => ({
+                    id: `${categoria}_${dati.comune}_${dataSingola}_${index}`,
+                    title: `${iconaEvento} ${dati.comune}`,
+                    start: dataSingola,
+                    end: dataSingola,
+                    backgroundColor: coloreEvento,
+                    borderColor: coloreEvento,
+                    textColor: 'white',
+                    className: classiCSS,
+                    extendedProps: {
+                        tipo: categoria,
+                        comune: dati.comune,
+                        tipologia: dati.tipologia || 'N/A',
+                        giornoRicorrente: dati.giornoRicorrente || 'N/A',
+                        orario: dati.orario || 'N/A',
+                        luogo: dati.luogo || 'N/A',
+                        organizzatore: dati.organizzatore || 'N/A',
+                        settori: dati.settori || 'N/A',
+                        dataInizio: dati.dataInizio || 'N/A',
+                        dataFine: dati.dataFine || 'N/A',
+                        multiGiorno: false
+                    }
+                }));
+                eventiArray.push(...eventi);
+            }
         }
     },
     
@@ -1890,7 +2077,8 @@ const DataLoader = {
                         organizzatore: dati.organizzatore || 'N/A',
                         settori: dati.settori || 'N/A',
                         dataInizio: dati.dataInizio || 'N/A',
-                        dataFine: dati.dataFine || 'N/A'
+                        dataFine: dati.dataFine || 'N/A',
+                        multiGiorno: false
                     }
                 }));
                 
@@ -1900,7 +2088,7 @@ const DataLoader = {
     }
 };
 
-console.log('🎯 Definizione App...');
+console.log('�� Definizione App...');
 
 // Applicazione principale
 const App = {
@@ -2073,6 +2261,7 @@ const FilterManager = {
         const comuneFilter = document.getElementById('comuneFilter');
         const categoriaFilter = document.getElementById('categoriaFilter');
         const searchFilter = document.getElementById('searchFilter');
+        const dateFilter = document.getElementById('dateFilter');
         
         if (comuneFilter) {
             comuneFilter.addEventListener('change', () => this.applicaFiltri());
@@ -2083,6 +2272,9 @@ const FilterManager = {
         if (searchFilter) {
             searchFilter.addEventListener('input', () => this.applicaFiltri());
         }
+        if (dateFilter) {
+            dateFilter.addEventListener('change', () => this.applicaFiltri());
+        }
     },
     
     // Applica filtri
@@ -2090,7 +2282,8 @@ const FilterManager = {
         const filtri = {
             comune: document.getElementById('comuneFilter')?.value || '',
             categoria: document.getElementById('categoriaFilter')?.value || '',
-            search: document.getElementById('searchFilter')?.value || ''
+            search: document.getElementById('searchFilter')?.value || '',
+            date: document.getElementById('dateFilter')?.value || ''
         };
         
         const eventiVisibili = CalendarManager.filterEvents(filtri);
@@ -2425,6 +2618,7 @@ const EventManager = {
             tipoLabel = 'Manifestazioni';
         } else if (tipoEvento === 'sagra') {
             tipoLabel = 'Sagre';
+        } else if (tipoEvento === 'festa-patronale') {
             tipoLabel = 'Feste Patronali';
         }
         
@@ -2467,6 +2661,7 @@ const EventManager = {
                     else if (evento.className.includes('fiera')) borderColor = '#ffc107';
                     else if (evento.className.includes('manifestazione')) borderColor = '#6f42c1';
                     else if (evento.className.includes('sagra')) borderColor = '#dc3545';
+                    else if (evento.className.includes('festa-patronale')) borderColor = '#007bff';
                 }
                 
                 html += `
@@ -2498,22 +2693,262 @@ const EventManager = {
         modal.show();
     },
     
-    // Aggiorna eventi vicini
+    // Gestisce il click su un evento
+    onEventClick(evento) {
+        Logger.debug('Click su evento:', evento.title);
+        EventManager.mostraDettagliEvento(evento);
+    },
+    
+    // Gestisce il click su un giorno
+    onDayClick(data) {
+        Logger.debug('Click su giorno:', data);
+        EventManager.mostraEventiGiorno(data);
+    },
+    
+
+    
+    // Restituisce le classi CSS per gli eventi
+    getEventClassNames(arg) {
+        const classNames = ['fade-in'];
+        if (arg.event.extendedProps.tipo === 'mercatino') {
+            classNames.push('fc-event-mercatino');
+        } else if (arg.event.extendedProps.tipo === 'fiera') {
+            classNames.push('fc-event-fiera');
+        }
+        return classNames;
+    },
+    
+    // Rimuove tutti gli eventi
+    clearEvents() {
+        if (this.calendar) {
+            this.calendar.removeAllEvents();
+            Logger.info('Eventi rimossi dal calendario');
+        }
+    },
+    
+    // Nota: loadEventsForCurrentRange rimossa - ora usiamo caricamento diretto e completo
+    
+    // Aggiunge un evento con controllo duplicati
+    addEvent(evento) {
+        if (this.calendar) {
+            try {
+                // Controlla se l'evento esiste già
+                const eventiEsistenti = this.calendar.getEvents();
+                const eventoDuplicato = eventiEsistenti.find(e => 
+                    e.title === evento.title && 
+                    e.startStr === evento.start
+                );
+                
+                if (eventoDuplicato) {
+                    Logger.debug(`⚠️ Evento duplicato ignorato: ${evento.title} ${evento.start}`);
+                    return false;
+                }
+                
+                this.calendar.addEvent(evento);
+                return true;
+            } catch (error) {
+                Logger.error(`Errore aggiunta evento: ${error.message}`);
+                return false;
+            }
+        }
+        return false;
+    },
+    
+    // Aggiunge più eventi con DEDUPLICAZIONE
+    addEvents(eventi) {
+        if (this.calendar && eventi.length > 0) {
+            // DEDUPLICAZIONE: Rimuovi eventi duplicati
+            const eventiUnici = [];
+            const eventiVisti = new Set();
+            
+            eventi.forEach(evento => {
+                // Crea una chiave unica basata su titolo + data
+                const chiaveUnica = `${evento.title}_${evento.start}`;
+                if (!eventiVisti.has(chiaveUnica)) {
+                    eventiVisti.add(chiaveUnica);
+                    eventiUnici.push(evento);
+                }
+            });
+            
+            Logger.info(`🔄 Deduplicazione: ${eventi.length} → ${eventiUnici.length} eventi unici`);
+            
+            let successi = 0;
+            eventiUnici.forEach(evento => {
+                if (this.addEvent(evento)) {
+                    successi++;
+                }
+            });
+            Logger.success(`${successi}/${eventiUnici.length} eventi aggiunti con successo`);
+            
+            // Render immediato per performance
+                this.calendar.render();
+        }
+    },
+    
+    // Restituisce tutti gli eventi
+    getEvents() {
+        return this.calendar ? this.calendar.getEvents() : [];
+    },
+    
+    // Restituisce il numero di eventi
+    getEventCount() {
+        return this.getEvents().length;
+    },
+    
+    // Filtra gli eventi
+    filterEvents(filtri) {
+        const eventi = this.getEvents();
+        let eventiVisibili = 0;
+        
+        eventi.forEach(evento => {
+            let mostra = true;
+            
+            if (filtri.comune && evento.extendedProps.comune !== filtri.comune) {
+                mostra = false;
+            }
+            
+            if (filtri.categoria && evento.extendedProps.tipologia !== filtri.categoria) {
+                mostra = false;
+            }
+            
+            if (filtri.search && evento.title.toLowerCase().indexOf(filtri.search.toLowerCase()) === -1) {
+                mostra = false;
+            }
+            
+            if (mostra) {
+                evento.setProp('display', 'auto');
+                eventiVisibili++;
+            } else {
+                evento.setProp('display', 'none');
+            }
+        });
+        
+        Logger.info(`Filtri applicati: ${eventiVisibili}/${eventi.length} eventi visibili`);
+        return eventiVisibili;
+    },
+    
+    // Aggiorna la vista
+    refresh() {
+        if (this.calendar) {
+            this.calendar.render();
+            Logger.info('Calendario aggiornato');
+        }
+    },
+    
+    // Aggiorna eventi vicini con filtri avanzati
     aggiornaEventiVicini() {
         const container = document.getElementById('eventiVicini');
-        const eventi = CalendarManager.getEvents().slice(0, 5); // Include tutti gli eventi (anche passati)
+        const eventi = CalendarManager.getEvents();
         
         if (eventi.length === 0) {
             container.innerHTML = '<p class="text-muted">Nessun evento trovato</p>';
+            return;
+        }
+        
+        // 🚀 FILTRI AVANZATI per eventi vicini
+        let html = `
+            <div class="mb-3">
+                <h6>🔍 Filtri Eventi Vicini</h6>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <select class="form-select form-select-sm" id="filtroTipologiaVicini">
+                            <option value="">Tutte le tipologie</option>
+                            <option value="mercatino">🛒 Mercatino</option>
+                            <option value="fiera">🎪 Fiera</option>
+                            <option value="manifestazione">🎭 Manifestazione</option>
+                            <option value="sagra">🍷 Sagra</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <select class="form-select form-select-sm" id="filtroComuneVicini">
+                            <option value="">Tutti i comuni</option>
+                            <option value="Camporosso">Camporosso</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="eventiViciniFiltrati">
+        `;
+        
+        // Mostra primi 5 eventi con filtri
+        const eventiFiltrati = eventi.slice(0, 5);
+        eventiFiltrati.forEach(evento => {
+            let dettagli = `📅 ${Utils.formattaData(evento.start)}`;
+            
+            if (evento.extendedProps.comune) {
+                dettagli += ` | 📍 ${evento.extendedProps.comune}`;
+            }
+            
+            if (evento.extendedProps.tipologia && evento.extendedProps.tipologia !== 'N/A') {
+                dettagli += ` | 🏷️ ${evento.extendedProps.tipologia}`;
+            }
+            
+            html += `
+                <div class="event-item">
+                    <div class="event-title">${evento.title}</div>
+                    <div class="event-details">
+                        ${dettagli}
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-sm btn-primary" onclick="EventManager.mostraDettagliEventoById('${evento.id}')">
+                            📋 Dettagli
+                        </button>
+                        <button class="btn btn-sm btn-success" onclick="EventManager.togglePreferito('${evento.id}')">
+                            ${this.isPreferito(evento.id) ? '💔 Rimuovi' : '❤️ Aggiungi'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        container.innerHTML = html;
+        
+        // Setup filtri eventi vicini
+        this.setupFiltriEventiVicini();
+    },
+    
+    // Setup filtri per eventi vicini
+    setupFiltriEventiVicini() {
+        const filtroTipologia = document.getElementById('filtroTipologiaVicini');
+        const filtroComune = document.getElementById('filtroComuneVicini');
+        
+        if (filtroTipologia) {
+            filtroTipologia.addEventListener('change', () => this.filtraEventiVicini());
+        }
+        if (filtroComune) {
+            filtroComune.addEventListener('change', () => this.filtraEventiVicini());
+        }
+    },
+    
+    // Filtra eventi vicini
+    filtraEventiVicini() {
+        const filtroTipologia = document.getElementById('filtroTipologiaVicini')?.value;
+        const filtroComune = document.getElementById('filtroComuneVicini')?.value;
+        const container = document.getElementById('eventiViciniFiltrati');
+        
+        if (!container) return;
+        
+        let eventi = CalendarManager.getEvents();
+        
+        // Applica filtri
+        if (filtroTipologia) {
+            eventi = eventi.filter(e => e.extendedProps.tipo === filtroTipologia);
+        }
+        if (filtroComune) {
+            eventi = eventi.filter(e => e.extendedProps.comune === filtroComune);
+        }
+        
+        // Mostra risultati filtrati
+        if (eventi.length === 0) {
+            container.innerHTML = '<p class="text-muted">Nessun evento trovato con i filtri selezionati</p>';
         } else {
             let html = '';
-            eventi.forEach(evento => {
+            eventi.slice(0, 10).forEach(evento => {
                 let dettagli = `📅 ${Utils.formattaData(evento.start)}`;
-                
                 if (evento.extendedProps.comune) {
                     dettagli += ` | 📍 ${evento.extendedProps.comune}`;
                 }
-                
                 if (evento.extendedProps.tipologia && evento.extendedProps.tipologia !== 'N/A') {
                     dettagli += ` | 🏷️ ${evento.extendedProps.tipologia}`;
                 }
@@ -2521,9 +2956,7 @@ const EventManager = {
                 html += `
                     <div class="event-item">
                         <div class="event-title">${evento.title}</div>
-                        <div class="event-details">
-                            ${dettagli}
-                        </div>
+                        <div class="event-details">${dettagli}</div>
                         <div class="event-actions">
                             <button class="btn btn-sm btn-primary" onclick="EventManager.mostraDettagliEventoById('${evento.id}')">
                                 📋 Dettagli
@@ -2535,7 +2968,6 @@ const EventManager = {
                     </div>
                 `;
             });
-            
             container.innerHTML = html;
         }
     }
@@ -2642,4 +3074,3 @@ console.log('- CalendarManager.init test:', typeof CalendarManager.init);
 console.log('- DataLoader.caricaDati test:', typeof DataLoader.caricaDati);
 console.log('- App.init test:', typeof App.init);
 console.log('- window.app test:', typeof window.app);
-

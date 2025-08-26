@@ -2,9 +2,8 @@
 :root {
     --mercatino-color: #28a745;
     --fiera-color: #007bff;  /* Cambiato da giallo a blu */
-    --manifestazione-color: #6f42c1;
-    --sagra-color: #dc3545;
-    /* --festa-patronale-color: #007bff; RIMOSSO */
+    --manifestazione-color: #dc3545;  /* Cambiato da viola a rosso */
+    --sagra-color: #6f42c1;  /* Cambiato da rosso a viola */
     
     --text-dark: #333;
     --text-light: #666;
@@ -891,7 +890,11 @@ body {
         color: var(--sagra-color);
     }
     
-    
+    .fc-daygrid-event.fc-event-festa-patronale {
+        background-color: transparent;
+        border: 2px solid var(--festa-patronale-color);
+        color: var(--festa-patronale-color);
+    }
     
     /* Pallino altro rimosso - sostituito con festa patronale */
     
@@ -1008,7 +1011,11 @@ body {
         border: 2px solid var(--sagra-color);
     }
     
-    
+    .fc-timeGridWeek-view .fc-event-festa-patronale {
+        background: transparent;
+        color: var(--festa-patronale-color);
+        border: 2px solid var(--festa-patronale-color);
+    }
     
     /* Card altro rimossa - sostituita con festa patronale */
 }
@@ -1063,7 +1070,10 @@ body {
     border-color: var(--sagra-color);
 }
 
-
+.legend-dot.festa-patronale {
+    background-color: var(--festa-patronale-color);
+    border-color: var(--festa-patronale-color);
+}
 
 /* Mobile legend */
 @media (max-width: 768px) {
@@ -1165,4 +1175,6 @@ body {
     /* FullCalendar userà backgroundColor: var(--sagra-color) dal JavaScript */
 }
 
-
+.fc-event-festa-patronale {
+    /* FullCalendar userà backgroundColor: var(--festa-patronale-color) dal JavaScript */
+}
