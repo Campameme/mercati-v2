@@ -100,7 +100,7 @@ body {
 
 /* ===== CONTROLS SECTION ===== */
 .controls-section {
-    background: white;
+    background: transparent;
     padding: 1.5rem;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
@@ -131,7 +131,7 @@ body {
     border-radius: var(--border-radius);
     font-size: 1rem;
     transition: var(--transition);
-    background: white;
+    background: transparent;
 }
 
 .filter-select:focus {
@@ -231,7 +231,7 @@ body {
 
 /* ===== SEZIONE CALENDARIO ===== */
 .calendar-section {
-    background: white;
+    background: transparent;
     padding: 1.5rem;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
@@ -262,7 +262,7 @@ body {
 }
 
 .sidebar-section {
-    background: white;
+    background: transparent;
     padding: 1.5rem;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
@@ -279,7 +279,7 @@ body {
 
 /* ===== EVENTI ===== */
 .event-item {
-    background: white;
+    background: transparent;
     padding: 1rem;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
@@ -882,25 +882,25 @@ body {
     
     /* Pallini per tipologia - CONTORNO COLORATO, INTERNO BIANCO */
     .fc-daygrid-event.fc-event-mercatino {
-        background-color: var(--bg-white) !important;
+        background-color: transparent !important;
         border: 2px solid var(--mercatino-color) !important;
         color: var(--mercatino-color) !important;
     }
     
     .fc-daygrid-event.fc-event-fiera {
-        background-color: var(--bg-white) !important;
+        background-color: transparent !important;
         border: 2px solid var(--fiera-color) !important;
         color: var(--fiera-color) !important;
     }
     
     .fc-daygrid-event.fc-event-manifestazione {
-        background-color: var(--bg-white) !important;
+        background-color: transparent !important;
         border: 2px solid var(--manifestazione-color) !important;
         color: var(--manifestazione-color) !important;
     }
     
     .fc-daygrid-event.fc-event-sagra {
-        background-color: var(--bg-white) !important;
+        background-color: transparent !important;
         border: 2px solid var(--sagra-color) !important;
         color: var(--sagra-color) !important;
     }
@@ -1003,31 +1003,31 @@ body {
     
     /* Card per tipologia - CONTORNO COLORATO, INTERNO BIANCO */
     .fc-timeGridWeek-view .fc-event-mercatino {
-        background: var(--bg-white) !important;
+        background: transparent !important;
         color: var(--mercatino-color) !important;
         border: 2px solid var(--mercatino-color) !important;
     }
     
     .fc-timeGridWeek-view .fc-event-fiera {
-        background: var(--bg-white) !important;
+        background: transparent !important;
         color: var(--fiera-color) !important;
         border: 2px solid var(--fiera-color) !important;
     }
     
     .fc-timeGridWeek-view .fc-event-manifestazione {
-        background: var(--bg-white) !important;
+        background: transparent !important;
         color: var(--manifestazione-color) !important;
         border: 2px solid var(--manifestazione-color) !important;
     }
     
     .fc-timeGridWeek-view .fc-event-sagra {
-        background: var(--bg-white) !important;
+        background: transparent !important;
         color: var(--sagra-color) !important;
         border: 2px solid var(--sagra-color) !important;
     }
     
     .fc-timeGridWeek-view .fc-event-festa-patronale {
-        background: var(--bg-white) !important;
+        background: transparent !important;
         color: var(--festa-patronale-color) !important;
         border: 2px solid var(--festa-patronale-color) !important;
     }
@@ -1043,7 +1043,7 @@ body {
     gap: 1rem;
     margin: 1rem 0;
     padding: 1rem;
-    background: var(--bg-white);
+    background: transparent;
     border: 1px solid var(--border-light);
     border-radius: 8px;
     flex-wrap: wrap;
@@ -1208,7 +1208,7 @@ body {
 
 /* ===== STILI EVENTI CALENDARIO - CONTORNO COLORATO, INTERNO BIANCO ===== */
 .fc-event-mercatino {
-    background-color: var(--bg-white) !important;
+    background-color: transparent !important;
     border: 2px solid var(--mercatino-color) !important;
     color: var(--mercatino-color) !important;
     background-image: none !important;
@@ -1216,7 +1216,7 @@ body {
 }
 
 .fc-event-fiera {
-    background-color: var(--bg-white) !important;
+    background-color: transparent !important;
     border: 2px solid var(--fiera-color) !important;
     color: var(--fiera-color) !important;
     background-image: none !important;
@@ -1224,7 +1224,7 @@ body {
 }
 
 .fc-event-manifestazione {
-    background-color: var(--bg-white) !important;
+    background-color: transparent !important;
     border: 2px solid var(--manifestazione-color) !important;
     color: var(--manifestazione-color) !important;
     background-image: none !important;
@@ -1232,7 +1232,7 @@ body {
 }
 
 .fc-event-sagra {
-    background-color: var(--bg-white) !important;
+    background-color: transparent !important;
     border: 2px solid var(--sagra-color) !important;
     color: var(--sagra-color) !important;
     background-image: none !important;
@@ -1240,7 +1240,7 @@ body {
 }
 
 .fc-event-festa-patronale {
-    background-color: var(--bg-white) !important;
+    background-color: transparent !important;
     border: 2px solid var(--festa-patronale-color) !important;
     color: var(--festa-patronale-color) !important;
     background-image: none !important;
