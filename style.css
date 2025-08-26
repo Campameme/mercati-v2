@@ -1098,10 +1098,8 @@ body {
 /* ===== TEMA SEMPRE CHIARO - NO DARK MODE ===== */
 :root {
     /* Colori sempre chiari */
-    --bg-color: #ffffff !important;
     --text-color: #333333 !important;
     --border-color: #dee2e6 !important;
-    --card-bg: #ffffff !important;
     --shadow-color: rgba(0, 0, 0, 0.1) !important;
 }
 
