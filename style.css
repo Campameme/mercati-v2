@@ -1178,3 +1178,44 @@ body {
 .fc-event-festa-patronale {
     /* FullCalendar userà backgroundColor: var(--festa-patronale-color) dal JavaScript */
 }
+
+/* ===== GESTIONE MODAL E OVERLAY ===== */
+
+/* Assicura che i modal si chiudano correttamente */
+.modal {
+    z-index: 1055;
+}
+
+.modal-backdrop {
+    z-index: 1050;
+}
+
+/* Modal evento sopra al modal giorno */
+#eventModal {
+    z-index: 2060;
+}
+
+#eventModal .modal-backdrop {
+    z-index: 2055;
+}
+
+/* Rimuovi overlay quando si chiude */
+.modal-backdrop.show {
+    opacity: 0.5;
+}
+
+/* Pulisci overlay rimasti */
+.modal-backdrop.removed {
+    display: none !important;
+}
+
+/* Assicura che il body non rimanga bloccato */
+body.modal-open {
+    overflow: auto !important;
+    padding-right: 0 !important;
+}
+
+/* Rimuovi gradient bloccato */
+body.loader-blocked {
+    overflow: auto !important;
+}

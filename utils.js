@@ -732,7 +732,7 @@ const CalendarManager = {
                 const day = String(infoDate.getDate()).padStart(2, '0');
                 const dateStr = `${year}-${month}-${day}`;
                 
-                // Apri immediatamente il modal personalizzato
+                // Apri immediatamente il modal del giorno
                 setTimeout(() => {
                     EventManager.mostraEventiGiorno(dateStr);
                 }, 0);
@@ -1037,7 +1037,16 @@ const CalendarManager = {
             body.innerHTML = html;
         }
         
+        // 🚀 GESTIONE CORRETTA CHIUSURA MODAL
         modal.show();
+        
+        // Assicura che il modal si chiuda correttamente
+        const modalEl = document.getElementById('dailyModal');
+        modalEl.addEventListener('hidden.bs.modal', function() {
+            // Rimuovi eventuali overlay rimasti
+            const overlays = document.querySelectorAll('.modal-backdrop');
+            overlays.forEach(overlay => overlay.remove());
+        });
     },
     
     // Mostra eventi di un tipo specifico per un giorno
@@ -1140,12 +1149,14 @@ const CalendarManager = {
     // Gestisce il click su un evento
     onEventClick(evento) {
         Logger.debug('Click su evento:', evento.title);
+        // 🚀 APRE SOLO IL MODAL DELL'EVENTO
         EventManager.mostraDettagliEvento(evento);
     },
     
     // Gestisce il click su un giorno
     onDayClick(data) {
         Logger.debug('Click su giorno:', data);
+        // 🚀 APRE SOLO IL MODAL DEL GIORNO
         EventManager.mostraEventiGiorno(data);
     },
     
@@ -2213,6 +2224,25 @@ const App = {
         if (spinner) {
         spinner.style.display = mostra ? 'block' : 'none';
         }
+    },
+    
+    // 🔥 NUOVA FUNZIONE: Pulisce overlay rimasti e sblocca schermo
+    pulisciOverlayRimasti() {
+        // Rimuovi tutti gli overlay rimasti
+        const overlays = document.querySelectorAll('.modal-backdrop');
+        overlays.forEach(overlay => {
+            overlay.remove();
+        });
+        
+        // Rimuovi classi che bloccano lo schermo
+        document.body.classList.remove('modal-open');
+        document.body.classList.remove('loader-blocked');
+        
+        // Ripristina scroll
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        
+        Logger.info('🧹 Overlay rimasti puliti, schermo sbloccato');
     }
 };
 
@@ -2490,7 +2520,18 @@ const EventManager = {
         `;
         
         body.innerHTML = html;
+        
+        // 🚀 GESTIONE CORRETTA CHIUSURA MODAL
         modal.show();
+        
+        // Assicura che il modal si chiuda correttamente
+        modalEl.addEventListener('hidden.bs.modal', function() {
+            // Pulisci lo z-index quando si chiude
+            modalEl.style.zIndex = '';
+            // Rimuovi eventuali overlay rimasti
+            const overlays = document.querySelectorAll('.modal-backdrop');
+            overlays.forEach(overlay => overlay.remove());
+        });
     },
     
     // Mostra eventi del giorno
@@ -2593,7 +2634,16 @@ const EventManager = {
             body.innerHTML = html;
         }
         
+        // 🚀 GESTIONE CORRETTA CHIUSURA MODAL
         modal.show();
+        
+        // Assicura che il modal si chiuda correttamente
+        const modalEl = document.getElementById('dailyModal');
+        modalEl.addEventListener('hidden.bs.modal', function() {
+            // Rimuovi eventuali overlay rimasti
+            const overlays = document.querySelectorAll('.modal-backdrop');
+            overlays.forEach(overlay => overlay.remove());
+        });
     },
     
     // Mostra eventi di un tipo specifico per un giorno
@@ -2696,12 +2746,14 @@ const EventManager = {
     // Gestisce il click su un evento
     onEventClick(evento) {
         Logger.debug('Click su evento:', evento.title);
+        // 🚀 APRE SOLO IL MODAL DELL'EVENTO
         EventManager.mostraDettagliEvento(evento);
     },
     
     // Gestisce il click su un giorno
     onDayClick(data) {
         Logger.debug('Click su giorno:', data);
+        // 🚀 APRE SOLO IL MODAL DEL GIORNO
         EventManager.mostraEventiGiorno(data);
     },
     
@@ -2813,6 +2865,15 @@ const EventManager = {
             
             if (filtri.search && evento.title.toLowerCase().indexOf(filtri.search.toLowerCase()) === -1) {
                 mostra = false;
+            }
+            
+            // 🚀 NUOVO FILTRO DATE
+            if (filtri.date) {
+                const dataFiltro = new Date(filtri.date);
+                const dataEvento = new Date(evento.start);
+                if (dataEvento.toDateString() !== dataFiltro.toDateString()) {
+                    mostra = false;
+                }
             }
             
             if (mostra) {
