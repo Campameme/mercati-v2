@@ -92,7 +92,7 @@ body {
 
 /* ===== CONTROLS SECTION ===== */
 .controls-section {
-    background: transparent;
+    background: rgba(248, 249, 250, 0.8);
     padding: 1.5rem;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
@@ -123,7 +123,7 @@ body {
     border-radius: var(--border-radius);
     font-size: 1rem;
     transition: var(--transition);
-    background: transparent;
+    background: rgba(255, 255, 255, 0.9);
 }
 
 .filter-select:focus {
@@ -219,7 +219,7 @@ body {
 
 /* ===== SEZIONE CALENDARIO ===== */
 .calendar-section {
-    background: transparent;
+    background: rgba(248, 249, 250, 0.6);
     padding: 1.5rem;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
@@ -250,7 +250,7 @@ body {
 }
 
 .sidebar-section {
-    background: transparent;
+    background: rgba(248, 249, 250, 0.8);
     padding: 1.5rem;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
@@ -267,7 +267,7 @@ body {
 
 /* ===== EVENTI ===== */
 .event-item {
-    background: transparent;
+    background: rgba(255, 255, 255, 0.9);
     padding: 1rem;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
@@ -1029,7 +1029,7 @@ body {
     gap: 1rem;
     margin: 1rem 0;
     padding: 1rem;
-    background: transparent;
+    background: rgba(248, 249, 250, 0.8);
     border: 1px solid var(--border-light);
     border-radius: 8px;
     flex-wrap: wrap;
