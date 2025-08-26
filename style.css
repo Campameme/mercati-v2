@@ -4,7 +4,7 @@
     --fiera-color: #ffc107;
     --manifestazione-color: #6f42c1;
     --sagra-color: #dc3545;
-    --altro-color: #6c757d;
+    --festa-patronale-color: #007bff;
     
     --text-dark: #333;
     --text-light: #666;
@@ -28,7 +28,7 @@
     --transition: all 0.3s ease;
 }
 
-/* ===== RESET E BASE ===== */
+/* ===== RESET GENERALE ===== */
 * {
     margin: 0;
     padding: 0;
@@ -43,14 +43,7 @@ body {
     overflow-x: hidden;
 }
 
-/* ===== LAYOUT PRINCIPALE ===== */
-.main-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 15px;
-}
-
-/* ===== HEADER ===== */
+/* ===== HEADER SENZA BOX BIANCHI ===== */
 .header {
     background: linear-gradient(135deg, var(--primary-color), var(--info-color));
     color: white;
@@ -65,11 +58,18 @@ body {
     font-size: 2.5rem;
     margin-bottom: 0.5rem;
     font-weight: 700;
+    color: white;
 }
 
 .header p {
     font-size: 1.1rem;
     opacity: 0.9;
+    color: white;
+}
+
+.header small {
+    color: white;
+    opacity: 0.8;
 }
 
 /* ===== STATUS BAR ===== */
@@ -831,6 +831,34 @@ body {
     display: none !important;
 }
 
+/* Selezione giorni sempre leggibile */
+.fc-daygrid-day.fc-day-today {
+    background-color: rgba(0, 123, 255, 0.1) !important;
+}
+
+.fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+    color: var(--dark-text) !important;
+    font-weight: bold !important;
+}
+
+.fc-daygrid-day.fc-day-selected {
+    background-color: rgba(0, 123, 255, 0.2) !important;
+}
+
+.fc-daygrid-day.fc-day-selected .fc-daygrid-day-number {
+    color: var(--dark-text) !important;
+    font-weight: bold !important;
+}
+
+/* Hover sui giorni sempre leggibile */
+.fc-daygrid-day:hover {
+    background-color: rgba(0, 123, 255, 0.05) !important;
+}
+
+.fc-daygrid-day:hover .fc-daygrid-day-number {
+    color: var(--dark-text) !important;
+}
+
 /* Vecchi stili rimossi - sostituiti con contorno colorato e interno bianco */
 
 /* ===== CALENDARIO MOBILE OTTIMIZZATO ===== */
@@ -877,11 +905,13 @@ body {
         color: var(--sagra-color) !important;
     }
     
-    .fc-daygrid-event.fc-event-altro {
+    .fc-daygrid-event.fc-event-festa-patronale {
         background-color: var(--bg-white) !important;
-        border: 2px solid var(--altro-color) !important;
-        color: var(--altro-color) !important;
+        border: 2px solid var(--festa-patronale-color) !important;
+        color: var(--festa-patronale-color) !important;
     }
+    
+    /* Pallino altro rimosso - sostituito con festa patronale */
     
     /* Container pallini per giorno - RAGGRUPPATI */
     .fc-daygrid-day-events {
@@ -996,11 +1026,13 @@ body {
         border: 2px solid var(--sagra-color) !important;
     }
     
-    .fc-timeGridWeek-view .fc-event-altro {
+    .fc-timeGridWeek-view .fc-event-festa-patronale {
         background: var(--bg-white) !important;
-        color: var(--altro-color) !important;
-        border: 2px solid var(--altro-color) !important;
+        color: var(--festa-patronale-color) !important;
+        border: 2px solid var(--festa-patronale-color) !important;
     }
+    
+    /* Card altro rimossa - sostituita con festa patronale */
 }
 
 /* ===== LEGENDA PALLINI SEMPLIFICATA ===== */
@@ -1051,6 +1083,11 @@ body {
 .legend-dot.sagra {
     background-color: var(--sagra-color);
     border-color: var(--sagra-color);
+}
+
+.legend-dot.festa-patronale {
+    background-color: var(--festa-patronale-color);
+    border-color: var(--festa-patronale-color);
 }
 
 /* Mobile legend */
@@ -1202,10 +1239,12 @@ body {
     box-shadow: none !important;
 }
 
-.fc-event-altro {
+.fc-event-festa-patronale {
     background-color: var(--bg-white) !important;
-    border: 2px solid var(--altro-color) !important;
-    color: var(--altro-color) !important;
+    border: 2px solid var(--festa-patronale-color) !important;
+    color: var(--festa-patronale-color) !important;
     background-image: none !important;
     box-shadow: none !important;
 }
+
+/* Evento altro rimosso - sostituito con festa patronale */
