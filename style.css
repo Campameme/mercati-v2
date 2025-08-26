@@ -1219,3 +1219,127 @@ body.modal-open {
 body.loader-blocked {
     overflow: auto !important;
 }
+
+/* ===== STILI GIORNI CALENDARIO ===== */
+
+/* Cerchio intorno ai numeri dei giorni */
+.fc-daygrid-day-number {
+    border: 2px solid transparent;
+    border-radius: 50%;
+    padding: 4px;
+    display: inline-block;
+    min-width: 24px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.fc-daygrid-day:hover .fc-daygrid-day-number {
+    border-color: var(--primary-color);
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+    border-color: var(--primary-color);
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* ===== HEADER MODAL COLORATI ===== */
+
+/* Header modal evento con colore categoria */
+#eventModal .modal-header {
+    border-bottom: none;
+    padding: 1rem 1.5rem;
+}
+
+#eventModal .modal-header.mercatino {
+    background-color: var(--mercatino-color);
+    color: white;
+}
+
+#eventModal .modal-header.fiera {
+    background-color: var(--fiera-color);
+    color: black;
+}
+
+#eventModal .modal-header.manifestazione {
+    background-color: var(--manifestazione-color);
+    color: white;
+}
+
+#eventModal .modal-header.sagra {
+    background-color: var(--sagra-color);
+    color: white;
+}
+
+/* ===== BORDINI COLORATI EVENTI GIORNO ===== */
+
+/* Bordini colorati per eventi nel modal giorno */
+.event-item.mercatino {
+    border-left: 4px solid var(--mercatino-color) !important;
+}
+
+.event-item.fiera {
+    border-left: 4px solid var(--fiera-color) !important;
+}
+
+.event-item.manifestazione {
+    border-left: 4px solid var(--manifestazione-color) !important;
+}
+
+.event-item.sagra {
+    border-left: 4px solid var(--sagra-color) !important;
+}
+
+/* ===== STATI PULSANTI PREFERITI ===== */
+
+/* Stato aggiunto */
+.btn-preferito-aggiunto {
+    background-color: var(--success-color) !important;
+    border-color: var(--success-color) !important;
+    color: white !important;
+}
+
+.btn-preferito-aggiunto:hover {
+    background-color: #218838 !important;
+    border-color: #1e7e34 !important;
+}
+
+/* Stato rimuovi */
+.btn-preferito-rimuovi {
+    background-color: var(--danger-color) !important;
+    border-color: var(--danger-color) !important;
+    color: white !important;
+}
+
+.btn-preferito-rimuovi:hover {
+    background-color: #c82333 !important;
+    border-color: #bd2130 !important;
+}
+
+/* ===== FIX SCROLL ORIZZONTALE POPUP GIORNO ===== */
+
+/* Rimuovi scroll orizzontale indesiderato */
+.events-container {
+    overflow-x: hidden !important;
+    max-width: 100% !important;
+}
+
+.event-item {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+}
+
+/* Fix mobile scroll orizzontale */
+@media (max-width: 768px) {
+    .events-container {
+        overflow-x: hidden !important;
+        width: 100% !important;
+    }
+    
+    .event-item {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+    }
+}

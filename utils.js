@@ -88,7 +88,7 @@ const Utils = {
     // Nota: Funzioni di range specifico rimosse - ora usiamo logica semplificata
     
     // Genera date per mercatini ricorrenti - LOGICA INTELLIGENTE per tutti i tipi
-    generaDateMercatino(dati, anno = new Date().getFullYear(), mesi = CONFIG.CALENDAR.MONTHS_TO_GENERATE) {
+    generaDateMercatino(dati, anno = new Date().getFullYear(), mesi = 12) {
         const { dataInizio, dataFine, giornoRicorrente, comune } = dati;
         
         // Cache key per evitare ricalcoli
@@ -105,7 +105,7 @@ const Utils = {
         
         const oggi = new Date();
         
-        // Determina il periodo di validità - RANGE ESTESO per mese corrente + precedente + successivo
+        // Determina il periodo di validità - RANGE COMPLETO per tutto l'anno
         let dataPartenza, dataLimite;
         
         if (dataInizio === 'ricorrente' && dataFine === 'ricorrente') {
@@ -124,17 +124,17 @@ const Utils = {
                         dataPartenza = new Date(anno, meseI - 1, giornoI);
                     } else {
                         Logger.warning(`⚠️ Data inizio non valida per ${comune}: ${dataInizio}`);
-                        // RANGE ESTESO: 1 mese prima del mese corrente
-                        dataPartenza = new Date(oggi.getFullYear(), oggi.getMonth() - 1, 1);
+                        // RANGE COMPLETO: tutto l'anno corrente
+                        dataPartenza = new Date(oggi.getFullYear(), 0, 1);
                     }
                 } catch (error) {
                     Logger.warning(`⚠️ Errore parsing data inizio per ${comune}: ${dataInizio}`, error);
-                    // RANGE ESTESO: 1 mese prima del mese corrente
-                    dataPartenza = new Date(oggi.getFullYear(), oggi.getMonth() - 1, 1);
+                    // RANGE COMPLETO: tutto l'anno corrente
+                    dataPartenza = new Date(oggi.getFullYear(), 0, 1);
                 }
             } else {
-                // RANGE ESTESO: 1 mese prima del mese corrente
-                dataPartenza = new Date(oggi.getFullYear(), oggi.getMonth() - 1, 1);
+                // RANGE COMPLETO: tutto l'anno corrente
+                dataPartenza = new Date(oggi.getFullYear(), 0, 1);
             }
             
             if (dataFine && dataFine !== 'ricorrente') {
@@ -144,17 +144,17 @@ const Utils = {
                         dataLimite = new Date(anno, meseF - 1, giornoF);
                     } else {
                         Logger.warning(`⚠️ Data fine non valida per ${comune}: ${dataFine}`);
-                        // RANGE ESTESO: 1 mese dopo il mese corrente
-                        dataLimite = new Date(oggi.getFullYear(), oggi.getMonth() + 2, 0);
+                        // RANGE COMPLETO: tutto l'anno corrente
+                        dataLimite = new Date(oggi.getFullYear(), 11, 31);
                     }
                 } catch (error) {
                     Logger.warning(`⚠️ Errore parsing data fine per ${comune}: ${dataFine}`, error);
-                    // RANGE ESTESO: 1 mese dopo il mese corrente
-                    dataLimite = new Date(oggi.getFullYear(), oggi.getMonth() + 2, 0);
+                    // RANGE COMPLETO: tutto l'anno corrente
+                    dataLimite = new Date(oggi.getFullYear(), 11, 31);
                 }
             } else {
-                // RANGE ESTESO: 1 mese dopo il mese corrente
-                dataLimite = new Date(oggi.getFullYear(), oggi.getMonth() + 2, 0);
+                // RANGE COMPLETO: tutto l'anno corrente
+                dataLimite = new Date(oggi.getFullYear(), 11, 31);
             }
         }
         
@@ -450,16 +450,16 @@ const Utils = {
                     throw new Error('Date non valide');
                 }
             } catch (error) {
-                // Fallback: range esteso
-                dataPartenza = new Date(annoCorrente, meseCorrente - 1, 1);
-                dataLimite = new Date(annoCorrente, meseCorrente + 2, 0);
+                // Fallback: range completo
+                dataPartenza = new Date(annoCorrente, 0, 1);
+                dataLimite = new Date(annoCorrente, 11, 31);
                 Logger.debug(`📅 RANGE FALLBACK per ${comune}: da ${dataPartenza.toLocaleDateString()} a ${dataLimite.toLocaleDateString()}`);
             }
         } else {
-            // CASO: Range esteso (3 mesi)
-            dataPartenza = new Date(annoCorrente, meseCorrente - 1, 1);  // 1 mese prima
-            dataLimite = new Date(annoCorrente, meseCorrente + 2, 0);     // 1 mese dopo
-            Logger.debug(`📅 RANGE ESTESO per ${comune}: da ${dataPartenza.toLocaleDateString()} a ${dataLimite.toLocaleDateString()}`);
+            // CASO: Range completo (tutto l'anno)
+            dataPartenza = new Date(annoCorrente, 0, 1);  // Inizio anno
+            dataLimite = new Date(annoCorrente, 11, 31);   // Fine anno
+            Logger.debug(`📅 RANGE COMPLETO per ${comune}: da ${dataPartenza.toLocaleDateString()} a ${dataLimite.toLocaleDateString()}`);
         }
         
         Logger.debug(`📅 Tipo ricorrenza: "${giornoRicorrente}" per ${comune}`);
@@ -1010,8 +1010,14 @@ const CalendarManager = {
                     dettagli += ` | 📍 ${evento.extendedProps.luogo}`;
                 }
                 
+                // 🎨 BORDINO COLORATO BASATO SU CATEGORIA
+                let classiEvento = `event-item border rounded p-3 mb-3 ${index % 2 === 0 ? 'bg-light' : ''}`;
+                if (evento.extendedProps.tipo) {
+                    classiEvento += ` ${evento.extendedProps.tipo}`;
+                }
+                
                 html += `
-                    <div class="event-item border rounded p-3 mb-3 ${index % 2 === 0 ? 'bg-light' : ''}">
+                    <div class="${classiEvento}">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="flex-grow-1">
                                 <div class="event-title h6 mb-2">${evento.title}</div>
@@ -1023,7 +1029,7 @@ const CalendarManager = {
                                 <button class="btn btn-sm btn-outline-primary mb-1" onclick="EventManager.mostraDettagliEventoById('${evento.id}')">
                                     📋 Dettagli
                                 </button>
-                                <button class="btn btn-sm ${this.isPreferito(evento.id) ? 'btn-outline-danger' : 'btn-outline-success'}" onclick="EventManager.togglePreferito('${evento.id}')">
+                                <button class="btn btn-sm ${this.isPreferito(evento.id) ? 'btn-preferito-rimuovi' : 'btn-outline-success'}" onclick="EventManager.togglePreferito('${evento.id}')">
                                     ${this.isPreferito(evento.id) ? '💔 Rimuovi' : '❤️ Aggiungi'}
                                 </button>
                             </div>
@@ -1270,12 +1276,22 @@ const CalendarManager = {
                 mostra = false;
             }
             
-            // 🚀 NUOVO FILTRO DATE
-            if (filtri.date) {
-                const dataFiltro = new Date(filtri.date);
+            // 🚀 FILTRO PERIODO DATE
+            if (filtri.dateStart || filtri.dateEnd) {
                 const dataEvento = new Date(evento.start);
-                if (dataEvento.toDateString() !== dataFiltro.toDateString()) {
-                    mostra = false;
+                
+                if (filtri.dateStart) {
+                    const dataInizio = new Date(filtri.dateStart);
+                    if (dataEvento < dataInizio) {
+                        mostra = false;
+                    }
+                }
+                
+                if (filtri.dateEnd) {
+                    const dataFine = new Date(filtri.dateEnd);
+                    if (dataEvento > dataFine) {
+                        mostra = false;
+                    }
                 }
             }
             
@@ -1434,6 +1450,11 @@ const CalendarManager = {
             });
             container.innerHTML = html;
         }
+    },
+    
+    // 🚀 NUOVA FUNZIONE: Naviga al calendario
+    navigaAData(data) {
+        this.calendar.gotoDate(data);
     }
 };
 
@@ -2288,36 +2309,46 @@ const FilterManager = {
     
     // Setup event listeners per filtri
     setupFilterListeners() {
+        const searchButton = document.getElementById('searchButton');
+        
+        // 🚀 SOLO PULSANTE RICERCA ATTIVA I FILTRI
+        if (searchButton) {
+            searchButton.addEventListener('click', () => this.applicaFiltri());
+        }
+        
+        // Rimuovi event listeners automatici dai filtri
         const comuneFilter = document.getElementById('comuneFilter');
         const categoriaFilter = document.getElementById('categoriaFilter');
         const searchFilter = document.getElementById('searchFilter');
-        const dateFilter = document.getElementById('dateFilter');
+        const dateStartFilter = document.getElementById('dateStartFilter');
+        const dateEndFilter = document.getElementById('dateEndFilter');
         
-        if (comuneFilter) {
-            comuneFilter.addEventListener('change', () => this.applicaFiltri());
-        }
-        if (categoriaFilter) {
-            categoriaFilter.addEventListener('change', () => this.applicaFiltri());
-        }
-        if (searchFilter) {
-            searchFilter.addEventListener('input', () => this.applicaFiltri());
-        }
-        if (dateFilter) {
-            dateFilter.addEventListener('change', () => this.applicaFiltri());
-        }
+        // Rimuovi event listeners precedenti
+        if (comuneFilter) comuneFilter.removeEventListener('change', this.applicaFiltri);
+        if (categoriaFilter) categoriaFilter.removeEventListener('change', this.applicaFiltri);
+        if (searchFilter) searchFilter.removeEventListener('input', this.applicaFiltri);
+        if (dateStartFilter) dateStartFilter.removeEventListener('change', this.applicaFiltri);
+        if (dateEndFilter) dateEndFilter.removeEventListener('change', this.applicaFiltri);
     },
     
-    // Applica filtri
+    // Applica filtri e naviga al calendario
     applicaFiltri() {
         const filtri = {
             comune: document.getElementById('comuneFilter')?.value || '',
             categoria: document.getElementById('categoriaFilter')?.value || '',
             search: document.getElementById('searchFilter')?.value || '',
-            date: document.getElementById('dateFilter')?.value || ''
+            dateStart: document.getElementById('dateStartFilter')?.value || '',
+            dateEnd: document.getElementById('dateEndFilter')?.value || ''
         };
         
+        // 🚀 NAVIGAZIONE CALENDARIO
+        if (filtri.dateStart) {
+            const dataInizio = new Date(filtri.dateStart);
+            CalendarManager.navigaAData(dataInizio);
+        }
+        
         const eventiVisibili = CalendarManager.filterEvents(filtri);
-        // Non mostrare messaggi di status
+        Logger.info(`🔍 Ricerca completata: ${eventiVisibili} eventi visibili`);
     }
 };
 
@@ -2351,12 +2382,12 @@ const EventManager = {
         this.salvaPreferiti();
         this.aggiornaListaPreferiti();
         
-        // Aggiorna il bottone nell'UI
+        // 🎨 AGGIORNA STATO PULSANTE NELL'UI
         const bottone = document.querySelector(`button[onclick*="${eventoId}"]`);
         if (bottone) {
             if (this.preferiti.has(eventoId)) {
                 bottone.textContent = '💔 Rimuovi';
-                bottone.className = 'btn btn-sm btn-outline-danger';
+                bottone.className = 'btn btn-sm btn-preferito-rimuovi';
             } else {
                 bottone.textContent = '❤️ Aggiungi';
                 bottone.className = 'btn btn-sm btn-outline-success';
@@ -2456,12 +2487,24 @@ const EventManager = {
         });
         const title = document.getElementById('eventModalTitle');
         const body = document.getElementById('eventModalBody');
+        const modalHeader = document.getElementById('eventModal').querySelector('.modal-header');
         
         // Assicura che questo modal sia sopra agli altri
         const modalEl = document.getElementById('eventModal');
         modalEl.style.zIndex = '2060'; // Più alto del modal giornaliero (1055)
         
         title.textContent = evento.title;
+        
+        // 🎨 HEADER COLORATO BASATO SU CATEGORIA
+        if (modalHeader) {
+            // Rimuovi classi precedenti
+            modalHeader.classList.remove('mercatino', 'fiera', 'manifestazione', 'sagra');
+            
+            // Aggiungi classe categoria
+            if (evento.extendedProps.tipo) {
+                modalHeader.classList.add(evento.extendedProps.tipo);
+            }
+        }
         
         // Ottieni il giorno della settimana
         const dataEvento = new Date(evento.start);
@@ -2607,8 +2650,14 @@ const EventManager = {
                     dettagli += ` | 📍 ${evento.extendedProps.luogo}`;
                 }
                 
+                // 🎨 BORDINO COLORATO BASATO SU CATEGORIA
+                let classiEvento = `event-item border rounded p-3 mb-3 ${index % 2 === 0 ? 'bg-light' : ''}`;
+                if (evento.extendedProps.tipo) {
+                    classiEvento += ` ${evento.extendedProps.tipo}`;
+                }
+                
                 html += `
-                    <div class="event-item border rounded p-3 mb-3 ${index % 2 === 0 ? 'bg-light' : ''}">
+                    <div class="${classiEvento}">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="flex-grow-1">
                                 <div class="event-title h6 mb-2">${evento.title}</div>
@@ -2620,7 +2669,7 @@ const EventManager = {
                                 <button class="btn btn-sm btn-outline-primary mb-1" onclick="EventManager.mostraDettagliEventoById('${evento.id}')">
                                     📋 Dettagli
                                 </button>
-                                <button class="btn btn-sm ${this.isPreferito(evento.id) ? 'btn-outline-danger' : 'btn-outline-success'}" onclick="EventManager.togglePreferito('${evento.id}')">
+                                <button class="btn btn-sm ${this.isPreferito(evento.id) ? 'btn-preferito-rimuovi' : 'btn-outline-success'}" onclick="EventManager.togglePreferito('${evento.id}')">
                                     ${this.isPreferito(evento.id) ? '💔 Rimuovi' : '❤️ Aggiungi'}
                                 </button>
                             </div>
@@ -2867,12 +2916,22 @@ const EventManager = {
                 mostra = false;
             }
             
-            // 🚀 NUOVO FILTRO DATE
-            if (filtri.date) {
-                const dataFiltro = new Date(filtri.date);
+            // 🚀 FILTRO PERIODO DATE
+            if (filtri.dateStart || filtri.dateEnd) {
                 const dataEvento = new Date(evento.start);
-                if (dataEvento.toDateString() !== dataFiltro.toDateString()) {
-                    mostra = false;
+                
+                if (filtri.dateStart) {
+                    const dataInizio = new Date(filtri.dateStart);
+                    if (dataEvento < dataInizio) {
+                        mostra = false;
+                    }
+                }
+                
+                if (filtri.dateEnd) {
+                    const dataFine = new Date(filtri.dateEnd);
+                    if (dataEvento > dataFine) {
+                        mostra = false;
+                    }
                 }
             }
             

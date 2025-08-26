@@ -55,11 +55,7 @@
             <div class="status-left">
                 <span>📅 Calendario Mercatini e Fiere</span>
             </div>
-            <div class="status-right">
-                <button class="btn btn-primary btn-sm" onclick="app.caricaDati()">
-                    🔄 Aggiorna Dati
-                </button>
-            </div>
+
         </div>
         
         <!-- Filtri -->
@@ -78,12 +74,23 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label for="dateFilter" class="form-label">📅 Data</label>
-                    <input type="date" class="form-control" id="dateFilter">
+                    <label for="dateStartFilter" class="form-label">📅 Data Inizio</label>
+                    <input type="date" class="form-control" id="dateStartFilter">
                 </div>
                 <div class="col-md-3">
+                    <label for="dateEndFilter" class="form-label">📅 Data Fine</label>
+                    <input type="date" class="form-control" id="dateEndFilter">
+                </div>
+            </div>
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
                     <label for="searchFilter" class="form-label">🔍 Cerca Evento</label>
                     <input type="text" class="form-control" id="searchFilter" placeholder="Nome evento...">
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <button type="button" class="btn btn-primary w-100" id="searchButton">
+                        🔍 Avvia Ricerca
+                    </button>
                 </div>
             </div>
         </div>
