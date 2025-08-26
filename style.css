@@ -46,7 +46,6 @@ body {
 /* ===== HEADER SENZA BOX BIANCHI ===== */
 .header {
     background: linear-gradient(135deg, var(--primary-color), var(--info-color));
-    color: white;
     padding: 2rem 0;
     text-align: center;
     margin-bottom: 2rem;
@@ -58,19 +57,13 @@ body {
     font-size: 2.5rem;
     margin-bottom: 0.5rem;
     font-weight: 700;
-    color: white;
 }
 
 .header p {
     font-size: 1.1rem;
     opacity: 0.9;
-    color: white;
 }
 
-.header small {
-    color: white;
-    opacity: 0.8;
-}
 
 /* ===== STATUS BAR ===== */
 .status-bar {
@@ -169,22 +162,18 @@ body {
 
 .btn-primary {
     background: var(--primary-color);
-    color: white;
 }
 
 .btn-success {
     background: var(--success-color);
-    color: white;
 }
 
 .btn-info {
     background: var(--info-color);
-    color: white;
 }
 
 .btn-danger {
     background: var(--danger-color);
-    color: white;
 }
 
 .btn-outline-primary {
@@ -321,7 +310,6 @@ body {
 /* ===== MODALI ===== */
 .modal-header {
     background: linear-gradient(135deg, var(--primary-color), var(--info-color));
-    color: white;
     border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
@@ -406,7 +394,6 @@ body {
 
 .fc-event-mercatino {
     background: var(--success-color) !important;
-    color: white !important;
 }
 
 .fc-event-fiera {
@@ -906,7 +893,7 @@ body {
     }
     
     .fc-daygrid-event.fc-event-festa-patronale {
-        background-color: var(--bg-white) !important;
+        background-color: transparent !important;
         border: 2px solid var(--festa-patronale-color) !important;
         color: var(--festa-patronale-color) !important;
     }
@@ -997,7 +984,7 @@ body {
     /* Card mercatini */
     .fc-timeGridWeek-view .fc-event-mercatino {
         background: linear-gradient(135deg, var(--primary-color), #1e7e34) !important;
-        color: white !important;
+        color: var(--mercatino-color) !important;
         border-left: 4px solid var(--primary-color) !important;
     }
     
