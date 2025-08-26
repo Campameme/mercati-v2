@@ -756,9 +756,7 @@ const CalendarManager = {
                     end: info.end,
                     view: info.view.type
                 };
-                // Non ricaricare automaticamente - sarà gestito dal caricamento normale
-                
-
+                                // Non ricaricare automaticamente - sarà gestito dal caricamento normale
             }
         });
         
@@ -1829,9 +1827,9 @@ const DataLoader = {
                 title: `${iconaEvento} ${dati.comune}`,
                 start: dataSingola,
                 end: dataSingola,
-                backgroundColor: '#ffffff',
+                backgroundColor: coloreEvento,
                 borderColor: coloreEvento,
-                textColor: coloreEvento,
+                textColor: 'white',
                 className: classiCSS,
                 extendedProps: {
                     tipo: categoria,
@@ -1894,7 +1892,7 @@ const DataLoader = {
                     end: dataSingola,
                     backgroundColor: coloreEvento,
                     borderColor: coloreEvento,
-                    textColor: isMercatino ? 'white' : CONFIG.COLORS.FIERA_TEXT,
+                    textColor: 'white',
                     extendedProps: {
                         tipo: tipoEvento,
                         comune: dati.comune,

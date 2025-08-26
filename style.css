@@ -1103,24 +1103,11 @@ body {
     --shadow-color: rgba(0, 0, 0, 0.1);
 }
 
-/* Forza tema chiaro su tutto */
-* {
-    background-color: var(--bg-light);
-    color: var(--text-dark);
-}
-
-body {
-    background-color: var(--bg-light);
-    color: var(--text-dark);
-}
-
-/* Override per elementi specifici */
+/* Tema chiaro per elementi specifici - senza forzature globali */
 .calendar-section,
 .sidebar-section,
 .filters-section,
-.calendar-legend,
-.modal-content,
-.btn {
+.calendar-legend {
     background-color: var(--bg-light);
     color: var(--text-dark);
 }
@@ -1156,69 +1143,39 @@ body {
     text-shadow: none;
 }
 
-/* ===== OVERRIDE COMPLETO PER ELIMINARE BOX BIANCHI ===== */
+/* ===== STILI FULLCALENDAR OTTIMIZZATI ===== */
+/* Rimuovo tutti gli override che causano conflitti */
+
+/* ===== STILI EVENTI CALENDARIO - OTTIMIZZATI ===== */
+
+/* Rimuovo tutte le forzature CSS che causano box bianchi */
 .fc-event {
-    background-image: none;
-    box-shadow: none;
-    text-shadow: none;
+    /* Stili base senza forzature */
 }
 
-.fc-event-title {
-    background: transparent;
-    background-color: transparent;
-    background-image: none;
-}
-
-.fc-event-main {
-    background: transparent;
-    background-color: transparent;
-    background-image: none;
-}
-
+.fc-event-title,
+.fc-event-main,
 .fc-event-main-frame {
-    background: transparent;
-    background-color: transparent;
-    background-image: none;
+    /* Stili base senza forzature */
 }
 
-/* Forza colori su tutti gli elementi FullCalendar */
-.fc-daygrid-event,
-.fc-timegrid-event,
-.fc-list-event {
-    background-image: none;
-    box-shadow: none;
-    text-shadow: none;
-}
-
-/* ===== STILI EVENTI CALENDARIO - SEMPLIFICATI ===== */
-
-/* Colori semplici per gli eventi - senza forzature */
+/* Colori eventi ottimizzati - FullCalendar userà backgroundColor dal JavaScript */
 .fc-event-mercatino {
-    background-color: var(--mercatino-color);
-    border: 1px solid var(--mercatino-color);
-    color: white;
+    /* FullCalendar userà backgroundColor: var(--mercatino-color) dal JavaScript */
 }
 
 .fc-event-fiera {
-    background-color: var(--fiera-color);
-    border: 1px solid var(--fiera-color);
-    color: black;
+    /* FullCalendar userà backgroundColor: var(--fiera-color) dal JavaScript */
 }
 
 .fc-event-manifestazione {
-    background-color: var(--manifestazione-color);
-    border: 1px solid var(--manifestazione-color);
-    color: white;
+    /* FullCalendar userà backgroundColor: var(--manifestazione-color) dal JavaScript */
 }
 
 .fc-event-sagra {
-    background-color: var(--sagra-color);
-    border: 1px solid var(--sagra-color);
-    color: white;
+    /* FullCalendar userà backgroundColor: var(--sagra-color) dal JavaScript */
 }
 
 .fc-event-festa-patronale {
-    background-color: var(--festa-patronale-color);
-    border: 1px solid var(--festa-patronale-color);
-    color: white;
+    /* FullCalendar userà backgroundColor: var(--festa-patronale-color) dal JavaScript */
 }
