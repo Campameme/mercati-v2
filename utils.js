@@ -1804,14 +1804,14 @@ const DataLoader = {
                     // Default per altre tipologie
                     categoria = 'altro';
                     iconaEvento = '🎉';
-                    coloreEvento = '#4e342e';
+                    coloreEvento = '#6c757d';
                     classiCSS = 'altro';
                 }
             } else {
                 // Default se non c'è tipologia
                 categoria = 'altro';
                 iconaEvento = '🎉';
-                coloreEvento = '#4e342e';
+                coloreEvento = '#6c757d';
                 classiCSS = 'altro';
             }
             
@@ -1820,9 +1820,9 @@ const DataLoader = {
                 title: `${iconaEvento} ${dati.comune}`,
                 start: dataSingola,
                 end: dataSingola,
-                backgroundColor: coloreEvento,
+                backgroundColor: '#ffffff',
                 borderColor: coloreEvento,
-                textColor: categoria === 'fiera' ? '#000' : 'white',
+                textColor: coloreEvento,
                 className: classiCSS,
                 extendedProps: {
                     tipo: categoria,
