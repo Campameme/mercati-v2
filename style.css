@@ -1190,209 +1190,35 @@ body {
     text-shadow: none;
 }
 
-/* ===== STILI EVENTI CALENDARIO - CONTORNO COLORATO, INTERNO BIANCO ===== */
+/* ===== STILI EVENTI CALENDARIO - SEMPLIFICATI ===== */
+
+/* Colori semplici per gli eventi - senza forzature */
 .fc-event-mercatino {
-    background-color: transparent;
-    border: 2px solid var(--mercatino-color);
-    color: var(--mercatino-color);
-    background-image: none;
-    box-shadow: none;
+    background-color: var(--mercatino-color);
+    border: 1px solid var(--mercatino-color);
+    color: white;
 }
 
 .fc-event-fiera {
-    background-color: transparent;
-    border: 2px solid var(--fiera-color);
-    color: var(--fiera-color);
-    background-image: none;
-    box-shadow: none;
+    background-color: var(--fiera-color);
+    border: 1px solid var(--fiera-color);
+    color: black;
 }
 
 .fc-event-manifestazione {
-    background-color: transparent;
-    border: 2px solid var(--manifestazione-color);
-    color: var(--manifestazione-color);
-    background-image: none;
-    box-shadow: none;
+    background-color: var(--manifestazione-color);
+    border: 1px solid var(--manifestazione-color);
+    color: white;
 }
 
 .fc-event-sagra {
-    background-color: transparent;
-    border: 2px solid var(--sagra-color);
-    color: var(--sagra-color);
-    background-image: none;
-    box-shadow: none;
+    background-color: var(--sagra-color);
+    border: 1px solid var(--sagra-color);
+    color: white;
 }
 
 .fc-event-festa-patronale {
-    background-color: transparent;
-    border: 2px solid var(--festa-patronale-color);
-    color: var(--festa-patronale-color);
-    background-image: none;
-    box-shadow: none;
-}
-
-/* Evento altro rimosso - sostituito con festa patronale */
-
-/* ===== APPROCCIO ALTERNATIVO - CSS CUSTOM PROPERTIES E SELETTORI SPECIFICI ===== */
-
-/* Definisco variabili CSS personalizzate per forzare i nostri stili */
-:root {
-    --force-mercatino-bg: transparent;
-    --force-mercatino-border: 2px solid var(--mercatino-color);
-    --force-mercatino-color: var(--mercatino-color);
-    
-    --force-fiera-bg: transparent;
-    --force-fiera-border: 2px solid var(--fiera-color);
-    --force-fiera-color: var(--fiera-color);
-    
-    --force-manifestazione-bg: transparent;
-    --force-manifestazione-border: 2px solid var(--manifestazione-color);
-    --force-manifestazione-color: var(--manifestazione-color);
-    
-    --force-sagra-bg: transparent;
-    --force-sagra-border: 2px solid var(--sagra-color);
-    --force-sagra-color: var(--sagra-color);
-    
-    --force-festa-patronale-bg: transparent;
-    --force-festa-patronale-border: 2px solid var(--festa-patronale-color);
-    --force-festa-patronale-color: var(--festa-patronale-color);
-}
-
-/* ===== STILI EVENTI CALENDARIO - APPROCCIO FORZATO ===== */
-
-/* Uso selettori molto specifici per sovrascrivere FullCalendar */
-.fc .fc-daygrid-event.fc-event-mercatino,
-.fc .fc-timegrid-event.fc-event-mercatino,
-.fc .fc-list-event.fc-event-mercatino {
-    background-color: var(--force-mercatino-bg) !important;
-    border: var(--force-mercatino-border) !important;
-    color: var(--force-mercatino-color) !important;
-    background-image: none !important;
-    box-shadow: none !important;
-}
-
-.fc .fc-daygrid-event.fc-event-fiera,
-.fc .fc-timegrid-event.fc-event-fiera,
-.fc .fc-list-event.fc-event-fiera {
-    background-color: var(--force-fiera-bg) !important;
-    border: var(--force-fiera-border) !important;
-    color: var(--force-fiera-color) !important;
-    background-image: none !important;
-    box-shadow: none !important;
-}
-
-.fc .fc-daygrid-event.fc-event-manifestazione,
-.fc .fc-timegrid-event.fc-event-manifestazione,
-.fc .fc-list-event.fc-event-manifestazione {
-    background-color: var(--force-manifestazione-bg) !important;
-    border: var(--force-manifestazione-border) !important;
-    color: var(--force-manifestazione-color) !important;
-    background-image: none !important;
-    box-shadow: none !important;
-}
-
-.fc .fc-daygrid-event.fc-event-sagra,
-.fc .fc-timegrid-event.fc-event-sagra,
-.fc .fc-list-event.fc-event-sagra {
-    background-color: var(--force-sagra-bg) !important;
-    border: var(--force-sagra-border) !important;
-    color: var(--force-sagra-color) !important;
-    background-image: none !important;
-    box-shadow: none !important;
-}
-
-.fc .fc-daygrid-event.fc-event-festa-patronale,
-.fc .fc-timegrid-event.fc-event-festa-patronale,
-.fc .fc-list-event.fc-event-festa-patronale {
-    background-color: var(--force-festa-patronale-bg) !important;
-    border: var(--force-festa-patronale-border) !important;
-    color: var(--force-festa-patronale-color) !important;
-    background-image: none !important;
-    box-shadow: none !important;
-}
-
-/* ===== STILI INLINE FORZATI - APPROCCIO JAVASCRIPT ===== */
-
-/* Questi stili verranno applicati via JavaScript per forzare i nostri colori */
-.evento-forzato-mercatino {
-    background-color: transparent !important;
-    border: 2px solid var(--mercatino-color) !important;
-    color: var(--mercatino-color) !important;
-    background-image: none !important;
-    box-shadow: none !important;
-}
-
-.evento-forzato-fiera {
-    background-color: transparent !important;
-    border: 2px solid var(--fiera-color) !important;
-    color: var(--fiera-color) !important;
-    background-image: none !important;
-    box-shadow: none !important;
-}
-
-.evento-forzato-manifestazione {
-    background-color: transparent !important;
-    border: 2px solid var(--manifestazione-color) !important;
-    color: var(--manifestazione-color) !important;
-    background-image: none !important;
-    box-shadow: none !important;
-}
-
-.evento-forzato-sagra {
-    background-color: transparent !important;
-    border: 2px solid var(--sagra-color) !important;
-    color: var(--sagra-color) !important;
-    background-image: none !important;
-    box-shadow: none !important;
-}
-
-.evento-forzato-festa-patronale {
-    background-color: transparent !important;
-    border: 2px solid var(--festa-patronale-color) !important;
-    color: var(--festa-patronale-color) !important;
-    background-image: none !important;
-    box-shadow: none !important;
-}
-
-/* ===== APPROCCIO FINALE - !IMPORTANT SELETTIVO ===== */
-
-/* Uso !important solo per gli eventi del calendario dove FullCalendar sovrascrive */
-.fc-event-mercatino {
-    background-color: transparent !important;
-    border: 2px solid var(--mercatino-color) !important;
-    color: var(--mercatino-color) !important;
-    background-image: none !important;
-    box-shadow: none !important;
-}
-
-.fc-event-fiera {
-    background-color: transparent !important;
-    border: 2px solid var(--fiera-color) !important;
-    color: var(--fiera-color) !important;
-    background-image: none !important;
-    box-shadow: none !important;
-}
-
-.fc-event-manifestazione {
-    background-color: transparent !important;
-    border: 2px solid var(--manifestazione-color) !important;
-    color: var(--manifestazione-color) !important;
-    background-image: none !important;
-    box-shadow: none !important;
-}
-
-.fc-event-sagra {
-    background-color: transparent !important;
-    border: 2px solid var(--sagra-color) !important;
-    color: var(--sagra-color) !important;
-    background-image: none !important;
-    box-shadow: none !important;
-}
-
-.fc-event-festa-patronale {
-    background-color: transparent !important;
-    border: 2px solid var(--festa-patronale-color) !important;
-    color: var(--festa-patronale-color) !important;
-    background-image: none !important;
-    box-shadow: none !important;
+    background-color: var(--festa-patronale-color);
+    border: 1px solid var(--festa-patronale-color);
+    color: white;
 }

@@ -758,12 +758,7 @@ const CalendarManager = {
                 };
                 // Non ricaricare automaticamente - sarà gestito dal caricamento normale
                 
-                // 🔥 FORZA COLORI DOPO CAMBIO VISTA
-                setTimeout(() => {
-                    if (DataLoader.forzaColoriEventi) {
-                        DataLoader.forzaColoriEventi();
-                    }
-                }, 200);
+
             }
         });
         
@@ -1282,62 +1277,7 @@ const CalendarManager = {
         }
     },
     
-    // 🔥 NUOVA FUNZIONE: Forza i colori degli eventi via JavaScript
-    forzaColoriEventi() {
-        Logger.info('🎨 Forzatura colori eventi via JavaScript...');
-        
-        // Trova tutti gli eventi del calendario
-        const eventi = document.querySelectorAll('.fc-event');
-        
-        eventi.forEach(evento => {
-            // Determina il tipo dall'ID o dalle classi
-            let tipo = 'manifestazione';
-            
-            if (evento.id && evento.id.includes('mercatino')) {
-                tipo = 'mercatino';
-            } else if (evento.id && evento.id.includes('fiera')) {
-                tipo = 'fiera';
-            } else if (evento.id && evento.id.includes('sagra')) {
-                tipo = 'sagra';
-            } else if (evento.id && evento.id.includes('festa-patronale')) {
-                tipo = 'festa-patronale';
-            } else if (evento.id && evento.id.includes('manifestazione')) {
-                tipo = 'manifestazione';
-            }
-            
-            // Applica stili direttamente via JavaScript
-            evento.style.setProperty('background-color', 'transparent', 'important');
-            evento.style.setProperty('background-image', 'none', 'important');
-            evento.style.setProperty('box-shadow', 'none', 'important');
-            evento.style.setProperty('text-shadow', 'none', 'important');
-            
-            // Colore del bordo e testo basato sul tipo
-            switch (tipo) {
-                case 'mercatino':
-                    evento.style.setProperty('border', '2px solid var(--mercatino-color)', 'important');
-                    evento.style.setProperty('color', 'var(--mercatino-color)', 'important');
-                    break;
-                case 'fiera':
-                    evento.style.setProperty('border', '2px solid var(--fiera-color)', 'important');
-                    evento.style.setProperty('color', 'var(--fiera-color)', 'important');
-                    break;
-                case 'manifestazione':
-                    evento.style.setProperty('border', '2px solid var(--manifestazione-color)', 'important');
-                    evento.style.setProperty('color', 'var(--manifestazione-color)', 'important');
-                    break;
-                case 'sagra':
-                    evento.style.setProperty('border', '2px solid var(--sagra-color)', 'important');
-                    evento.style.setProperty('color', 'var(--sagra-color)', 'important');
-                    break;
-                case 'festa-patronale':
-                    evento.style.setProperty('border', '2px solid var(--festa-patronale-color)', 'important');
-                    evento.style.setProperty('color', 'var(--festa-patronale-color)', 'important');
-                    break;
-            }
-        });
-        
-        Logger.success(`✅ Colori forzati su ${eventi.length} eventi`);
-    }
+
 };
 
 console.log('📊 Definizione DataLoader...');
@@ -1761,11 +1701,6 @@ const DataLoader = {
             CalendarManager.addEvents(tuttijEventi);
             eventiAggiunti = tuttijEventi.length;
         }
-        
-        // 🔥 FORZA COLORI VIA JAVASCRIPT - DOPO RENDER
-        setTimeout(() => {
-            CalendarManager.forzaColoriEventi();
-        }, 100);
         
         Logger.success(`✅ ${eventiAggiunti} eventi caricati! Database: ${this.mercatini.length} mercatini`);
     },
