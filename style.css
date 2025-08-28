@@ -4,6 +4,7 @@
     --fiera-color: #007bff;  /* Cambiato da giallo a blu */
     --manifestazione-color: #dc3545;  /* Cambiato da viola a rosso */
     --sagra-color: #6f42c1;  /* Cambiato da rosso a viola */
+    --festa-patronale-color: #fd7e14;  /* Arancione per feste patronali */
     
     --text-dark: #333;
     --text-light: #666;
@@ -397,6 +398,21 @@ body {
 .fc-event-fiera {
     background: var(--warning-color);
     color: var(--dark-text);
+}
+
+.fc-event-festa-patronale {
+    background: var(--festa-patronale-color);
+    color: white;
+}
+
+.fc-event-manifestazione {
+    background: var(--manifestazione-color);
+    color: white;
+}
+
+.fc-event-sagra {
+    background: var(--sagra-color);
+    color: white;
 }
 
 /* ===== ANIMAZIONI ===== */
@@ -1272,6 +1288,11 @@ body.loader-blocked {
     color: white;
 }
 
+#eventModal .modal-header.festa-patronale {
+    background-color: var(--festa-patronale-color);
+    color: white;
+}
+
 /* ===== BORDINI COLORATI EVENTI GIORNO ===== */
 
 /* Bordini colorati per eventi nel modal giorno */
@@ -1289,6 +1310,10 @@ body.loader-blocked {
 
 .event-item.sagra {
     border-left: 4px solid var(--sagra-color) !important;
+}
+
+.event-item.festa-patronale {
+    border-left: 4px solid var(--festa-patronale-color) !important;
 }
 
 /* ===== STATI PULSANTI PREFERITI ===== */

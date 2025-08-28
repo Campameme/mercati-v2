@@ -713,7 +713,8 @@ const CalendarManager = {
             eventClick: (info) => this.onEventClick(info.event),
             dateClick: (info) => this.onDayClick(info.dateStr),
             eventClassNames: (arg) => this.getEventClassNames(arg),
-            dayMaxEvents: 3, // Ridotto per evitare sovrapposizioni
+            dayMaxEvents: 2, // Ridotto a 2 per evitare sovrapposizioni
+            dayMaxEventRows: 2, // Massimo 2 righe di eventi per giorno
             moreLinkClick: function(info) {
                 // Previeni COMPLETAMENTE il popover/dropdown
                 if (info.jsEvent) {
@@ -811,7 +812,7 @@ const CalendarManager = {
         Logger.info('📱 Event listeners mobile configurati');
     },
     
-    // Raggruppa pallini per tipologia su mobile (massimo 6 per giorno)
+    // Raggruppa pallini per tipologia su mobile (massimo 4 per giorno)
     raggruppaPalliniPerTipologia() {
         if (window.innerWidth > 768) return; // Solo su mobile
         
@@ -856,9 +857,9 @@ const CalendarManager = {
             // Pulisci container
             eventsContainer.innerHTML = '';
             
-            // Aggiungi un pallino per ogni tipologia (massimo 5)
+            // Aggiungi un pallino per ogni tipologia (massimo 4)
             let palliniAggiunti = 0;
-            const maxPallini = 5;
+            const maxPallini = 4; // Ridotto da 5 a 4
             
             for (const [tipologia, eventi] of eventiPerTipologia) {
                 if (palliniAggiunti >= maxPallini) break;
@@ -888,7 +889,7 @@ const CalendarManager = {
             }
         });
         
-        Logger.info('📱 Pallini raggruppati per tipologia su mobile');
+        Logger.info('📱 Pallini raggruppati per tipologia su mobile (max 4)');
     },
     
     // Gestisce click su pallini e giorni su mobile
@@ -1010,22 +1011,38 @@ const CalendarManager = {
                     dettagli += ` | 📍 ${evento.extendedProps.luogo}`;
                 }
                 
-                // 🎨 BORDINO COLORATO BASATO SU CATEGORIA
-                let classiEvento = `event-item border rounded p-3 mb-3 ${index % 2 === 0 ? 'bg-light' : ''}`;
-                if (evento.extendedProps.tipo) {
-                    classiEvento += ` ${evento.extendedProps.tipo}`;
+                // 🎨 BORDINO COLORATO BASATO SU CATEGORIA - OTTIMIZZATO
+                let classiEvento = `event-item border rounded p-2 mb-2 ${index % 2 === 0 ? 'bg-light' : ''}`;
+                let borderColor = 'var(--border-color)';
+                
+                // Determina colore del bordo basato sulla tipologia
+                if (evento.extendedProps.tipo === 'mercatino') {
+                    classiEvento += ' mercatino';
+                    borderColor = 'var(--mercatino-color)';
+                } else if (evento.extendedProps.tipo === 'fiera') {
+                    classiEvento += ' fiera';
+                    borderColor = 'var(--fiera-color)';
+                } else if (evento.extendedProps.tipo === 'manifestazione') {
+                    classiEvento += ' manifestazione';
+                    borderColor = 'var(--manifestazione-color)';
+                } else if (evento.extendedProps.tipo === 'sagra') {
+                    classiEvento += ' sagra';
+                    borderColor = 'var(--sagra-color)';
+                } else if (evento.extendedProps.tipo === 'festa-patronale') {
+                    classiEvento += ' festa-patronale';
+                    borderColor = 'var(--primary-color)';
                 }
                 
                 html += `
-                    <div class="${classiEvento}">
+                    <div class="${classiEvento}" style="border-left: 4px solid ${borderColor} !important;">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="flex-grow-1">
-                                <div class="event-title h6 mb-2">${evento.title}</div>
+                                <div class="event-title h6 mb-1">${evento.title}</div>
                                 <div class="event-details">
                                     <small class="text-muted">${dettagli}</small>
                                 </div>
                             </div>
-                            <div class="btn-group-vertical ms-3" role="group">
+                            <div class="btn-group-vertical ms-2" role="group">
                                 <button class="btn btn-sm btn-outline-primary mb-1" onclick="EventManager.mostraDettagliEventoById('${evento.id}')">
                                     📋 Dettagli
                                 </button>
@@ -1155,15 +1172,21 @@ const CalendarManager = {
     // Gestisce il click su un evento
     onEventClick(evento) {
         Logger.debug('Click su evento:', evento.title);
-        // 🚀 APRE SOLO IL MODAL DELL'EVENTO
+        // 🚀 APRE SOLO IL MODAL DELL'EVENTO - NON quello del giorno
         EventManager.mostraDettagliEvento(evento);
+        
+        // Previeni che si apra anche il popup del giorno
+        return false;
     },
     
     // Gestisce il click su un giorno
     onDayClick(data) {
         Logger.debug('Click su giorno:', data);
-        // 🚀 APRE SOLO IL MODAL DEL GIORNO
+        // 🚀 APRE SOLO IL MODAL DEL GIORNO - NON quello dell'evento
         EventManager.mostraEventiGiorno(data);
+        
+        // Previeni che si apra anche il popup dell'evento
+        return false;
     },
     
 
@@ -1175,6 +1198,12 @@ const CalendarManager = {
             classNames.push('fc-event-mercatino');
         } else if (arg.event.extendedProps.tipo === 'fiera') {
             classNames.push('fc-event-fiera');
+        } else if (arg.event.extendedProps.tipo === 'manifestazione') {
+            classNames.push('fc-event-manifestazione');
+        } else if (arg.event.extendedProps.tipo === 'sagra') {
+            classNames.push('fc-event-sagra');
+        } else if (arg.event.extendedProps.tipo === 'festa-patronale') {
+            classNames.push('fc-event-festa-patronale');
         }
         return classNames;
     },
@@ -1363,17 +1392,35 @@ const CalendarManager = {
                 dettagli += ` | 🏷️ ${evento.extendedProps.tipologia}`;
             }
             
+            // 🎨 BORDINO COLORATO BASATO SU CATEGORIA
+            let classiEvento = 'event-item border rounded p-2 mb-2';
+            let borderColor = 'var(--border-color)';
+            
+            if (evento.extendedProps.tipo === 'mercatino') {
+                classiEvento += ' mercatino';
+                borderColor = 'var(--mercatino-color)';
+            } else if (evento.extendedProps.tipo === 'fiera') {
+                classiEvento += ' fiera';
+                borderColor = 'var(--fiera-color)';
+            } else if (evento.extendedProps.tipo === 'manifestazione') {
+                classiEvento += ' manifestazione';
+                borderColor = 'var(--manifestazione-color)';
+            } else if (evento.extendedProps.tipo === 'sagra') {
+                classiEvento += ' sagra';
+                borderColor = 'var(--sagra-color)';
+            }
+            
             html += `
-                <div class="event-item">
-                    <div class="event-title">${evento.title}</div>
-                    <div class="event-details">
-                        ${dettagli}
+                <div class="${classiEvento}" style="border-left: 4px solid ${borderColor} !important;">
+                    <div class="event-title h6 mb-1">${evento.title}</div>
+                    <div class="event-details mb-2">
+                        <small class="text-muted">${dettagli}</small>
                     </div>
                     <div class="event-actions">
                         <button class="btn btn-sm btn-primary" onclick="EventManager.mostraDettagliEventoById('${evento.id}')">
                             📋 Dettagli
                         </button>
-                        <button class="btn btn-sm btn-success" onclick="EventManager.togglePreferito('${evento.id}')">
+                        <button class="btn btn-sm ${this.isPreferito(evento.id) ? 'btn-preferito-rimuovi' : 'btn-outline-success'}" onclick="EventManager.togglePreferito('${evento.id}')">
                             ${this.isPreferito(evento.id) ? '💔 Rimuovi' : '❤️ Aggiungi'}
                         </button>
                     </div>
@@ -2382,9 +2429,28 @@ const EventManager = {
         this.salvaPreferiti();
         this.aggiornaListaPreferiti();
         
-        // 🎨 AGGIORNA STATO PULSANTE NELL'UI
-        const bottone = document.querySelector(`button[onclick*="${eventoId}"]`);
-        if (bottone) {
+        // 🎨 AGGIORNA STATO PULSANTE NELL'UI - CORRETTO
+        const bottoni = document.querySelectorAll(`button[onclick*="${eventoId}"]`);
+        bottoni.forEach(bottone => {
+            if (bottone.onclick && bottone.onclick.toString().includes('togglePreferito')) {
+                if (this.preferiti.has(eventoId)) {
+                    bottone.textContent = '💔 Rimuovi';
+                    bottone.className = 'btn btn-sm btn-preferito-rimuovi';
+                } else {
+                    bottone.textContent = '❤️ Aggiungi';
+                    bottone.className = 'btn btn-sm btn-outline-success';
+                }
+            }
+        });
+        
+        // Aggiorna anche i pulsanti nelle liste
+        this.aggiornaPulsantiPreferiti(eventoId);
+    },
+    
+    // Aggiorna tutti i pulsanti preferiti per un evento specifico
+    aggiornaPulsantiPreferiti(eventoId) {
+        const bottoniPreferiti = document.querySelectorAll(`button[onclick*="togglePreferito('${eventoId}')"]`);
+        bottoniPreferiti.forEach(bottone => {
             if (this.preferiti.has(eventoId)) {
                 bottone.textContent = '💔 Rimuovi';
                 bottone.className = 'btn btn-sm btn-preferito-rimuovi';
@@ -2392,7 +2458,7 @@ const EventManager = {
                 bottone.textContent = '❤️ Aggiungi';
                 bottone.className = 'btn btn-sm btn-outline-success';
             }
-        }
+        });
     },
     
     // Controlla se è preferito
@@ -2650,22 +2716,38 @@ const EventManager = {
                     dettagli += ` | 📍 ${evento.extendedProps.luogo}`;
                 }
                 
-                // 🎨 BORDINO COLORATO BASATO SU CATEGORIA
-                let classiEvento = `event-item border rounded p-3 mb-3 ${index % 2 === 0 ? 'bg-light' : ''}`;
-                if (evento.extendedProps.tipo) {
-                    classiEvento += ` ${evento.extendedProps.tipo}`;
+                // 🎨 BORDINO COLORATO BASATO SU CATEGORIA - OTTIMIZZATO
+                let classiEvento = `event-item border rounded p-2 mb-2 ${index % 2 === 0 ? 'bg-light' : ''}`;
+                let borderColor = 'var(--border-color)';
+                
+                // Determina colore del bordo basato sulla tipologia
+                if (evento.extendedProps.tipo === 'mercatino') {
+                    classiEvento += ' mercatino';
+                    borderColor = 'var(--mercatino-color)';
+                } else if (evento.extendedProps.tipo === 'fiera') {
+                    classiEvento += ' fiera';
+                    borderColor = 'var(--fiera-color)';
+                } else if (evento.extendedProps.tipo === 'manifestazione') {
+                    classiEvento += ' manifestazione';
+                    borderColor = 'var(--manifestazione-color)';
+                } else if (evento.extendedProps.tipo === 'sagra') {
+                    classiEvento += ' sagra';
+                    borderColor = 'var(--sagra-color)';
+                } else if (evento.extendedProps.tipo === 'festa-patronale') {
+                    classiEvento += ' festa-patronale';
+                    borderColor = 'var(--primary-color)';
                 }
                 
                 html += `
-                    <div class="${classiEvento}">
+                    <div class="${classiEvento}" style="border-left: 4px solid ${borderColor} !important;">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="flex-grow-1">
-                                <div class="event-title h6 mb-2">${evento.title}</div>
+                                <div class="event-title h6 mb-1">${evento.title}</div>
                                 <div class="event-details">
                                     <small class="text-muted">${dettagli}</small>
                                 </div>
                             </div>
-                            <div class="btn-group-vertical ms-3" role="group">
+                            <div class="btn-group-vertical ms-2" role="group">
                                 <button class="btn btn-sm btn-outline-primary mb-1" onclick="EventManager.mostraDettagliEventoById('${evento.id}')">
                                     📋 Dettagli
                                 </button>
@@ -2795,15 +2877,21 @@ const EventManager = {
     // Gestisce il click su un evento
     onEventClick(evento) {
         Logger.debug('Click su evento:', evento.title);
-        // 🚀 APRE SOLO IL MODAL DELL'EVENTO
+        // 🚀 APRE SOLO IL MODAL DELL'EVENTO - NON quello del giorno
         EventManager.mostraDettagliEvento(evento);
+        
+        // Previeni che si apra anche il popup del giorno
+        return false;
     },
     
     // Gestisce il click su un giorno
     onDayClick(data) {
         Logger.debug('Click su giorno:', data);
-        // 🚀 APRE SOLO IL MODAL DEL GIORNO
+        // 🚀 APRE SOLO IL MODAL DEL GIORNO - NON quello dell'evento
         EventManager.mostraEventiGiorno(data);
+        
+        // Previeni che si apra anche il popup dell'evento
+        return false;
     },
     
 
@@ -2815,6 +2903,12 @@ const EventManager = {
             classNames.push('fc-event-mercatino');
         } else if (arg.event.extendedProps.tipo === 'fiera') {
             classNames.push('fc-event-fiera');
+        } else if (arg.event.extendedProps.tipo === 'manifestazione') {
+            classNames.push('fc-event-manifestazione');
+        } else if (arg.event.extendedProps.tipo === 'sagra') {
+            classNames.push('fc-event-sagra');
+        } else if (arg.event.extendedProps.tipo === 'festa-patronale') {
+            classNames.push('fc-event-festa-patronale');
         }
         return classNames;
     },
@@ -3003,17 +3097,35 @@ const EventManager = {
                 dettagli += ` | 🏷️ ${evento.extendedProps.tipologia}`;
             }
             
+            // 🎨 BORDINO COLORATO BASATO SU CATEGORIA
+            let classiEvento = 'event-item border rounded p-2 mb-2';
+            let borderColor = 'var(--border-color)';
+            
+            if (evento.extendedProps.tipo === 'mercatino') {
+                classiEvento += ' mercatino';
+                borderColor = 'var(--mercatino-color)';
+            } else if (evento.extendedProps.tipo === 'fiera') {
+                classiEvento += ' fiera';
+                borderColor = 'var(--fiera-color)';
+            } else if (evento.extendedProps.tipo === 'manifestazione') {
+                classiEvento += ' manifestazione';
+                borderColor = 'var(--manifestazione-color)';
+            } else if (evento.extendedProps.tipo === 'sagra') {
+                classiEvento += ' sagra';
+                borderColor = 'var(--sagra-color)';
+            }
+            
             html += `
-                <div class="event-item">
-                    <div class="event-title">${evento.title}</div>
-                    <div class="event-details">
-                        ${dettagli}
+                <div class="${classiEvento}" style="border-left: 4px solid ${borderColor} !important;">
+                    <div class="event-title h6 mb-1">${evento.title}</div>
+                    <div class="event-details mb-2">
+                        <small class="text-muted">${dettagli}</small>
                     </div>
                     <div class="event-actions">
                         <button class="btn btn-sm btn-primary" onclick="EventManager.mostraDettagliEventoById('${evento.id}')">
                             📋 Dettagli
                         </button>
-                        <button class="btn btn-sm btn-success" onclick="EventManager.togglePreferito('${evento.id}')">
+                        <button class="btn btn-sm ${this.isPreferito(evento.id) ? 'btn-preferito-rimuovi' : 'btn-outline-success'}" onclick="EventManager.togglePreferito('${evento.id}')">
                             ${this.isPreferito(evento.id) ? '💔 Rimuovi' : '❤️ Aggiungi'}
                         </button>
                     </div>
