@@ -1060,16 +1060,27 @@ const CalendarManager = {
             body.innerHTML = html;
         }
         
-        // 🚀 GESTIONE CORRETTA CHIUSURA MODAL
+        // 🚀 GESTIONE CORRETTA CHIUSURA MODAL - FIXATA
         modal.show();
         
         // Assicura che il modal si chiuda correttamente
         const modalEl = document.getElementById('dailyModal');
         modalEl.addEventListener('hidden.bs.modal', function() {
+            // Pulisci tutto quando si chiude
+            modalEl.style.zIndex = '';
+            modalEl.classList.remove('modal-open');
+            
             // Rimuovi eventuali overlay rimasti
             const overlays = document.querySelectorAll('.modal-backdrop');
             overlays.forEach(overlay => overlay.remove());
-        });
+            
+            // Rimuovi classi che bloccano lo schermo
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            
+            Logger.info('🧹 Modal giornaliero chiuso correttamente, schermo sbloccato');
+        }, { once: true }); // Assicura che l'event listener venga eseguito solo una volta
     },
     
     // Mostra eventi di un tipo specifico per un giorno
@@ -1502,6 +1513,55 @@ const CalendarManager = {
     // 🚀 NUOVA FUNZIONE: Naviga al calendario
     navigaAData(data) {
         this.calendar.gotoDate(data);
+    },
+    
+    // 🔥 NUOVA FUNZIONE: Pulisce overlay rimasti e sblocca schermo
+    pulisciOverlayRimasti() {
+        // Rimuovi tutti gli overlay rimasti
+        const overlays = document.querySelectorAll('.modal-backdrop');
+        overlays.forEach(overlay => {
+            overlay.remove();
+        });
+        
+        // Rimuovi classi che bloccano lo schermo
+        document.body.classList.remove('modal-open');
+        document.body.classList.remove('loader-blocked');
+        
+        // Ripristina scroll
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        
+        Logger.info('🧹 Overlay rimasti puliti, schermo sbloccato');
+    },
+    
+    // 🚨 FUNZIONE DI EMERGENZA: Sblocca completamente lo schermo
+    sbloccaSchermo() {
+        // Chiudi tutti i modal aperti
+        const modals = document.querySelectorAll('.modal.show');
+        modals.forEach(modal => {
+            const modalInstance = bootstrap.Modal.getInstance(modal);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+        });
+        
+        // Rimuovi tutti gli overlay
+        const overlays = document.querySelectorAll('.modal-backdrop');
+        overlays.forEach(overlay => overlay.remove());
+        
+        // Rimuovi tutte le classi che bloccano
+        document.body.classList.remove('modal-open', 'loader-blocked');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        
+        // Reset z-index di tutti i modal
+        const allModals = document.querySelectorAll('.modal');
+        allModals.forEach(modal => {
+            modal.style.zIndex = '';
+            modal.classList.remove('modal-open');
+        });
+        
+        Logger.info('🚨 Schermo sbloccato completamente in modalità emergenza');
     }
 };
 
@@ -2554,17 +2614,18 @@ const EventManager = {
         const title = document.getElementById('eventModalTitle');
         const body = document.getElementById('eventModalBody');
         const modalHeader = document.getElementById('eventModal').querySelector('.modal-header');
-        
-        // Assicura che questo modal sia sopra agli altri
         const modalEl = document.getElementById('eventModal');
-        modalEl.style.zIndex = '2060'; // Più alto del modal giornaliero (1055)
+        
+        // Reset z-index e rimuovi classi precedenti
+        modalEl.style.zIndex = '';
+        modalEl.classList.remove('modal-open');
         
         title.textContent = evento.title;
         
         // 🎨 HEADER COLORATO BASATO SU CATEGORIA
         if (modalHeader) {
             // Rimuovi classi precedenti
-            modalHeader.classList.remove('mercatino', 'fiera', 'manifestazione', 'sagra');
+            modalHeader.classList.remove('mercatino', 'fiera', 'manifestazione', 'sagra', 'festa-patronale');
             
             // Aggiungi classe categoria
             if (evento.extendedProps.tipo) {
@@ -2630,17 +2691,26 @@ const EventManager = {
         
         body.innerHTML = html;
         
-        // 🚀 GESTIONE CORRETTA CHIUSURA MODAL
+        // 🚀 GESTIONE CORRETTA CHIUSURA MODAL - FIXATA
         modal.show();
         
         // Assicura che il modal si chiuda correttamente
         modalEl.addEventListener('hidden.bs.modal', function() {
-            // Pulisci lo z-index quando si chiude
+            // Pulisci tutto quando si chiude
             modalEl.style.zIndex = '';
+            modalEl.classList.remove('modal-open');
+            
             // Rimuovi eventuali overlay rimasti
             const overlays = document.querySelectorAll('.modal-backdrop');
             overlays.forEach(overlay => overlay.remove());
-        });
+            
+            // Rimuovi classi che bloccano lo schermo
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            
+            Logger.info('🧹 Modal evento chiuso correttamente, schermo sbloccato');
+        }, { once: true }); // Assicura che l'event listener venga eseguito solo una volta
     },
     
     // Mostra eventi del giorno
@@ -3211,61 +3281,61 @@ console.log('🎬 Setup inizializzazione...');
 function initApp() {
     console.log('📱 Tentativo di inizializzazione app...');
     
-    // Verifica librerie esterne
-    console.log('📦 Verifica librerie:', {
-        FullCalendar: typeof FullCalendar !== 'undefined',
-        bootstrap: typeof bootstrap !== 'undefined',
-        Papa: typeof Papa !== 'undefined'
+    // 🚨 EVENT LISTENER GLOBALE per prevenire blocchi dello schermo
+    document.addEventListener('keydown', function(event) {
+        // ESC key per sbloccare lo schermo in emergenza
+        if (event.key === 'Escape') {
+            const modals = document.querySelectorAll('.modal.show');
+            if (modals.length > 0) {
+                // Se ci sono modal aperti, chiudili normalmente
+                modals.forEach(modal => {
+                    const modalInstance = bootstrap.Modal.getInstance(modal);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+                });
+            } else {
+                // Se non ci sono modal ma lo schermo è bloccato, sbloccalo
+                if (document.body.classList.contains('modal-open') || document.body.style.overflow === 'hidden') {
+                    App.sbloccaSchermo();
+                }
+            }
+        }
     });
     
-    if (typeof FullCalendar === 'undefined') {
-        console.error('❌ FullCalendar non caricato, riprovo tra 100ms...');
-        setTimeout(initApp, 100);
-        return;
-    }
-    
-    if (typeof bootstrap === 'undefined') {
-        console.error('❌ Bootstrap non caricato, riprovo tra 100ms...');
-        setTimeout(initApp, 100);
-        return;
-    }
-    
-    if (typeof Papa === 'undefined') {
-        console.error('❌ PapaParse non caricato, riprovo tra 100ms...');
-        setTimeout(initApp, 100);
-        return;
-    }
-    
-    // Verifica che l'elemento calendario esista
-    const calendarEl = document.getElementById('calendar');
-    if (!calendarEl) {
-        console.error('❌ Elemento calendario non trovato, riprovo tra 100ms...');
-        setTimeout(initApp, 100);
-        return;
-    }
-    
-    console.log('✅ Tutti i componenti esterni caricati!');
-    console.log('🔍 Verifica moduli interni:', {
-        CONFIG: typeof CONFIG !== 'undefined',
-        Logger: typeof Logger !== 'undefined',
-        Utils: typeof Utils !== 'undefined',
-        CalendarManager: typeof CalendarManager !== 'undefined',
-        DataLoader: typeof DataLoader !== 'undefined',
-        App: typeof App !== 'undefined',
-        FilterManager: typeof FilterManager !== 'undefined',
-        EventManager: typeof EventManager !== 'undefined'
+    // 🚨 EVENT LISTENER per click fuori dai modal (fallback)
+    document.addEventListener('click', function(event) {
+        if (event.target.classList.contains('modal-backdrop')) {
+            // Click sull'overlay, chiudi tutti i modal
+            const modals = document.querySelectorAll('.modal.show');
+            modals.forEach(modal => {
+                const modalInstance = bootstrap.Modal.getInstance(modal);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+            });
+        }
     });
     
-    console.log('🚀 Avvio App.init()...');
-    App.init();
-    
-    // Carica automaticamente i dati all'avvio
-    console.log('📡 Caricamento automatico dati...');
-    setTimeout(() => {
-        App.caricaDati().catch(error => {
-            console.error('❌ Errore caricamento automatico:', error);
-        });
-    }, 500);
+    try {
+        // Inizializza l'app
+        App.init();
+        
+        // Carica i dati
+        App.caricaDati();
+        
+        console.log('✅ App inizializzata con successo!');
+        
+    } catch (error) {
+        console.error('❌ Errore durante l\'inizializzazione:', error);
+        
+        // In caso di errore, prova a pulire eventuali overlay rimasti
+        setTimeout(() => {
+            if (App.pulisciOverlayRimasti) {
+                App.pulisciOverlayRimasti();
+            }
+        }, 1000);
+    }
 }
 
 // Avvia l'inizializzazione
