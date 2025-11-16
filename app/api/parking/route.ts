@@ -98,11 +98,16 @@ async function getParkingFromGooglePlaces(lat: number, lng: number, radius: numb
   
   if (allResults.length === 0) {
     console.warn('[API] ⚠️ Nessun risultato da Google Places!')
-    console.warn('[API] Status Text Search:', textSearchDataArray.map((d: any) => d.status))
+    console.warn('[API] Status Text Search:', textSearchDataArray.map((d: any, i: number) => `${queries[i]}: ${d.status}`))
     console.warn('[API] Status Nearby Search:', nearbySearchData.status)
     if (nearbySearchData.error_message) {
-      console.error('[API] Error message:', nearbySearchData.error_message)
+      console.error('[API] Error message Nearby Search:', nearbySearchData.error_message)
     }
+    textSearchDataArray.forEach((d: any, i: number) => {
+      if (d.error_message) {
+        console.error(`[API] Error message Text Search ${i + 1} (${queries[i]}):`, d.error_message)
+      }
+    })
   }
 
   // Converti i risultati in formato Parking
