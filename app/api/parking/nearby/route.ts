@@ -99,7 +99,7 @@ function convertGooglePlaceToParking(
     hasRestrooms: false,
     placeId: place.place_id,
     rating: place.rating,
-    userRatingsTotal: place.user_ratingsTotal,
+    userRatingsTotal: place.user_ratings_total,
     distance,
     nearRiver, // Flag per parcheggi vicini al fiume Roja
     source: 'google' as const,
