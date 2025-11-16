@@ -15,34 +15,33 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 })
 
-// Centro area mercato venerdì Ventimiglia (lungo via G. Oberdan e via Gerolamo Rossi)
-// Coordinate corrette: centro tra via G. Oberdan e via Gerolamo Rossi
-const defaultCenter: [number, number] = [43.7920, 7.6095]
+// Centro area mercato venerdì Ventimiglia
+// Il mercato si svolge lungo Via della Repubblica, da Piazza della Libertà a Via Martiri della Libertà
+const defaultCenter: [number, number] = [43.7912, 7.6082]
 
-// Percorso del mercato del venerdì lungo via G. Oberdan e via Gerolamo Rossi
-// Coordinate corrette basate sul percorso reale del mercato
-// Via G. Oberdan: da 43.7915, 7.6070 a 43.7920, 7.6095
-// Via Gerolamo Rossi: da 43.7920, 7.6095 a 43.7930, 7.6110
+// Percorso del mercato del venerdì lungo Via della Repubblica
+// Il mercato si estende da Piazza della Libertà (43.7910, 7.6075) 
+// fino all'intersezione con Via Martiri della Libertà (43.7915, 7.6090)
+// Percorso dettagliato che segue fedelmente Via della Repubblica
 const marketPath: [number, number][] = [
-  [43.7915, 7.6070], // Inizio percorso - via G. Oberdan (sud-ovest)
-  [43.7917, 7.6075], // via G. Oberdan
-  [43.7918, 7.6080], // via G. Oberdan
-  [43.7919, 7.6085], // via G. Oberdan
-  [43.7920, 7.6090], // via G. Oberdan
-  [43.7920, 7.6095], // Incrocio - via G. Oberdan / via Gerolamo Rossi
-  [43.7922, 7.6100], // via Gerolamo Rossi
-  [43.7925, 7.6105], // via Gerolamo Rossi
-  [43.7930, 7.6110], // Fine percorso - via Gerolamo Rossi (nord-est)
+  [43.7910, 7.6075], // Inizio - Piazza della Libertà
+  [43.7910, 7.6077], // Via della Repubblica
+  [43.7911, 7.6080], // Via della Repubblica (vicino mercato coperto)
+  [43.7912, 7.6082], // Via della Repubblica (centro percorso)
+  [43.7913, 7.6085], // Via della Repubblica
+  [43.7914, 7.6087], // Via della Repubblica
+  [43.7915, 7.6090], // Fine - Intersezione Via Martiri della Libertà
 ]
 
-// Mercato coperto Ventimiglia - coordinate reali
-// Via della Repubblica 7, 18039 Ventimiglia
-// Coordinate: 43.79102, 7.6087
+// Mercato coperto Ventimiglia - forma rettangolare corretta
+// Via della Repubblica 5, 18039 Ventimiglia
+// Coordinate centro: 43.7912, 7.6080
+// Forma rettangolare dell'edificio (circa 50m x 30m)
 const coveredMarketArea: [number, number][] = [
-  [43.7909, 7.6084], // Nord-ovest
-  [43.7911, 7.6089], // Nord-est
-  [43.7910, 7.6091], // Sud-est
-  [43.7908, 7.6086], // Sud-ovest
+  [43.7910, 7.6078], // Nord-ovest
+  [43.7914, 7.6082], // Nord-est
+  [43.7913, 7.6085], // Sud-est
+  [43.7909, 7.6081], // Sud-ovest
 ]
 
 /**
@@ -249,11 +248,12 @@ export default function OperatorMap({ category, searchQuery }: OperatorMapProps)
         />
         
         {/* Marker per il mercato coperto - posizionato al centro dell'area */}
-        <Marker position={[43.79102, 7.6087]}>
+        <Marker position={[43.7912, 7.6080]}>
           <Popup>
             <div className="text-sm">
               <div className="font-semibold text-blue-600">🏛️ Mercato Coperto</div>
-              <div className="text-gray-600">Via della Repubblica 7, Ventimiglia</div>
+              <div className="text-gray-600">Via della Repubblica 5, Ventimiglia</div>
+              <div className="text-xs text-gray-500 mt-1">Orari: Lun-Gio 7-14, Ven-Sab 7-17</div>
             </div>
           </Popup>
         </Marker>
