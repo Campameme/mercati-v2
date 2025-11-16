@@ -71,50 +71,32 @@ export default function WeatherWidget() {
   const loadWeather = async () => {
     try {
       setLoading(true)
-      // Coordinate Ventimiglia: 43.7885, 7.6060
-      // Usa OpenWeatherMap API (gratuita) o un'altra API meteo
-      // Per ora usiamo dati mock, ma puoi integrare un'API reale
       
-      // Esempio con OpenWeatherMap (richiede API key):
-      // const apiKey = process.env.NEXT_PUBLIC_WEATHER_API_KEY
-      // const response = await fetch(
-      //   `https://api.openweathermap.org/data/2.5/weather?lat=43.7885&lon=7.6060&appid=${apiKey}&units=metric&lang=it`
-      // )
-      // const data = await response.json()
+      // Chiama API meteo
+      const response = await fetch('/api/weather')
+      const result = await response.json()
 
-      // Mock data per ora
-      const mockWeather: WeatherData = {
-        current: {
-          temperature: 15,
-          condition: 'Parzialmente nuvoloso',
-          icon: 'partly-cloudy',
-          humidity: 65,
-          windSpeed: 12,
-        },
-        hourly: Array.from({ length: 24 }, (_, i) => ({
-          time: new Date(Date.now() + i * 60 * 60 * 1000),
-          temperature: 12 + Math.random() * 8,
-          condition: i < 6 ? 'Sereno' : i < 12 ? 'Nuvoloso' : 'Pioggia leggera',
-          icon: i < 6 ? 'sunny' : i < 12 ? 'cloudy' : 'rainy',
-          precipitation: i < 12 ? 0 : Math.random() * 5,
-        })),
-        daily: Array.from({ length: 3 }, (_, i) => ({
-          date: new Date(Date.now() + i * 24 * 60 * 60 * 1000),
-          maxTemp: 18 + Math.random() * 5,
-          minTemp: 8 + Math.random() * 5,
-          condition: i === 0 ? 'Vento forte' : i === 1 ? 'Pioggia' : 'Sereno',
-          icon: i === 0 ? 'windy' : i === 1 ? 'rainy' : 'sunny',
-          precipitation: i === 1 ? 15 : 0,
-        })),
-        alerts: [],
+      if (result.success && result.data) {
+        // Converti le date da stringhe ISO a oggetti Date
+        const weatherData: WeatherData = {
+          ...result.data,
+          hourly: result.data.hourly.map((h: any) => ({
+            ...h,
+            time: new Date(h.time),
+          })),
+          daily: result.data.daily.map((d: any) => ({
+            ...d,
+            date: new Date(d.date),
+          })),
+        }
+
+        setWeather(weatherData)
+      } else {
+        throw new Error('Errore nel caricamento dati meteo')
       }
-
-      setTimeout(() => {
-        setWeather(mockWeather)
-        setLoading(false)
-      }, 300)
     } catch (error) {
       console.error('Errore nel caricamento meteo:', error)
+    } finally {
       setLoading(false)
     }
   }

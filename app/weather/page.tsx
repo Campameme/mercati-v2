@@ -51,85 +51,41 @@ export default function WeatherPage() {
         setIsRefreshing(true)
       }
 
-      // Simula variazione dei dati meteo (in produzione verrà da API meteo)
-      const baseTemp = 12 + Math.random() * 8
-      const hour = new Date().getHours()
-      const isDaytime = hour >= 6 && hour < 20
-      
-      const mockWeather: WeatherData = {
-        current: {
-          temperature: Math.round(baseTemp * 10) / 10,
-          condition: isDaytime 
-            ? (baseTemp > 18 ? 'Sereno' : baseTemp > 15 ? 'Parzialmente nuvoloso' : 'Nuvoloso')
-            : 'Sereno',
-          icon: isDaytime 
-            ? (baseTemp > 18 ? 'sunny' : baseTemp > 15 ? 'partly-cloudy' : 'cloudy')
-            : 'clear-night',
-          humidity: Math.round(50 + Math.random() * 30),
-          windSpeed: Math.round(5 + Math.random() * 20),
-        },
-        hourly: Array.from({ length: 24 }, (_, i) => {
-          const hourTime = new Date(Date.now() + i * 60 * 60 * 1000)
-          const hourOfDay = hourTime.getHours()
-          const isDay = hourOfDay >= 6 && hourOfDay < 20
-          const temp = isDay 
-            ? (12 + Math.random() * 8 + (hourOfDay >= 12 && hourOfDay < 16 ? 3 : 0))
-            : (10 + Math.random() * 4)
-          
-          return {
-            time: hourTime,
-            temperature: Math.round(temp * 10) / 10,
-            condition: isDay 
-              ? (temp > 18 ? 'Sereno' : temp > 15 ? 'Nuvoloso' : 'Pioggia leggera')
-              : 'Sereno',
-            icon: isDay 
-              ? (temp > 18 ? 'sunny' : temp > 15 ? 'cloudy' : 'rainy')
-              : 'clear-night',
-            precipitation: i >= 12 && i < 18 ? Math.random() * 5 : 0,
-          }
-        }),
-        daily: Array.from({ length: 3 }, (_, i) => {
-          const dayDate = new Date(Date.now() + i * 24 * 60 * 60 * 1000)
-          const maxTemp = 15 + Math.random() * 8
-          const minTemp = maxTemp - 5 - Math.random() * 3
-          
-          return {
-            date: dayDate,
-            maxTemp: Math.round(maxTemp * 10) / 10,
-            minTemp: Math.round(minTemp * 10) / 10,
-            condition: i === 0 ? 'Vento forte' : i === 1 ? 'Pioggia' : 'Sereno',
-            icon: i === 0 ? 'windy' : i === 1 ? 'rainy' : 'sunny',
-            precipitation: i === 1 ? Math.round(15 + Math.random() * 10) : 0,
-          }
-        }),
-        alerts: baseTemp < 5 || baseTemp > 30 ? [
-          {
-            type: baseTemp < 5 ? 'wind' : 'storm',
-            severity: 'severe',
-            message: baseTemp < 5 
-              ? `Temperature molto basse previste: ${Math.round(baseTemp)}°C. Si consiglia di coprire le bancarelle.`
-              : `Temperature molto alte previste: ${Math.round(baseTemp)}°C. Si consiglia di idratarsi e cercare ombra.`,
-          },
-        ] : [],
-      }
+      // Chiama API meteo
+      const response = await fetch('/api/weather')
+      const result = await response.json()
 
-      setTimeout(() => {
-        setWeather(mockWeather)
+      if (result.success && result.data) {
+        // Converti le date da stringhe ISO a oggetti Date
+        const weatherData: WeatherData = {
+          ...result.data,
+          hourly: result.data.hourly.map((h: any) => ({
+            ...h,
+            time: new Date(h.time),
+          })),
+          daily: result.data.daily.map((d: any) => ({
+            ...d,
+            date: new Date(d.date),
+          })),
+        }
+
+        setWeather(weatherData)
         setLastUpdate(new Date())
-        setLoading(false)
-        setIsRefreshing(false)
-      }, 300)
-
-      // Invia notifiche per alert critici
-      if (permission === 'granted' && mockWeather.alerts.length > 0) {
-        mockWeather.alerts.forEach((alert) => {
-          if (alert.severity === 'severe') {
-            sendNotification('Allerta Meteo', alert.message)
-          }
-        })
+        
+        // Invia notifiche per alert critici
+        if (permission === 'granted' && weatherData.alerts.length > 0) {
+          weatherData.alerts.forEach((alert) => {
+            if (alert.severity === 'severe') {
+              sendNotification('Allerta Meteo', alert.message)
+            }
+          })
+        }
+      } else {
+        throw new Error('Errore nel caricamento dati meteo')
       }
     } catch (error) {
       console.error('Errore nel caricamento meteo:', error)
+    } finally {
       setLoading(false)
       setIsRefreshing(false)
     }
