@@ -1,5 +1,105 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// Forza rendering dinamico (non statico) perché usiamo nextUrl.origin
+export const dynamic = 'force-dynamic'
+
+// Importa direttamente la logica da nearby invece di fare una chiamata HTTP
+// Questo evita problemi con le chiamate interne su Netlify
+async function getParkingFromGooglePlaces(lat: number, lng: number, radius: number) {
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+  if (!apiKey) {
+    throw new Error('Google Maps API key non configurata')
+  }
+
+  // Usa Text Search API per cercare "parcheggio" e "porto" a Ventimiglia
+  const queries = [
+    'parcheggio Ventimiglia',
+    'porto Ventimiglia',
+    'parking Ventimiglia',
+  ]
+  
+  // Esegui ricerche testuali multiple
+  const textSearchPromises = queries.map(query => {
+    const textSearchUrl = new URL('https://maps.googleapis.com/maps/api/place/textsearch/json')
+    textSearchUrl.searchParams.set('query', query)
+    textSearchUrl.searchParams.set('location', `${lat},${lng}`)
+    textSearchUrl.searchParams.set('radius', Math.min(radius, 2000).toString())
+    textSearchUrl.searchParams.set('key', apiKey)
+    return fetch(textSearchUrl.toString())
+  })
+  
+  // Anche Nearby Search per tipo "parking"
+  const nearbySearchUrl = new URL('https://maps.googleapis.com/maps/api/place/nearbysearch/json')
+  nearbySearchUrl.searchParams.set('location', `${lat},${lng}`)
+  nearbySearchUrl.searchParams.set('radius', Math.min(radius, 2000).toString())
+  nearbySearchUrl.searchParams.set('type', 'parking')
+  nearbySearchUrl.searchParams.set('key', apiKey)
+  
+  // Esegui tutte le ricerche in parallelo
+  const [textSearchResponses, nearbySearchResponse] = await Promise.all([
+    Promise.all(textSearchPromises),
+    fetch(nearbySearchUrl.toString()),
+  ])
+  
+  const textSearchDataArray = await Promise.all(
+    textSearchResponses.map(r => r.json())
+  )
+  const nearbySearchData = await nearbySearchResponse.json()
+  
+  // Combina i risultati
+  let allResults: any[] = []
+  const seenPlaceIds = new Set<string>()
+  
+  textSearchDataArray.forEach((textSearchData: any) => {
+    if (textSearchData.status === 'OK' && textSearchData.results) {
+      textSearchData.results.forEach((result: any) => {
+        if (!seenPlaceIds.has(result.place_id)) {
+          allResults.push(result)
+          seenPlaceIds.add(result.place_id)
+        }
+      })
+    }
+  })
+  
+  if (nearbySearchData.status === 'OK' && nearbySearchData.results) {
+    nearbySearchData.results.forEach((result: any) => {
+      if (!seenPlaceIds.has(result.place_id)) {
+        allResults.push(result)
+        seenPlaceIds.add(result.place_id)
+      }
+    })
+  }
+
+  // Converti i risultati in formato Parking
+  return allResults.map((place: any) => {
+    const distance = calculateDistance(lat, lng, place.geometry.location.lat, place.geometry.location.lng)
+    const isPaid = place.rating ? place.rating > 3 : undefined
+    
+    return {
+      id: `google_${place.place_id}`,
+      name: place.name,
+      address: place.formatted_address || place.vicinity || 'Indirizzo non disponibile',
+      type: 'private' as const,
+      paid: isPaid,
+      fee: isPaid === undefined ? 'Indefinito' : (isPaid ? 'Indefinito' : 'Gratuito'),
+      hours: 'Orari da verificare',
+      availableSpots: 30,
+      totalSpots: 50,
+      location: {
+        lat: place.geometry.location.lat,
+        lng: place.geometry.location.lng,
+      },
+      accessible: false,
+      hasRestrooms: false,
+      placeId: place.place_id,
+      rating: place.rating,
+      userRatingsTotal: place.user_ratings_total,
+      distance,
+      source: 'google' as const,
+    }
+  })
+}
+
 // Funzione per calcolare distanza in metri usando formula Haversine
 function calculateDistance(
   lat1: number,
@@ -20,9 +120,6 @@ function calculateDistance(
   return R * c
 }
 
-// Forza rendering dinamico (non statico) perché usiamo nextUrl.origin
-export const dynamic = 'force-dynamic'
-
 export async function GET(request: NextRequest) {
   try {
     // SOLO Google Places - fonte affidabile con nomi reali
@@ -31,7 +128,7 @@ export async function GET(request: NextRequest) {
       lng: 7.6060,
     }
     
-    const MAX_DISTANCE_FROM_MARKET = 2000 // metri - parcheggi vicini al mercato (2km max come richiesto)
+    const MAX_DISTANCE_FROM_MARKET = 2000 // metri - parcheggi vicini al mercato (2km max)
     
     const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
     
@@ -44,142 +141,62 @@ export async function GET(request: NextRequest) {
       }, { status: 500 })
     }
 
-    // Chiama direttamente l'API nearby invece di fare una chiamata HTTP interna
-    // Questo evita problemi con le chiamate interne su Netlify
-    const baseUrl = request.nextUrl.origin
-    const nearbyUrl = new URL('/api/parking/nearby', baseUrl)
-    nearbyUrl.searchParams.set('lat', MARKET_CENTER.lat.toString())
-    nearbyUrl.searchParams.set('lng', MARKET_CENTER.lng.toString())
-    nearbyUrl.searchParams.set('radius', MAX_DISTANCE_FROM_MARKET.toString())
-    
-    // Fetch da Google Places con timeout
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 secondi timeout
-    
-    let googleResponse: Response
-    try {
-      googleResponse = await fetch(nearbyUrl.toString(), {
-        cache: 'no-store',
-        signal: controller.signal,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      clearTimeout(timeoutId)
-    } catch (fetchError: any) {
-      clearTimeout(timeoutId)
-      console.error('Errore fetch parking/nearby:', fetchError)
-      if (fetchError.name === 'AbortError') {
-        return NextResponse.json({
-          success: true,
-          data: [],
-          city: 'Ventimiglia',
-          source: 'Google Places',
-          lastUpdated: new Date().toISOString(),
-          count: 0,
-          warning: 'Timeout nel caricamento parcheggi',
-        })
-      }
-      throw fetchError
-    }
-    
-    if (!googleResponse.ok) {
-      const errorText = await googleResponse.text().catch(() => googleResponse.statusText)
-      console.error(`Errore HTTP ${googleResponse.status}:`, errorText)
-      return NextResponse.json({
-        success: true,
-        data: [],
-        city: 'Ventimiglia',
-        source: 'Google Places',
-        lastUpdated: new Date().toISOString(),
-        count: 0,
-        warning: `Errore HTTP: ${googleResponse.status}`,
-      })
-    }
-    
-    let googleData: any
-    try {
-      googleData = await googleResponse.json()
-    } catch (jsonError) {
-      console.error('Errore parsing JSON:', jsonError)
-      return NextResponse.json({
-        success: true,
-        data: [],
-        city: 'Ventimiglia',
-        source: 'Google Places',
-        lastUpdated: new Date().toISOString(),
-        count: 0,
-        warning: 'Errore nel parsing della risposta',
-      })
-    }
-    
-    if (!googleData || !Array.isArray(googleData.data)) {
-      return NextResponse.json({
-        success: true,
-        data: [],
-        city: 'Ventimiglia',
-        source: 'Google Places',
-        lastUpdated: new Date().toISOString(),
-        count: 0,
-        warning: 'Formato dati non valido',
-      })
-    }
+    // Chiama direttamente la funzione invece di fare una chiamata HTTP
+    const allParkings = await getParkingFromGooglePlaces(
+      MARKET_CENTER.lat,
+      MARKET_CENTER.lng,
+      MAX_DISTANCE_FROM_MARKET
+    )
 
     // Filtra solo parcheggi vicini al mercato e deduplica
-    const allParkings: any[] = []
+    const filteredParkings: any[] = []
     const seenPositions: Array<{ lat: number; lng: number; parking: any }> = []
-    const DUPLICATE_THRESHOLD = 30 // metri - se due parcheggi sono a meno di 30m, sono duplicati
+    const DUPLICATE_THRESHOLD = 30 // metri
     
-    // Funzione per verificare se un parcheggio è duplicato
-    const isDuplicate = (lat: number, lng: number): { isDuplicate: boolean; existing?: any } => {
+    const isDuplicate = (lat: number, lng: number): boolean => {
       for (const seen of seenPositions) {
         const distance = calculateDistance(lat, lng, seen.lat, seen.lng)
         if (distance < DUPLICATE_THRESHOLD) {
-          return { isDuplicate: true, existing: seen.parking }
+          return true
         }
       }
-      return { isDuplicate: false }
+      return false
     }
     
-    googleData.data.forEach((p: any) => {
+    allParkings.forEach((p: any) => {
       if (!p.location || !p.location.lat || !p.location.lng) return
       
-      const distance = calculateDistance(
+      const distance = p.distance || calculateDistance(
         MARKET_CENTER.lat,
         MARKET_CENTER.lng,
         p.location.lat,
         p.location.lng
       )
       
-      if (distance <= MAX_DISTANCE_FROM_MARKET) {
-        const duplicate = isDuplicate(p.location.lat, p.location.lng)
-        
-        if (!duplicate.isDuplicate) {
-          p.distance = distance
-          p.source = 'google'
-          allParkings.push(p)
-          seenPositions.push({ lat: p.location.lat, lng: p.location.lng, parking: p })
-        }
+      if (distance <= MAX_DISTANCE_FROM_MARKET && !isDuplicate(p.location.lat, p.location.lng)) {
+        p.distance = distance
+        filteredParkings.push(p)
+        seenPositions.push({ lat: p.location.lat, lng: p.location.lng, parking: p })
       }
     })
     
     // Ordina per distanza dal mercato
-    allParkings.sort((a: any, b: any) => (a.distance || 0) - (b.distance || 0))
+    filteredParkings.sort((a: any, b: any) => (a.distance || 0) - (b.distance || 0))
     
-    console.log(`API: ✅ ${allParkings.length} parcheggi Google Places trovati vicino al mercato`)
+    console.log(`API: ✅ ${filteredParkings.length} parcheggi Google Places trovati vicino al mercato`)
 
     return NextResponse.json({
       success: true,
-      data: allParkings,
+      data: filteredParkings,
       city: 'Ventimiglia',
       source: 'Google Places',
       lastUpdated: new Date().toISOString(),
-      count: allParkings.length,
+      count: filteredParkings.length,
       marketCenter: MARKET_CENTER,
       maxDistance: MAX_DISTANCE_FROM_MARKET,
-      message: allParkings.length === 0 
+      message: filteredParkings.length === 0 
         ? 'Nessun parcheggio trovato vicino al mercato'
-        : `${allParkings.length} parcheggi trovati vicino al mercato`,
+        : `${filteredParkings.length} parcheggi trovati vicino al mercato`,
     })
   } catch (error) {
     console.error('Errore nel caricamento parcheggi:', error)
