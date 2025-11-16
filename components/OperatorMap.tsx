@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { MapContainer, TileLayer, Polyline, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, Polyline, Polygon, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import OperatorCard from './OperatorCard'
 import { Operator, OperatorCategory } from '@/types/operator'
@@ -33,6 +33,91 @@ const marketPath: [number, number][] = [
   [43.7890, 7.6080], // Via Milite Ignoto
   [43.7891, 7.6085], // Fine - Via Milite Ignoto (est)
 ]
+
+/**
+ * Crea un'area (poligono) dal percorso del mercato
+ * Espande il percorso creando un'area più larga intorno alla linea
+ */
+function createMarketArea(path: [number, number][], width: number = 0.0003): [number, number][] {
+  if (path.length < 2) return path
+  
+  const area: [number, number][] = []
+  
+  // Aggiungi punti lungo il percorso espandendo perpendicolarmente
+  for (let i = 0; i < path.length; i++) {
+    const point = path[i]
+    let dx = 0
+    let dy = 0
+    
+    if (i === 0) {
+      // Primo punto: usa la direzione verso il prossimo punto
+      const next = path[i + 1]
+      dx = next[1] - point[1]
+      dy = next[0] - point[0]
+    } else if (i === path.length - 1) {
+      // Ultimo punto: usa la direzione dal punto precedente
+      const prev = path[i - 1]
+      dx = point[1] - prev[1]
+      dy = point[0] - prev[0]
+    } else {
+      // Punti intermedi: usa la media delle direzioni
+      const prev = path[i - 1]
+      const next = path[i + 1]
+      dx = (next[1] - prev[1]) / 2
+      dy = (next[0] - prev[0]) / 2
+    }
+    
+    // Normalizza e ruota di 90 gradi per ottenere la perpendicolare
+    const length = Math.sqrt(dx * dx + dy * dy)
+    if (length > 0) {
+      const perpX = -dy / length * width
+      const perpY = dx / length * width
+      
+      // Aggiungi punto a sinistra e a destra del percorso
+      area.push([point[0] + perpX, point[1] + perpY])
+    }
+  }
+  
+  // Aggiungi i punti sul lato opposto (in ordine inverso)
+  for (let i = path.length - 1; i >= 0; i--) {
+    const point = path[i]
+    let dx = 0
+    let dy = 0
+    
+    if (i === 0) {
+      const next = path[i + 1]
+      dx = next[1] - point[1]
+      dy = next[0] - point[0]
+    } else if (i === path.length - 1) {
+      const prev = path[i - 1]
+      dx = point[1] - prev[1]
+      dy = point[0] - prev[0]
+    } else {
+      const prev = path[i - 1]
+      const next = path[i + 1]
+      dx = (next[1] - prev[1]) / 2
+      dy = (next[0] - prev[0]) / 2
+    }
+    
+    const length = Math.sqrt(dx * dx + dy * dy)
+    if (length > 0) {
+      const perpX = dy / length * width
+      const perpY = -dx / length * width
+      
+      area.push([point[0] + perpX, point[1] + perpY])
+    }
+  }
+  
+  // Chiudi il poligono tornando al primo punto
+  if (area.length > 0) {
+    area.push(area[0])
+  }
+  
+  return area
+}
+
+// Crea l'area del mercato espandendo il percorso
+const marketArea = createMarketArea(marketPath, 0.0004)
 
 // Componente per centrare la mappa
 function MapCenter({ center }: { center: [number, number] }) {
@@ -127,14 +212,26 @@ export default function OperatorMap({ category, searchQuery }: OperatorMapProps)
             url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           />
           
-          {/* Percorso del mercato del venerdì - evidenziato */}
+          {/* Area del mercato del venerdì - evidenziata come poligono */}
+          <Polygon
+            positions={marketArea}
+            pathOptions={{
+              color: '#f59e0b',
+              fillColor: '#f59e0b',
+              fillOpacity: 0.4,
+              weight: 3,
+              opacity: 0.8,
+            }}
+          />
+          
+          {/* Linea centrale del percorso per maggiore visibilità */}
           <Polyline
             positions={marketPath}
             pathOptions={{
               color: '#f59e0b',
-              weight: 10,
+              weight: 4,
               opacity: 0.9,
-              dashArray: '20, 15',
+              dashArray: '15, 10',
             }}
           />
         </MapContainer>
