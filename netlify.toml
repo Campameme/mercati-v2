@@ -7,6 +7,10 @@
 
 [build.environment]
   NODE_VERSION = "18"
+  # Disabilita la scansione dei segreti per NEXT_PUBLIC_* (chiavi pubbliche intenzionalmente esposte)
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,NEXT_PUBLIC_WEATHER_API_KEY"
+  # Escludi anche i file .next dalla scansione (contengono il bundle compilato)
+  SECRETS_SCAN_OMIT_PATHS = ".next/**"
 
 # Il plugin @netlify/plugin-nextjs gestisce automaticamente:
 # - Tutte le route di Next.js
