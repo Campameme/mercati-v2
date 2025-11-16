@@ -1,7 +1,6 @@
 [build]
   command = "npm run build"
-  # IMPORTANTE: Non impostare publish qui - il plugin Next.js lo gestisce automaticamente
-  # Se Netlify ha un publish directory configurato nelle impostazioni, rimuovilo o impostalo a ".next"
+  publish = ".next"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
