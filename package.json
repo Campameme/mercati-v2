@@ -38,6 +38,7 @@
     "zustand": "^4.5.7"
   },
   "devDependencies": {
+    "@netlify/plugin-nextjs": "^4.41.3",
     "@types/node": "^20.19.25",
     "@types/papaparse": "^5.3.14",
     "@types/react": "^18.3.26",

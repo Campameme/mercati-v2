@@ -1,0 +1,16 @@
+[build]
+  command = "npm run build"
+  # Il plugin @netlify/plugin-nextjs gestisce automaticamente il publish directory
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Il plugin @netlify/plugin-nextjs gestisce automaticamente:
+# - Tutte le route di Next.js
+# - Server-side rendering
+# - API routes
+# - Redirects e rewrites
+
