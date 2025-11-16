@@ -1,8 +1,47 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
+import { MapContainer, TileLayer, Polyline, useMap } from 'react-leaflet'
+import 'leaflet/dist/leaflet.css'
 import OperatorCard from './OperatorCard'
 import { Operator, OperatorCategory } from '@/types/operator'
+import L from 'leaflet'
+
+// Fix per i marker di Leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+})
+
+// Centro area mercato venerdì Ventimiglia - lungo il lungomare
+const defaultCenter: [number, number] = [43.7885, 7.6065]
+
+// Percorso del mercato del venerdì lungo il LUNGOMARE
+// Passeggiata Oberdan, Passeggiata Cavallotti, Via Milite Ignoto
+// Coordinate basate sul lungomare di Ventimiglia
+const marketPath: [number, number][] = [
+  [43.7880, 7.6040], // Inizio - Passeggiata Oberdan (ovest)
+  [43.7882, 7.6045], // Passeggiata Oberdan
+  [43.7884, 7.6050], // Passeggiata Oberdan
+  [43.7885, 7.6055], // Passeggiata Oberdan / Passeggiata Cavallotti
+  [43.7886, 7.6060], // Passeggiata Cavallotti
+  [43.7887, 7.6065], // Passeggiata Cavallotti
+  [43.7888, 7.6070], // Passeggiata Cavallotti / Via Milite Ignoto
+  [43.7889, 7.6075], // Via Milite Ignoto
+  [43.7890, 7.6080], // Via Milite Ignoto
+  [43.7891, 7.6085], // Fine - Via Milite Ignoto (est)
+]
+
+// Componente per centrare la mappa
+function MapCenter({ center }: { center: [number, number] }) {
+  const map = useMap()
+  useEffect(() => {
+    map.setView(center, map.getZoom())
+  }, [center, map])
+  return null
+}
 
 interface OperatorMapProps {
   category: OperatorCategory | 'all'
@@ -74,18 +113,31 @@ export default function OperatorMap({ category, searchQuery }: OperatorMapProps)
 
   return (
     <div className="space-y-6">
-      {/* Mappa Google Maps con iframe */}
+      {/* Mappa con percorso evidenziato */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="relative w-full" style={{ paddingBottom: '56.25%' }}> {/* 16:9 aspect ratio */}
-          <iframe
-            src="https://www.google.com/maps/d/embed?mid=1tP9yt5wmgh2vtxTKpQ0vrHdTz-sinmw&ehbc=2E312F"
-            className="absolute top-0 left-0 w-full h-full border-0"
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Mappa Mercato Venerdì Ventimiglia"
+        <MapContainer
+          center={defaultCenter}
+          zoom={16}
+          style={{ height: '600px', width: '100%' }}
+          scrollWheelZoom={true}
+        >
+          <MapCenter center={defaultCenter} />
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           />
-        </div>
+          
+          {/* Percorso del mercato del venerdì - evidenziato */}
+          <Polyline
+            positions={marketPath}
+            pathOptions={{
+              color: '#f59e0b',
+              weight: 10,
+              opacity: 0.9,
+              dashArray: '20, 15',
+            }}
+          />
+        </MapContainer>
       </div>
 
       {/* Indicazioni per raggiungere il mercato */}
