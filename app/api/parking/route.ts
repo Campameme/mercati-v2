@@ -95,18 +95,27 @@ async function getParkingFromGooglePlaces(lat: number, lng: number, radius: numb
   }
 
   console.log(`[API] Totale risultati Google Places: ${allResults.length}`)
+  
+  if (allResults.length === 0) {
+    console.warn('[API] ⚠️ Nessun risultato da Google Places!')
+    console.warn('[API] Status Text Search:', textSearchDataArray.map((d: any) => d.status))
+    console.warn('[API] Status Nearby Search:', nearbySearchData.status)
+    if (nearbySearchData.error_message) {
+      console.error('[API] Error message:', nearbySearchData.error_message)
+    }
+  }
 
   // Converti i risultati in formato Parking
   const parkings = allResults.map((place: any) => {
     if (!place.geometry || !place.geometry.location) {
-      console.warn('[API] Place senza geometry:', place)
+      console.warn('[API] Place senza geometry:', place.name || place.place_id)
       return null
     }
     
     const distance = calculateDistance(lat, lng, place.geometry.location.lat, place.geometry.location.lng)
     const isPaid = place.rating ? place.rating > 3 : undefined
     
-    return {
+    const parking = {
       id: `google_${place.place_id}`,
       name: place.name,
       address: place.formatted_address || place.vicinity || 'Indirizzo non disponibile',
@@ -128,6 +137,9 @@ async function getParkingFromGooglePlaces(lat: number, lng: number, radius: numb
       distance,
       source: 'google' as const,
     }
+    
+    console.log(`[API] Convertito: ${parking.name} (${distance.toFixed(0)}m dal centro)`)
+    return parking
   }).filter((p: any) => p !== null) // Rimuovi null
 
   console.log(`[API] Parcheggi convertiti: ${parkings.length}`)
@@ -212,19 +224,24 @@ export async function GET(request: NextRequest) {
         p.location.lng
       )
       
-      if (distance > MAX_DISTANCE_FROM_MARKET) {
-        console.log(`[API] Parcheggio ${p.name} troppo lontano: ${distance.toFixed(0)}m > ${MAX_DISTANCE_FROM_MARKET}m`)
+      // Rilassa il filtro della distanza - mostra anche parcheggi leggermente più lontani
+      // per debug: mostra tutti i parcheggi entro 3km invece di 2km
+      const MAX_DISTANCE_DEBUG = 3000 // 3km per debug
+      
+      if (distance > MAX_DISTANCE_DEBUG) {
+        console.log(`[API] Parcheggio ${p.name} troppo lontano: ${distance.toFixed(0)}m > ${MAX_DISTANCE_DEBUG}m`)
         return
       }
       
       if (isDuplicate(p.location.lat, p.location.lng)) {
-        console.log(`[API] Parcheggio ${p.name} duplicato`)
+        console.log(`[API] Parcheggio ${p.name} duplicato (${distance.toFixed(0)}m dal mercato)`)
         return
       }
       
       p.distance = distance
       filteredParkings.push(p)
       seenPositions.push({ lat: p.location.lat, lng: p.location.lng, parking: p })
+      console.log(`[API] ✅ Parcheggio aggiunto: ${p.name} (${distance.toFixed(0)}m dal mercato)`)
     })
     
     // Ordina per distanza dal mercato
