@@ -1,6 +1,7 @@
 [build]
   command = "npm run build"
-  # Il plugin @netlify/plugin-nextjs gestisce automaticamente il publish directory
+  # IMPORTANTE: Non impostare publish qui - il plugin Next.js lo gestisce automaticamente
+  # Se Netlify ha un publish directory configurato nelle impostazioni, rimuovilo o impostalo a ".next"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
@@ -13,4 +14,5 @@
 # - Server-side rendering
 # - API routes
 # - Redirects e rewrites
+# - Publish directory (non deve essere configurato manualmente)
 
