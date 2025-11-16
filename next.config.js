@@ -5,10 +5,8 @@ const nextConfig = {
     domains: ['localhost', 'maps.googleapis.com'],
   },
   // Le variabili NEXT_PUBLIC_* sono automaticamente esposte, non serve duplicarle qui
-  i18n: {
-    locales: ['it', 'en'],
-    defaultLocale: 'it',
-  },
+  // NOTA: i18n è stato rimosso perché non è supportato con App Router in Next.js 14
+  // Se serve supporto multilingua, usa il nuovo sistema di routing con [locale]
   async headers() {
     return [
       {
