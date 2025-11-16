@@ -84,7 +84,7 @@ export default function ParkingCard({ parking, onNavigate, onSelect }: ParkingCa
           <Euro className="w-4 h-4 mr-1.5 text-gray-400" />
           <div className="flex-1">
             <p className="text-xs text-gray-500">Tariffa</p>
-            {parking.pricing ? (
+            {parking.pricing && parking.pricing.currentHourlyRate ? (
               <div>
                 <p className={`text-sm font-semibold ${
                   parking.pricing.trafficMultiplier && parking.pricing.trafficMultiplier > 1.0 
@@ -98,7 +98,7 @@ export default function ParkingCard({ parking, onNavigate, onSelect }: ParkingCa
                     Alta domanda (+{Math.round((parking.pricing.trafficMultiplier - 1) * 100)}%)
                   </p>
                 )}
-                {parking.pricing.dailyRate && (
+                {parking.pricing.currentDailyRate && (
                   <p className="text-xs text-gray-500 mt-0.5">
                     {parking.pricing.currentDailyRate.toFixed(2)}€/giorno
                   </p>
