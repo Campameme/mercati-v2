@@ -129,6 +129,9 @@ function convertOSMToParking(node: OSMNode, index: number, geometry?: { lat: num
   }
 }
 
+// Forza rendering dinamico
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     // Coordinate Ventimiglia e mercato

@@ -216,6 +216,9 @@ function estimateAvailability(): { availableSpots: number; totalSpots: number } 
   }
 }
 
+// Forza rendering dinamico (non statico) perché usiamo searchParams
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams

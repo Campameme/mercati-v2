@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server'
 
+// Forza rendering dinamico
+export const dynamic = 'force-dynamic'
+
 // Dati operatori mercato venerdì Ventimiglia - SOLO quelli di cui siamo CERTI della posizione
 // Distribuiti nell'area mercato per evitare cluster eccessivi
 // Area mercato: circa 43.7880-43.7890 lat, 7.6055-7.6070 lng

@@ -20,6 +20,9 @@ function calculateDistance(
   return R * c
 }
 
+// Forza rendering dinamico (non statico) perché usiamo nextUrl.origin
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     // SOLO Google Places - fonte affidabile con nomi reali
