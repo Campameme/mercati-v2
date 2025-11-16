@@ -30,30 +30,42 @@ export async function GET(request: NextRequest) {
     
     const MAX_DISTANCE_FROM_MARKET = 2000 // metri - parcheggi vicini al mercato (2km max come richiesto)
     
-    const baseUrl = request.nextUrl.origin
     const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
     
     if (!googleApiKey) {
+      console.error('NEXT_PUBLIC_GOOGLE_MAPS_API_KEY non configurata')
       return NextResponse.json({
         success: false,
         error: 'Google Maps API key non configurata',
-        message: 'Aggiungi NEXT_PUBLIC_GOOGLE_MAPS_API_KEY al file .env.local',
+        message: 'Aggiungi NEXT_PUBLIC_GOOGLE_MAPS_API_KEY alle variabili d\'ambiente su Netlify',
       }, { status: 500 })
     }
 
-    // Fetch da Google Places
+    // Chiama direttamente l'API nearby invece di fare una chiamata HTTP interna
+    // Questo evita problemi con le chiamate interne su Netlify
+    const baseUrl = request.nextUrl.origin
+    const nearbyUrl = new URL('/api/parking/nearby', baseUrl)
+    nearbyUrl.searchParams.set('lat', MARKET_CENTER.lat.toString())
+    nearbyUrl.searchParams.set('lng', MARKET_CENTER.lng.toString())
+    nearbyUrl.searchParams.set('radius', MAX_DISTANCE_FROM_MARKET.toString())
+    
+    // Fetch da Google Places con timeout
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 15000) // 15 secondi timeout
+    const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 secondi timeout
     
     let googleResponse: Response
     try {
-      googleResponse = await fetch(`${baseUrl}/api/parking/nearby?lat=${MARKET_CENTER.lat}&lng=${MARKET_CENTER.lng}&radius=${MAX_DISTANCE_FROM_MARKET}`, {
+      googleResponse = await fetch(nearbyUrl.toString(), {
         cache: 'no-store',
         signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
       clearTimeout(timeoutId)
     } catch (fetchError: any) {
       clearTimeout(timeoutId)
+      console.error('Errore fetch parking/nearby:', fetchError)
       if (fetchError.name === 'AbortError') {
         return NextResponse.json({
           success: true,
@@ -69,6 +81,8 @@ export async function GET(request: NextRequest) {
     }
     
     if (!googleResponse.ok) {
+      const errorText = await googleResponse.text().catch(() => googleResponse.statusText)
+      console.error(`Errore HTTP ${googleResponse.status}:`, errorText)
       return NextResponse.json({
         success: true,
         data: [],
@@ -80,7 +94,21 @@ export async function GET(request: NextRequest) {
       })
     }
     
-    const googleData = await googleResponse.json()
+    let googleData: any
+    try {
+      googleData = await googleResponse.json()
+    } catch (jsonError) {
+      console.error('Errore parsing JSON:', jsonError)
+      return NextResponse.json({
+        success: true,
+        data: [],
+        city: 'Ventimiglia',
+        source: 'Google Places',
+        lastUpdated: new Date().toISOString(),
+        count: 0,
+        warning: 'Errore nel parsing della risposta',
+      })
+    }
     
     if (!googleData || !Array.isArray(googleData.data)) {
       return NextResponse.json({
