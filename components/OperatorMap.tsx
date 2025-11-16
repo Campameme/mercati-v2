@@ -15,28 +15,98 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 })
 
-// Centro area mercato venerdì Ventimiglia
-const defaultCenter: [number, number] = [43.7885, 7.6060]
+// Centro area mercato venerdì Ventimiglia (lungo via G. Oberdan e via Gerolamo Rossi)
+// Coordinate corrette: centro tra via G. Oberdan e via Gerolamo Rossi
+const defaultCenter: [number, number] = [43.7920, 7.6095]
 
-// Percorso del mercato del venerdì (polilinea lungo la strada principale)
-// Coordinate basate sulle posizioni reali degli operatori
+// Percorso del mercato del venerdì lungo via G. Oberdan e via Gerolamo Rossi
+// Coordinate corrette basate sul percorso reale del mercato
+// Via G. Oberdan: da 43.7915, 7.6070 a 43.7920, 7.6095
+// Via Gerolamo Rossi: da 43.7920, 7.6095 a 43.7930, 7.6110
 const marketPath: [number, number][] = [
-  [43.7882, 7.6060], // Inizio percorso (sud) - Fiori e Piante
-  [43.7883, 7.6059], // Moda & Accessori
-  [43.7884, 7.6060],
-  [43.7885, 7.6062], // Centro - Formaggi e Salumi Liguri
-  [43.7886, 7.6065], // Pesce Fresco del Golfo
-  [43.7888, 7.6068], // Fine percorso (nord-est) - Frutti e Verdura di Maria
+  [43.7915, 7.6070], // Inizio percorso - via G. Oberdan (sud-ovest)
+  [43.7917, 7.6075], // via G. Oberdan
+  [43.7918, 7.6080], // via G. Oberdan
+  [43.7919, 7.6085], // via G. Oberdan
+  [43.7920, 7.6090], // via G. Oberdan
+  [43.7920, 7.6095], // Incrocio - via G. Oberdan / via Gerolamo Rossi
+  [43.7922, 7.6100], // via Gerolamo Rossi
+  [43.7925, 7.6105], // via Gerolamo Rossi
+  [43.7930, 7.6110], // Fine percorso - via Gerolamo Rossi (nord-est)
 ]
 
-// Area mercato coperto (poligono - posizionato vicino al centro del mercato)
+// Mercato coperto Ventimiglia - coordinate reali
+// Via della Repubblica 7, 18039 Ventimiglia
+// Coordinate: 43.79102, 7.6087
 const coveredMarketArea: [number, number][] = [
-  [43.7884, 7.6060],
-  [43.7886, 7.6061],
-  [43.7886, 7.6064],
-  [43.7884, 7.6063],
-  [43.7883, 7.6061],
+  [43.7909, 7.6084], // Nord-ovest
+  [43.7911, 7.6089], // Nord-est
+  [43.7910, 7.6091], // Sud-est
+  [43.7908, 7.6086], // Sud-ovest
 ]
+
+/**
+ * Distribuisce gli operatori lungo il percorso del mercato
+ */
+function distributeOperatorsAlongPath(operators: Operator[], path: [number, number][]): Operator[] {
+  if (operators.length === 0 || path.length < 2) return operators
+  
+  // Calcola la lunghezza totale del percorso
+  const pathLength = path.reduce((total, point, index) => {
+    if (index === 0) return 0
+    const prevPoint = path[index - 1]
+    const dx = point[1] - prevPoint[1]
+    const dy = point[0] - prevPoint[0]
+    return total + Math.sqrt(dx * dx + dy * dy)
+  }, 0)
+  
+  // Distribuisci gli operatori lungo il percorso
+  return operators.map((operator, index) => {
+    // Posizione lungo il percorso (0 = inizio, 1 = fine)
+    const position = operators.length > 1 ? index / (operators.length - 1) : 0.5
+    
+    // Trova il punto corrispondente lungo il percorso
+    let accumulatedLength = 0
+    let targetLength = position * pathLength
+    
+    for (let i = 1; i < path.length; i++) {
+      const prevPoint = path[i - 1]
+      const currentPoint = path[i]
+      const dx = currentPoint[1] - prevPoint[1]
+      const dy = currentPoint[0] - prevPoint[0]
+      const segmentLength = Math.sqrt(dx * dx + dy * dy)
+      
+      if (accumulatedLength + segmentLength >= targetLength) {
+        // Interpola tra i due punti
+        const t = (targetLength - accumulatedLength) / segmentLength
+        const lat = prevPoint[0] + dy * t
+        const lng = prevPoint[1] + dx * t
+        
+        return {
+          ...operator,
+          location: {
+            ...operator.location,
+            lat,
+            lng,
+          },
+        }
+      }
+      
+      accumulatedLength += segmentLength
+    }
+    
+    // Se non trovato, usa l'ultimo punto
+    const lastPoint = path[path.length - 1]
+    return {
+      ...operator,
+      location: {
+        ...operator.location,
+        lat: lastPoint[0],
+        lng: lastPoint[1],
+      },
+    }
+  })
+}
 
 
 interface OperatorMapProps {
@@ -78,16 +148,23 @@ export default function OperatorMap({ category, searchQuery }: OperatorMapProps)
         const result = await response.json()
         
         if (result.success && result.data) {
-          // Mantieni le posizioni originali degli operatori (già corrette)
-          // Il percorso serve solo per visualizzazione
-          setOperators(result.data)
+          // Distribuisci gli operatori lungo il percorso del mercato
+          const distributedOperators = distributeOperatorsAlongPath(result.data, marketPath)
+          console.log('Operatori distribuiti lungo il percorso:', distributedOperators.length)
+          console.log('Percorso mercato:', marketPath)
+          setOperators(distributedOperators)
           setMarketInfo(result.location)
           // Imposta il centro dell'area mercato
           if (result.location?.center) {
             setCenter([result.location.center.lat, result.location.center.lng])
+          } else {
+            // Usa il centro predefinito se non disponibile
+            setCenter(defaultCenter)
           }
         } else {
           setError('Errore nel caricamento degli operatori')
+          // Imposta comunque il centro predefinito
+          setCenter(defaultCenter)
         }
       } catch (err) {
         console.error('Errore nel caricamento operatori:', err)
@@ -172,11 +249,11 @@ export default function OperatorMap({ category, searchQuery }: OperatorMapProps)
         />
         
         {/* Marker per il mercato coperto - posizionato al centro dell'area */}
-        <Marker position={[43.7885, 7.6062]}>
+        <Marker position={[43.79102, 7.6087]}>
           <Popup>
             <div className="text-sm">
               <div className="font-semibold text-blue-600">🏛️ Mercato Coperto</div>
-              <div className="text-gray-600">Area coperta del mercato</div>
+              <div className="text-gray-600">Via della Repubblica 7, Ventimiglia</div>
             </div>
           </Popup>
         </Marker>
