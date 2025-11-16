@@ -16,26 +16,31 @@ L.Icon.Default.mergeOptions({
 })
 
 // Centro area mercato venerdì Ventimiglia
-// Il mercato si svolge lungo Via della Repubblica, da Piazza della Libertà a Via Martiri della Libertà
-const defaultCenter: [number, number] = [43.7912, 7.6082]
+// Il mercato si svolge lungo il LUNGOMARE: Passeggiata Oberdan, Passeggiata Cavallotti, Via Milite Ignoto
+// Queste strade costeggiano il mare, quindi sono più a sud rispetto al centro città
+const defaultCenter: [number, number] = [43.7885, 7.6065]
 
-// Percorso del mercato del venerdì lungo Via della Repubblica
-// Il mercato si estende da Piazza della Libertà (43.7910, 7.6075) 
-// fino all'intersezione con Via Martiri della Libertà (43.7915, 7.6090)
-// Percorso dettagliato che segue fedelmente Via della Repubblica
+// Percorso del mercato del venerdì lungo il LUNGOMARE
+// Il mercato si estende lungo Passeggiata Oberdan, Passeggiata Cavallotti e Via Milite Ignoto
+// Queste strade corrono parallele al mare, da ovest a est
+// Coordinate basate sul lungomare di Ventimiglia (più vicino al mare, lat ~43.788)
 const marketPath: [number, number][] = [
-  [43.7910, 7.6075], // Inizio - Piazza della Libertà
-  [43.7910, 7.6077], // Via della Repubblica
-  [43.7911, 7.6080], // Via della Repubblica (vicino mercato coperto)
-  [43.7912, 7.6082], // Via della Repubblica (centro percorso)
-  [43.7913, 7.6085], // Via della Repubblica
-  [43.7914, 7.6087], // Via della Repubblica
-  [43.7915, 7.6090], // Fine - Intersezione Via Martiri della Libertà
+  [43.7880, 7.6040], // Inizio - Passeggiata Oberdan (ovest, vicino al porto)
+  [43.7882, 7.6045], // Passeggiata Oberdan
+  [43.7884, 7.6050], // Passeggiata Oberdan
+  [43.7885, 7.6055], // Passeggiata Oberdan / Passeggiata Cavallotti (centro)
+  [43.7886, 7.6060], // Passeggiata Cavallotti
+  [43.7887, 7.6065], // Passeggiata Cavallotti
+  [43.7888, 7.6070], // Passeggiata Cavallotti / Via Milite Ignoto
+  [43.7889, 7.6075], // Via Milite Ignoto
+  [43.7890, 7.6080], // Via Milite Ignoto
+  [43.7891, 7.6085], // Fine - Via Milite Ignoto (est)
 ]
 
 // Mercato coperto Ventimiglia - forma rettangolare corretta
-// Via della Repubblica 5, 18039 Ventimiglia
-// Coordinate centro: 43.7912, 7.6080
+// Piazza della Libertà, 18039 Ventimiglia
+// Il mercato coperto si trova nel centro città, non sul lungomare
+// Coordinate centro: 43.7912, 7.6080 (Piazza della Libertà)
 // Forma rettangolare dell'edificio (circa 50m x 30m)
 const coveredMarketArea: [number, number][] = [
   [43.7910, 7.6078], // Nord-ovest
@@ -252,8 +257,8 @@ export default function OperatorMap({ category, searchQuery }: OperatorMapProps)
           <Popup>
             <div className="text-sm">
               <div className="font-semibold text-blue-600">🏛️ Mercato Coperto</div>
-              <div className="text-gray-600">Via della Repubblica 5, Ventimiglia</div>
-              <div className="text-xs text-gray-500 mt-1">Orari: Lun-Gio 7-14, Ven-Sab 7-17</div>
+              <div className="text-gray-600">Piazza della Libertà, Ventimiglia</div>
+              <div className="text-xs text-gray-500 mt-1">Orari: Lun-Gio 7-13:30, Ven-Sab 7-19</div>
             </div>
           </Popup>
         </Marker>
