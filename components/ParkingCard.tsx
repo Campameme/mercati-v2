@@ -82,14 +82,36 @@ export default function ParkingCard({ parking, onNavigate, onSelect }: ParkingCa
       <div className="grid grid-cols-2 gap-2 mb-3">
         <div className="flex items-center text-gray-700">
           <Euro className="w-4 h-4 mr-1.5 text-gray-400" />
-          <div>
+          <div className="flex-1">
             <p className="text-xs text-gray-500">Tariffa</p>
-            <p className={`text-sm font-semibold ${
-              parking.fee === 'Indefinito' ? 'text-gray-500 italic' : 
-              parking.fee.toLowerCase().includes('gratuito') ? 'text-green-600' : ''
-            }`}>
-              {parking.fee}
-            </p>
+            {parking.pricing ? (
+              <div>
+                <p className={`text-sm font-semibold ${
+                  parking.pricing.trafficMultiplier && parking.pricing.trafficMultiplier > 1.0 
+                    ? 'text-orange-600' 
+                    : 'text-gray-900'
+                }`}>
+                  {parking.pricing.currentHourlyRate.toFixed(2)}€/h
+                </p>
+                {parking.pricing.trafficMultiplier && parking.pricing.trafficMultiplier > 1.0 && (
+                  <p className="text-xs text-orange-600 font-medium">
+                    Alta domanda (+{Math.round((parking.pricing.trafficMultiplier - 1) * 100)}%)
+                  </p>
+                )}
+                {parking.pricing.dailyRate && (
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {parking.pricing.currentDailyRate.toFixed(2)}€/giorno
+                  </p>
+                )}
+              </div>
+            ) : (
+              <p className={`text-sm font-semibold ${
+                parking.fee === 'Indefinito' ? 'text-gray-500 italic' : 
+                parking.fee.toLowerCase().includes('gratuito') ? 'text-green-600' : ''
+              }`}>
+                {parking.fee}
+              </p>
+            )}
           </div>
         </div>
         <div className="flex items-center text-gray-700">

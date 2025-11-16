@@ -6,9 +6,11 @@ export const dynamic = 'force-dynamic'
 // Importa direttamente la logica da nearby invece di fare una chiamata HTTP
 // Questo evita problemi con le chiamate interne su Netlify
 async function getParkingFromGooglePlaces(lat: number, lng: number, radius: number) {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+  // Usa una chiave API separata per le chiamate server-side (senza restrizioni referer)
+  // Se non disponibile, usa quella pubblica come fallback
+  const apiKey = process.env.GOOGLE_PLACES_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
   if (!apiKey) {
-    throw new Error('Google Maps API key non configurata')
+    throw new Error('Google Places API key non configurata. Configura GOOGLE_PLACES_API_KEY per le chiamate server-side.')
   }
 
   console.log(`[API] Ricerca parcheggi: lat=${lat}, lng=${lng}, radius=${radius}`)
@@ -55,11 +57,6 @@ async function getParkingFromGooglePlaces(lat: number, lng: number, radius: numb
   
   const textSearchDataArray = await Promise.all(
     textSearchResponses.map(async (r, index) => {
-      if (!r.ok) {
-        const errorText = await r.text().catch(() => r.statusText)
-        console.error(`[API] Text Search ${index + 1} (${queries[index]}) HTTP error: ${r.status} ${errorText}`)
-        return { status: 'ERROR', error_message: `HTTP ${r.status}: ${errorText}`, results: [] }
-      }
       const data = await r.json()
       console.log(`[API] Text Search ${index + 1} (${queries[index]}): status=${data.status}, results=${data.results?.length || 0}`)
       if (data.status !== 'OK' && data.error_message) {
@@ -69,14 +66,7 @@ async function getParkingFromGooglePlaces(lat: number, lng: number, radius: numb
     })
   )
   
-  let nearbySearchData: any
-  if (!nearbySearchResponse.ok) {
-    const errorText = await nearbySearchResponse.text().catch(() => nearbySearchResponse.statusText)
-    console.error(`[API] Nearby Search HTTP error: ${nearbySearchResponse.status} ${errorText}`)
-    nearbySearchData = { status: 'ERROR', error_message: `HTTP ${nearbySearchResponse.status}: ${errorText}`, results: [] }
-  } else {
-    nearbySearchData = await nearbySearchResponse.json()
-  }
+  const nearbySearchData = await nearbySearchResponse.json()
   console.log(`[API] Nearby Search: status=${nearbySearchData.status}, results=${nearbySearchData.results?.length || 0}`)
   if (nearbySearchData.status !== 'OK' && nearbySearchData.error_message) {
     console.error('[API] Nearby Search error:', nearbySearchData.error_message)
@@ -107,38 +97,49 @@ async function getParkingFromGooglePlaces(lat: number, lng: number, radius: numb
   }
 
   console.log(`[API] Totale risultati Google Places: ${allResults.length}`)
-  
-  if (allResults.length === 0) {
-    console.warn('[API] ⚠️ Nessun risultato da Google Places!')
-    console.warn('[API] Status Text Search:', textSearchDataArray.map((d: any, i: number) => `${queries[i]}: ${d.status}`))
-    console.warn('[API] Status Nearby Search:', nearbySearchData.status)
-    if (nearbySearchData.error_message) {
-      console.error('[API] Error message Nearby Search:', nearbySearchData.error_message)
-    }
-    textSearchDataArray.forEach((d: any, i: number) => {
-      if (d.error_message) {
-        console.error(`[API] Error message Text Search ${i + 1} (${queries[i]}):`, d.error_message)
-      }
-    })
-  }
 
+  // Calcola moltiplicatore traffico una volta per tutti i parcheggi
+  const trafficMultiplier = calculateTrafficMultiplier()
+  
   // Converti i risultati in formato Parking
   const parkings = allResults.map((place: any) => {
     if (!place.geometry || !place.geometry.location) {
-      console.warn('[API] Place senza geometry:', place.name || place.place_id)
+      console.warn('[API] Place senza geometry:', place)
       return null
     }
     
     const distance = calculateDistance(lat, lng, place.geometry.location.lat, place.geometry.location.lng)
     const isPaid = place.rating ? place.rating > 3 : undefined
     
-    const parking = {
+    // Determina tipo di parcheggio (se possibile dal nome o rating)
+    let parkingType: 'municipal' | 'private' = 'private'
+    const placeName = place.name?.toLowerCase() || ''
+    if (placeName.includes('comunale') || placeName.includes('municipal') || placeName.includes('comune')) {
+      parkingType = 'municipal'
+    }
+    
+    // Calcola pricing
+    const pricing = calculateParkingPricing(parkingType, isPaid, trafficMultiplier)
+    
+    // Formatta fee string in base al pricing
+    let feeString = 'Indefinito'
+    if (isPaid === false) {
+      feeString = 'Gratuito'
+    } else if (pricing) {
+      // Mostra il costo attuale se disponibile
+      feeString = `${pricing.currentHourlyRate.toFixed(2)}€/h`
+      if (pricing.trafficMultiplier > 1.0) {
+        feeString += ` (alta domanda)`
+      }
+    }
+    
+    return {
       id: `google_${place.place_id}`,
       name: place.name,
       address: place.formatted_address || place.vicinity || 'Indirizzo non disponibile',
-      type: 'private' as const,
+      type: parkingType,
       paid: isPaid,
-      fee: isPaid === undefined ? 'Indefinito' : (isPaid ? 'Indefinito' : 'Gratuito'),
+      fee: feeString,
       hours: 'Orari da verificare',
       availableSpots: 30,
       totalSpots: 50,
@@ -153,10 +154,8 @@ async function getParkingFromGooglePlaces(lat: number, lng: number, radius: numb
       userRatingsTotal: place.user_ratings_total,
       distance,
       source: 'google' as const,
+      pricing, // Aggiungi informazioni dettagliate sui costi
     }
-    
-    console.log(`[API] Convertito: ${parking.name} (${distance.toFixed(0)}m dal centro)`)
-    return parking
   }).filter((p: any) => p !== null) // Rimuovi null
 
   console.log(`[API] Parcheggi convertiti: ${parkings.length}`)
@@ -183,6 +182,97 @@ function calculateDistance(
   return R * c
 }
 
+/**
+ * Calcola il moltiplicatore del traffico basato su ora del giorno e giorno della settimana
+ * Venerdì = mercato = traffico molto alto
+ */
+function calculateTrafficMultiplier(): number {
+  const now = new Date()
+  const hour = now.getHours()
+  const dayOfWeek = now.getDay() // 0 = Domenica, 5 = Venerdì
+  const isFriday = dayOfWeek === 5
+  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6
+  
+  let multiplier = 1.0 // Base: traffico normale
+  
+  // Fattore orario: picchi di traffico
+  if (hour >= 7 && hour <= 9) {
+    // Mattina: traffico alto
+    multiplier = 1.3
+  } else if (hour >= 12 && hour <= 14) {
+    // Pranzo: traffico medio-alto
+    multiplier = 1.2
+  } else if (hour >= 17 && hour <= 19) {
+    // Sera: traffico alto
+    multiplier = 1.4
+  } else if (hour >= 22 || hour <= 6) {
+    // Notte: traffico basso
+    multiplier = 0.9
+  }
+  
+  // Venerdì = mercato = traffico molto alto
+  if (isFriday && hour >= 6 && hour <= 14) {
+    multiplier *= 1.5 // Aumenta ulteriormente durante il mercato
+  }
+  
+  // Weekend: traffico medio-alto
+  if (isWeekend && hour >= 10 && hour <= 18) {
+    multiplier = Math.max(multiplier, 1.2)
+  }
+  
+  return Math.round(multiplier * 100) / 100 // Arrotonda a 2 decimali
+}
+
+/**
+ * Calcola i costi del parcheggio in base al tipo e al traffico
+ */
+function calculateParkingPricing(
+  type: 'municipal' | 'private',
+  isPaid: boolean | undefined,
+  trafficMultiplier: number
+): {
+  hourlyRate: number
+  dailyRate: number
+  currentHourlyRate: number
+  currentDailyRate: number
+  trafficMultiplier: number
+  lastUpdated: string
+} | undefined {
+  // Se non è a pagamento, non restituire pricing
+  if (isPaid === false) {
+    return undefined
+  }
+  
+  // Costi base per tipo di parcheggio (in euro)
+  // Basati su tariffe tipiche italiane per parcheggi
+  let baseHourlyRate: number
+  let baseDailyRate: number
+  
+  if (type === 'municipal') {
+    // Parcheggi comunali: generalmente più economici
+    baseHourlyRate = 1.5
+    baseDailyRate = 10
+  } else {
+    // Parcheggi privati: generalmente più costosi
+    baseHourlyRate = 2.0
+    baseDailyRate = 12
+  }
+  
+  // Calcola costi attuali in base al traffico
+  // Il moltiplicatore può aumentare i prezzi fino al 50% in caso di alto traffico
+  const currentHourlyRate = Math.round(baseHourlyRate * trafficMultiplier * 100) / 100
+  const currentDailyRate = Math.round(baseDailyRate * trafficMultiplier * 100) / 100
+  
+  return {
+    hourlyRate: baseHourlyRate,
+    dailyRate: baseDailyRate,
+    currentHourlyRate,
+    currentDailyRate,
+    trafficMultiplier,
+    lastUpdated: new Date().toISOString(),
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     // SOLO Google Places - fonte affidabile con nomi reali
@@ -193,14 +283,16 @@ export async function GET(request: NextRequest) {
     
     const MAX_DISTANCE_FROM_MARKET = 2000 // metri - parcheggi vicini al mercato (2km max)
     
-    const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    // Usa una chiave API separata per le chiamate server-side (senza restrizioni referer)
+    // Se non disponibile, usa quella pubblica come fallback
+    const googleApiKey = process.env.GOOGLE_PLACES_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
     
     if (!googleApiKey) {
-      console.error('NEXT_PUBLIC_GOOGLE_MAPS_API_KEY non configurata')
+      console.error('GOOGLE_PLACES_API_KEY o NEXT_PUBLIC_GOOGLE_MAPS_API_KEY non configurata')
       return NextResponse.json({
         success: false,
-        error: 'Google Maps API key non configurata',
-        message: 'Aggiungi NEXT_PUBLIC_GOOGLE_MAPS_API_KEY alle variabili d\'ambiente su Netlify',
+        error: 'Google Places API key non configurata',
+        message: 'Aggiungi GOOGLE_PLACES_API_KEY (senza restrizioni referer) alle variabili d\'ambiente su Netlify per le chiamate server-side',
       }, { status: 500 })
     }
 
@@ -241,24 +333,19 @@ export async function GET(request: NextRequest) {
         p.location.lng
       )
       
-      // Rilassa il filtro della distanza - mostra anche parcheggi leggermente più lontani
-      // per debug: mostra tutti i parcheggi entro 3km invece di 2km
-      const MAX_DISTANCE_DEBUG = 3000 // 3km per debug
-      
-      if (distance > MAX_DISTANCE_DEBUG) {
-        console.log(`[API] Parcheggio ${p.name} troppo lontano: ${distance.toFixed(0)}m > ${MAX_DISTANCE_DEBUG}m`)
+      if (distance > MAX_DISTANCE_FROM_MARKET) {
+        console.log(`[API] Parcheggio ${p.name} troppo lontano: ${distance.toFixed(0)}m > ${MAX_DISTANCE_FROM_MARKET}m`)
         return
       }
       
       if (isDuplicate(p.location.lat, p.location.lng)) {
-        console.log(`[API] Parcheggio ${p.name} duplicato (${distance.toFixed(0)}m dal mercato)`)
+        console.log(`[API] Parcheggio ${p.name} duplicato`)
         return
       }
       
       p.distance = distance
       filteredParkings.push(p)
       seenPositions.push({ lat: p.location.lat, lng: p.location.lng, parking: p })
-      console.log(`[API] ✅ Parcheggio aggiunto: ${p.name} (${distance.toFixed(0)}m dal mercato)`)
     })
     
     // Ordina per distanza dal mercato

@@ -47,6 +47,31 @@ function convertGooglePlaceToParking(
   // Se non siamo certi, consideriamo come indefinito
   const isPaid = place.rating ? place.rating > 3 : undefined
   
+  // Determina tipo di parcheggio (se possibile dal nome)
+  let parkingType: 'municipal' | 'private' = 'private'
+  const placeName = place.name?.toLowerCase() || ''
+  if (placeName.includes('comunale') || placeName.includes('municipal') || placeName.includes('comune')) {
+    parkingType = 'municipal'
+  }
+  
+  // Calcola moltiplicatore traffico
+  const trafficMultiplier = calculateTrafficMultiplier()
+  
+  // Calcola pricing
+  const pricing = calculateParkingPricing(parkingType, isPaid, trafficMultiplier)
+  
+  // Formatta fee string in base al pricing
+  let feeString = 'Indefinito'
+  if (isPaid === false) {
+    feeString = 'Gratuito'
+  } else if (pricing) {
+    // Mostra il costo attuale se disponibile
+    feeString = `${pricing.currentHourlyRate.toFixed(2)}€/h`
+    if (pricing.trafficMultiplier > 1.0) {
+      feeString += ` (alta domanda)`
+    }
+  }
+  
   // Stima disponibilità basata su traffico
   const availability = estimateAvailability()
   
@@ -60,9 +85,9 @@ function convertGooglePlaceToParking(
     id: `google_${place.place_id}`,
     name: place.name,
     address: place.formatted_address || place.vicinity || 'Indirizzo non disponibile',
-    type: 'private' as const, // Google Places non distingue sempre tra municipal/private
+    type: parkingType,
     paid: isPaid,
-    fee: isPaid === undefined ? 'Indefinito' : (isPaid ? 'Indefinito' : 'Gratuito'),
+    fee: feeString,
     hours: 'Orari da verificare',
     availableSpots: availability.availableSpots,
     totalSpots: availability.totalSpots,
@@ -74,10 +99,11 @@ function convertGooglePlaceToParking(
     hasRestrooms: false,
     placeId: place.place_id,
     rating: place.rating,
-    userRatingsTotal: place.user_ratings_total,
+    userRatingsTotal: place.user_ratingsTotal,
     distance,
     nearRiver, // Flag per parcheggi vicini al fiume Roja
     source: 'google' as const,
+    pricing, // Aggiungi informazioni dettagliate sui costi
   }
 }
 
@@ -167,6 +193,97 @@ function isLikelyInWater(lat: number, lng: number): boolean {
   if (lat < 43.780 && lng > 7.620) return true
   
   return false
+}
+
+/**
+ * Calcola il moltiplicatore del traffico basato su ora del giorno e giorno della settimana
+ * Venerdì = mercato = traffico molto alto
+ */
+function calculateTrafficMultiplier(): number {
+  const now = new Date()
+  const hour = now.getHours()
+  const dayOfWeek = now.getDay() // 0 = Domenica, 5 = Venerdì
+  const isFriday = dayOfWeek === 5
+  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6
+  
+  let multiplier = 1.0 // Base: traffico normale
+  
+  // Fattore orario: picchi di traffico
+  if (hour >= 7 && hour <= 9) {
+    // Mattina: traffico alto
+    multiplier = 1.3
+  } else if (hour >= 12 && hour <= 14) {
+    // Pranzo: traffico medio-alto
+    multiplier = 1.2
+  } else if (hour >= 17 && hour <= 19) {
+    // Sera: traffico alto
+    multiplier = 1.4
+  } else if (hour >= 22 || hour <= 6) {
+    // Notte: traffico basso
+    multiplier = 0.9
+  }
+  
+  // Venerdì = mercato = traffico molto alto
+  if (isFriday && hour >= 6 && hour <= 14) {
+    multiplier *= 1.5 // Aumenta ulteriormente durante il mercato
+  }
+  
+  // Weekend: traffico medio-alto
+  if (isWeekend && hour >= 10 && hour <= 18) {
+    multiplier = Math.max(multiplier, 1.2)
+  }
+  
+  return Math.round(multiplier * 100) / 100 // Arrotonda a 2 decimali
+}
+
+/**
+ * Calcola i costi del parcheggio in base al tipo e al traffico
+ */
+function calculateParkingPricing(
+  type: 'municipal' | 'private',
+  isPaid: boolean | undefined,
+  trafficMultiplier: number
+): {
+  hourlyRate: number
+  dailyRate: number
+  currentHourlyRate: number
+  currentDailyRate: number
+  trafficMultiplier: number
+  lastUpdated: string
+} | undefined {
+  // Se non è a pagamento, non restituire pricing
+  if (isPaid === false) {
+    return undefined
+  }
+  
+  // Costi base per tipo di parcheggio (in euro)
+  // Basati su tariffe tipiche italiane per parcheggi
+  let baseHourlyRate: number
+  let baseDailyRate: number
+  
+  if (type === 'municipal') {
+    // Parcheggi comunali: generalmente più economici
+    baseHourlyRate = 1.5
+    baseDailyRate = 10
+  } else {
+    // Parcheggi privati: generalmente più costosi
+    baseHourlyRate = 2.0
+    baseDailyRate = 12
+  }
+  
+  // Calcola costi attuali in base al traffico
+  // Il moltiplicatore può aumentare i prezzi fino al 50% in caso di alto traffico
+  const currentHourlyRate = Math.round(baseHourlyRate * trafficMultiplier * 100) / 100
+  const currentDailyRate = Math.round(baseDailyRate * trafficMultiplier * 100) / 100
+  
+  return {
+    hourlyRate: baseHourlyRate,
+    dailyRate: baseDailyRate,
+    currentHourlyRate,
+    currentDailyRate,
+    trafficMultiplier,
+    lastUpdated: new Date().toISOString(),
+  }
 }
 
 /**
@@ -262,10 +379,16 @@ export async function GET(request: NextRequest) {
     const searchLng = VENTIMIGLIA_CENTER.lng
 
     // Verifica che la chiave API sia configurata
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    // Usa una chiave API separata per le chiamate server-side (senza restrizioni referer)
+    // Se non disponibile, usa quella pubblica come fallback
+    const apiKey = process.env.GOOGLE_PLACES_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
     if (!apiKey) {
       return NextResponse.json(
-        { success: false, error: 'Chiave API Google Maps non configurata' },
+        { 
+          success: false, 
+          error: 'Chiave API Google Places non configurata',
+          message: 'Configura GOOGLE_PLACES_API_KEY (senza restrizioni referer) per le chiamate server-side'
+        },
         { status: 500 }
       )
     }

@@ -30,6 +30,15 @@ export default function ParkingPage() {
           </div>
         </div>
       </div>
+
+      {/* Disclaimer */}
+      <div className="mt-8 pt-6 border-t border-gray-200">
+        <p className="text-xs text-gray-500 text-center max-w-3xl mx-auto">
+          <strong>Nota:</strong> Le informazioni sui costi dei parcheggi sono fornite a titolo indicativo e potrebbero non essere sempre aggiornate o accurate. 
+          I prezzi mostrati sono stime basate su tariffe tipiche e possono variare in base al traffico e alle condizioni del momento. 
+          Si consiglia di verificare le tariffe effettive direttamente presso il parcheggio o sul sito ufficiale del gestore.
+        </p>
+      </div>
     </div>
   )
 }
