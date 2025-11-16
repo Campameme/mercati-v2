@@ -11,6 +11,8 @@ async function getParkingFromGooglePlaces(lat: number, lng: number, radius: numb
     throw new Error('Google Maps API key non configurata')
   }
 
+  console.log(`[API] Ricerca parcheggi: lat=${lat}, lng=${lng}, radius=${radius}`)
+
   // Usa Text Search API per cercare "parcheggio" e "porto" a Ventimiglia
   const queries = [
     'parcheggio Ventimiglia',
@@ -25,6 +27,7 @@ async function getParkingFromGooglePlaces(lat: number, lng: number, radius: numb
     textSearchUrl.searchParams.set('location', `${lat},${lng}`)
     textSearchUrl.searchParams.set('radius', Math.min(radius, 2000).toString())
     textSearchUrl.searchParams.set('key', apiKey)
+    console.log(`[API] Text Search: ${query}`)
     return fetch(textSearchUrl.toString())
   })
   
@@ -34,17 +37,38 @@ async function getParkingFromGooglePlaces(lat: number, lng: number, radius: numb
   nearbySearchUrl.searchParams.set('radius', Math.min(radius, 2000).toString())
   nearbySearchUrl.searchParams.set('type', 'parking')
   nearbySearchUrl.searchParams.set('key', apiKey)
+  console.log(`[API] Nearby Search: type=parking`)
   
   // Esegui tutte le ricerche in parallelo
-  const [textSearchResponses, nearbySearchResponse] = await Promise.all([
-    Promise.all(textSearchPromises),
-    fetch(nearbySearchUrl.toString()),
-  ])
+  let textSearchResponses: Response[]
+  let nearbySearchResponse: Response
+  
+  try {
+    [textSearchResponses, nearbySearchResponse] = await Promise.all([
+      Promise.all(textSearchPromises),
+      fetch(nearbySearchUrl.toString()),
+    ])
+  } catch (fetchError) {
+    console.error('[API] Errore nelle chiamate Google Places:', fetchError)
+    throw fetchError
+  }
   
   const textSearchDataArray = await Promise.all(
-    textSearchResponses.map(r => r.json())
+    textSearchResponses.map(async (r, index) => {
+      const data = await r.json()
+      console.log(`[API] Text Search ${index + 1} (${queries[index]}): status=${data.status}, results=${data.results?.length || 0}`)
+      if (data.status !== 'OK' && data.error_message) {
+        console.error(`[API] Text Search ${index + 1} error:`, data.error_message)
+      }
+      return data
+    })
   )
+  
   const nearbySearchData = await nearbySearchResponse.json()
+  console.log(`[API] Nearby Search: status=${nearbySearchData.status}, results=${nearbySearchData.results?.length || 0}`)
+  if (nearbySearchData.status !== 'OK' && nearbySearchData.error_message) {
+    console.error('[API] Nearby Search error:', nearbySearchData.error_message)
+  }
   
   // Combina i risultati
   let allResults: any[] = []
@@ -70,8 +94,15 @@ async function getParkingFromGooglePlaces(lat: number, lng: number, radius: numb
     })
   }
 
+  console.log(`[API] Totale risultati Google Places: ${allResults.length}`)
+
   // Converti i risultati in formato Parking
-  return allResults.map((place: any) => {
+  const parkings = allResults.map((place: any) => {
+    if (!place.geometry || !place.geometry.location) {
+      console.warn('[API] Place senza geometry:', place)
+      return null
+    }
+    
     const distance = calculateDistance(lat, lng, place.geometry.location.lat, place.geometry.location.lng)
     const isPaid = place.rating ? place.rating > 3 : undefined
     
@@ -97,7 +128,10 @@ async function getParkingFromGooglePlaces(lat: number, lng: number, radius: numb
       distance,
       source: 'google' as const,
     }
-  })
+  }).filter((p: any) => p !== null) // Rimuovi null
+
+  console.log(`[API] Parcheggi convertiti: ${parkings.length}`)
+  return parkings
 }
 
 // Funzione per calcolare distanza in metri usando formula Haversine
@@ -142,11 +176,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Chiama direttamente la funzione invece di fare una chiamata HTTP
+    console.log('[API] Inizio ricerca parcheggi Google Places...')
     const allParkings = await getParkingFromGooglePlaces(
       MARKET_CENTER.lat,
       MARKET_CENTER.lng,
       MAX_DISTANCE_FROM_MARKET
     )
+    console.log(`[API] Parcheggi ricevuti da Google Places: ${allParkings.length}`)
 
     // Filtra solo parcheggi vicini al mercato e deduplica
     const filteredParkings: any[] = []
@@ -164,7 +200,10 @@ export async function GET(request: NextRequest) {
     }
     
     allParkings.forEach((p: any) => {
-      if (!p.location || !p.location.lat || !p.location.lng) return
+      if (!p.location || !p.location.lat || !p.location.lng) {
+        console.warn('[API] Parcheggio senza location valida:', p)
+        return
+      }
       
       const distance = p.distance || calculateDistance(
         MARKET_CENTER.lat,
@@ -173,17 +212,34 @@ export async function GET(request: NextRequest) {
         p.location.lng
       )
       
-      if (distance <= MAX_DISTANCE_FROM_MARKET && !isDuplicate(p.location.lat, p.location.lng)) {
-        p.distance = distance
-        filteredParkings.push(p)
-        seenPositions.push({ lat: p.location.lat, lng: p.location.lng, parking: p })
+      if (distance > MAX_DISTANCE_FROM_MARKET) {
+        console.log(`[API] Parcheggio ${p.name} troppo lontano: ${distance.toFixed(0)}m > ${MAX_DISTANCE_FROM_MARKET}m`)
+        return
       }
+      
+      if (isDuplicate(p.location.lat, p.location.lng)) {
+        console.log(`[API] Parcheggio ${p.name} duplicato`)
+        return
+      }
+      
+      p.distance = distance
+      filteredParkings.push(p)
+      seenPositions.push({ lat: p.location.lat, lng: p.location.lng, parking: p })
     })
     
     // Ordina per distanza dal mercato
     filteredParkings.sort((a: any, b: any) => (a.distance || 0) - (b.distance || 0))
     
-    console.log(`API: ✅ ${filteredParkings.length} parcheggi Google Places trovati vicino al mercato`)
+    console.log(`[API] ✅ ${filteredParkings.length} parcheggi Google Places trovati vicino al mercato (su ${allParkings.length} totali)`)
+    
+    if (filteredParkings.length === 0 && allParkings.length > 0) {
+      console.warn(`[API] ⚠️ Tutti i ${allParkings.length} parcheggi sono stati filtrati!`)
+      console.warn('[API] Primi 3 parcheggi raw:', allParkings.slice(0, 3).map((p: any) => ({
+        name: p.name,
+        location: p.location,
+        distance: p.distance,
+      })))
+    }
 
     return NextResponse.json({
       success: true,

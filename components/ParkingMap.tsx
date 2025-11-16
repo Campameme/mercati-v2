@@ -36,17 +36,48 @@ export default function ParkingMap({ onSelectParking }: ParkingMapProps) {
     const loadParkings = async () => {
       try {
         setLoading(true)
+        setError(null)
+        console.log('ParkingMap: Inizio caricamento parcheggi...')
+        
         const response = await fetch('/api/parking')
+        console.log('ParkingMap: Response status:', response.status, response.statusText)
+        
+        if (!response.ok) {
+          const errorText = await response.text().catch(() => response.statusText)
+          console.error('ParkingMap: Errore HTTP:', response.status, errorText)
+          setError(`Errore HTTP ${response.status}: ${errorText}`)
+          setLoading(false)
+          return
+        }
+        
         const result = await response.json()
+        console.log('ParkingMap: Risposta API:', {
+          success: result.success,
+          count: result.count,
+          dataLength: result.data?.length,
+          message: result.message,
+          warning: result.warning,
+          error: result.error,
+        })
         
         if (result.success && result.data && Array.isArray(result.data)) {
           // Mostra tutti i parcheggi senza deduplicazione eccessiva
           // La deduplicazione è già fatta nel backend
-          const validParkings = result.data.filter((p: Parking) => 
-            p.location && p.location.lat && p.location.lng && 
-            !isNaN(p.location.lat) && !isNaN(p.location.lng)
-          )
-          console.log(`ParkingMap: ${validParkings.length} parcheggi validi caricati`)
+          const validParkings = result.data.filter((p: Parking) => {
+            const isValid = p.location && p.location.lat && p.location.lng && 
+                           !isNaN(p.location.lat) && !isNaN(p.location.lng)
+            if (!isValid) {
+              console.warn('ParkingMap: Parcheggio non valido scartato:', p)
+            }
+            return isValid
+          })
+          
+          console.log(`ParkingMap: ${result.data.length} parcheggi totali, ${validParkings.length} validi dopo filtri`)
+          
+          if (validParkings.length === 0 && result.data.length > 0) {
+            console.warn('ParkingMap: Tutti i parcheggi sono stati filtrati! Dati raw:', result.data)
+          }
+          
           setParkings(validParkings)
           
           // Centra mappa sulla media delle posizioni
@@ -59,17 +90,27 @@ export default function ParkingMap({ onSelectParking }: ParkingMapProps) {
                 lat: lats.reduce((a: number, b: number) => a + b, 0) / lats.length,
                 lng: lngs.reduce((a: number, b: number) => a + b, 0) / lngs.length,
               })
+              console.log('ParkingMap: Mappa centrata su:', { lat: lats.reduce((a: number, b: number) => a + b, 0) / lats.length, lng: lngs.reduce((a: number, b: number) => a + b, 0) / lngs.length })
             } else {
               setCenter(defaultCenter)
             }
           } else {
             setCenter(defaultCenter)
+            if (result.warning) {
+              setError(result.warning)
+            } else if (result.message) {
+              setError(result.message)
+            } else {
+              setError('Nessun parcheggio trovato')
+            }
           }
         } else {
-          setError('Errore nel caricamento dei parcheggi')
+          console.error('ParkingMap: Formato risposta non valido:', result)
+          setError(result.error || result.warning || 'Errore nel caricamento dei parcheggi')
         }
       } catch (err) {
-        setError('Errore nel caricamento dei parcheggi')
+        console.error('ParkingMap: Errore nel caricamento:', err)
+        setError(`Errore: ${err instanceof Error ? err.message : 'Errore sconosciuto'}`)
       } finally {
         setLoading(false)
       }
