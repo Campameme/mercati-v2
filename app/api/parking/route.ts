@@ -55,6 +55,11 @@ async function getParkingFromGooglePlaces(lat: number, lng: number, radius: numb
   
   const textSearchDataArray = await Promise.all(
     textSearchResponses.map(async (r, index) => {
+      if (!r.ok) {
+        const errorText = await r.text().catch(() => r.statusText)
+        console.error(`[API] Text Search ${index + 1} (${queries[index]}) HTTP error: ${r.status} ${errorText}`)
+        return { status: 'ERROR', error_message: `HTTP ${r.status}: ${errorText}`, results: [] }
+      }
       const data = await r.json()
       console.log(`[API] Text Search ${index + 1} (${queries[index]}): status=${data.status}, results=${data.results?.length || 0}`)
       if (data.status !== 'OK' && data.error_message) {
@@ -64,7 +69,14 @@ async function getParkingFromGooglePlaces(lat: number, lng: number, radius: numb
     })
   )
   
-  const nearbySearchData = await nearbySearchResponse.json()
+  let nearbySearchData: any
+  if (!nearbySearchResponse.ok) {
+    const errorText = await nearbySearchResponse.text().catch(() => nearbySearchResponse.statusText)
+    console.error(`[API] Nearby Search HTTP error: ${nearbySearchResponse.status} ${errorText}`)
+    nearbySearchData = { status: 'ERROR', error_message: `HTTP ${nearbySearchResponse.status}: ${errorText}`, results: [] }
+  } else {
+    nearbySearchData = await nearbySearchResponse.json()
+  }
   console.log(`[API] Nearby Search: status=${nearbySearchData.status}, results=${nearbySearchData.results?.length || 0}`)
   if (nearbySearchData.status !== 'OK' && nearbySearchData.error_message) {
     console.error('[API] Nearby Search error:', nearbySearchData.error_message)
