@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Cloud, Droplet, Wind, Sun, AlertTriangle } from 'lucide-react'
+import { Cloud, Droplet, Wind, Sun, AlertTriangle, RefreshCw } from 'lucide-react'
 import { useNotifications } from '@/components/NotificationProvider'
 import { format } from 'date-fns'
 import { it } from 'date-fns/locale/it'
@@ -40,55 +40,108 @@ export default function WeatherPage() {
   const { sendNotification, permission } = useNotifications()
   const [weather, setWeather] = useState<WeatherData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+
+  const loadWeather = async (showLoading = true) => {
+    try {
+      if (showLoading) {
+        setLoading(true)
+      } else {
+        setIsRefreshing(true)
+      }
+
+      // Simula variazione dei dati meteo (in produzione verrà da API meteo)
+      const baseTemp = 12 + Math.random() * 8
+      const hour = new Date().getHours()
+      const isDaytime = hour >= 6 && hour < 20
+      
+      const mockWeather: WeatherData = {
+        current: {
+          temperature: Math.round(baseTemp * 10) / 10,
+          condition: isDaytime 
+            ? (baseTemp > 18 ? 'Sereno' : baseTemp > 15 ? 'Parzialmente nuvoloso' : 'Nuvoloso')
+            : 'Sereno',
+          icon: isDaytime 
+            ? (baseTemp > 18 ? 'sunny' : baseTemp > 15 ? 'partly-cloudy' : 'cloudy')
+            : 'clear-night',
+          humidity: Math.round(50 + Math.random() * 30),
+          windSpeed: Math.round(5 + Math.random() * 20),
+        },
+        hourly: Array.from({ length: 24 }, (_, i) => {
+          const hourTime = new Date(Date.now() + i * 60 * 60 * 1000)
+          const hourOfDay = hourTime.getHours()
+          const isDay = hourOfDay >= 6 && hourOfDay < 20
+          const temp = isDay 
+            ? (12 + Math.random() * 8 + (hourOfDay >= 12 && hourOfDay < 16 ? 3 : 0))
+            : (10 + Math.random() * 4)
+          
+          return {
+            time: hourTime,
+            temperature: Math.round(temp * 10) / 10,
+            condition: isDay 
+              ? (temp > 18 ? 'Sereno' : temp > 15 ? 'Nuvoloso' : 'Pioggia leggera')
+              : 'Sereno',
+            icon: isDay 
+              ? (temp > 18 ? 'sunny' : temp > 15 ? 'cloudy' : 'rainy')
+              : 'clear-night',
+            precipitation: i >= 12 && i < 18 ? Math.random() * 5 : 0,
+          }
+        }),
+        daily: Array.from({ length: 3 }, (_, i) => {
+          const dayDate = new Date(Date.now() + i * 24 * 60 * 60 * 1000)
+          const maxTemp = 15 + Math.random() * 8
+          const minTemp = maxTemp - 5 - Math.random() * 3
+          
+          return {
+            date: dayDate,
+            maxTemp: Math.round(maxTemp * 10) / 10,
+            minTemp: Math.round(minTemp * 10) / 10,
+            condition: i === 0 ? 'Vento forte' : i === 1 ? 'Pioggia' : 'Sereno',
+            icon: i === 0 ? 'windy' : i === 1 ? 'rainy' : 'sunny',
+            precipitation: i === 1 ? Math.round(15 + Math.random() * 10) : 0,
+          }
+        }),
+        alerts: baseTemp < 5 || baseTemp > 30 ? [
+          {
+            type: baseTemp < 5 ? 'wind' : 'storm',
+            severity: 'severe',
+            message: baseTemp < 5 
+              ? `Temperature molto basse previste: ${Math.round(baseTemp)}°C. Si consiglia di coprire le bancarelle.`
+              : `Temperature molto alte previste: ${Math.round(baseTemp)}°C. Si consiglia di idratarsi e cercare ombra.`,
+          },
+        ] : [],
+      }
+
+      setTimeout(() => {
+        setWeather(mockWeather)
+        setLastUpdate(new Date())
+        setLoading(false)
+        setIsRefreshing(false)
+      }, 300)
+
+      // Invia notifiche per alert critici
+      if (permission === 'granted' && mockWeather.alerts.length > 0) {
+        mockWeather.alerts.forEach((alert) => {
+          if (alert.severity === 'severe') {
+            sendNotification('Allerta Meteo', alert.message)
+          }
+        })
+      }
+    } catch (error) {
+      console.error('Errore nel caricamento meteo:', error)
+      setLoading(false)
+      setIsRefreshing(false)
+    }
+  }
 
   useEffect(() => {
-    // Mock data - in produzione verrà da API meteo
-    const mockWeather: WeatherData = {
-      current: {
-        temperature: 15,
-        condition: 'Parzialmente nuvoloso',
-        icon: 'partly-cloudy',
-        humidity: 65,
-        windSpeed: 12,
-      },
-      hourly: Array.from({ length: 24 }, (_, i) => ({
-        time: new Date(Date.now() + i * 60 * 60 * 1000),
-        temperature: 12 + Math.random() * 8,
-        condition: i < 6 ? 'Sereno' : i < 12 ? 'Nuvoloso' : 'Pioggia leggera',
-        icon: i < 6 ? 'sunny' : i < 12 ? 'cloudy' : 'rainy',
-        precipitation: i < 12 ? 0 : Math.random() * 5,
-      })),
-      daily: Array.from({ length: 3 }, (_, i) => ({
-        date: new Date(Date.now() + i * 24 * 60 * 60 * 1000),
-        maxTemp: 18 + Math.random() * 5,
-        minTemp: 8 + Math.random() * 5,
-        condition: i === 0 ? 'Vento forte' : i === 1 ? 'Pioggia' : 'Sereno',
-        icon: i === 0 ? 'windy' : i === 1 ? 'rainy' : 'sunny',
-        precipitation: i === 1 ? 15 : 0,
-      })),
-      alerts: [
-        {
-          type: 'wind',
-          severity: 'severe',
-          message: 'Vento forte previsto mercoledì 24 gennaio con raffiche fino a 60 km/h',
-        },
-      ],
-    }
-
-    setTimeout(() => {
-      setWeather(mockWeather)
-      setLoading(false)
-    }, 500)
-
-    // Invia notifiche per alert critici
-    if (permission === 'granted' && mockWeather.alerts.length > 0) {
-      mockWeather.alerts.forEach((alert) => {
-        if (alert.severity === 'severe') {
-          sendNotification('Allerta Meteo', alert.message)
-        }
-      })
-    }
-  }, [sendNotification, permission])
+    loadWeather()
+    // Aggiorna ogni 30 minuti
+    const interval = setInterval(() => loadWeather(false), 30 * 60 * 1000)
+    return () => clearInterval(interval)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   if (loading) {
     return (
@@ -108,11 +161,26 @@ export default function WeatherPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Meteo</h1>
-        <p className="text-gray-600">
-          Previsioni meteo 24 ore e 3 giorni con alert per condizioni critiche
-        </p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Meteo</h1>
+          <p className="text-gray-600">
+            Previsioni meteo 24 ore e 3 giorni con alert per condizioni critiche
+          </p>
+          {lastUpdate && (
+            <p className="text-sm text-gray-500 mt-1">
+              Ultimo aggiornamento: {format(lastUpdate, 'HH:mm:ss', { locale: it })}
+            </p>
+          )}
+        </div>
+        <button
+          onClick={() => loadWeather(false)}
+          disabled={isRefreshing}
+          className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          <span>{isRefreshing ? 'Aggiornamento...' : 'Aggiorna'}</span>
+        </button>
       </div>
 
       {/* Alert critici */}
