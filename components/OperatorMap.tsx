@@ -19,22 +19,22 @@ L.Icon.Default.mergeOptions({
 const defaultCenter: [number, number] = [43.7885, 7.6060]
 
 // Percorso del mercato del venerdì (polilinea lungo la strada principale)
-// Coordinate approssimative del percorso del mercato
+// Coordinate basate sulle posizioni reali degli operatori
 const marketPath: [number, number][] = [
-  [43.7880, 7.6055], // Inizio percorso (sud-ovest)
-  [43.7882, 7.6058],
+  [43.7882, 7.6060], // Inizio percorso (sud) - Fiori e Piante
+  [43.7883, 7.6059], // Moda & Accessori
   [43.7884, 7.6060],
-  [43.7886, 7.6062],
-  [43.7888, 7.6065],
-  [43.7889, 7.6068], // Fine percorso (nord-est)
+  [43.7885, 7.6062], // Centro - Formaggi e Salumi Liguri
+  [43.7886, 7.6065], // Pesce Fresco del Golfo
+  [43.7888, 7.6068], // Fine percorso (nord-est) - Frutti e Verdura di Maria
 ]
 
-// Area mercato coperto (poligono approssimativo)
+// Area mercato coperto (poligono - posizionato vicino al centro del mercato)
 const coveredMarketArea: [number, number][] = [
-  [43.7883, 7.6057],
-  [43.7885, 7.6059],
-  [43.7887, 7.6061],
-  [43.7885, 7.6063],
+  [43.7884, 7.6060],
+  [43.7886, 7.6061],
+  [43.7886, 7.6064],
+  [43.7884, 7.6063],
   [43.7883, 7.6061],
 ]
 
@@ -140,9 +140,9 @@ export default function OperatorMap({ category, searchQuery }: OperatorMapProps)
         const result = await response.json()
         
         if (result.success && result.data) {
-          // Distribuisci gli operatori lungo il percorso del mercato
-          const distributedOperators = distributeOperatorsAlongPath(result.data, marketPath)
-          setOperators(distributedOperators)
+          // Mantieni le posizioni originali degli operatori (già corrette)
+          // Il percorso serve solo per visualizzazione
+          setOperators(result.data)
           setMarketInfo(result.location)
           // Imposta il centro dell'area mercato
           if (result.location?.center) {
@@ -233,8 +233,8 @@ export default function OperatorMap({ category, searchQuery }: OperatorMapProps)
           }}
         />
         
-        {/* Marker per il mercato coperto */}
-        <Marker position={[43.7885, 7.6060]}>
+        {/* Marker per il mercato coperto - posizionato al centro dell'area */}
+        <Marker position={[43.7885, 7.6062]}>
           <Popup>
             <div className="text-sm">
               <div className="font-semibold">Mercato Coperto</div>
