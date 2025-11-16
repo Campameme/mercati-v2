@@ -38,68 +38,6 @@ const coveredMarketArea: [number, number][] = [
   [43.7883, 7.6061],
 ]
 
-/**
- * Distribuisce gli operatori lungo il percorso del mercato
- */
-function distributeOperatorsAlongPath(operators: Operator[], path: [number, number][]): Operator[] {
-  if (operators.length === 0 || path.length < 2) return operators
-  
-  // Calcola la lunghezza totale del percorso
-  const pathLength = path.reduce((total, point, index) => {
-    if (index === 0) return 0
-    const prevPoint = path[index - 1]
-    const dx = point[1] - prevPoint[1]
-    const dy = point[0] - prevPoint[0]
-    return total + Math.sqrt(dx * dx + dy * dy)
-  }, 0)
-  
-  // Distribuisci gli operatori lungo il percorso
-  return operators.map((operator, index) => {
-    // Posizione lungo il percorso (0 = inizio, 1 = fine)
-    const position = operators.length > 1 ? index / (operators.length - 1) : 0.5
-    
-    // Trova il punto corrispondente lungo il percorso
-    let accumulatedLength = 0
-    let targetLength = position * pathLength
-    
-    for (let i = 1; i < path.length; i++) {
-      const prevPoint = path[i - 1]
-      const currentPoint = path[i]
-      const dx = currentPoint[1] - prevPoint[1]
-      const dy = currentPoint[0] - prevPoint[0]
-      const segmentLength = Math.sqrt(dx * dx + dy * dy)
-      
-      if (accumulatedLength + segmentLength >= targetLength) {
-        // Interpola tra i due punti
-        const t = (targetLength - accumulatedLength) / segmentLength
-        const lat = prevPoint[0] + dy * t
-        const lng = prevPoint[1] + dx * t
-        
-        return {
-          ...operator,
-          location: {
-            ...operator.location,
-            lat,
-            lng,
-          },
-        }
-      }
-      
-      accumulatedLength += segmentLength
-    }
-    
-    // Se non trovato, usa l'ultimo punto
-    const lastPoint = path[path.length - 1]
-    return {
-      ...operator,
-      location: {
-        ...operator.location,
-        lat: lastPoint[0],
-        lng: lastPoint[1],
-      },
-    }
-  })
-}
 
 interface OperatorMapProps {
   category: OperatorCategory | 'all'
@@ -243,7 +181,7 @@ export default function OperatorMap({ category, searchQuery }: OperatorMapProps)
           </Popup>
         </Marker>
         
-        {operators.map((operator) => {
+        {operators.map((operator, index) => {
           // Marker personalizzato con stile in linea con il design (amber/orange)
           const customIcon = L.divIcon({
             className: 'custom-operator-marker',
@@ -267,7 +205,7 @@ export default function OperatorMap({ category, searchQuery }: OperatorMapProps)
 
           return (
             <Marker
-              key={operator.id}
+              key={`operator-${operator.id}-${index}`}
               position={[operator.location.lat, operator.location.lng]}
               icon={customIcon}
               eventHandlers={{
@@ -278,6 +216,9 @@ export default function OperatorMap({ category, searchQuery }: OperatorMapProps)
                 <div className="text-sm">
                   <div className="font-semibold">{operator.name}</div>
                   <div className="text-gray-600">Bancarella {operator.location.stallNumber}</div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {operator.location.lat.toFixed(4)}, {operator.location.lng.toFixed(4)}
+                  </div>
                 </div>
               </Popup>
             </Marker>
