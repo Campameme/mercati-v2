@@ -149,25 +149,25 @@ export default function OperatorMap({ category, searchQuery }: OperatorMapProps)
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
         
-        {/* Percorso del mercato del venerdì */}
+        {/* Percorso del mercato del venerdì - evidenziato */}
         <Polyline
           positions={marketPath}
           pathOptions={{
             color: '#f59e0b',
-            weight: 6,
-            opacity: 0.8,
-            dashArray: '10, 5',
+            weight: 8,
+            opacity: 0.9,
+            dashArray: '15, 10',
           }}
         />
         
-        {/* Mercato coperto */}
+        {/* Mercato coperto - evidenziato */}
         <Polygon
           positions={coveredMarketArea}
           pathOptions={{
             color: '#3b82f6',
             fillColor: '#3b82f6',
-            fillOpacity: 0.3,
-            weight: 3,
+            fillOpacity: 0.4,
+            weight: 4,
           }}
         />
         
@@ -175,7 +175,7 @@ export default function OperatorMap({ category, searchQuery }: OperatorMapProps)
         <Marker position={[43.7885, 7.6062]}>
           <Popup>
             <div className="text-sm">
-              <div className="font-semibold">Mercato Coperto</div>
+              <div className="font-semibold text-blue-600">🏛️ Mercato Coperto</div>
               <div className="text-gray-600">Area coperta del mercato</div>
             </div>
           </Popup>
