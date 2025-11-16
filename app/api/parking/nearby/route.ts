@@ -21,6 +21,7 @@ interface GooglePlacesResponse {
   results: GooglePlaceResult[]
   status: string
   error_message?: string
+  next_page_token?: string
 }
 
 /**

@@ -38,7 +38,7 @@ function convertOSMToParking(node: OSMNode, index: number, geometry?: { lat: num
   let name = tags.name
   if (!name) {
     // Prova con operator, addr:street, o altri tag comuni
-    name = tags.operator || tags['addr:street'] || tags['addr:housename'] || null
+    name = tags.operator || tags['addr:street'] || tags['addr:housename'] || undefined
   }
   if (!name) {
     // Se c'è una via, usa "Parcheggio [Via]"
@@ -337,7 +337,7 @@ export async function GET(request: NextRequest) {
           if (el.geometry && el.geometry.length >= 3) {
             geometry = el.geometry
               .map((g) => ({ lat: g.lat, lng: g.lon }))
-              .filter((g) => g.lat && g.lon && !isNaN(g.lat) && !isNaN(g.lon))
+              .filter((g) => g.lat && g.lng && !isNaN(g.lat) && !isNaN(g.lng))
             
             // Chiudi il poligono se non è già chiuso
             if (geometry.length >= 3) {

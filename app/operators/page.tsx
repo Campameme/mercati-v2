@@ -1,9 +1,20 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import OperatorMap from '@/components/OperatorMap'
+import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import OperatorFilters from '@/components/OperatorFilters'
 import { OperatorCategory } from '@/types/operator'
+
+// Import dinamico per evitare problemi di SSR con Leaflet
+const OperatorMap = dynamic(() => import('@/components/OperatorMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="bg-white rounded-lg shadow-md p-12 text-center">
+      <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      <p className="mt-4 text-gray-600">Caricamento mappa...</p>
+    </div>
+  ),
+})
 
 export default function OperatorsPage() {
   const [selectedCategory, setSelectedCategory] = useState<OperatorCategory | 'all'>('all')
