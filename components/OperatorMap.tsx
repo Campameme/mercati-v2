@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { MapContainer, TileLayer, Polyline, Polygon, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, Polygon, Marker, Popup, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import OperatorCard from './OperatorCard'
 import { Operator, OperatorCategory } from '@/types/operator'
 import L from 'leaflet'
+import Link from 'next/link'
+import { useMarketSlug } from '@/lib/markets/useMarketSlug'
 
 // Fix per i marker di Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl
@@ -15,116 +17,15 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 })
 
-// Centro area mercato venerdì Ventimiglia - lungo il lungomare
-const defaultCenter: [number, number] = [43.7885, 7.6065]
+// Centro provincia di Imperia (fallback prima che arrivino le coord del mercato)
+const defaultCenter: [number, number] = [43.9, 7.85]
 
-// Percorso del mercato del venerdì lungo il LUNGOMARE
-// Passeggiata Oberdan, Passeggiata Cavallotti, Via Milite Ignoto
-// Coordinate basate sul lungomare di Ventimiglia
-const marketPath: [number, number][] = [
-  [43.7880, 7.6040], // Inizio - Passeggiata Oberdan (ovest)
-  [43.7882, 7.6045], // Passeggiata Oberdan
-  [43.7884, 7.6050], // Passeggiata Oberdan
-  [43.7885, 7.6055], // Passeggiata Oberdan / Passeggiata Cavallotti
-  [43.7886, 7.6060], // Passeggiata Cavallotti
-  [43.7887, 7.6065], // Passeggiata Cavallotti
-  [43.7888, 7.6070], // Passeggiata Cavallotti / Via Milite Ignoto
-  [43.7889, 7.6075], // Via Milite Ignoto
-  [43.7890, 7.6080], // Via Milite Ignoto
-  [43.7891, 7.6085], // Fine - Via Milite Ignoto (est)
-]
-
-/**
- * Crea un'area (poligono) dal percorso del mercato
- * Espande il percorso creando un'area più larga intorno alla linea
- */
-function createMarketArea(path: [number, number][], width: number = 0.0003): [number, number][] {
-  if (path.length < 2) return path
-  
-  const area: [number, number][] = []
-  
-  // Aggiungi punti lungo il percorso espandendo perpendicolarmente
-  for (let i = 0; i < path.length; i++) {
-    const point = path[i]
-    let dx = 0
-    let dy = 0
-    
-    if (i === 0) {
-      // Primo punto: usa la direzione verso il prossimo punto
-      const next = path[i + 1]
-      dx = next[1] - point[1]
-      dy = next[0] - point[0]
-    } else if (i === path.length - 1) {
-      // Ultimo punto: usa la direzione dal punto precedente
-      const prev = path[i - 1]
-      dx = point[1] - prev[1]
-      dy = point[0] - prev[0]
-    } else {
-      // Punti intermedi: usa la media delle direzioni
-      const prev = path[i - 1]
-      const next = path[i + 1]
-      dx = (next[1] - prev[1]) / 2
-      dy = (next[0] - prev[0]) / 2
-    }
-    
-    // Normalizza e ruota di 90 gradi per ottenere la perpendicolare
-    const length = Math.sqrt(dx * dx + dy * dy)
-    if (length > 0) {
-      const perpX = -dy / length * width
-      const perpY = dx / length * width
-      
-      // Aggiungi punto a sinistra e a destra del percorso
-      area.push([point[0] + perpX, point[1] + perpY])
-    }
-  }
-  
-  // Aggiungi i punti sul lato opposto (in ordine inverso)
-  for (let i = path.length - 1; i >= 0; i--) {
-    const point = path[i]
-    let dx = 0
-    let dy = 0
-    
-    if (i === 0) {
-      const next = path[i + 1]
-      dx = next[1] - point[1]
-      dy = next[0] - point[0]
-    } else if (i === path.length - 1) {
-      const prev = path[i - 1]
-      dx = point[1] - prev[1]
-      dy = point[0] - prev[0]
-    } else {
-      const prev = path[i - 1]
-      const next = path[i + 1]
-      dx = (next[1] - prev[1]) / 2
-      dy = (next[0] - prev[0]) / 2
-    }
-    
-    const length = Math.sqrt(dx * dx + dy * dy)
-    if (length > 0) {
-      const perpX = dy / length * width
-      const perpY = -dx / length * width
-      
-      area.push([point[0] + perpX, point[1] + perpY])
-    }
-  }
-  
-  // Chiudi il poligono tornando al primo punto
-  if (area.length > 0) {
-    area.push(area[0])
-  }
-  
-  return area
-}
-
-// Crea l'area del mercato espandendo il percorso
-const marketArea = createMarketArea(marketPath, 0.0004)
-
-// Componente per centrare la mappa
-function MapCenter({ center }: { center: [number, number] }) {
+// Applica reattivamente center + zoom (MapContainer legge i prop solo al mount)
+function ApplyView({ center, zoom }: { center: [number, number]; zoom: number }) {
   const map = useMap()
   useEffect(() => {
-    map.setView(center, map.getZoom())
-  }, [center, map])
+    map.setView(center, zoom)
+  }, [center, zoom, map])
   return null
 }
 
@@ -134,31 +35,62 @@ interface OperatorMapProps {
 }
 
 export default function OperatorMap({ category, searchQuery }: OperatorMapProps) {
+  const marketSlug = useMarketSlug()
   const [selectedOperator, setSelectedOperator] = useState<Operator | null>(null)
   const [operators, setOperators] = useState<Operator[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [marketInfo, setMarketInfo] = useState<any>(null)
+  const [center, setCenter] = useState<[number, number]>(defaultCenter)
+  const [zoom, setZoom] = useState<number>(16)
+  const [areaPositions, setAreaPositions] = useState<[number, number][] | null>(null)
+  const [areaStyle, setAreaStyle] = useState<{ color: string; fillOpacity: number }>({ color: '#f97316', fillOpacity: 0.2 })
 
-  // Carica operatori da API
+  useEffect(() => {
+    if (!marketSlug) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/markets/by-slug/${encodeURIComponent(marketSlug)}`)
+        if (!res.ok) return
+        const { data } = await res.json()
+        if (cancelled || !data) return
+        if (data.market) {
+          setCenter([data.market.center_lat, data.market.center_lng])
+          setZoom(data.market.default_zoom_operators ?? data.market.default_zoom ?? 17)
+        }
+        const ring = data.area?.polygon_geojson?.geometry?.coordinates?.[0]
+        if (Array.isArray(ring)) {
+          setAreaPositions(ring.map((c: number[]) => [c[1], c[0]] as [number, number]))
+          if (data.area?.style) {
+            setAreaStyle({
+              color: data.area.style.color ?? '#f97316',
+              fillOpacity: data.area.style.fillOpacity ?? 0.2,
+            })
+          }
+        } else {
+          setAreaPositions(null)
+        }
+      } catch { /* ignore */ }
+    })()
+    return () => { cancelled = true }
+  }, [marketSlug])
+
   useEffect(() => {
     const loadOperators = async () => {
       try {
         setLoading(true)
         const params = new URLSearchParams()
-        if (category && category !== 'all') {
-          params.append('category', category)
-        }
-        if (searchQuery) {
-          params.append('search', searchQuery)
-        }
-        
+        if (category && category !== 'all') params.append('category', category)
+        if (searchQuery) params.append('search', searchQuery)
+        if (marketSlug) params.append('marketSlug', marketSlug)
+
         const response = await fetch(`/api/operators?${params.toString()}`)
         const result = await response.json()
-        
+
         if (result.success && result.data) {
           setOperators(result.data)
-          setMarketInfo(result.location)
+          setMarketInfo(result.market)
         } else {
           setError('Errore nel caricamento degli operatori')
         }
@@ -169,9 +101,8 @@ export default function OperatorMap({ category, searchQuery }: OperatorMapProps)
         setLoading(false)
       }
     }
-
     loadOperators()
-  }, [category, searchQuery])
+  }, [category, searchQuery, marketSlug])
 
   const handleNavigate = useCallback((operator: Operator) => {
     const url = `https://www.google.com/maps/dir/?api=1&destination=${operator.location.lat},${operator.location.lng}`
@@ -182,7 +113,7 @@ export default function OperatorMap({ category, searchQuery }: OperatorMapProps)
     return (
       <div className="bg-white rounded-lg shadow-md p-12 text-center">
         <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-        <p className="mt-4 text-gray-600">Caricamento operatori mercato venerdì Ventimiglia...</p>
+        <p className="mt-4 text-gray-600">Caricamento operatori…</p>
       </div>
     )
   }
@@ -201,81 +132,52 @@ export default function OperatorMap({ category, searchQuery }: OperatorMapProps)
       {/* Mappa con percorso evidenziato */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <MapContainer
-          center={defaultCenter}
-          zoom={16}
+          center={center}
+          zoom={zoom}
           style={{ height: '600px', width: '100%' }}
           scrollWheelZoom={true}
         >
-          <MapCenter center={defaultCenter} />
+          <ApplyView center={center} zoom={zoom} />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
             url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           />
-          
-          {/* Area del mercato del venerdì - evidenziata come poligono */}
-          <Polygon
-            positions={marketArea}
-            pathOptions={{
-              color: '#f59e0b',
-              fillColor: '#f59e0b',
-              fillOpacity: 0.4,
-              weight: 3,
-              opacity: 0.8,
-            }}
-          />
-          
-          {/* Linea centrale del percorso per maggiore visibilità */}
-          <Polyline
-            positions={marketPath}
-            pathOptions={{
-              color: '#f59e0b',
-              weight: 4,
-              opacity: 0.9,
-              dashArray: '15, 10',
-            }}
-          />
+          {areaPositions && (
+            <Polygon
+              positions={areaPositions}
+              pathOptions={{
+                color: areaStyle.color,
+                fillColor: areaStyle.color,
+                fillOpacity: areaStyle.fillOpacity,
+                weight: 2,
+                opacity: 0.9,
+              }}
+            />
+          )}
+          {operators
+            .filter((op) => op.location?.lat && op.location?.lng)
+            .map((op) => (
+              <Marker
+                key={op.id}
+                position={[op.location.lat, op.location.lng]}
+                eventHandlers={{ click: () => setSelectedOperator(op) }}
+              >
+                <Popup>
+                  <div className="min-w-[180px]">
+                    <div className="font-semibold text-gray-900">{op.name}</div>
+                    {op.location.stallNumber && (
+                      <div className="text-xs text-gray-500">Bancarella {op.location.stallNumber}</div>
+                    )}
+                    {marketSlug && (
+                      <Link href={`/${marketSlug}/operators/${op.id}`} className="text-xs text-primary-600 hover:underline block mt-1">
+                        Vedi dettagli →
+                      </Link>
+                    )}
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
         </MapContainer>
-      </div>
-
-      {/* Indicazioni per raggiungere il mercato */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">📍 Come raggiungere il Mercato del Venerdì</h2>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="font-semibold text-gray-800 mb-2">🚗 In Auto</h3>
-            <ul className="text-sm text-gray-700 space-y-1">
-              <li>• Parcheggi disponibili lungo il lungomare e nelle zone limitrofe</li>
-              <li>• Durante il mercato (venerdì 8:00-17:00) alcune strade sono chiuse al traffico</li>
-              <li>• Si consiglia di parcheggiare nelle aree indicate nella mappa</li>
-              <li>• Accesso da: Autostrada A10, uscita Ventimiglia</li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-800 mb-2">🚶 A Piedi / 🚲 In Bicicletta</h3>
-            <ul className="text-sm text-gray-700 space-y-1">
-              <li>• Il mercato si svolge lungo il lungomare (Passeggiata Oberdan, Cavallotti, Via Milite Ignoto)</li>
-              <li>• Facilmente raggiungibile dal centro città (circa 5-10 minuti a piedi)</li>
-              <li>• Percorso pedonale sicuro e accessibile</li>
-              <li>• Parcheggio bici disponibile nelle zone limitrofe</li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-800 mb-2">🚌 Con i Mezzi Pubblici</h3>
-            <ul className="text-sm text-gray-700 space-y-1">
-              <li>• Linee bus locali fermano vicino al lungomare</li>
-              <li>• Stazione ferroviaria Ventimiglia: 15 minuti a piedi</li>
-              <li>• Servizio navetta disponibile durante il mercato</li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-800 mb-2">⏰ Orari Mercato</h3>
-            <ul className="text-sm text-gray-700 space-y-1">
-              <li>• <strong>Venerdì:</strong> 8:00 - 17:00 (ora legale) / 8:00 - 16:00 (ora solare)</li>
-              <li>• Chiusura strade al traffico durante gli orari del mercato</li>
-              <li>• Mercato coperto: Lun-Gio 7-13:30, Ven-Sab 7-19</li>
-            </ul>
-          </div>
-        </div>
       </div>
 
       {/* Lista operatori */}
@@ -302,23 +204,25 @@ export default function OperatorMap({ category, searchQuery }: OperatorMapProps)
               {filteredOperators.map((operator) => (
                 <div
                   key={operator.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => setSelectedOperator(operator)}
+                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
                 >
-                  <div className="font-semibold text-gray-900">{operator.name}</div>
-                  <div className="text-sm text-gray-600 mt-1">{operator.description}</div>
-                  <div className="text-xs text-gray-500 mt-2">
-                    Bancarella {operator.location.stallNumber}
+                  <Link href={marketSlug ? `/${marketSlug}/operators/${operator.id}` : '#'} className="block">
+                    <div className="font-semibold text-gray-900 hover:text-primary-600">{operator.name}</div>
+                    <div className="text-sm text-gray-600 mt-1">{operator.description}</div>
+                    {operator.location?.stallNumber && (
+                      <div className="text-xs text-gray-500 mt-2">Bancarella {operator.location.stallNumber}</div>
+                    )}
+                  </Link>
+                  <div className="flex items-center gap-3 mt-3 text-xs">
+                    <button
+                      onClick={() => setSelectedOperator(operator)}
+                      className="text-gray-600 hover:text-gray-800 font-medium"
+                    >Mostra sulla mappa</button>
+                    <button
+                      onClick={() => handleNavigate(operator)}
+                      className="text-blue-600 hover:text-blue-800 font-medium"
+                    >📍 Indicazioni</button>
                   </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleNavigate(operator)
-                    }}
-                    className="mt-3 text-xs text-blue-600 hover:text-blue-800 font-medium"
-                  >
-                    📍 Ottieni indicazioni
-                  </button>
                 </div>
               ))}
             </div>

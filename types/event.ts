@@ -1,24 +1,16 @@
+// Event type backed by DB (table "events").
 export interface MarketEvent {
   id: string
-  comune: string
-  evento: string
-  tipologia: string
-  giorno?: string // es: "sabato", "domenica"
-  dataInizio: string // "ricorrente" o "DD/MM"
-  dataFine: string // "ricorrente" o "DD/MM"
-  mese?: string // es: "giugno", "agosto"
-  orario?: string
-  luogo?: string
-  organizzatore?: string
-  settoriMerceologici?: string
-  start?: Date // Data calcolata per FullCalendar
-  end?: Date // Data calcolata per FullCalendar
-  allDay?: boolean
+  market_id: string
+  title: string
+  description: string | null
+  category: string
+  location: string | null
+  start_at: string       // ISO
+  end_at: string | null  // ISO
+  is_recurring: boolean
+  recurrence_rule: string | null
+  created_at: string
+  created_by: string | null
+  markets?: { slug: string; name: string; city: string } | null
 }
-
-export interface EventFilters {
-  comune: string
-  categoria: string
-  tipo: string
-}
-

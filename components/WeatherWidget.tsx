@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Sun, Cloud, CloudRain, X } from 'lucide-react'
 import { format } from 'date-fns'
 import { it } from 'date-fns/locale/it'
+import { useMarketSlug } from '@/lib/markets/useMarketSlug'
 
 interface WeatherData {
   current: {
@@ -57,23 +58,27 @@ const getWeatherIcon = (condition: string, icon: string) => {
 }
 
 export default function WeatherWidget() {
+  const marketSlug = useMarketSlug()
   const [weather, setWeather] = useState<WeatherData | null>(null)
+  const [location, setLocation] = useState<string>('')
+  const [owmName, setOwmName] = useState<string | null>(null)
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [source, setSource] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
 
   useEffect(() => {
     loadWeather()
-    // Aggiorna ogni 30 minuti
     const interval = setInterval(loadWeather, 30 * 60 * 1000)
     return () => clearInterval(interval)
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [marketSlug])
 
   const loadWeather = async () => {
     try {
       setLoading(true)
-      
-      // Chiama API meteo
-      const response = await fetch('/api/weather')
+      const qs = marketSlug ? `?marketSlug=${encodeURIComponent(marketSlug)}` : ''
+      const response = await fetch(`/api/weather${qs}`)
       const result = await response.json()
 
       if (result.success && result.data) {
@@ -91,6 +96,10 @@ export default function WeatherWidget() {
         }
 
         setWeather(weatherData)
+        if (result.location) setLocation(result.location)
+        setOwmName(result.owmName ?? null)
+        setCoords(result.coords ?? null)
+        setSource(result.source ?? '')
       } else {
         throw new Error('Errore nel caricamento dati meteo')
       }
@@ -136,7 +145,7 @@ export default function WeatherWidget() {
       <button
         onClick={() => setShowModal(true)}
         className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
-        title={`Meteo Ventimiglia: ${weather.current.temperature}° - ${weather.current.condition}`}
+        title={`Meteo ${owmName || location || 'Mercato'}${coords ? ` (${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)})` : ''}: ${weather.current.temperature}° - ${weather.current.condition}${source.startsWith('mock') ? ' [dati demo]' : ''}`}
       >
         {getWidgetIcon(weather.current.condition, weather.current.icon)}
         <span className="text-sm font-semibold text-gray-900">
@@ -152,7 +161,13 @@ export default function WeatherWidget() {
             <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-t-xl">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h2 className="text-2xl font-bold mb-2">Meteo Ventimiglia</h2>
+                  <h2 className="text-2xl font-bold mb-2">Meteo {owmName || location || 'Mercato'}</h2>
+                  {owmName && location && owmName.toLowerCase() !== location.toLowerCase() && (
+                    <p className="text-blue-100 text-xs">(area {location})</p>
+                  )}
+                  {coords && (
+                    <p className="text-blue-100 text-xs">{coords.lat.toFixed(4)}, {coords.lng.toFixed(4)}{source.startsWith('mock') ? ' · dati demo' : ''}</p>
+                  )}
                   <p className="text-blue-100">Previsioni aggiornate in tempo reale</p>
                 </div>
                 <button

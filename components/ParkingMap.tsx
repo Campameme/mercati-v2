@@ -1,16 +1,17 @@
 'use client'
 
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api'
+import { GoogleMap, Marker, InfoWindow, Polygon } from '@react-google-maps/api'
 import ParkingCard from './ParkingCard'
 import { Parking } from '@/types/parking'
+import { useMarketSlug } from '@/lib/markets/useMarketSlug'
+import { geojsonToGoogleMapsPath } from '@/lib/geo/geojsonToGoogleMapsPath'
+import { crowdingColor } from './CrowdingBadge'
+import { matchesFilter, type ParkingFilter } from './ParkingFilters'
 
 // Rimuoviamo le zone inventate - useremo solo i parcheggi reali
 
-const mapContainerStyle = {
-  width: '100%',
-  height: '600px',
-}
+const defaultMapHeight = '600px'
 
 const defaultCenter = {
   lat: 43.7885,
@@ -19,13 +20,26 @@ const defaultCenter = {
 
 interface ParkingMapProps {
   onSelectParking: (id: string | null) => void
+  filter?: ParkingFilter
+  /**
+   * Se fornite, sovrascrivono la ricerca per marketSlug e centrano mappa + query API
+   * su coordinate esplicite (usato per i mercati a livello comune/sessione).
+   */
+  coordsOverride?: { lat: number; lng: number; city?: string }
+  height?: string
 }
 
-export default function ParkingMap({ onSelectParking }: ParkingMapProps) {
+export default function ParkingMap({ onSelectParking, filter, coordsOverride, height = '600px' }: ParkingMapProps) {
+  const autoSlug = useMarketSlug()
+  // Quando `coordsOverride` è settato ignoriamo il marketSlug della URL
+  const marketSlug = coordsOverride ? undefined : autoSlug
   const [selectedParking, setSelectedParking] = useState<Parking | null>(null)
   const [selectedParkingId, setSelectedParkingId] = useState<string | null>(null)
   const [center, setCenter] = useState(defaultCenter)
+  const [zoom, setZoom] = useState<number>(15)
   const [parkings, setParkings] = useState<Parking[]>([])
+  const [areaPath, setAreaPath] = useState<google.maps.LatLngLiteral[]>([])
+  const [areaStyle, setAreaStyle] = useState<{ color: string; fillOpacity: number }>({ color: '#f97316', fillOpacity: 0.2 })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [mapType, setMapType] = useState<'roadmap' | 'satellite'>('satellite')
@@ -39,7 +53,17 @@ export default function ParkingMap({ onSelectParking }: ParkingMapProps) {
         setError(null)
         console.log('ParkingMap: Inizio caricamento parcheggi...')
         
-        const response = await fetch('/api/parking')
+        let qs = ''
+        if (coordsOverride) {
+          const p = new URLSearchParams()
+          p.set('lat', String(coordsOverride.lat))
+          p.set('lng', String(coordsOverride.lng))
+          if (coordsOverride.city) p.set('city', coordsOverride.city)
+          qs = `?${p.toString()}`
+        } else if (marketSlug) {
+          qs = `?marketSlug=${encodeURIComponent(marketSlug)}`
+        }
+        const response = await fetch(`/api/parking${qs}`)
         console.log('ParkingMap: Response status:', response.status, response.statusText)
         
         if (!response.ok) {
@@ -117,7 +141,45 @@ export default function ParkingMap({ onSelectParking }: ParkingMapProps) {
     }
 
     loadParkings()
-  }, [])
+  }, [marketSlug, coordsOverride?.lat, coordsOverride?.lng, coordsOverride?.city])
+
+  // Centro mappa su coordsOverride (priorità) o area poligono da market
+  useEffect(() => {
+    if (coordsOverride) {
+      setCenter({ lat: coordsOverride.lat, lng: coordsOverride.lng })
+      setZoom(17)
+      setAreaPath([])
+      return
+    }
+    if (!marketSlug) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/markets/by-slug/${encodeURIComponent(marketSlug)}`)
+        if (!res.ok) return
+        const { data } = await res.json()
+        if (cancelled || !data) return
+        if (data.market) {
+          setCenter({ lat: data.market.center_lat, lng: data.market.center_lng })
+          if (typeof data.market.default_zoom === 'number') setZoom(data.market.default_zoom)
+        }
+        if (data.area?.polygon_geojson) {
+          setAreaPath(geojsonToGoogleMapsPath(data.area.polygon_geojson))
+          if (data.area.style) {
+            setAreaStyle({
+              color: data.area.style.color ?? '#f97316',
+              fillOpacity: data.area.style.fillOpacity ?? 0.2,
+            })
+          }
+        } else {
+          setAreaPath([])
+        }
+      } catch {
+        /* ignore */
+      }
+    })()
+    return () => { cancelled = true }
+  }, [marketSlug, coordsOverride?.lat, coordsOverride?.lng])
 
   // Sincronizza selezione dalla lista
   useEffect(() => {
@@ -192,9 +254,9 @@ export default function ParkingMap({ onSelectParking }: ParkingMapProps) {
       </div>
 
       <GoogleMap
-        mapContainerStyle={mapContainerStyle}
+        mapContainerStyle={{ width: '100%', height: height ?? defaultMapHeight }}
         center={center}
-        zoom={15}
+        zoom={zoom}
         onLoad={handleMapLoad}
         options={{
           disableDefaultUI: false,
@@ -228,22 +290,41 @@ export default function ParkingMap({ onSelectParking }: ParkingMapProps) {
           ] : undefined,
         }}
       >
+        {areaPath.length > 0 && (
+          <Polygon
+            paths={areaPath}
+            options={{
+              strokeColor: areaStyle.color,
+              strokeOpacity: 0.9,
+              strokeWeight: 2,
+              fillColor: areaStyle.color,
+              fillOpacity: areaStyle.fillOpacity,
+              clickable: false,
+              zIndex: 1,
+            }}
+          />
+        )}
         {parkings
           .filter((parking) => {
-            return parking.location && parking.location.lat && parking.location.lng && 
+            const validPos = parking.location && parking.location.lat && parking.location.lng &&
                    !isNaN(parking.location.lat) && !isNaN(parking.location.lng)
+            if (!validPos) return false
+            if (filter && !matchesFilter(parking, filter)) return false
+            return true
           })
           .map((parking) => {
           const position = { lat: parking.location.lat, lng: parking.location.lng }
           const isPaid = parking.paid
           const nearRiver = parking.nearRiver || false
           
-          // Colore marker basato su tipo: blu per a pagamento, verde per gratuito, rosso/amber per altri
+          // Colore marker: priorità all'affluenza (crowding), fallback su tipo parcheggio
           let markerColor: string
-          if (nearRiver) {
-            markerColor = '#3b82f6' // Blu per parcheggi vicini al fiume Roja
+          if (parking.crowding) {
+            markerColor = crowdingColor(parking.crowding.level)
+          } else if (nearRiver) {
+            markerColor = '#3b82f6'
           } else {
-            markerColor = isPaid ? '#ef4444' : '#f59e0b' // Rosso o Amber
+            markerColor = isPaid ? '#ef4444' : '#f59e0b'
           }
           const borderColor = '#ffffff'
           const borderWidth = nearRiver ? 3 : 2

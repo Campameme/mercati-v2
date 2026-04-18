@@ -2,6 +2,7 @@
 
 import { Parking } from '@/types/parking'
 import { MapPin, Clock, Euro, Car, Accessibility, Building2, Navigation, Star, Route } from 'lucide-react'
+import CrowdingBadge from './CrowdingBadge'
 
 interface ParkingCardProps {
   parking: Parking
@@ -38,6 +39,11 @@ export default function ParkingCard({ parking, onNavigate, onSelect }: ParkingCa
             <MapPin className="w-3 h-3 mr-1" />
             <span className="line-clamp-1">{parking.address}</span>
           </div>
+          {parking.crowding && (
+            <div className="mb-2">
+              <CrowdingBadge level={parking.crowding.level} />
+            </div>
+          )}
           
           {/* Distanza e Rating */}
           <div className="flex items-center gap-2 mb-2 text-xs">
@@ -84,34 +90,13 @@ export default function ParkingCard({ parking, onNavigate, onSelect }: ParkingCa
           <Euro className="w-4 h-4 mr-1.5 text-gray-400" />
           <div className="flex-1">
             <p className="text-xs text-gray-500">Tariffa</p>
-            {parking.pricing && parking.pricing.currentHourlyRate ? (
-              <div>
-                <p className={`text-sm font-semibold ${
-                  parking.pricing.trafficMultiplier && parking.pricing.trafficMultiplier > 1.0 
-                    ? 'text-orange-600' 
-                    : 'text-gray-900'
-                }`}>
-                  {parking.pricing.currentHourlyRate.toFixed(2)}€/h
-                </p>
-                {parking.pricing.trafficMultiplier && parking.pricing.trafficMultiplier > 1.0 && (
-                  <p className="text-xs text-orange-600 font-medium">
-                    Alta domanda (+{Math.round((parking.pricing.trafficMultiplier - 1) * 100)}%)
-                  </p>
-                )}
-                {parking.pricing.currentDailyRate && (
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    {parking.pricing.currentDailyRate.toFixed(2)}€/giorno
-                  </p>
-                )}
-              </div>
-            ) : (
-              <p className={`text-sm font-semibold ${
-                parking.fee === 'Indefinito' ? 'text-gray-500 italic' : 
-                parking.fee.toLowerCase().includes('gratuito') ? 'text-green-600' : ''
-              }`}>
-                {parking.fee}
-              </p>
-            )}
+            <p className={`text-sm font-semibold ${
+              parking.paid === false ? 'text-green-600'
+              : parking.paid === true ? 'text-gray-900'
+              : 'text-gray-500 italic'
+            }`}>
+              {parking.fee}
+            </p>
           </div>
         </div>
         <div className="flex items-center text-gray-700">

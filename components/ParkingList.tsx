@@ -3,27 +3,41 @@
 import { useState, useEffect } from 'react'
 import ParkingCard from './ParkingCard'
 import { Parking } from '@/types/parking'
-import { Filter } from 'lucide-react'
+import { useMarketSlug } from '@/lib/markets/useMarketSlug'
+import { matchesFilter, type ParkingFilter } from './ParkingFilters'
 
 interface ParkingListProps {
   onSelectParking: (id: string | null) => void
+  filter: ParkingFilter
+  coordsOverride?: { lat: number; lng: number; city?: string }
 }
 
 export default function ParkingList({
   onSelectParking,
+  filter,
+  coordsOverride,
 }: ParkingListProps) {
-  const [filter, setFilter] = useState<'all' | 'municipal' | 'private' | 'free'>('all')
-  const [showFilters, setShowFilters] = useState(false)
+  const autoSlug = useMarketSlug()
+  const marketSlug = coordsOverride ? undefined : autoSlug
   const [parkings, setParkings] = useState<Parking[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Carica parcheggi da API (OpenStreetMap)
   useEffect(() => {
     const loadParkings = async () => {
       try {
         setLoading(true)
-        const response = await fetch('/api/parking')
+        let qs = ''
+        if (coordsOverride) {
+          const p = new URLSearchParams()
+          p.set('lat', String(coordsOverride.lat))
+          p.set('lng', String(coordsOverride.lng))
+          if (coordsOverride.city) p.set('city', coordsOverride.city)
+          qs = `?${p.toString()}`
+        } else if (marketSlug) {
+          qs = `?marketSlug=${encodeURIComponent(marketSlug)}`
+        }
+        const response = await fetch(`/api/parking${qs}`)
         const result = await response.json()
         
         if (result.success && result.data) {
@@ -40,13 +54,9 @@ export default function ParkingList({
     }
 
     loadParkings()
-  }, [])
+  }, [marketSlug, coordsOverride?.lat, coordsOverride?.lng, coordsOverride?.city])
 
-  const filteredParkings = parkings.filter((p) => {
-    if (filter === 'all') return true
-    if (filter === 'free') return !p.paid
-    return p.type === filter
-  })
+  const filteredParkings = parkings.filter((p) => matchesFilter(p, filter))
 
   const handleNavigate = (parking: Parking) => {
     const url = `https://www.google.com/maps/dir/?api=1&destination=${parking.location.lat},${parking.location.lng}`
@@ -65,7 +75,7 @@ export default function ParkingList({
     return (
       <div className="text-center py-12">
         <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-        <p className="mt-4 text-gray-600">Caricamento parcheggi di Ventimiglia...</p>
+        <p className="mt-4 text-gray-600">Caricamento parcheggi…</p>
       </div>
     )
   }
@@ -81,38 +91,9 @@ export default function ParkingList({
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">
-          Parcheggi ({filteredParkings.length})
-        </h2>
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center space-x-2 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50 w-full"
-        >
-          <Filter className="w-4 h-4" />
-          <span>Filtri</span>
-        </button>
-      </div>
-
-      {showFilters && (
-        <div className="mb-4 bg-white p-3 rounded-lg shadow-sm">
-          <div className="flex flex-wrap gap-2">
-            {(['all', 'municipal', 'private', 'free'] as const).map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
-                  filter === f
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {f === 'all' ? 'Tutti' : f === 'municipal' ? 'Comunali' : f === 'private' ? 'Privati' : 'Gratuiti'}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        Parcheggi ({filteredParkings.length})
+      </h2>
 
       <div className="space-y-3 max-h-[calc(100vh-300px)] overflow-y-auto">
         {filteredParkings.length === 0 ? (

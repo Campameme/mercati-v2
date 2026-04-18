@@ -8,7 +8,7 @@
 [build.environment]
   NODE_VERSION = "18"
   # Disabilita la scansione dei segreti per NEXT_PUBLIC_* (chiavi pubbliche intenzionalmente esposte)
-  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,NEXT_PUBLIC_WEATHER_API_KEY"
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,NEXT_PUBLIC_WEATHER_API_KEY,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY"
   # Escludi anche i file .next dalla scansione (contengono il bundle compilato)
   SECRETS_SCAN_OMIT_PATHS = ".next/**"
 

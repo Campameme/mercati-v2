@@ -25,12 +25,22 @@ export interface Parking {
   nearRiver?: boolean // Flag per parcheggi vicini al fiume Roja
   // Informazioni sui costi
   pricing?: {
-    hourlyRate?: number // Costo orario base in euro
-    dailyRate?: number // Costo giornaliero base in euro
-    currentHourlyRate?: number // Costo orario attuale (aggiornato in base al traffico)
-    currentDailyRate?: number // Costo giornaliero attuale (aggiornato in base al traffico)
-    trafficMultiplier?: number // Moltiplicatore basato sul traffico (1.0 = normale, >1.0 = alto traffico)
-    lastUpdated?: string // Timestamp ultimo aggiornamento
+    hourlyRate?: number
+    dailyRate?: number
+    currentHourlyRate?: number
+    currentDailyRate?: number
+    trafficMultiplier?: number
+    lastUpdated?: string
+  }
+  crowding?: {
+    score: 1 | 2 | 3 | 4 | 5
+    level: 'empty' | 'low' | 'medium' | 'high' | 'full'
+    factors: {
+      trafficRatio?: number // duration_in_traffic / duration
+      timeOfDay: number // hourly heuristic 0.9-2.1
+      isMarketDay: boolean
+    }
+    lastUpdated: string
   }
 }
 

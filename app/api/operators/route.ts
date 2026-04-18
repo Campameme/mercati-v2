@@ -1,157 +1,115 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+import { resolveMarketFromRequest } from '@/lib/markets/resolve'
 
-// Forza rendering dinamico
 export const dynamic = 'force-dynamic'
 
-// Dati operatori mercato venerdì Ventimiglia - SOLO quelli di cui siamo CERTI della posizione
-// Distribuiti nell'area mercato per evitare cluster eccessivi
-// Area mercato: circa 43.7880-43.7890 lat, 7.6055-7.6070 lng
-const ventimigliaOperators = [
-  {
-    id: '1',
-    name: 'Frutti e Verdura di Maria',
-    category: 'food',
-    description: 'Frutta e verdura fresca di stagione, prodotti locali e biologici',
-    photos: [],
-    languages: ['it', 'fr'],
-    paymentMethods: ['cash', 'card'],
-    socialLinks: {},
-    location: {
-      lat: 43.7888, // Nord-est area mercato
-      lng: 7.6068,
-      stallNumber: 'A01',
-    },
-    isOpen: true,
-    rating: 4.8,
-  },
-  {
-    id: '2',
-    name: 'Pesce Fresco del Golfo',
-    category: 'food',
-    description: 'Pesce fresco del giorno, crostacei e frutti di mare',
-    photos: [],
-    languages: ['it', 'fr'],
-    paymentMethods: ['cash', 'card'],
-    socialLinks: {},
-    location: {
-      lat: 43.7886, // Centro-nord area mercato
-      lng: 7.6065,
-      stallNumber: 'A05',
-    },
-    isOpen: true,
-    rating: 4.9,
-  },
-  {
-    id: '3',
-    name: 'Formaggi e Salumi Liguri',
-    category: 'food',
-    description: 'Formaggi locali, salumi artigianali e specialità liguri',
-    photos: [],
-    languages: ['it'],
-    paymentMethods: ['cash', 'card'],
-    socialLinks: {},
-    location: {
-      lat: 43.7885, // Centro area mercato
-      lng: 7.6062,
-      stallNumber: 'A10',
-    },
-    isOpen: true,
-    rating: 4.7,
-  },
-  {
-    id: '4',
-    name: 'Moda & Accessori',
-    category: 'clothing',
-    description: 'Abbigliamento, borse e accessori moda',
-    photos: [],
-    languages: ['it', 'fr', 'en'],
-    paymentMethods: ['cash', 'card', 'digital'],
-    socialLinks: {
-      instagram: '@modaventimiglia',
-    },
-    location: {
-      lat: 43.7883, // Sud-ovest area mercato
-      lng: 7.6059,
-      stallNumber: 'B03',
-    },
-    isOpen: true,
-    rating: 4.5,
-  },
-  {
-    id: '5',
-    name: 'Fiori e Piante',
-    category: 'flowers',
-    description: 'Fiori freschi, piante da giardino e da appartamento',
-    photos: [],
-    languages: ['it', 'fr'],
-    paymentMethods: ['cash', 'card'],
-    socialLinks: {},
-    location: {
-      lat: 43.7882, // Sud area mercato
-      lng: 7.6060,
-      stallNumber: 'C02',
-    },
-    isOpen: true,
-    rating: 4.6,
-  },
-]
-
-export async function GET(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url)
-    const category = searchParams.get('category')
-    const search = searchParams.get('search')
-
-    let filteredOperators = [...ventimigliaOperators]
-
-    // Filtro per categoria
-    if (category && category !== 'all') {
-      filteredOperators = filteredOperators.filter(
-        (op) => op.category === category
-      )
-    }
-
-    // Filtro per ricerca
-    if (search) {
-      const searchLower = search.toLowerCase()
-      filteredOperators = filteredOperators.filter(
-        (op) =>
-          op.name.toLowerCase().includes(searchLower) ||
-          op.description.toLowerCase().includes(searchLower) ||
-          op.location.stallNumber.toLowerCase().includes(searchLower)
-      )
-    }
-
-    // In produzione: qui si può chiamare un'API esterna o database
-    // Esempio: const response = await fetch('https://api.comune.ventimiglia.it/market/operators')
-    // const data = await response.json()
-
-    return NextResponse.json({
-      success: true,
-      data: filteredOperators,
-      city: 'Ventimiglia',
-      marketDay: 'Venerdì',
-      location: {
-        name: 'Mercato Venerdì Ventimiglia',
-        address: 'Area Mercato, 18039 Ventimiglia IM',
-        center: {
-          lat: 43.7885,
-          lng: 7.6065,
-        },
-        bounds: {
-          north: 43.7895,
-          south: 43.7875,
-          east: 7.6090,
-          west: 7.6035,
-        },
-      },
-      lastUpdated: new Date().toISOString(),
-    })
-  } catch (error) {
-    return NextResponse.json(
-      { success: false, error: 'Errore nel caricamento operatori' },
-      { status: 500 }
-    )
+export async function POST(request: NextRequest) {
+  const supabase = createClient()
+  const body = await request.json()
+  const { market_id, name, category } = body
+  if (!market_id || !name || !category) {
+    return NextResponse.json({ error: 'market_id, name, category obbligatori' }, { status: 400 })
   }
+  const insert = {
+    market_id,
+    schedule_id: body.schedule_id ?? null,
+    name,
+    category,
+    description: body.description ?? null,
+    stall_number: body.stall_number ?? null,
+    location_lat: body.location_lat ?? null,
+    location_lng: body.location_lng ?? null,
+    languages: body.languages ?? [],
+    payment_methods: body.payment_methods ?? [],
+    is_open: body.is_open ?? true,
+  }
+  const { data, error } = await supabase.from('operators').insert(insert).select().single()
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+  return NextResponse.json({ data })
 }
 
+export async function GET(request: NextRequest) {
+  const supabase = createClient()
+  const { searchParams } = new URL(request.url)
+  const category = searchParams.get('category')
+  const search = searchParams.get('search')
+  const wantsAll = searchParams.get('all') === '1'
+  const scheduleId = searchParams.get('scheduleId')
+
+  if (wantsAll) {
+    let q = supabase
+      .from('operators')
+      .select('id, name, category, description, stall_number, location_lat, location_lng, photos, languages, payment_methods, social_links, is_open, rating, market_id, schedule_id, markets(slug, name, city)')
+    if (category && category !== 'all') q = q.eq('category', category)
+    if (search) q = q.or(`name.ilike.%${search}%,description.ilike.%${search}%,stall_number.ilike.%${search}%`)
+    const { data, error } = await q
+    if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+    const shaped = (data ?? []).map((op: any) => ({
+      id: op.id,
+      name: op.name,
+      category: op.category,
+      description: op.description ?? '',
+      photos: op.photos ?? [],
+      languages: op.languages ?? [],
+      paymentMethods: op.payment_methods ?? [],
+      socialLinks: op.social_links ?? {},
+      location: {
+        lat: op.location_lat ?? 0,
+        lng: op.location_lng ?? 0,
+        stallNumber: op.stall_number ?? '',
+      },
+      isOpen: op.is_open ?? true,
+      rating: op.rating ?? undefined,
+      market: op.markets ? { id: op.market_id, slug: op.markets.slug, name: op.markets.name, city: op.markets.city } : null,
+    }))
+    return NextResponse.json({ success: true, data: shaped, lastUpdated: new Date().toISOString() })
+  }
+
+  const resolved = await resolveMarketFromRequest(searchParams)
+  if (resolved.kind === 'not_found') {
+    return NextResponse.json({ success: false, error: 'Mercato non trovato' }, { status: 404 })
+  }
+  if (resolved.kind === 'coords') {
+    return NextResponse.json({ success: true, data: [], message: 'Operatori disponibili solo per mercati registrati' })
+  }
+
+  let query = supabase
+    .from('operators')
+    .select('id, name, category, description, stall_number, location_lat, location_lng, photos, languages, payment_methods, social_links, is_open, rating, schedule_id')
+    .eq('market_id', resolved.market.id)
+
+  if (scheduleId) query = query.eq('schedule_id', scheduleId)
+  if (category && category !== 'all') query = query.eq('category', category)
+  if (search) query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%,stall_number.ilike.%${search}%`)
+
+  const { data, error } = await query
+  if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+
+  // Shape for backward-compat with existing UI types
+  const shaped = (data ?? []).map((op) => ({
+    id: op.id,
+    name: op.name,
+    category: op.category,
+    description: op.description ?? '',
+    photos: op.photos ?? [],
+    languages: op.languages ?? [],
+    paymentMethods: op.payment_methods ?? [],
+    socialLinks: op.social_links ?? {},
+    location: {
+      lat: op.location_lat ?? 0,
+      lng: op.location_lng ?? 0,
+      stallNumber: op.stall_number ?? '',
+    },
+    isOpen: op.is_open ?? true,
+    rating: op.rating ?? undefined,
+  }))
+
+  return NextResponse.json({
+    success: true,
+    data: shaped,
+    city: resolved.market.city,
+    market: { id: resolved.market.id, slug: resolved.market.slug, name: resolved.market.name },
+    lastUpdated: new Date().toISOString(),
+  })
+}
