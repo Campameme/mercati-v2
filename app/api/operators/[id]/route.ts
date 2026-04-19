@@ -22,7 +22,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     'name', 'category', 'description', 'stall_number',
     'location_lat', 'location_lng',
     'photos', 'languages', 'payment_methods', 'social_links',
-    'is_open', 'rating',
+    'rating',
   ]
   const update: Record<string, unknown> = {}
   for (const k of allowed) if (k in body) update[k] = body[k]

@@ -5,13 +5,13 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { Plus, Pencil, Trash2, Mail, CheckCircle2 } from 'lucide-react'
 import LocationFields from '@/components/LocationFields'
+import ExcelOperatorsTools from '@/components/ExcelOperatorsTools'
 
 interface OperatorRow {
   id: string
   name: string
   category: string
   stall_number: string | null
-  is_open: boolean
   user_id: string | null
 }
 
@@ -57,7 +57,6 @@ export default function AdminMarketOperatorsPage() {
       name: o.name,
       category: o.category,
       stall_number: o.location?.stallNumber ?? null,
-      is_open: o.isOpen,
       user_id: null, // filled on demand via /api/operators/[id]
     })))
 
@@ -125,6 +124,10 @@ export default function AdminMarketOperatorsPage() {
         <button onClick={() => setShowCreate((s) => !s)} className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">
           <Plus className="w-4 h-4" /> <span>Nuovo operatore</span>
         </button>
+      </div>
+
+      <div className="mb-6">
+        <ExcelOperatorsTools marketSlug={slug} onImported={load} />
       </div>
 
       {showCreate && (
@@ -212,11 +215,6 @@ export default function AdminMarketOperatorsPage() {
                   <h2 className="font-semibold text-gray-900">{o.name}</h2>
                   <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded">{o.category}</span>
                   {o.stall_number && <span className="text-xs text-gray-500">• {o.stall_number}</span>}
-                  {o.is_open ? (
-                    <span className="text-xs text-green-700">• aperto</span>
-                  ) : (
-                    <span className="text-xs text-red-700">• chiuso</span>
-                  )}
                 </div>
               </div>
               <div className="flex items-center space-x-1">

@@ -66,7 +66,6 @@ export default function OperatorMarketDashboard() {
         languages: operator.languages,
         payment_methods: operator.payment_methods,
         social_links: operator.social_links,
-        is_open: operator.is_open,
       }),
     })
     const j = await res.json()
@@ -110,16 +109,10 @@ export default function OperatorMarketDashboard() {
       </div>
 
       <form onSubmit={handleSave} className="bg-white rounded-xl shadow p-6 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700">Nome</span>
-            <input value={operator.name} onChange={(e) => setOperator({ ...operator, name: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
-          </label>
-          <label className="flex items-center space-x-2 mt-6">
-            <input type="checkbox" checked={operator.is_open} onChange={(e) => setOperator({ ...operator, is_open: e.target.checked })} />
-            <span className="text-sm">Aperto oggi</span>
-          </label>
-        </div>
+        <label className="block">
+          <span className="text-sm font-medium text-gray-700">Nome</span>
+          <input value={operator.name} onChange={(e) => setOperator({ ...operator, name: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
+        </label>
 
         <label className="block">
           <span className="text-sm font-medium text-gray-700">Descrizione</span>

@@ -79,11 +79,6 @@ export default function OperatorHub() {
               <div className="flex items-center space-x-2 mt-1 text-xs">
                 <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded">{op.category}</span>
                 {op.stall_number && <span className="text-gray-500">• {op.stall_number}</span>}
-                {op.is_open ? (
-                  <span className="text-green-700">• aperto</span>
-                ) : (
-                  <span className="text-red-700">• chiuso</span>
-                )}
               </div>
             </div>
           </Link>

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Plus, Pencil, Globe } from 'lucide-react'
 import type { Market } from '@/types/market'
 import DaySelector from '@/components/DaySelector'
+import ExcelOperatorsTools from '@/components/ExcelOperatorsTools'
 
 export default function AdminMarketsPage() {
   const [markets, setMarkets] = useState<Market[]>([])
@@ -68,6 +69,10 @@ export default function AdminMarketsPage() {
         >
           <Plus className="w-4 h-4" /> <span>Nuovo mercato</span>
         </button>
+      </div>
+
+      <div className="mb-6">
+        <ExcelOperatorsTools />
       </div>
 
       {showForm && (

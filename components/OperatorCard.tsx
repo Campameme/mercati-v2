@@ -21,15 +21,6 @@ export default function OperatorCard({ operator, onNavigate }: OperatorCardProps
         <div className="flex-1">
           <div className="flex items-center space-x-2 mb-2">
             <h3 className="text-xl font-semibold text-gray-900">{operator.name}</h3>
-            {operator.isOpen ? (
-              <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
-                Aperto
-              </span>
-            ) : (
-              <span className="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded">
-                Chiuso
-              </span>
-            )}
           </div>
           <div className="flex items-center text-gray-600 text-sm mb-2">
             <MapPin className="w-4 h-4 mr-1" />

@@ -26,7 +26,6 @@ interface OperatorRow {
   name: string
   category: string
   stall_number: string | null
-  is_open: boolean
   location_lat: number | null
   location_lng: number | null
 }
@@ -92,7 +91,6 @@ export default function AdminSessionPage() {
       name: o.name,
       category: o.category,
       stall_number: o.location?.stallNumber ?? null,
-      is_open: o.isOpen,
       location_lat: o.location?.lat || null,
       location_lng: o.location?.lng || null,
     })))
@@ -271,9 +269,6 @@ export default function AdminSessionPage() {
                     <h3 className="font-serif text-lg text-ink">{o.name}</h3>
                     <span className="text-xs px-2 py-0.5 bg-cream-200 text-ink rounded-sm">{o.category}</span>
                     {o.stall_number && <span className="text-xs text-ink-muted">· Banco {o.stall_number}</span>}
-                    {o.is_open
-                      ? <span className="text-xs text-olive-600">● aperto</span>
-                      : <span className="text-xs text-terra-500">○ chiuso</span>}
                   </div>
                   {o.location_lat != null && o.location_lng != null && (
                     <p className="text-xs text-ink-muted tabular-nums mt-1">

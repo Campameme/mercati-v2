@@ -16,7 +16,7 @@ export interface Operator {
     lng: number
     stallNumber: string
   }
-  isOpen: boolean
+  isOpen?: boolean
   rating?: number
 }
 

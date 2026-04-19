@@ -142,15 +142,6 @@ export default function SearchPage() {
                               {operator.category}
                             </span>
                           </div>
-                          {operator.isOpen ? (
-                            <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
-                              Aperto
-                            </span>
-                          ) : (
-                            <span className="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded">
-                              Chiuso
-                            </span>
-                          )}
                         </div>
                         <p className="text-gray-600 text-sm line-clamp-2">
                           {operator.description}
