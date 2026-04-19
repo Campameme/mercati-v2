@@ -1,17 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import * as XLSX from 'xlsx'
 import { createClient } from '@/lib/supabase/server'
-import {
-  OPERATORS_SHEET_NAME,
-  OPERATORS_COLUMNS,
-  INSTRUCTIONS_SHEET_NAME,
-  INSTRUCTIONS_ROWS,
-  SESSIONS_SHEET_NAME,
-} from '@/lib/excel/operators'
+import { buildOperatorsWorkbook, type SessionRow } from '@/lib/excel/build-workbook'
 
 export const dynamic = 'force-dynamic'
 
-// Template vuoto: stesso formato dell'export ma senza righe operatori.
 export async function GET(request: NextRequest) {
   const supabase = createClient()
   const { searchParams } = new URL(request.url)
@@ -37,7 +29,7 @@ export async function GET(request: NextRequest) {
   if (marketId) schQuery = schQuery.eq('market_id', marketId)
   const { data: sessions } = await schQuery
 
-  const sessionsRows = (sessions ?? []).map((s: any) => ({
+  const sessionsRows: SessionRow[] = (sessions ?? []).map((s: any) => ({
     ScheduleId: s.id,
     MarketSlug: s.markets?.slug ?? '',
     Zona: s.markets?.name ?? '',
@@ -49,15 +41,20 @@ export async function GET(request: NextRequest) {
     Lng: s.lng ?? '',
   }))
 
-  const wb = XLSX.utils.book_new()
-  const wsOp = XLSX.utils.json_to_sheet([], { header: OPERATORS_COLUMNS as unknown as string[] })
-  XLSX.utils.book_append_sheet(wb, wsOp, OPERATORS_SHEET_NAME)
-  const wsSes = XLSX.utils.json_to_sheet(sessionsRows)
-  XLSX.utils.book_append_sheet(wb, wsSes, SESSIONS_SHEET_NAME)
-  const wsInstr = XLSX.utils.aoa_to_sheet(INSTRUCTIONS_ROWS)
-  XLSX.utils.book_append_sheet(wb, wsInstr, INSTRUCTIONS_SHEET_NAME)
+  let marketSlugs: string[] = []
+  if (marketSlug) marketSlugs = [marketSlug]
+  else {
+    const { data: allM } = await supabase.from('markets').select('slug').eq('is_active', true).order('slug')
+    marketSlugs = (allM ?? []).map((m: any) => m.slug)
+  }
 
-  const buffer = XLSX.write(wb, { type: 'array', bookType: 'xlsx' }) as ArrayBuffer
+  const buffer = await buildOperatorsWorkbook({
+    operators: [],
+    sessions: sessionsRows,
+    marketSlugs,
+    label,
+  })
+
   return new NextResponse(buffer, {
     status: 200,
     headers: {
