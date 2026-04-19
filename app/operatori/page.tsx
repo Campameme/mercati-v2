@@ -70,10 +70,10 @@ export default function OperatoriHubPage() {
           <p className="text-[0.72rem] uppercase tracking-widest-plus">Provincia · panoramica</p>
         </div>
         <h1 className="font-serif text-3xl md:text-5xl text-ink leading-tight">
-          Bancarelle <span className="italic font-light text-olive-600">della provincia</span>
+          Banchi <span className="italic font-light text-olive-600">della provincia</span>
         </h1>
         <p className="text-sm text-ink-soft mt-3 max-w-xl">
-          Tutti gli operatori, filtrabili per zona e categoria. Clicca una bancarella per la sua scheda.
+          Tutti gli operatori, filtrabili per zona e categoria. Clicca un banco per la sua scheda.
         </p>
       </div>
 
@@ -84,7 +84,7 @@ export default function OperatoriHubPage() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Cerca bancarella…"
+            placeholder="Cerca banco…"
             className="w-full pl-9 pr-3 py-2.5 bg-cream-50 border border-cream-300 rounded-sm text-sm focus:outline-none focus:border-olive-500"
           />
         </div>
@@ -113,7 +113,7 @@ export default function OperatoriHubPage() {
         <div className="bg-cream-50 border border-cream-300 rounded-sm p-10 text-center text-ink-muted">
           Nessun operatore coi filtri correnti.
           {operators.length === 0 && (
-            <p className="text-xs mt-2">Gli admin di zona possono aggiungere bancarelle dall&apos;area di gestione.</p>
+            <p className="text-xs mt-2">Gli admin di zona possono aggiungere banchi dall&apos;area di gestione.</p>
           )}
         </div>
       ) : (

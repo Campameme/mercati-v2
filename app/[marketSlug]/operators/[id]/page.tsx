@@ -27,17 +27,17 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <Link href={`/${params.marketSlug}/operators`} className="inline-flex items-center text-sm text-gray-600 hover:text-primary-600 mb-4">
-        <ArrowLeft className="w-4 h-4 mr-1" /> Tutti gli operatori
+        <ArrowLeft className="w-4 h-4 mr-1" /> Tutti i banchi
       </Link>
 
       <div className="bg-white rounded-xl shadow p-6 mb-6">
         <div className="flex items-start justify-between mb-4">
-          <div>
+          <div className="min-w-0 flex-1">
             <h1 className="text-3xl font-bold text-gray-900 mb-1">{operator.name}</h1>
             <div className="flex items-center space-x-2 text-sm text-gray-600">
               <span className="px-2 py-0.5 bg-primary-100 text-primary-700 rounded">{operator.category}</span>
               {operator.stall_number && (
-                <span className="flex items-center"><MapPin className="w-3 h-3 mr-1" />Bancarella {operator.stall_number}</span>
+                <span className="flex items-center"><MapPin className="w-3 h-3 mr-1" />Banco {operator.stall_number}</span>
               )}
               {operator.is_open ? (
                 <span className="flex items-center text-green-700"><CheckCircle2 className="w-4 h-4 mr-1" />Aperto</span>
@@ -46,6 +46,16 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
               )}
             </div>
           </div>
+          {operator.location_lat != null && operator.location_lng != null && (
+            <a
+              href={`https://www.google.com/maps/dir/?api=1&destination=${operator.location_lat},${operator.location_lng}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 bg-ink text-cream-100 rounded-full text-sm hover:bg-ink/90 transition-colors"
+            >
+              <MapPin className="w-4 h-4" /> Indicazioni
+            </a>
+          )}
         </div>
         {operator.description && <p className="text-gray-700">{operator.description}</p>}
 

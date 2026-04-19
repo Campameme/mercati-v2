@@ -1,12 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { ArrowLeft, Save, Mail, CheckCircle2 } from 'lucide-react'
-
-const LocationPicker = dynamic(() => import('@/components/LocationPicker'), { ssr: false })
+import LocationFields from '@/components/LocationFields'
 
 const CATEGORIES = ['food', 'clothing', 'accessories', 'electronics', 'home', 'books', 'flowers', 'other']
 
@@ -98,7 +96,7 @@ export default function AdminEditOperatorPage() {
               {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </label>
-          <F label="Bancarella" value={operator.stall_number ?? ''} onChange={(v) => setOperator({ ...operator, stall_number: v })} />
+          <F label="Banco" value={operator.stall_number ?? ''} onChange={(v) => setOperator({ ...operator, stall_number: v })} />
           <label className="flex items-center space-x-2 mt-6">
             <input type="checkbox" checked={operator.is_open} onChange={(e) => setOperator({ ...operator, is_open: e.target.checked })} />
             <span className="text-sm">Aperto</span>
@@ -109,19 +107,15 @@ export default function AdminEditOperatorPage() {
           <textarea value={operator.description ?? ''} onChange={(e) => setOperator({ ...operator, description: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
         </label>
 
-        <div>
-          <p className="text-sm font-medium text-gray-700 mb-2">Posizione sulla mappa — clicca o trascina il marker</p>
-          <LocationPicker
-            center={[market.center_lat, market.center_lng]}
-            zoom={market.default_zoom}
-            value={operator.location_lat != null && operator.location_lng != null ? [operator.location_lat, operator.location_lng] : null}
-            onChange={([lat, lng]) => setOperator({ ...operator, location_lat: lat, location_lng: lng })}
-            areaPositions={areaPositions}
-          />
-          {operator.location_lat != null && operator.location_lng != null && (
-            <p className="text-xs text-gray-500 mt-1">lat {operator.location_lat.toFixed(6)} • lng {operator.location_lng.toFixed(6)}</p>
-          )}
-        </div>
+        <LocationFields
+          center={[market.center_lat, market.center_lng]}
+          zoom={market.default_zoom}
+          lat={operator.location_lat}
+          lng={operator.location_lng}
+          onChange={(lat, lng) => setOperator({ ...operator, location_lat: lat, location_lng: lng })}
+          areaPositions={areaPositions}
+          label="Posizione del banco"
+        />
 
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-600">{msg}</div>

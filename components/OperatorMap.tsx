@@ -166,7 +166,7 @@ export default function OperatorMap({ category, searchQuery }: OperatorMapProps)
                   <div className="min-w-[180px]">
                     <div className="font-semibold text-gray-900">{op.name}</div>
                     {op.location.stallNumber && (
-                      <div className="text-xs text-gray-500">Bancarella {op.location.stallNumber}</div>
+                      <div className="text-xs text-gray-500">Banco {op.location.stallNumber}</div>
                     )}
                     {marketSlug && (
                       <Link href={`/${marketSlug}/operators/${op.id}`} className="text-xs text-primary-600 hover:underline block mt-1">
@@ -210,7 +210,7 @@ export default function OperatorMap({ category, searchQuery }: OperatorMapProps)
                     <div className="font-semibold text-gray-900 hover:text-primary-600">{operator.name}</div>
                     <div className="text-sm text-gray-600 mt-1">{operator.description}</div>
                     {operator.location?.stallNumber && (
-                      <div className="text-xs text-gray-500 mt-2">Bancarella {operator.location.stallNumber}</div>
+                      <div className="text-xs text-gray-500 mt-2">Banco {operator.location.stallNumber}</div>
                     )}
                   </Link>
                   <div className="flex items-center gap-3 mt-3 text-xs">

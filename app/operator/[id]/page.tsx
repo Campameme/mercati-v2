@@ -93,7 +93,7 @@ export default function OperatorMarketDashboard() {
         <div>
           {totalOwned > 1 && (
             <Link href="/operator" className="inline-flex items-center text-sm text-gray-600 hover:text-primary-600 mb-1">
-              <ArrowLeft className="w-4 h-4 mr-1" /> Tutte le bancarelle
+              <ArrowLeft className="w-4 h-4 mr-1" /> Tutti i banchi
             </Link>
           )}
           <p className="text-sm text-gray-500">{operator.markets?.name}</p>
@@ -127,7 +127,7 @@ export default function OperatorMarketDashboard() {
         </label>
 
         <div>
-          <p className="text-sm font-medium text-gray-700 mb-2">Foto bancarella</p>
+          <p className="text-sm font-medium text-gray-700 mb-2">Foto del banco</p>
           <PhotoUploader
             bucket="operator-photos"
             folder={operator.id}

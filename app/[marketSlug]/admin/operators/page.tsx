@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { Plus, Pencil, Trash2, Mail, CheckCircle2 } from 'lucide-react'
+import LocationFields from '@/components/LocationFields'
 
 interface OperatorRow {
   id: string
@@ -20,11 +21,16 @@ export default function AdminMarketOperatorsPage() {
   const params = useParams<{ marketSlug: string }>()
   const slug = params?.marketSlug
   const [marketId, setMarketId] = useState<string | null>(null)
+  const [marketCenter, setMarketCenter] = useState<[number, number] | null>(null)
+  const [areaPositions, setAreaPositions] = useState<[number, number][] | null>(null)
   const [operators, setOperators] = useState<OperatorRow[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreate, setShowCreate] = useState(false)
-  const [createForm, setCreateForm] = useState({ name: '', category: 'food', stall_number: '', schedule_id: '' })
-  const [sessions, setSessions] = useState<Array<{ id: string; comune: string; giorno: string; luogo: string | null }>>([])
+  const [createForm, setCreateForm] = useState({
+    name: '', category: 'food', stall_number: '', schedule_id: '',
+    location_lat: null as number | null, location_lng: null as number | null,
+  })
+  const [sessions, setSessions] = useState<Array<{ id: string; comune: string; giorno: string; luogo: string | null; lat: number | null; lng: number | null }>>([])
   const [error, setError] = useState<string | null>(null)
 
   async function load() {
@@ -33,6 +39,11 @@ export default function AdminMarketOperatorsPage() {
     const res = await fetch(`/api/markets/by-slug/${encodeURIComponent(slug)}`)
     const { data } = await res.json()
     setMarketId(data?.market?.id ?? null)
+    if (data?.market) {
+      setMarketCenter([data.market.center_lat, data.market.center_lng])
+    }
+    const ring = data?.area?.polygon_geojson?.geometry?.coordinates?.[0]
+    setAreaPositions(Array.isArray(ring) ? ring.map((c: number[]) => [c[1], c[0]] as [number, number]) : null)
 
     const opsRes = await fetch(`/api/operators?marketSlug=${encodeURIComponent(slug)}`)
     const ops = await opsRes.json()
@@ -57,11 +68,11 @@ export default function AdminMarketOperatorsPage() {
       const schPub = await fetch(`/api/schedules/occurrences`) // solo per fallback: ritorna schedule_id nelle occorrenze
       // In realtà meglio esporre un endpoint dedicato, ma proviamo via occurrences deduplicate
       const { data: occs } = await schPub.json()
-      const seen = new Map<string, { id: string; comune: string; giorno: string; luogo: string | null }>()
+      const seen = new Map<string, { id: string; comune: string; giorno: string; luogo: string | null; lat: number | null; lng: number | null }>()
       for (const o of (occs ?? []) as any[]) {
         if (o.market_id !== data.market.id) continue
         if (!seen.has(o.schedule_id)) {
-          seen.set(o.schedule_id, { id: o.schedule_id, comune: o.comune, giorno: o.giorno, luogo: o.luogo })
+          seen.set(o.schedule_id, { id: o.schedule_id, comune: o.comune, giorno: o.giorno, luogo: o.luogo, lat: o.lat ?? null, lng: o.lng ?? null })
         }
       }
       setSessions(Array.from(seen.values()))
@@ -84,6 +95,8 @@ export default function AdminMarketOperatorsPage() {
         name: createForm.name,
         category: createForm.category,
         stall_number: createForm.stall_number || null,
+        location_lat: createForm.location_lat,
+        location_lng: createForm.location_lng,
       }),
     })
     if (!res.ok) {
@@ -92,7 +105,7 @@ export default function AdminMarketOperatorsPage() {
       return
     }
     setShowCreate(false)
-    setCreateForm({ name: '', category: 'food', stall_number: '', schedule_id: '' })
+    setCreateForm({ name: '', category: 'food', stall_number: '', schedule_id: '', location_lat: null, location_lng: null })
     load()
   }
 
@@ -127,14 +140,24 @@ export default function AdminMarketOperatorsPage() {
             </select>
           </label>
           <label className="block">
-            <span className="text-sm font-medium text-gray-700">Bancarella (opz.)</span>
+            <span className="text-sm font-medium text-gray-700">Banco (opz.)</span>
             <input value={createForm.stall_number} onChange={(e) => setCreateForm({ ...createForm, stall_number: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
           </label>
           <label className="block md:col-span-3">
             <span className="text-sm font-medium text-gray-700">Sessione mercato (opz.)</span>
             <select
               value={createForm.schedule_id}
-              onChange={(e) => setCreateForm({ ...createForm, schedule_id: e.target.value })}
+              onChange={(e) => {
+                const scheduleId = e.target.value
+                // Se sceglie una sessione e non ha ancora coord, centra sulle coord della sessione
+                const s = sessions.find((x) => x.id === scheduleId)
+                setCreateForm((prev) => ({
+                  ...prev,
+                  schedule_id: scheduleId,
+                  location_lat: prev.location_lat ?? s?.lat ?? null,
+                  location_lng: prev.location_lng ?? s?.lng ?? null,
+                }))
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             >
               <option value="">— Tutta la zona (non legato a una sessione specifica)</option>
@@ -148,6 +171,27 @@ export default function AdminMarketOperatorsPage() {
               Collega questo operatore a una sessione specifica (es. Imperia Martedì) per mostrarlo solo quando l&apos;utente apre quel mercato.
             </p>
           </label>
+
+          {marketCenter && (
+            <div className="md:col-span-3 border-t border-gray-200 pt-4">
+              <LocationFields
+                center={(() => {
+                  // Se c'è una sessione selezionata con coord, centra lì; altrimenti centro zona
+                  const s = sessions.find((x) => x.id === createForm.schedule_id)
+                  if (s?.lat != null && s?.lng != null) return [s.lat, s.lng]
+                  return marketCenter
+                })()}
+                zoom={17}
+                lat={createForm.location_lat}
+                lng={createForm.location_lng}
+                onChange={(lat, lng) => setCreateForm({ ...createForm, location_lat: lat, location_lng: lng })}
+                areaPositions={areaPositions}
+                label="Posizione del banco"
+                helperText="Clicca sulla mappa, trascina il marker, inserisci coord manualmente o premi Sono qui."
+              />
+            </div>
+          )}
+
           {error && <p className="md:col-span-3 text-sm text-red-600">{error}</p>}
           <div className="md:col-span-3 flex justify-end space-x-2">
             <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">Annulla</button>

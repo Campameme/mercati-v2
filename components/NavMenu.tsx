@@ -100,7 +100,7 @@ export default function NavMenu({ open, onClose }: Props) {
   const globalLinks = [
     { href: '/',           label: 'Mappa provincia',       icon: MapIcon },
     { href: '/parcheggi',  label: 'Parcheggi',             icon: Car },
-    { href: '/operatori',  label: 'Bancarelle',            icon: Store },
+    { href: '/operatori',  label: 'Banchi',                icon: Store },
     { href: '/calendar',   label: 'Calendario provincia',  icon: Calendar },
   ]
 
@@ -158,7 +158,7 @@ export default function NavMenu({ open, onClose }: Props) {
               autoFocus
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Cerca zona, comune, bancarella…"
+              placeholder="Cerca zona, comune, banco…"
               className="w-full pl-9 pr-3 py-2.5 bg-cream-50 border border-cream-300 rounded-sm text-sm focus:outline-none focus:border-olive-500"
             />
           </div>
@@ -258,7 +258,7 @@ export default function NavMenu({ open, onClose }: Props) {
                       {!isAgg && (
                         <div className="flex gap-1 pb-2 pl-3 text-xs">
                           <Link href={`/${m.slug}/parking`} onClick={onClose} className="px-2 py-0.5 rounded-sm bg-cream-200 text-ink hover:bg-cream-300">Parcheggi</Link>
-                          <Link href={`/${m.slug}/operators`} onClick={onClose} className="px-2 py-0.5 rounded-sm bg-cream-200 text-ink hover:bg-cream-300">Bancarelle</Link>
+                          <Link href={`/${m.slug}/operators`} onClick={onClose} className="px-2 py-0.5 rounded-sm bg-cream-200 text-ink hover:bg-cream-300">Banchi</Link>
                           <Link href={`/${m.slug}/calendar`} onClick={onClose} className="px-2 py-0.5 rounded-sm bg-cream-200 text-ink hover:bg-cream-300">Calendario</Link>
                           <Link href={`/${m.slug}/news`} onClick={onClose} className="px-2 py-0.5 rounded-sm bg-cream-200 text-ink hover:bg-cream-300">Notizie</Link>
                         </div>

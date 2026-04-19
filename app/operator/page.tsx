@@ -44,7 +44,7 @@ export default function OperatorHub() {
   if (operators.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-2xl text-center">
-        <h1 className="text-2xl font-bold mb-4">Nessuna bancarella collegata</h1>
+        <h1 className="text-2xl font-bold mb-4">Nessun banco collegato</h1>
         <p className="text-gray-600 mb-6">Non risulta nessuna scheda operatore associata al tuo account. Chiedi all&apos;amministratore del mercato di invitarti.</p>
         <button onClick={handleLogout} className="px-4 py-2 bg-gray-200 rounded-md">Logout</button>
       </div>
@@ -54,7 +54,7 @@ export default function OperatorHub() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Le tue bancarelle</h1>
+        <h1 className="text-3xl font-bold text-gray-900">I tuoi banchi</h1>
         <button onClick={handleLogout} className="flex items-center space-x-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md">
           <LogOut className="w-4 h-4" /> <span>Esci</span>
         </button>

@@ -33,7 +33,7 @@ export default function OperatorCard({ operator, onNavigate }: OperatorCardProps
           </div>
           <div className="flex items-center text-gray-600 text-sm mb-2">
             <MapPin className="w-4 h-4 mr-1" />
-            <span>Bancarella {operator.location.stallNumber}</span>
+            <span>Banco {operator.location.stallNumber}</span>
           </div>
           {operator.rating && (
             <div className="flex items-center space-x-1 mb-2">
@@ -124,7 +124,7 @@ export default function OperatorCard({ operator, onNavigate }: OperatorCardProps
         className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
       >
         <Navigation className="w-5 h-5" />
-        <span>Portami alla bancarella</span>
+        <span>Portami al banco</span>
       </button>
     </div>
   )

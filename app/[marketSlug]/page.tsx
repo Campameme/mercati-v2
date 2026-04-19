@@ -52,7 +52,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
 
   const features = [
     { href: `/${marketFull.slug}/parking`,   label: 'Parcheggi',  icon: MapPin },
-    { href: `/${marketFull.slug}/operators`, label: 'Bancarelle', icon: Store },
+    { href: `/${marketFull.slug}/operators`, label: 'Banchi',     icon: Store },
     { href: `/${marketFull.slug}/calendar`,  label: 'Calendario', icon: Calendar },
     { href: `/${marketFull.slug}/news`,      label: 'Notizie',    icon: Newspaper },
     { href: `/${marketFull.slug}/weather`,   label: 'Meteo',      icon: Cloud },

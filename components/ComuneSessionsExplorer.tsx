@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { MapPin, Store, Car } from 'lucide-react'
+import { MapPin, Store, Car, Navigation2, Newspaper, Calendar, Cloud } from 'lucide-react'
 import ParkingFilters, { type ParkingFilter } from '@/components/ParkingFilters'
 import { classifySchedule, CATEGORY_COLOR, CATEGORY_LABEL } from '@/lib/schedules/classify'
 
@@ -101,8 +101,37 @@ export default function ComuneSessionsExplorer({
 
   if (!active) return null
 
+  const shortcuts = [
+    { href: `/${marketSlug}/parking`,   label: 'Parcheggi',  icon: Car },
+    { href: `/${marketSlug}/operators`, label: 'Banchi',     icon: Store },
+    { href: `/${marketSlug}/calendar`,  label: 'Calendario', icon: Calendar },
+    { href: `/${marketSlug}/news`,      label: 'Notizie',    icon: Newspaper },
+    { href: `/${marketSlug}/weather`,   label: 'Meteo',      icon: Cloud },
+  ]
+
   return (
     <>
+      {/* Shortcut grid della zona (coerente col layout di Sanremo/zone a comune singolo) */}
+      <nav className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-10 pb-8 border-b border-cream-300">
+        {shortcuts.map((f, i) => {
+          const Icon = f.icon
+          return (
+            <Link
+              key={f.href}
+              href={f.href}
+              className="group flex items-center justify-between gap-3 px-4 py-3 border border-cream-300 rounded-sm bg-cream-50 hover:bg-cream-100 hover:border-olive-500 transition-all hover:-translate-y-0.5"
+              style={{ transitionDelay: `${i * 20}ms` }}
+            >
+              <span className="flex items-center gap-2.5 text-sm text-ink font-medium">
+                <Icon className="w-4 h-4 text-olive-500" />
+                {f.label}
+              </span>
+              <span className="text-ink-muted group-hover:text-olive-600 group-hover:translate-x-0.5 transition-all">→</span>
+            </Link>
+          )
+        })}
+      </nav>
+
       {/* Session tabs */}
       <section className="mb-8">
         <p className="text-xs uppercase tracking-widest-plus text-ink-muted mb-3">Scegli l&apos;appuntamento</p>
@@ -139,22 +168,36 @@ export default function ComuneSessionsExplorer({
       {/* Dettaglio sessione */}
       <section className="mb-10">
         <div className="bg-cream-50 border border-cream-300 rounded-sm p-5 md:p-6">
-          <div className="flex items-baseline flex-wrap gap-x-3 mb-2">
-            <h2 className="font-serif text-2xl md:text-3xl text-ink">{active.giorno}</h2>
-            {active.orario && <span className="text-sm text-ink-muted tabular-nums">{active.orario}</span>}
-            <span
-              className="text-[11px] uppercase tracking-wider"
-              style={{ color: CATEGORY_COLOR[cat] }}
-            >
-              {CATEGORY_LABEL[cat]}
-            </span>
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-baseline flex-wrap gap-x-3 mb-2">
+                <h2 className="font-serif text-2xl md:text-3xl text-ink">{active.giorno}</h2>
+                {active.orario && <span className="text-sm text-ink-muted tabular-nums">{active.orario}</span>}
+                <span
+                  className="text-[11px] uppercase tracking-wider"
+                  style={{ color: CATEGORY_COLOR[cat] }}
+                >
+                  {CATEGORY_LABEL[cat]}
+                </span>
+              </div>
+              {active.luogo && (
+                <p className="text-sm text-ink flex items-center gap-1.5 mt-1">
+                  <MapPin className="w-4 h-4 text-olive-500" /> {active.luogo}
+                </p>
+              )}
+              {active.settori && <p className="text-xs text-ink-muted italic mt-2">{active.settori}</p>}
+            </div>
+            {active.lat != null && active.lng != null && (
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${active.lat},${active.lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-cream-100 rounded-full text-sm hover:bg-ink/90 transition-colors flex-shrink-0"
+              >
+                <Navigation2 className="w-4 h-4" /> Indicazioni
+              </a>
+            )}
           </div>
-          {active.luogo && (
-            <p className="text-sm text-ink flex items-center gap-1.5 mt-1">
-              <MapPin className="w-4 h-4 text-olive-500" /> {active.luogo}
-            </p>
-          )}
-          {active.settori && <p className="text-xs text-ink-muted italic mt-2">{active.settori}</p>}
         </div>
       </section>
 
@@ -163,7 +206,7 @@ export default function ComuneSessionsExplorer({
         <div className="flex items-center gap-2 mb-4 text-ink-muted">
           <Store className="w-4 h-4" />
           <h3 className="text-xs uppercase tracking-widest-plus">
-            Bancarelle · {operatorsForSession.length}
+            Banchi · {operatorsForSession.length}
           </h3>
         </div>
         {operatorsForSession.length === 0 ? (

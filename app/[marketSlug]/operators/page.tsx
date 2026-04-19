@@ -48,10 +48,10 @@ export default function OperatorsPage() {
           <p className="text-[0.72rem] uppercase tracking-widest-plus">{marketCity ?? 'Mercato'}</p>
         </div>
         <h1 className="font-serif text-3xl md:text-4xl text-ink leading-tight">
-          Bancarelle {marketName ? <span className="italic font-light text-olive-600">· {marketName}</span> : ''}
+          Banchi {marketName ? <span className="italic font-light text-olive-600">· {marketName}</span> : ''}
         </h1>
         <p className="text-sm text-ink-soft mt-2 max-w-2xl">
-          Esplora gli operatori, filtra per categoria e trova le tue bancarelle preferite.
+          Esplora gli operatori, filtra per categoria e trova i tuoi banchi preferiti.
         </p>
       </div>
 
