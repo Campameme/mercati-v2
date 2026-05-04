@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic'
 
 interface RawRow {
   OperatorId?: string
+  OperatorCode?: string
   Nome?: string
   Categoria?: string
   Descrizione?: string
@@ -22,24 +23,28 @@ interface RawRow {
 }
 
 interface RowError {
-  rowIndex: number // 1-based, escluse header
+  rowIndex: number
   message: string
   raw: RawRow
 }
 
 interface OperatorGroup {
-  key: string // OperatorId oppure "new:<nome>"
+  /** Chiave di raggruppamento: OperatorId | OperatorCode | "new:<nome>:<homeMarket>" */
+  key: string
   operatorId: string | null
+  operatorCode: string | null
   name: string
   category: string
   description: string
   email: string | null
   languages: string[]
   paymentMethods: string[]
-  marketSlug: string
-  marketId: string | null
+  /** Mercato di "registrazione" (prima riga per quel codice) */
+  homeMarketId: string | null
+  homeMarketSlug: string
   presences: Array<{
     scheduleId: string
+    scheduleMarketId: string
     lat: number | null
     lng: number | null
     stall: string | null
@@ -67,7 +72,6 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await authClient.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
 
-  // Verifica ruolo: super_admin o market_admin
   const { data: profile } = await authClient.from('profiles').select('role').eq('id', user.id).maybeSingle()
   const isSuper = profile?.role === 'super_admin'
   const { data: adminOf } = await authClient.from('market_admins').select('market_id').eq('user_id', user.id)
@@ -80,7 +84,6 @@ export async function POST(request: NextRequest) {
   const url = new URL(request.url)
   const dryRun = url.searchParams.get('dryRun') === '1'
 
-  // Parse multipart
   const form = await request.formData()
   const file = form.get('file')
   if (!(file instanceof File)) return NextResponse.json({ error: 'File mancante' }, { status: 400 })
@@ -107,16 +110,43 @@ export async function POST(request: NextRequest) {
   const scheduleToMarket = new Map<string, string>()
   for (const s of allSchedules ?? []) scheduleToMarket.set((s as any).id, (s as any).market_id)
 
+  // Cerca operatori esistenti per code (case-insensitive)
+  const incomingCodes = Array.from(
+    new Set(rawRows.map((r) => toStr(r.OperatorCode).toLowerCase()).filter(Boolean)),
+  )
+  const codeToOperatorId = new Map<string, { id: string; market_id: string }>()
+  if (incomingCodes.length > 0) {
+    const { data: existing } = await service
+      .from('operators')
+      .select('id, code, market_id')
+      .in('code', incomingCodes)
+    // case-insensitive: ricerca anche con lower(code) se necessario
+    for (const r of existing ?? []) {
+      if ((r as any).code) codeToOperatorId.set(((r as any).code as string).toLowerCase(), { id: (r as any).id, market_id: (r as any).market_id })
+    }
+    // fallback ilike per codici case diversi
+    if (codeToOperatorId.size < incomingCodes.length) {
+      for (const c of incomingCodes) {
+        if (codeToOperatorId.has(c)) continue
+        const { data: e } = await service
+          .from('operators')
+          .select('id, code, market_id')
+          .ilike('code', c)
+          .maybeSingle()
+        if (e && (e as any).code) codeToOperatorId.set(c, { id: (e as any).id, market_id: (e as any).market_id })
+      }
+    }
+  }
+
   // Group per operator
   const groups = new Map<string, OperatorGroup>()
   const errors: RowError[] = []
 
   rawRows.forEach((r, idx) => {
-    const rowIndex = idx + 2 // tiene conto header
+    const rowIndex = idx + 2
 
     const name = toStr(r.Nome)
     if (!name) {
-      // riga vuota → skip silenzioso
       if (Object.values(r).every((v) => toStr(v) === '')) return
       errors.push({ rowIndex, message: 'Nome mancante', raw: r })
       return
@@ -144,21 +174,37 @@ export async function POST(request: NextRequest) {
     }
 
     const operatorId = toStr(r.OperatorId) || null
-    const key = operatorId ?? `new:${name}:${marketId}`
+    const operatorCode = toStr(r.OperatorCode) || null
+    const codeKey = operatorCode ? operatorCode.toLowerCase() : null
+
+    // Determina la chiave di raggruppamento
+    // Priorità: OperatorId > OperatorCode > nome+market
+    let key: string
+    let resolvedId: string | null = operatorId
+    if (operatorId) {
+      key = `id:${operatorId}`
+    } else if (codeKey) {
+      const existing = codeToOperatorId.get(codeKey)
+      if (existing) resolvedId = existing.id
+      key = `code:${codeKey}`
+    } else {
+      key = `new:${name}:${marketId}`
+    }
 
     let group = groups.get(key)
     if (!group) {
       group = {
         key,
-        operatorId,
+        operatorId: resolvedId,
+        operatorCode,
         name,
         category,
         description: toStr(r.Descrizione),
         email: toStr(r.Email) || null,
         languages: splitList(r.Lingue),
         paymentMethods: splitList(r.Pagamenti),
-        marketSlug,
-        marketId,
+        homeMarketId: marketId,
+        homeMarketSlug: marketSlug,
         presences: [],
       }
       groups.set(key, group)
@@ -171,12 +217,15 @@ export async function POST(request: NextRequest) {
         errors.push({ rowIndex, message: `ScheduleId "${scheduleId}" non trovato`, raw: r })
         return
       }
-      if (schedMarket !== marketId) {
-        errors.push({ rowIndex, message: `ScheduleId non appartiene al mercato "${marketSlug}"`, raw: r })
+      // Cross-market: la sessione può essere in un mercato diverso da quello di home,
+      // ma l'utente deve essere admin di QUEL mercato (o super)
+      if (!isSuper && !adminMarkets.has(schedMarket)) {
+        errors.push({ rowIndex, message: `Non sei admin del mercato della sessione (ScheduleId ${scheduleId})`, raw: r })
         return
       }
       group.presences.push({
         scheduleId,
+        scheduleMarketId: schedMarket,
         lat: toNumOrNull(r.Lat),
         lng: toNumOrNull(r.Lng),
         stall: toStr(r.Banco) || null,
@@ -192,8 +241,9 @@ export async function POST(request: NextRequest) {
     errors,
     groups: Array.from(groups.values()).map((g) => ({
       operatorId: g.operatorId,
+      operatorCode: g.operatorCode,
       name: g.name,
-      marketSlug: g.marketSlug,
+      marketSlug: g.homeMarketSlug,
       action: g.operatorId ? ('update' as const) : ('create' as const),
       presencesCount: g.presences.length,
     })),
@@ -212,21 +262,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Correggi gli errori prima di importare', preview }, { status: 400 })
   }
 
-  // Esecuzione reale
   let created = 0
   let updated = 0
   let presencesSaved = 0
 
   for (const g of groups.values()) {
     let opId = g.operatorId
-    const opPayload = {
-      market_id: g.marketId!,
+    const opPayload: Record<string, unknown> = {
+      market_id: g.homeMarketId!,
       name: g.name,
       category: g.category,
       description: g.description || null,
       languages: g.languages,
       payment_methods: g.paymentMethods,
     }
+    if (g.operatorCode) opPayload.code = g.operatorCode
     if (opId) {
       const { error } = await service.from('operators').update(opPayload).eq('id', opId)
       if (error) {

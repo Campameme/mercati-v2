@@ -8,6 +8,7 @@ import { slugifyName } from '@/lib/markets/slug'
 import { classifySchedule, CATEGORY_COLOR } from '@/lib/schedules/classify'
 import ZoneImage from '@/components/ZoneImage'
 import Reveal from '@/components/Reveal'
+import MarketsMapClient from '@/components/MarketsMapClient'
 
 export const dynamic = 'force-dynamic'
 
@@ -35,23 +36,34 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
   const prevMarket = idx > 0 ? (allMarkets ?? [])[idx - 1] : null
   const nextMarket = idx < (allMarkets?.length ?? 0) - 1 ? (allMarkets ?? [])[idx + 1] : null
 
-  // Full market info + sessions
+  // Full market info + sessions (con coord e poligoni per la mappa)
   const [{ data: marketFull }, { data: schedules }] = await Promise.all([
     supabase.from('markets').select('*').eq('id', market.id).maybeSingle(),
     supabase
       .from('market_schedules')
-      .select('comune, giorno, orario, luogo, settori')
+      .select('id, comune, giorno, orario, luogo, settori, lat, lng, polygon_geojson')
       .eq('market_id', market.id)
       .eq('is_active', true)
       .order('comune', { ascending: true }),
   ])
   if (!marketFull) notFound()
 
+  const mapPins = (schedules ?? [])
+    .filter((s) => s.lat != null && s.lng != null)
+    .map((s) => ({
+      id: s.id as string,
+      lat: s.lat as number,
+      lng: s.lng as number,
+      title: `${s.comune} · ${s.giorno}`,
+      subtitle: s.luogo ?? s.settori ?? undefined,
+      polygon: (s.polygon_geojson as any) ?? null,
+      href: `/${marketFull.slug}/c/${slugifyName(s.comune)}`,
+    }))
+
   const comuni = Array.from(new Set((schedules ?? []).map((s) => s.comune)))
   const heroQuery = ZONE_HERO_COMUNE[marketFull.slug] ?? marketFull.city ?? comuni[0]
 
   const features = [
-    { href: `/${marketFull.slug}/parking`,   label: 'Parcheggi',  icon: MapPin },
     { href: `/${marketFull.slug}/operators`, label: 'Banchi',     icon: Store },
     { href: `/${marketFull.slug}/calendar`,  label: 'Calendario', icon: Calendar },
     { href: `/${marketFull.slug}/news`,      label: 'Notizie',    icon: Newspaper },
@@ -60,63 +72,71 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
 
   return (
     <div>
-      {/* HERO editoriale split (niente full-bleed): testo + frame foto */}
+      {/* HERO: foto a sinistra (piccola) + testo + mappa above-the-fold a destra */}
       <section className="border-b border-cream-300">
-        <div className="container mx-auto px-4 md:px-6 py-12 md:py-20 max-w-6xl">
-          <div className="grid md:grid-cols-[1.25fr_1fr] gap-8 md:gap-14 items-center">
+        <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl">
+          <div className="grid md:grid-cols-[280px_1fr] gap-8 md:gap-10 items-start">
+            {/* Foto a sinistra, leggermente più piccola */}
             <Reveal>
               <Link
                 href="/"
-                className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest-plus text-ink-muted hover:text-ink mb-5 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest-plus text-ink-muted hover:text-ink mb-4 transition-colors"
               >
                 <ChevronLeft className="w-3.5 h-3.5" /> Provincia
               </Link>
-              <div className="flex items-center gap-3 mb-4 text-ink-soft">
-                <OliveSprig className="w-10 h-3 text-olive-500" />
-                <p className="text-[0.72rem] uppercase tracking-widest-plus">
-                  {comuni.length > 1 ? `${comuni.length} comuni` : marketFull.city}
-                </p>
+              <div className="relative rounded-sm overflow-hidden border border-cream-300 shadow-sm bg-cream-50 p-1.5">
+                <ZoneImage
+                  query={heroQuery}
+                  fallbackQuery={comuni[0] ?? marketFull.city}
+                  alt={marketFull.name}
+                  aspect="aspect-[4/5]"
+                  priority
+                />
               </div>
-              <h1 className="font-serif text-4xl md:text-6xl leading-[1.02] tracking-tight text-ink">
-                {marketFull.name}
-              </h1>
-              {marketFull.description && (
-                <p className="mt-5 text-base md:text-lg text-ink-soft max-w-xl leading-relaxed">
-                  {marketFull.description}
-                </p>
-              )}
-              {marketFull.market_days && marketFull.market_days.length > 0 && (
-                <p className="mt-5 text-sm text-ink-soft">
-                  <span className="uppercase tracking-widest-plus text-xs text-ink-muted mr-2">Giorni</span>
-                  <span className="text-ink">{formatMarketDays(marketFull.market_days)}</span>
-                </p>
-              )}
+              <p className="mt-2 text-[11px] text-ink-muted italic">{heroQuery} · via Wikipedia</p>
             </Reveal>
 
-            {/* Frame foto — editoriale, non full-bleed */}
-            <Reveal delayMs={120} className="order-first md:order-last">
-              <div className="relative max-w-md mx-auto md:mx-0 md:ml-auto">
-                <div className="relative rounded-sm overflow-hidden border border-cream-300 shadow-sm bg-cream-50 p-1.5 md:rotate-[0.5deg]">
-                  <ZoneImage
-                    query={heroQuery}
-                    fallbackQuery={comuni[0] ?? marketFull.city}
-                    alt={marketFull.name}
-                    aspect="aspect-[4/5]"
-                    priority
-                  />
+            {/* Testo + mappa */}
+            <div>
+              <Reveal>
+                <div className="flex items-center gap-3 mb-4 text-ink-soft">
+                  <OliveSprig className="w-10 h-3 text-olive-500" />
+                  <p className="text-[0.72rem] uppercase tracking-widest-plus">
+                    {comuni.length > 1 ? `${comuni.length} comuni` : marketFull.city}
+                  </p>
                 </div>
-                <p className="mt-2 text-[11px] text-ink-muted italic text-center md:text-right">
-                  {heroQuery} · via Wikipedia
-                </p>
-              </div>
-            </Reveal>
+                <h1 className="font-serif text-3xl md:text-5xl leading-[1.04] tracking-tight text-ink">
+                  {marketFull.name}
+                </h1>
+                {marketFull.description && (
+                  <p className="mt-4 text-sm md:text-base text-ink-soft max-w-2xl leading-relaxed">
+                    {marketFull.description}
+                  </p>
+                )}
+                {marketFull.market_days && marketFull.market_days.length > 0 && (
+                  <p className="mt-3 text-sm text-ink-soft">
+                    <span className="uppercase tracking-widest-plus text-xs text-ink-muted mr-2">Giorni</span>
+                    <span className="text-ink">{formatMarketDays(marketFull.market_days)}</span>
+                  </p>
+                )}
+              </Reveal>
+
+              {mapPins.length > 0 && (
+                <Reveal delayMs={80} className="mt-5">
+                  <MarketsMapClient pins={mapPins} height={380} showParking />
+                  <p className="mt-2 text-[11px] text-ink-muted">
+                    {mapPins.length} {mapPins.length === 1 ? 'mercato' : 'mercati'} · pin verdi: aree mercato · pin blu: parcheggi vicini
+                  </p>
+                </Reveal>
+              )}
+            </div>
           </div>
         </div>
       </section>
 
       <div className="container mx-auto px-4 md:px-6 max-w-5xl">
         {/* Shortcut */}
-        <Reveal as="nav" className="grid grid-cols-2 md:grid-cols-5 gap-2 py-8 border-b border-cream-300">
+        <Reveal as="nav" className="grid grid-cols-2 md:grid-cols-4 gap-2 py-8 border-b border-cream-300">
           {features.map((f, i) => {
             const Icon = f.icon
             return (

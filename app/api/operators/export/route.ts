@@ -27,8 +27,20 @@ export async function GET(request: NextRequest) {
 
   let opQuery = supabase
     .from('operators')
-    .select('id, market_id, name, category, description, stall_number, languages, payment_methods, markets(slug), operator_schedules(schedule_id, location_lat, location_lng, stall_number, market_schedules(id, comune, giorno, luogo))')
-  if (marketId) opQuery = opQuery.eq('market_id', marketId)
+    .select('id, code, market_id, name, category, description, stall_number, languages, payment_methods, markets(slug), operator_schedules(schedule_id, location_lat, location_lng, stall_number, market_schedules(id, comune, giorno, luogo, market_id, markets(slug)))')
+  if (marketId) {
+    // Includi sia operators del market sia operators con presenze in questo market
+    const { data: presenceOps } = await supabase
+      .from('operator_schedules')
+      .select('operator_id, market_schedules!inner(market_id)')
+      .eq('market_schedules.market_id', marketId)
+    const presenceIds = Array.from(new Set((presenceOps ?? []).map((r: any) => r.operator_id)))
+    if (presenceIds.length > 0) {
+      opQuery = opQuery.or(`market_id.eq.${marketId},id.in.(${presenceIds.join(',')})`)
+    } else {
+      opQuery = opQuery.eq('market_id', marketId)
+    }
+  }
   const { data: ops, error: opErr } = await opQuery
   if (opErr) return NextResponse.json({ error: opErr.message }, { status: 500 })
 
@@ -45,19 +57,20 @@ export async function GET(request: NextRequest) {
   const operatorRows: OperatorRow[] = []
   for (const op of ops ?? []) {
     const presences = (op as any).operator_schedules ?? []
-    const base = {
+    const baseFor = (rowMarketSlug: string) => ({
       OperatorId: op.id,
+      OperatorCode: (op as any).code ?? '',
       Nome: op.name,
       Categoria: op.category,
       Descrizione: op.description ?? '',
       Email: emailByOperator.get(op.id) ?? '',
       Lingue: (op.languages ?? []).join(', '),
       Pagamenti: (op.payment_methods ?? []).join(', '),
-      MarketSlug: (op as any).markets?.slug ?? '',
-    }
+      MarketSlug: rowMarketSlug,
+    })
     if (presences.length === 0) {
       operatorRows.push({
-        ...base,
+        ...baseFor((op as any).markets?.slug ?? ''),
         ScheduleId: '',
         Banco: op.stall_number ?? '',
         Lat: '',
@@ -65,8 +78,10 @@ export async function GET(request: NextRequest) {
       })
     } else {
       for (const p of presences) {
+        // Per ciascuna presenza il MarketSlug è quello della sessione (cross-market)
+        const sessionSlug = p.market_schedules?.markets?.slug ?? (op as any).markets?.slug ?? ''
         operatorRows.push({
-          ...base,
+          ...baseFor(sessionSlug),
           ScheduleId: p.schedule_id,
           Banco: p.stall_number ?? '',
           Lat: p.location_lat ?? '',

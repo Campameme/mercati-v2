@@ -9,6 +9,7 @@ export const SESSIONS_SHEET_NAME = 'Sessioni'
 
 export const OPERATORS_COLUMNS = [
   'OperatorId',
+  'OperatorCode',
   'Nome',
   'Categoria',
   'Descrizione',
@@ -43,7 +44,8 @@ export const INSTRUCTIONS_ROWS: string[][] = [
   ["Se lo stesso operatore frequenta più mercati, inserisci una riga per ciascuno."],
   [''],
   ['Colonne:'],
-  ['OperatorId', "UUID dell'operatore. Lascia vuoto per crearne uno nuovo."],
+  ['OperatorId', "UUID dell'operatore (autogenerato). Lascia vuoto per crearne uno nuovo."],
+  ['OperatorCode', "Codice mnemonico univoco (es. \"MARIO_FRUTTA\"). Permette di importare presenze su più mercati per lo stesso operatore: usa lo stesso codice in tutte le righe del medesimo operatore. Se OperatorId è vuoto ma OperatorCode esiste già, l'operatore esistente viene aggiornato."],
   ['Nome', 'Obbligatorio. Stesso valore in tutte le righe dello stesso operatore.'],
   ['Categoria', `Una tra: ${CATEGORIES.join(', ')}`],
   ['Descrizione', 'Testo libero.'],

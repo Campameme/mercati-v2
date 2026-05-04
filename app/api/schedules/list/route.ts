@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
   let query = supabase
     .from('market_schedules')
-    .select('id, market_id, comune, giorno, orario, luogo, settori, lat, lng, is_active, markets(slug, name, city)')
+    .select('id, market_id, comune, giorno, orario, luogo, settori, lat, lng, polygon_geojson, area_style, is_active, markets(slug, name, city)')
     .eq('is_active', true)
     .order('comune', { ascending: true })
     .order('giorno', { ascending: true })
@@ -44,6 +44,8 @@ export async function GET(request: NextRequest) {
     settori: s.settori,
     lat: s.lat,
     lng: s.lng,
+    polygon: s.polygon_geojson ?? null,
+    style: s.area_style ?? null,
   }))
   return NextResponse.json({ data: shaped })
 }

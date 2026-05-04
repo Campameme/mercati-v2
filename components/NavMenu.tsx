@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  X, Map as MapIcon, Car, Store, Calendar, Newspaper, Cloud, MapPin, ChevronDown,
+  X, Map as MapIcon, Store, Calendar, Newspaper, Cloud, MapPin, ChevronDown,
   Search, Shield, LogIn,
 } from 'lucide-react'
 import { OliveSprig } from './decorations'
@@ -99,7 +99,6 @@ export default function NavMenu({ open, onClose }: Props) {
 
   const globalLinks = [
     { href: '/',           label: 'Mappa provincia',       icon: MapIcon },
-    { href: '/parcheggi',  label: 'Parcheggi',             icon: Car },
     { href: '/operatori',  label: 'Banchi',                icon: Store },
     { href: '/calendar',   label: 'Calendario provincia',  icon: Calendar },
   ]
@@ -257,7 +256,6 @@ export default function NavMenu({ open, onClose }: Props) {
                       {/* Shortcut sotto ogni zona */}
                       {!isAgg && (
                         <div className="flex gap-1 pb-2 pl-3 text-xs">
-                          <Link href={`/${m.slug}/parking`} onClick={onClose} className="px-2 py-0.5 rounded-sm bg-cream-200 text-ink hover:bg-cream-300">Parcheggi</Link>
                           <Link href={`/${m.slug}/operators`} onClick={onClose} className="px-2 py-0.5 rounded-sm bg-cream-200 text-ink hover:bg-cream-300">Banchi</Link>
                           <Link href={`/${m.slug}/calendar`} onClick={onClose} className="px-2 py-0.5 rounded-sm bg-cream-200 text-ink hover:bg-cream-300">Calendario</Link>
                           <Link href={`/${m.slug}/news`} onClick={onClose} className="px-2 py-0.5 rounded-sm bg-cream-200 text-ink hover:bg-cream-300">Notizie</Link>
@@ -300,7 +298,7 @@ export default function NavMenu({ open, onClose }: Props) {
         {/* Footer */}
         <div className="px-5 md:px-7 py-4 border-t border-cream-300 text-[11px] text-ink-muted flex items-center gap-2 flex-shrink-0">
           <OliveSprig className="w-8 h-2.5 text-olive-500" />
-          <span className="font-serif italic">iMercati</span>
+          <span className="font-serif italic">IMercati</span>
           <span>· Liguria · Provincia di Imperia</span>
         </div>
       </aside>

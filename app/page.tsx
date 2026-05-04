@@ -214,7 +214,7 @@ export default async function HomePage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-xs text-ink-muted">
             <div className="flex items-center gap-3">
               <OliveSprig className="w-8 h-2.5 text-olive-500" />
-              <span className="font-serif italic text-ink">iMercati</span>
+              <span className="font-serif italic text-ink">IMercati</span>
               <span>· Liguria · Provincia di Imperia</span>
             </div>
             <div>

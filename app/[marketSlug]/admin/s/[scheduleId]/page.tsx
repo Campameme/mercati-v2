@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { Plus, Pencil, Trash2, ArrowLeft, MapPin, Navigation2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, ArrowLeft, MapPin, Navigation2, Search, MapIcon, Link2 } from 'lucide-react'
 import LocationFields from '@/components/LocationFields'
 import { classifySchedule, CATEGORY_COLOR, CATEGORY_LABEL } from '@/lib/schedules/classify'
 
@@ -50,6 +50,12 @@ export default function AdminSessionPage() {
     location_lng: null as number | null,
   })
   const [error, setError] = useState<string | null>(null)
+
+  // Selezione operatore esistente (cross-market)
+  const [showLink, setShowLink] = useState(false)
+  const [searchQ, setSearchQ] = useState('')
+  const [searchResults, setSearchResults] = useState<Array<{ id: string; name: string; code: string | null; category: string; marketName: string | null; marketSlug: string | null }>>([])
+  const [linkBusy, setLinkBusy] = useState(false)
 
   async function load() {
     if (!slug || !scheduleId) return
@@ -132,6 +138,39 @@ export default function AdminSessionPage() {
     load()
   }
 
+  async function searchOperators() {
+    if (!searchQ.trim()) { setSearchResults([]); return }
+    const r = await fetch(`/api/operators/search?q=${encodeURIComponent(searchQ.trim())}&limit=20`)
+    const j = await r.json()
+    // escludi operatori già presenti su questa sessione
+    const existing = new Set(operators.map((o) => o.id))
+    setSearchResults((j.data ?? []).filter((o: any) => !existing.has(o.id)))
+  }
+
+  async function linkExistingOperator(operatorId: string) {
+    if (!session) return
+    setLinkBusy(true)
+    const r = await fetch(`/api/operators/${operatorId}/schedules`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        schedule_id: session.id,
+        location_lat: session.lat,
+        location_lng: session.lng,
+      }),
+    })
+    setLinkBusy(false)
+    if (!r.ok) {
+      const j = await r.json()
+      alert(j.error ?? 'Errore aggiunta operatore')
+      return
+    }
+    setShowLink(false)
+    setSearchQ('')
+    setSearchResults([])
+    load()
+  }
+
   if (loading || !session) {
     return (
       <div className="container mx-auto px-4 md:px-6 py-10 max-w-5xl">
@@ -182,20 +221,92 @@ export default function AdminSessionPage() {
         {session.settori && <p className="text-xs text-ink-muted italic mt-2">{session.settori}</p>}
       </div>
 
+      {/* Toolbar: editor area sessione */}
+      <div className="flex flex-wrap items-center gap-2 mb-6">
+        <Link
+          href={`/${slug}/admin/s/${scheduleId}/area`}
+          className="inline-flex items-center gap-1.5 px-3 py-2 bg-cream-200 hover:bg-cream-300 text-ink rounded-sm text-xs"
+        >
+          <MapIcon className="w-3.5 h-3.5" /> Disegna area di questa sessione
+        </Link>
+      </div>
+
       {/* Banchi di questa sessione */}
       <section>
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
           <div>
             <p className="text-xs uppercase tracking-widest-plus text-ink-muted">Banchi di questo mercato</p>
             <h2 className="font-serif text-2xl text-ink">{operators.length} {operators.length === 1 ? 'banco' : 'banchi'}</h2>
           </div>
-          <button
-            onClick={() => setShowCreate((s) => !s)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-cream-100 rounded-full text-sm hover:bg-ink/90"
-          >
-            <Plus className="w-4 h-4" /> Nuovo banco
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => { setShowLink((s) => !s); setShowCreate(false) }}
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-cream-200 hover:bg-cream-300 text-ink rounded-full text-sm"
+            >
+              <Link2 className="w-4 h-4" /> Aggiungi esistente
+            </button>
+            <button
+              onClick={() => { setShowCreate((s) => !s); setShowLink(false) }}
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-cream-100 rounded-full text-sm hover:bg-ink/90"
+            >
+              <Plus className="w-4 h-4" /> Nuovo banco
+            </button>
+          </div>
         </div>
+
+        {showLink && (
+          <div className="bg-cream-50 border border-cream-300 rounded-sm p-5 mb-6 space-y-3">
+            <p className="text-xs uppercase tracking-widest-plus text-ink-muted">Cerca un operatore già esistente (anche di altri mercati)</p>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted" />
+                <input
+                  value={searchQ}
+                  onChange={(e) => setSearchQ(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); searchOperators() } }}
+                  placeholder="Cerca per nome, codice, descrizione…"
+                  className="w-full pl-9 pr-3 py-2 border border-cream-300 rounded-sm bg-cream-100 text-sm"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={searchOperators}
+                className="px-4 py-2 bg-ink text-cream-100 rounded-full text-sm hover:bg-ink/90"
+              >
+                Cerca
+              </button>
+            </div>
+            {searchResults.length === 0 && searchQ.trim() && (
+              <p className="text-xs text-ink-muted italic">Nessun risultato.</p>
+            )}
+            {searchResults.length > 0 && (
+              <ul className="border-y border-cream-300 divide-y divide-cream-300 max-h-72 overflow-y-auto">
+                {searchResults.map((op) => (
+                  <li key={op.id} className="flex items-center justify-between gap-3 py-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-baseline gap-2 flex-wrap">
+                        <span className="font-serif text-base text-ink">{op.name}</span>
+                        {op.code && <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 bg-cream-200 rounded-sm text-ink-muted">{op.code}</span>}
+                      </div>
+                      <p className="text-xs text-ink-muted">
+                        {op.category}
+                        {op.marketName && <> · attualmente: <strong className="text-ink">{op.marketName}</strong></>}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => linkExistingOperator(op.id)}
+                      disabled={linkBusy}
+                      className="px-3 py-1.5 text-xs bg-olive-600 hover:bg-olive-700 text-cream-100 rounded-full disabled:opacity-50"
+                    >
+                      Aggiungi qui
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
 
         {showCreate && (
           <form

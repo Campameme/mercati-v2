@@ -12,6 +12,7 @@ interface Operator {
   id: string
   market_id: string
   user_id: string | null
+  code: string | null
   name: string
   category: string
   description: string | null
@@ -204,6 +205,11 @@ export default function AdminEditOperatorPage() {
               {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </label>
+          <F
+            label="Codice operatore (per import Excel cross-market)"
+            value={operator.code ?? ''}
+            onChange={(v) => setOperator({ ...operator, code: v || null })}
+          />
           <F
             label="Banco (default)"
             value={operator.stall_number ?? ''}

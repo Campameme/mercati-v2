@@ -48,10 +48,10 @@ export default function Navigation() {
                 <Menu className="w-4 h-4" />
                 <span className="text-xs uppercase tracking-widest-plus hidden sm:inline">Menu</span>
               </button>
-              <Link href="/" className="flex items-center gap-2.5" aria-label="iMercati — home">
+              <Link href="/" className="flex items-center gap-2.5" aria-label="IMercati — home">
                 <OliveSprig className="w-10 h-3 text-olive-500 -mb-1 hidden sm:block" />
                 <span className="font-serif text-[1.5rem] leading-none text-ink tracking-tight">
-                  <span className="italic">i</span><span className="font-medium">Mercati</span>
+                  <span className="italic">I</span><span className="font-medium">Mercati</span>
                 </span>
               </Link>
             </div>

@@ -19,6 +19,7 @@ export interface SessionRow {
 
 export interface OperatorRow {
   OperatorId: string
+  OperatorCode: string
   Nome: string
   Categoria: string
   Descrizione: string
@@ -110,6 +111,7 @@ export async function buildOperatorsWorkbook(opts: {
     key: c,
     width: c === 'OperatorId' || c === 'ScheduleId' ? 38
          : c === 'Nome' || c === 'Descrizione' || c === 'Luogo' ? 28
+         : c === 'OperatorCode' ? 18
          : c === 'Email' || c === 'Lingue' || c === 'Pagamenti' ? 18
          : c === 'Comune' ? 20
          : 14,
@@ -126,6 +128,7 @@ export async function buildOperatorsWorkbook(opts: {
     const rowNum = i + 2
     const row = ws.getRow(rowNum)
     row.getCell(colIdx.OperatorId).value = op.OperatorId || ''
+    row.getCell(colIdx.OperatorCode).value = op.OperatorCode || ''
     row.getCell(colIdx.Nome).value = op.Nome
     row.getCell(colIdx.Categoria).value = op.Categoria
     row.getCell(colIdx.Descrizione).value = op.Descrizione

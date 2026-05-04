@@ -6,40 +6,37 @@ export const dynamic = 'force-dynamic'
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
   const supabase = createClient()
   const { data, error } = await supabase
-    .from('operators')
-    .select('*')
+    .from('market_schedules')
+    .select('id, market_id, comune, giorno, luogo, lat, lng, polygon_geojson, area_style')
     .eq('id', params.id)
     .maybeSingle()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  if (!data) return NextResponse.json({ error: 'Operatore non trovato' }, { status: 404 })
+  if (!data) return NextResponse.json({ error: 'Sessione non trovata' }, { status: 404 })
   return NextResponse.json({ data })
 }
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
+
   const body = await request.json()
-  const allowed = [
-    'name', 'code', 'category', 'description', 'stall_number',
-    'location_lat', 'location_lng',
-    'photos', 'languages', 'payment_methods', 'social_links',
-    'rating',
-  ]
-  const update: Record<string, unknown> = {}
-  for (const k of allowed) if (k in body) update[k] = body[k]
+  const polygon = body.polygon_geojson ?? null
+  const style = body.style ?? null
+
+  const update: Record<string, unknown> = {
+    polygon_geojson: polygon,
+    area_updated_at: new Date().toISOString(),
+    area_updated_by: user.id,
+  }
+  if (style) update.area_style = style
 
   const { data, error } = await supabase
-    .from('operators')
+    .from('market_schedules')
     .update(update)
     .eq('id', params.id)
-    .select()
+    .select('id, polygon_geojson, area_style')
     .single()
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
   return NextResponse.json({ data })
-}
-
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createClient()
-  const { error } = await supabase.from('operators').delete().eq('id', params.id)
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
-  return NextResponse.json({ ok: true })
 }
