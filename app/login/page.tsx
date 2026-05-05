@@ -1,11 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { LogIn, Mail, Lock, UserPlus } from 'lucide-react'
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto px-4 py-12 max-w-md text-center text-gray-500">Caricamento…</div>}>
+      <LoginPageInner />
+    </Suspense>
+  )
+}
+
+function LoginPageInner() {
   const router = useRouter()
   const search = useSearchParams()
   const next = search.get('next') ?? '/'

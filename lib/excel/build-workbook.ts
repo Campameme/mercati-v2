@@ -27,6 +27,7 @@ export interface OperatorRow {
   Lingue: string
   Pagamenti: string
   MarketSlug: string
+  PlaceId?: string
   ScheduleId: string
   Comune?: string
   Giorno?: string
@@ -109,7 +110,7 @@ export async function buildOperatorsWorkbook(opts: {
   ws.columns = OPERATORS_COLUMNS.map((c) => ({
     header: c,
     key: c,
-    width: c === 'OperatorId' || c === 'ScheduleId' ? 38
+    width: c === 'OperatorId' || c === 'ScheduleId' || c === 'PlaceId' ? 38
          : c === 'Nome' || c === 'Descrizione' || c === 'Luogo' ? 28
          : c === 'OperatorCode' ? 18
          : c === 'Email' || c === 'Lingue' || c === 'Pagamenti' ? 18
@@ -136,6 +137,7 @@ export async function buildOperatorsWorkbook(opts: {
     row.getCell(colIdx.Lingue).value = op.Lingue
     row.getCell(colIdx.Pagamenti).value = op.Pagamenti
     row.getCell(colIdx.MarketSlug).value = op.MarketSlug
+    row.getCell(colIdx.PlaceId).value = op.PlaceId || ''
     row.getCell(colIdx.ScheduleId).value = op.ScheduleId || ''
     row.getCell(colIdx.Banco).value = op.Banco ?? ''
     row.getCell(colIdx.Lat).value = op.Lat === '' ? null : op.Lat

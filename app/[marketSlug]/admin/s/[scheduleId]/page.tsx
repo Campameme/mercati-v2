@@ -19,6 +19,15 @@ interface Session {
   settori: string | null
   lat: number | null
   lng: number | null
+  place_id: string | null
+}
+
+interface PlaceInfo {
+  id: string
+  comune: string
+  luogo: string
+  schedules: Array<{ id: string; giorno: string; orario: string | null }>
+  hasPolygon: boolean
 }
 
 interface OperatorRow {
@@ -36,6 +45,7 @@ export default function AdminSessionPage() {
   const scheduleId = params?.scheduleId
 
   const [session, setSession] = useState<Session | null>(null)
+  const [placeInfo, setPlaceInfo] = useState<PlaceInfo | null>(null)
   const [marketName, setMarketName] = useState<string>('')
   const [marketCenter, setMarketCenter] = useState<[number, number] | null>(null)
   const [areaPositions, setAreaPositions] = useState<[number, number][] | null>(null)
@@ -71,22 +81,45 @@ export default function AdminSessionPage() {
 
     if (!marketId) { setLoading(false); return }
 
-    // Trova la sessione tramite /api/schedules/occurrences (unica fonte pubblica)
-    const occRes = await fetch('/api/schedules/occurrences')
-    const occs = await occRes.json()
-    const firstOcc = (occs.data ?? []).find((o: any) => o.schedule_id === scheduleId)
-    if (firstOcc) {
+    // Trova la sessione (con place_id) tramite /api/schedules/list
+    const schedRes = await fetch(`/api/schedules/list?marketId=${encodeURIComponent(marketId)}`)
+    const schedJson = await schedRes.json()
+    const sched = (schedJson.data ?? []).find((s: any) => s.id === scheduleId)
+    let placeId: string | null = null
+    if (sched) {
+      placeId = sched.placeId ?? null
       setSession({
-        id: firstOcc.schedule_id,
-        market_id: firstOcc.market_id,
-        comune: firstOcc.comune,
-        giorno: firstOcc.giorno,
-        orario: firstOcc.orario,
-        luogo: firstOcc.luogo,
-        settori: firstOcc.settori,
-        lat: firstOcc.lat ?? null,
-        lng: firstOcc.lng ?? null,
+        id: sched.id,
+        market_id: sched.marketId,
+        comune: sched.comune,
+        giorno: sched.giorno,
+        orario: sched.orario,
+        luogo: sched.luogo,
+        settori: sched.settori,
+        lat: sched.lat ?? null,
+        lng: sched.lng ?? null,
+        place_id: placeId,
       })
+    }
+
+    // Carica info place (luoghi del market) per avere le sessioni che condividono l'area
+    if (placeId) {
+      const placesRes = await fetch(`/api/markets/${marketId}/places`)
+      const placesJson = await placesRes.json()
+      const found = (placesJson.data ?? []).find((p: any) => p.id === placeId)
+      if (found) {
+        setPlaceInfo({
+          id: found.id,
+          comune: found.comune,
+          luogo: found.luogo,
+          schedules: found.schedules ?? [],
+          hasPolygon: !!found.polygon_geojson,
+        })
+      } else {
+        setPlaceInfo(null)
+      }
+    } else {
+      setPlaceInfo(null)
     }
 
     // Operatori della sessione (filtro scheduleId)
@@ -221,15 +254,40 @@ export default function AdminSessionPage() {
         {session.settori && <p className="text-xs text-ink-muted italic mt-2">{session.settori}</p>}
       </div>
 
-      {/* Toolbar: editor area sessione */}
-      <div className="flex flex-wrap items-center gap-2 mb-6">
-        <Link
-          href={`/${slug}/admin/s/${scheduleId}/area`}
-          className="inline-flex items-center gap-1.5 px-3 py-2 bg-cream-200 hover:bg-cream-300 text-ink rounded-sm text-xs"
-        >
-          <MapIcon className="w-3.5 h-3.5" /> Disegna area di questa sessione
-        </Link>
-      </div>
+      {/* Info area del luogo (place) */}
+      {placeInfo && (
+        <div className="mb-6 bg-cream-50 border border-cream-300 rounded-sm p-4 flex items-start gap-3 flex-wrap">
+          <MapIcon className="w-4 h-4 text-olive-500 mt-0.5 flex-shrink-0" />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm text-ink">
+              {placeInfo.hasPolygon ? (
+                <>Area definita su <strong>{placeInfo.luogo}</strong></>
+              ) : (
+                <>Nessuna area disegnata per <strong>{placeInfo.luogo}</strong></>
+              )}
+              {placeInfo.schedules.length > 1 && (
+                <>
+                  , condivisa con {placeInfo.schedules.length - 1}{' '}
+                  altra sessione{placeInfo.schedules.length - 1 === 1 ? '' : 'i'} (
+                  {placeInfo.schedules
+                    .filter((s) => s.id !== scheduleId)
+                    .map((s) => s.giorno)
+                    .join(', ')}
+                  ).
+                </>
+              )}
+            </p>
+          </div>
+          {session.place_id && (
+            <Link
+              href={`/${slug}/admin/places/${session.place_id}/area`}
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-cream-200 hover:bg-cream-300 text-ink rounded-sm text-xs flex-shrink-0"
+            >
+              <MapIcon className="w-3.5 h-3.5" /> Modifica area del luogo
+            </Link>
+          )}
+        </div>
+      )}
 
       {/* Banchi di questa sessione */}
       <section>

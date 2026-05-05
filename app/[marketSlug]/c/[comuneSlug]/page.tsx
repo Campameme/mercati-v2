@@ -25,13 +25,25 @@ export default async function ComunePage({
 
   const { data: schedules } = await supabase
     .from('market_schedules')
-    .select('id, comune, giorno, orario, luogo, settori, lat, lng, polygon_geojson')
+    .select('id, comune, giorno, orario, luogo, settori, lat, lng, polygon_geojson, place_id, market_places(polygon_geojson)')
     .eq('market_id', market.id)
     .eq('is_active', true)
     .order('comune', { ascending: true })
 
-  const forComune = (schedules ?? []).filter((s) => slugifyName(s.comune) === params.comuneSlug)
-  if (forComune.length === 0) notFound()
+  const forComuneRaw = (schedules ?? []).filter((s) => slugifyName(s.comune) === params.comuneSlug)
+  if (forComuneRaw.length === 0) notFound()
+  const forComune = forComuneRaw.map((s: any) => ({
+    id: s.id,
+    comune: s.comune,
+    giorno: s.giorno,
+    orario: s.orario,
+    luogo: s.luogo,
+    settori: s.settori,
+    lat: s.lat,
+    lng: s.lng,
+    polygon_geojson: s.polygon_geojson ?? null,
+    placePolygon: s.market_places?.polygon_geojson ?? null,
+  }))
 
   const comune = forComune[0].comune
 

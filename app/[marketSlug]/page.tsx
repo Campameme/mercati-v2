@@ -41,7 +41,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
     supabase.from('markets').select('*').eq('id', market.id).maybeSingle(),
     supabase
       .from('market_schedules')
-      .select('id, comune, giorno, orario, luogo, settori, lat, lng, polygon_geojson')
+      .select('id, comune, giorno, orario, luogo, settori, lat, lng, polygon_geojson, place_id, market_places(polygon_geojson)')
       .eq('market_id', market.id)
       .eq('is_active', true)
       .order('comune', { ascending: true }),
@@ -50,15 +50,19 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
 
   const mapPins = (schedules ?? [])
     .filter((s) => s.lat != null && s.lng != null)
-    .map((s) => ({
-      id: s.id as string,
-      lat: s.lat as number,
-      lng: s.lng as number,
-      label: `${s.comune} · ${s.giorno}`,
-      subtitle: s.luogo ?? s.settori ?? undefined,
-      polygon: (s.polygon_geojson as any) ?? null,
-      href: `/${marketFull.slug}/c/${slugifyName(s.comune)}`,
-    }))
+    .map((s: any) => {
+      const placePolygon = s.market_places?.polygon_geojson ?? null
+      return {
+        id: s.id as string,
+        lat: s.lat as number,
+        lng: s.lng as number,
+        kind: 'market' as const,
+        title: `${s.comune} · ${s.giorno}`,
+        subtitle: s.luogo ?? s.settori ?? undefined,
+        polygon: (placePolygon ?? s.polygon_geojson ?? null) as any,
+        href: `/${marketFull.slug}/c/${slugifyName(s.comune)}`,
+      }
+    })
 
   const comuni = Array.from(new Set((schedules ?? []).map((s) => s.comune)))
   const heroQuery = ZONE_HERO_COMUNE[marketFull.slug] ?? marketFull.city ?? comuni[0]

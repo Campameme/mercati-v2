@@ -16,6 +16,7 @@ interface RawRow {
   Lingue?: string
   Pagamenti?: string
   MarketSlug?: string
+  PlaceId?: string
   ScheduleId?: string
   Banco?: string | number
   Lat?: string | number

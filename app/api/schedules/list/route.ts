@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
   let query = supabase
     .from('market_schedules')
-    .select('id, market_id, comune, giorno, orario, luogo, settori, lat, lng, polygon_geojson, area_style, is_active, markets(slug, name, city)')
+    .select('id, market_id, place_id, comune, giorno, orario, luogo, settori, lat, lng, polygon_geojson, area_style, is_active, markets(slug, name, city), market_places(polygon_geojson)')
     .eq('is_active', true)
     .order('comune', { ascending: true })
     .order('giorno', { ascending: true })
@@ -31,21 +31,26 @@ export async function GET(request: NextRequest) {
   const { data, error } = await query
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  const shaped = (data ?? []).map((s: any) => ({
-    id: s.id,
-    marketId: s.market_id,
-    marketSlug: s.markets?.slug ?? null,
-    marketName: s.markets?.name ?? null,
-    marketCity: s.markets?.city ?? null,
-    comune: s.comune,
-    giorno: s.giorno,
-    orario: s.orario,
-    luogo: s.luogo,
-    settori: s.settori,
-    lat: s.lat,
-    lng: s.lng,
-    polygon: s.polygon_geojson ?? null,
-    style: s.area_style ?? null,
-  }))
+  const shaped = (data ?? []).map((s: any) => {
+    const placePolygon = s.market_places?.polygon_geojson ?? null
+    return {
+      id: s.id,
+      marketId: s.market_id,
+      marketSlug: s.markets?.slug ?? null,
+      marketName: s.markets?.name ?? null,
+      marketCity: s.markets?.city ?? null,
+      placeId: s.place_id ?? null,
+      comune: s.comune,
+      giorno: s.giorno,
+      orario: s.orario,
+      luogo: s.luogo,
+      settori: s.settori,
+      lat: s.lat,
+      lng: s.lng,
+      polygon: placePolygon ?? s.polygon_geojson ?? null,
+      placePolygon,
+      style: s.area_style ?? null,
+    }
+  })
   return NextResponse.json({ data: shaped })
 }

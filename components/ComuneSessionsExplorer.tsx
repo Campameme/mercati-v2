@@ -16,6 +16,8 @@ interface SessionLite {
   lat: number | null
   lng: number | null
   polygon_geojson?: GeoJSON.Feature<GeoJSON.Polygon> | null
+  /** Polygon ereditato dal place (preferito). Fallback su polygon_geojson legacy. */
+  placePolygon?: GeoJSON.Feature<GeoJSON.Polygon> | null
 }
 
 interface OperatorLite {
@@ -83,9 +85,10 @@ export default function ComuneSessionsExplorer({
       id: active.id,
       lat: active.lat,
       lng: active.lng,
-      label: `${active.comune} · ${active.giorno}`,
+      kind: 'market' as const,
+      title: `${active.comune} · ${active.giorno}`,
       subtitle: active.luogo ?? active.settori ?? undefined,
-      polygon: (active.polygon_geojson ?? null) as any,
+      polygon: (active.placePolygon ?? active.polygon_geojson ?? null) as any,
     }]
   }, [active])
 

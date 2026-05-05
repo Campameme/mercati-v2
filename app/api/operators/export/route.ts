@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
 
   let opQuery = supabase
     .from('operators')
-    .select('id, code, market_id, name, category, description, stall_number, languages, payment_methods, markets(slug), operator_schedules(schedule_id, location_lat, location_lng, stall_number, market_schedules(id, comune, giorno, luogo, market_id, markets(slug)))')
+    .select('id, code, market_id, name, category, description, stall_number, languages, payment_methods, markets(slug), operator_schedules(schedule_id, location_lat, location_lng, stall_number, market_schedules(id, comune, giorno, luogo, market_id, place_id, markets(slug)))')
   if (marketId) {
     // Includi sia operators del market sia operators con presenze in questo market
     const { data: presenceOps } = await supabase
@@ -71,6 +71,7 @@ export async function GET(request: NextRequest) {
     if (presences.length === 0) {
       operatorRows.push({
         ...baseFor((op as any).markets?.slug ?? ''),
+        PlaceId: '',
         ScheduleId: '',
         Banco: op.stall_number ?? '',
         Lat: '',
@@ -82,6 +83,7 @@ export async function GET(request: NextRequest) {
         const sessionSlug = p.market_schedules?.markets?.slug ?? (op as any).markets?.slug ?? ''
         operatorRows.push({
           ...baseFor(sessionSlug),
+          PlaceId: p.market_schedules?.place_id ?? '',
           ScheduleId: p.schedule_id,
           Banco: p.stall_number ?? '',
           Lat: p.location_lat ?? '',

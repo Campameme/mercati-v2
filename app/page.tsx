@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { formatMarketDays } from '@/lib/markets/days'
-import ProvinceMapWrapper from '@/components/ProvinceMapWrapper'
+import UnifiedMapClient from '@/components/UnifiedMapClient'
+import { slugifyName } from '@/lib/markets/slug'
+import type { UnifiedMapPin } from '@/components/UnifiedMap'
 import { MountainSea, WaveDivider, OliveSprig } from '@/components/decorations'
 import ZoneImage from '@/components/ZoneImage'
 import Reveal from '@/components/Reveal'
@@ -60,6 +62,26 @@ export default async function HomePage() {
 
   const totalComuni = new Set(mapSessions.map((s) => s.comune)).size
   const totalMercati = mapSessions.length
+
+  // Pin per UnifiedMap: 1 pin per coppia (comune, market_slug) — il primo trovato
+  // (un comune può avere più sessioni dello stesso market: prendi uno solo per non sovrapporre)
+  const seen = new Set<string>()
+  const mapPins: UnifiedMapPin[] = []
+  for (const s of mapSessions) {
+    if (s.lat == null || s.lng == null) continue
+    const key = `${s.market_slug}:${s.comune}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    mapPins.push({
+      id: key,
+      lat: s.lat,
+      lng: s.lng,
+      kind: 'market',
+      title: s.comune,
+      subtitle: s.market_name,
+      href: `/${s.market_slug}/c/${slugifyName(s.comune)}`,
+    })
+  }
 
   return (
     <div>
@@ -132,7 +154,7 @@ export default async function HomePage() {
               <WaveDivider className="w-32 text-sea-500 opacity-60 hidden md:block" />
             </div>
             <div className="border border-cream-300 bg-cream-50 rounded-sm p-1.5">
-              <ProvinceMapWrapper sessions={mapSessions} />
+              <UnifiedMapClient pins={mapPins} height={520} maxZoom={12} />
             </div>
             <p className="mt-3 text-xs text-ink-muted">
               {totalComuni} comuni · {totalMercati} mercati · tocca un pin per i dettagli

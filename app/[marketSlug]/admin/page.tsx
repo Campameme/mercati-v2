@@ -1,10 +1,24 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { MapIcon, Store, Newspaper, CalendarDays, ArrowRight, MapPin } from 'lucide-react'
+import { MapIcon, Store, Newspaper, CalendarDays, ArrowRight, MapPin, Map as MapPinIcon } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { classifySchedule, CATEGORY_COLOR } from '@/lib/schedules/classify'
 
 export const dynamic = 'force-dynamic'
+
+interface PlaceScheduleRow {
+  id: string
+  giorno: string
+  orario: string | null
+  settori: string | null
+}
+
+interface PlaceRow {
+  id: string
+  comune: string
+  luogo: string
+  market_schedules: PlaceScheduleRow[] | null
+}
 
 export default async function MarketAdminHome({ params }: { params: { marketSlug: string } }) {
   const supabase = createClient()
@@ -15,14 +29,13 @@ export default async function MarketAdminHome({ params }: { params: { marketSlug
     .maybeSingle()
   if (!market) notFound()
 
-  const [{ data: schedules }, { count: operatorsCount }] = await Promise.all([
+  const [{ data: places }, { count: operatorsCount }] = await Promise.all([
     supabase
-      .from('market_schedules')
-      .select('id, comune, giorno, orario, luogo, settori')
+      .from('market_places')
+      .select('id, comune, luogo, market_schedules(id, giorno, orario, settori)')
       .eq('market_id', market.id)
-      .eq('is_active', true)
       .order('comune', { ascending: true })
-      .order('giorno', { ascending: true }),
+      .order('luogo', { ascending: true }),
     supabase
       .from('operators')
       .select('*', { count: 'exact', head: true })
@@ -47,6 +60,8 @@ export default async function MarketAdminHome({ params }: { params: { marketSlug
     { href: `/${market.slug}/admin/news`,      icon: Newspaper,    title: 'News e avvisi',     desc: 'Pubblica notizie con finestra temporale.' },
     { href: `/${market.slug}/admin/events`,    icon: CalendarDays, title: 'Eventi',            desc: 'Crea eventi con categoria e orario.' },
   ]
+
+  const placeRows: PlaceRow[] = (places ?? []) as any
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-5xl">
@@ -79,57 +94,97 @@ export default async function MarketAdminHome({ params }: { params: { marketSlug
         </div>
       </section>
 
-      {/* Gestione per singolo mercato (schedule) */}
+      {/* Gestione per luogo (place) → sessioni del luogo */}
       <section>
         <div className="flex items-end justify-between mb-4">
           <div>
-            <p className="text-xs uppercase tracking-widest-plus text-ink-muted mb-1">Gestione per singolo mercato</p>
-            <h2 className="font-serif text-2xl text-ink">Mercoledì ≠ Sabato</h2>
+            <p className="text-xs uppercase tracking-widest-plus text-ink-muted mb-1">Gestione per luogo</p>
+            <h2 className="font-serif text-2xl text-ink">Stesso luogo, sessioni diverse</h2>
           </div>
           <p className="text-xs text-ink-muted hidden sm:block">
-            Configurazione banchi separata per ogni sessione
+            Area condivisa, banchi specifici per ogni giorno
           </p>
         </div>
         <p className="text-sm text-ink-soft mb-5 max-w-2xl">
-          Ogni sessione (giorno + luogo) ha la sua disposizione di banchi. Entra in una sessione per
-          gestire gli operatori associati, la loro posizione sulla mappa e la configurazione specifica.
+          Ogni luogo (comune + indirizzo) può avere più sessioni (giorni). Disegni l'area del mercato una sola volta
+          per il luogo: vale per tutti i giorni. I banchi invece restano configurabili per singola sessione.
         </p>
 
-        {(!schedules || schedules.length === 0) ? (
-          <p className="text-sm text-ink-muted italic">Nessuna sessione configurata per questa zona.</p>
+        {placeRows.length === 0 ? (
+          <p className="text-sm text-ink-muted italic">Nessun luogo configurato per questa zona.</p>
         ) : (
-          <ul className="border-y border-cream-300 divide-y divide-cream-300">
-            {schedules.map((s) => {
-              const cat = classifySchedule(s.settori)
-              const opsCount = countByScheduleId.get(s.id) ?? 0
+          <div className="space-y-6">
+            {placeRows.map((place) => {
+              const schedules = place.market_schedules ?? []
+              const totalOps = schedules.reduce(
+                (acc, s) => acc + (countByScheduleId.get(s.id) ?? 0),
+                0,
+              )
               return (
-                <li key={s.id}>
-                  <Link
-                    href={`/${market.slug}/admin/s/${s.id}`}
-                    className="group grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-5 items-center py-4 md:py-5 hover:bg-cream-50 -mx-4 px-4 md:-mx-6 md:px-6 transition-colors"
-                  >
-                    <div className="md:col-span-3 flex items-center gap-2.5 min-w-0">
-                      <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: CATEGORY_COLOR[cat] }} />
-                      <span className="font-serif text-lg text-ink truncate">{s.comune}</span>
+                <div key={place.id} className="border border-cream-300 rounded-sm bg-cream-50">
+                  <div className="flex items-center justify-between gap-3 px-4 md:px-5 py-4 border-b border-cream-300 flex-wrap">
+                    <div className="min-w-0">
+                      <h3 className="font-serif text-xl text-ink flex items-center gap-2 min-w-0">
+                        <MapPin className="w-4 h-4 text-olive-500 flex-shrink-0" />
+                        <span className="truncate">{place.comune}</span>
+                        <span className="text-ink-muted">·</span>
+                        <span className="truncate text-ink-soft">{place.luogo}</span>
+                      </h3>
+                      <p className="text-xs text-ink-muted mt-1 tabular-nums">
+                        {schedules.length} sessione{schedules.length === 1 ? '' : 'i'} · {totalOps} banc{totalOps === 1 ? 'o' : 'hi'}
+                      </p>
                     </div>
-                    <div className="md:col-span-3 min-w-0">
-                      <p className="text-sm text-ink truncate">{s.giorno}</p>
-                      {s.orario && <p className="text-xs text-ink-muted tabular-nums">{s.orario}</p>}
-                    </div>
-                    <div className="md:col-span-4 min-w-0">
-                      {s.luogo && <p className="text-sm text-ink-soft flex items-center gap-1"><MapPin className="w-3 h-3 flex-shrink-0" /> <span className="truncate">{s.luogo}</span></p>}
-                    </div>
-                    <div className="md:col-span-2 flex items-center justify-between md:justify-end gap-3">
-                      <span className="text-xs text-ink-muted tabular-nums">
-                        {opsCount} banch{opsCount === 1 ? 'o' : 'i'}
-                      </span>
-                      <ArrowRight className="w-4 h-4 text-ink-muted group-hover:text-olive-600 group-hover:translate-x-0.5 transition-all" />
-                    </div>
-                  </Link>
-                </li>
+                    <Link
+                      href={`/${market.slug}/admin/places/${place.id}/area`}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 bg-cream-200 hover:bg-cream-300 text-ink rounded-sm text-xs"
+                    >
+                      <MapPinIcon className="w-3.5 h-3.5" /> Disegna area
+                    </Link>
+                  </div>
+
+                  {schedules.length === 0 ? (
+                    <p className="px-4 md:px-5 py-4 text-sm text-ink-muted italic">
+                      Nessuna sessione legata a questo luogo.
+                    </p>
+                  ) : (
+                    <ul className="divide-y divide-cream-300">
+                      {schedules.map((s) => {
+                        const cat = classifySchedule(s.settori)
+                        const opsCount = countByScheduleId.get(s.id) ?? 0
+                        return (
+                          <li key={s.id}>
+                            <Link
+                              href={`/${market.slug}/admin/s/${s.id}`}
+                              className="group grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-5 items-center py-3 md:py-4 px-4 md:px-5 hover:bg-cream-100 transition-colors"
+                            >
+                              <div className="md:col-span-4 flex items-center gap-2.5 min-w-0">
+                                <span
+                                  className="w-2 h-2 rounded-full flex-shrink-0"
+                                  style={{ backgroundColor: CATEGORY_COLOR[cat] }}
+                                />
+                                <span className="font-serif text-base text-ink truncate">{s.giorno}</span>
+                              </div>
+                              <div className="md:col-span-4 min-w-0">
+                                {s.orario && (
+                                  <p className="text-xs text-ink-muted tabular-nums">{s.orario}</p>
+                                )}
+                              </div>
+                              <div className="md:col-span-4 flex items-center justify-between md:justify-end gap-3">
+                                <span className="text-xs text-ink-muted tabular-nums">
+                                  {opsCount} banc{opsCount === 1 ? 'o' : 'hi'}
+                                </span>
+                                <ArrowRight className="w-4 h-4 text-ink-muted group-hover:text-olive-600 group-hover:translate-x-0.5 transition-all" />
+                              </div>
+                            </Link>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  )}
+                </div>
               )
             })}
-          </ul>
+          </div>
         )}
 
         {unboundCount > 0 && (
