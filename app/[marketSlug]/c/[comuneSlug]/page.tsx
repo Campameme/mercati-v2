@@ -7,7 +7,6 @@ import { OliveSprig } from '@/components/decorations'
 import ZoneImage from '@/components/ZoneImage'
 import Reveal from '@/components/Reveal'
 import ComuneSessionsExplorer from '@/components/ComuneSessionsExplorer'
-import MarketsMapClient from '@/components/MarketsMapClient'
 
 export const dynamic = 'force-dynamic'
 
@@ -49,27 +48,16 @@ export default async function ComunePage({
     .select('id, name, category, description, stall_number, schedule_id')
     .eq('market_id', market.id)
 
-  const mapPins = forComune
-    .filter((s) => s.lat != null && s.lng != null)
-    .map((s) => ({
-      id: s.id as string,
-      lat: s.lat as number,
-      lng: s.lng as number,
-      title: `${s.comune} · ${s.giorno}`,
-      subtitle: s.luogo ?? s.settori ?? undefined,
-      polygon: ((s as any).polygon_geojson as any) ?? null,
-    }))
-
   return (
     <div>
-      {/* HERO: foto a sinistra, testo + mappa above-the-fold */}
+      {/* HERO compatto: foto sx, titolo dx. Mappa è sotto in ComuneSessionsExplorer */}
       <section className="border-b border-cream-300">
-        <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl">
-          <div className="grid md:grid-cols-[280px_1fr] gap-8 md:gap-10 items-start">
+        <div className="container mx-auto px-4 md:px-6 py-8 md:py-10 max-w-6xl">
+          <div className="grid md:grid-cols-[220px_1fr] gap-6 md:gap-10 items-start">
             <Reveal>
               <Link
                 href={`/${market.slug}`}
-                className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest-plus text-ink-muted hover:text-ink mb-4 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest-plus text-ink-muted hover:text-ink mb-3 transition-colors"
               >
                 <ChevronLeft className="w-3.5 h-3.5" /> {market.name}
               </Link>
@@ -79,27 +67,16 @@ export default async function ComunePage({
               <p className="mt-2 text-[11px] text-ink-muted italic">{comune} · via Wikipedia</p>
             </Reveal>
 
-            <div>
-              <Reveal>
-                <div className="flex items-center gap-3 mb-4 text-ink-soft">
-                  <OliveSprig className="w-8 h-2.5 text-olive-500" />
-                  <p className="text-[0.72rem] uppercase tracking-widest-plus">Comune</p>
-                </div>
-                <h1 className="font-serif text-3xl md:text-5xl text-ink leading-[1.04]">{comune}</h1>
-                <p className="mt-3 text-sm text-ink-soft">
-                  {forComune.length} {forComune.length === 1 ? 'mercato' : 'mercati'} · {market.name}
-                </p>
-              </Reveal>
-
-              {mapPins.length > 0 && (
-                <Reveal delayMs={80} className="mt-5">
-                  <MarketsMapClient pins={mapPins} height={380} showParking />
-                  <p className="mt-2 text-[11px] text-ink-muted">
-                    Aree mercato e parcheggi vicini · tocca un pin per i dettagli
-                  </p>
-                </Reveal>
-              )}
-            </div>
+            <Reveal>
+              <div className="flex items-center gap-3 mb-3 text-ink-soft">
+                <OliveSprig className="w-8 h-2.5 text-olive-500" />
+                <p className="text-[0.72rem] uppercase tracking-widest-plus">Comune</p>
+              </div>
+              <h1 className="font-serif text-3xl md:text-5xl text-ink leading-[1.04]">{comune}</h1>
+              <p className="mt-3 text-sm text-ink-soft">
+                {forComune.length} {forComune.length === 1 ? 'mercato' : 'mercati'} · {market.name}
+              </p>
+            </Reveal>
           </div>
         </div>
       </section>

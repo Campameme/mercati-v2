@@ -8,7 +8,7 @@ import { slugifyName } from '@/lib/markets/slug'
 import { classifySchedule, CATEGORY_COLOR } from '@/lib/schedules/classify'
 import ZoneImage from '@/components/ZoneImage'
 import Reveal from '@/components/Reveal'
-import MarketsMapClient from '@/components/MarketsMapClient'
+import MarketViewer from '@/components/MarketViewer'
 
 export const dynamic = 'force-dynamic'
 
@@ -54,7 +54,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
       id: s.id as string,
       lat: s.lat as number,
       lng: s.lng as number,
-      title: `${s.comune} · ${s.giorno}`,
+      label: `${s.comune} · ${s.giorno}`,
       subtitle: s.luogo ?? s.settori ?? undefined,
       polygon: (s.polygon_geojson as any) ?? null,
       href: `/${marketFull.slug}/c/${slugifyName(s.comune)}`,
@@ -123,9 +123,9 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
 
               {mapPins.length > 0 && (
                 <Reveal delayMs={80} className="mt-5">
-                  <MarketsMapClient pins={mapPins} height={380} showParking />
+                  <MarketViewer pins={mapPins} mapHeight="460px" />
                   <p className="mt-2 text-[11px] text-ink-muted">
-                    {mapPins.length} {mapPins.length === 1 ? 'mercato' : 'mercati'} · pin verdi: aree mercato · pin blu: parcheggi vicini
+                    {mapPins.length} {mapPins.length === 1 ? 'mercato' : 'mercati'} · parcheggi entro 2 km
                   </p>
                 </Reveal>
               )}

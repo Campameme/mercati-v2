@@ -10,23 +10,53 @@ interface ParkingListProps {
   onSelectParking: (id: string | null) => void
   filter: ParkingFilter
   coordsOverride?: { lat: number; lng: number; city?: string }
+  marketPins?: Array<{ id: string; lat: number; lng: number; label: string }>
 }
 
 export default function ParkingList({
   onSelectParking,
   filter,
   coordsOverride,
+  marketPins,
 }: ParkingListProps) {
   const autoSlug = useMarketSlug()
-  const marketSlug = coordsOverride ? undefined : autoSlug
+  const useMulti = !!(marketPins && marketPins.length > 0)
+  const marketSlug = useMulti || coordsOverride ? undefined : autoSlug
   const [parkings, setParkings] = useState<Parking[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const pinsKey = (marketPins ?? []).map((p) => `${p.id}:${p.lat}:${p.lng}`).join('|')
 
   useEffect(() => {
     const loadParkings = async () => {
       try {
         setLoading(true)
+        if (useMulti && marketPins) {
+          const lists = await Promise.all(
+            marketPins.map(async (pin) => {
+              const p = new URLSearchParams()
+              p.set('lat', String(pin.lat))
+              p.set('lng', String(pin.lng))
+              p.set('city', pin.label)
+              const r = await fetch(`/api/parking?${p.toString()}`)
+              if (!r.ok) return [] as Parking[]
+              const j = await r.json()
+              return (j.success && Array.isArray(j.data) ? j.data : []) as Parking[]
+            }),
+          )
+          const merged: Parking[] = []
+          for (const l of lists) for (const p of l) {
+            if (!p?.location?.lat || !p?.location?.lng) continue
+            const dup = merged.some((m) =>
+              Math.abs(m.location.lat - p.location.lat) < 0.0003 &&
+              Math.abs(m.location.lng - p.location.lng) < 0.0003,
+            )
+            if (!dup) merged.push(p)
+          }
+          setParkings(merged)
+          setLoading(false)
+          return
+        }
         let qs = ''
         if (coordsOverride) {
           const p = new URLSearchParams()
@@ -39,14 +69,10 @@ export default function ParkingList({
         }
         const response = await fetch(`/api/parking${qs}`)
         const result = await response.json()
-        
-        if (result.success && result.data) {
-          setParkings(result.data)
-        } else {
-          setError('Errore nel caricamento dei parcheggi')
-        }
+        if (result.success && result.data) setParkings(result.data)
+        else setError('Errore nel caricamento dei parcheggi')
       } catch (err) {
-        console.error('Errore nel caricamento parcheggi:', err)
+        console.error(err)
         setError('Errore nel caricamento dei parcheggi')
       } finally {
         setLoading(false)
@@ -54,7 +80,8 @@ export default function ParkingList({
     }
 
     loadParkings()
-  }, [marketSlug, coordsOverride?.lat, coordsOverride?.lng, coordsOverride?.city])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [marketSlug, coordsOverride?.lat, coordsOverride?.lng, coordsOverride?.city, pinsKey])
 
   const filteredParkings = parkings.filter((p) => matchesFilter(p, filter))
 

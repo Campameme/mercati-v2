@@ -18,6 +18,16 @@ const defaultCenter = {
   lng: 7.6060,
 }
 
+export interface MarketPin {
+  id: string
+  lat: number
+  lng: number
+  label: string
+  subtitle?: string
+  href?: string
+  polygon?: GeoJSON.Feature<GeoJSON.Polygon> | null
+}
+
 interface ParkingMapProps {
   onSelectParking: (id: string | null) => void
   filter?: ParkingFilter
@@ -26,24 +36,30 @@ interface ParkingMapProps {
    * su coordinate esplicite (usato per i mercati a livello comune/sessione).
    */
   coordsOverride?: { lat: number; lng: number; city?: string }
+  /** Pin di mercato (uno o più). Se valorizzato, ignora marketSlug/coordsOverride. */
+  marketPins?: MarketPin[]
   height?: string
 }
 
-export default function ParkingMap({ onSelectParking, filter, coordsOverride, height = '600px' }: ParkingMapProps) {
+export default function ParkingMap({ onSelectParking, filter, coordsOverride, marketPins, height = '600px' }: ParkingMapProps) {
   const autoSlug = useMarketSlug()
-  // Quando `coordsOverride` è settato ignoriamo il marketSlug della URL
-  const marketSlug = coordsOverride ? undefined : autoSlug
+  // Priorità: marketPins > coordsOverride > marketSlug (URL)
+  const useMulti = !!(marketPins && marketPins.length > 0)
+  const marketSlug = useMulti || coordsOverride ? undefined : autoSlug
   const [selectedParking, setSelectedParking] = useState<Parking | null>(null)
   const [selectedParkingId, setSelectedParkingId] = useState<string | null>(null)
+  const [selectedMarketPinId, setSelectedMarketPinId] = useState<string | null>(null)
   const [center, setCenter] = useState(defaultCenter)
   const [zoom, setZoom] = useState<number>(15)
   const [parkings, setParkings] = useState<Parking[]>([])
   const [areaPath, setAreaPath] = useState<google.maps.LatLngLiteral[]>([])
-  const [areaStyle, setAreaStyle] = useState<{ color: string; fillOpacity: number }>({ color: '#f97316', fillOpacity: 0.2 })
+  const [pinPolygons, setPinPolygons] = useState<Array<{ id: string; path: google.maps.LatLngLiteral[] }>>([])
+  const [areaStyle, setAreaStyle] = useState<{ color: string; fillOpacity: number }>({ color: '#7d8f4e', fillOpacity: 0.18 })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [mapType, setMapType] = useState<'roadmap' | 'satellite'>('satellite')
   const mapRef = useRef<google.maps.Map | null>(null)
+  const pinsKey = (marketPins ?? []).map((p) => `${p.id}:${p.lat}:${p.lng}`).join('|')
 
   // Carica parcheggi
   useEffect(() => {
@@ -51,8 +67,37 @@ export default function ParkingMap({ onSelectParking, filter, coordsOverride, he
       try {
         setLoading(true)
         setError(null)
-        console.log('ParkingMap: Inizio caricamento parcheggi...')
-        
+
+        // Multi-pin: una fetch per ogni pin, poi merge dedup
+        if (useMulti && marketPins) {
+          const lists = await Promise.all(
+            marketPins.map(async (pin) => {
+              const p = new URLSearchParams()
+              p.set('lat', String(pin.lat))
+              p.set('lng', String(pin.lng))
+              p.set('city', pin.label)
+              const r = await fetch(`/api/parking?${p.toString()}`)
+              if (!r.ok) return [] as Parking[]
+              const j = await r.json()
+              return (j.success && Array.isArray(j.data) ? j.data : []) as Parking[]
+            }),
+          )
+          const merged: Parking[] = []
+          for (const l of lists) {
+            for (const p of l) {
+              if (!p?.location?.lat || !p?.location?.lng) continue
+              const dup = merged.some((m) =>
+                Math.abs(m.location.lat - p.location.lat) < 0.0003 &&
+                Math.abs(m.location.lng - p.location.lng) < 0.0003,
+              )
+              if (!dup) merged.push(p)
+            }
+          }
+          setParkings(merged)
+          setLoading(false)
+          return
+        }
+
         let qs = ''
         if (coordsOverride) {
           const p = new URLSearchParams()
@@ -141,14 +186,30 @@ export default function ParkingMap({ onSelectParking, filter, coordsOverride, he
     }
 
     loadParkings()
-  }, [marketSlug, coordsOverride?.lat, coordsOverride?.lng, coordsOverride?.city])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [marketSlug, coordsOverride?.lat, coordsOverride?.lng, coordsOverride?.city, pinsKey])
 
-  // Centro mappa su coordsOverride (priorità) o area poligono da market
+  // Centro mappa: priorità marketPins > coordsOverride > slug
   useEffect(() => {
+    if (useMulti && marketPins && marketPins.length > 0) {
+      // Calcola centro come media
+      const avgLat = marketPins.reduce((s, p) => s + p.lat, 0) / marketPins.length
+      const avgLng = marketPins.reduce((s, p) => s + p.lng, 0) / marketPins.length
+      setCenter({ lat: avgLat, lng: avgLng })
+      setZoom(marketPins.length === 1 ? 16 : 13)
+      setAreaPath([])
+      // Polygons per pin
+      const polys = marketPins
+        .filter((p) => p.polygon)
+        .map((p) => ({ id: p.id, path: geojsonToGoogleMapsPath(p.polygon!) }))
+      setPinPolygons(polys)
+      return
+    }
     if (coordsOverride) {
       setCenter({ lat: coordsOverride.lat, lng: coordsOverride.lng })
       setZoom(17)
       setAreaPath([])
+      setPinPolygons([])
       return
     }
     if (!marketSlug) return
@@ -179,7 +240,17 @@ export default function ParkingMap({ onSelectParking, filter, coordsOverride, he
       }
     })()
     return () => { cancelled = true }
-  }, [marketSlug, coordsOverride?.lat, coordsOverride?.lng])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [marketSlug, coordsOverride?.lat, coordsOverride?.lng, pinsKey])
+
+  // Auto-fit bounds quando ci sono multi pin
+  useEffect(() => {
+    if (!useMulti || !marketPins || marketPins.length < 2 || !mapRef.current) return
+    const bounds = new google.maps.LatLngBounds()
+    marketPins.forEach((p) => bounds.extend({ lat: p.lat, lng: p.lng }))
+    parkings.forEach((p) => bounds.extend({ lat: p.location.lat, lng: p.location.lng }))
+    mapRef.current.fitBounds(bounds, 60)
+  }, [useMulti, pinsKey, parkings.length]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sincronizza selezione dalla lista
   useEffect(() => {
@@ -304,6 +375,69 @@ export default function ParkingMap({ onSelectParking, filter, coordsOverride, he
             }}
           />
         )}
+
+        {/* Polygons per ciascun marketPin */}
+        {pinPolygons.map((poly) => (
+          <Polygon
+            key={`pin-poly-${poly.id}`}
+            paths={poly.path}
+            options={{
+              strokeColor: '#7d8f4e',
+              strokeOpacity: 0.9,
+              strokeWeight: 2,
+              fillColor: '#7d8f4e',
+              fillOpacity: 0.18,
+              clickable: false,
+              zIndex: 1,
+            }}
+          />
+        ))}
+
+        {/* Marker mercato (uno per pin) */}
+        {useMulti && marketPins && marketPins.map((pin) => {
+          const svgIcon = {
+            url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+              <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="20" cy="20" r="16" fill="#5d6e3b" stroke="#fff" stroke-width="3"/>
+                <text x="20" y="26" font-family="Georgia, serif" font-size="16" font-weight="700" fill="white" text-anchor="middle">M</text>
+              </svg>
+            `)}`,
+            scaledSize: new google.maps.Size(40, 40),
+            anchor: new google.maps.Point(20, 20),
+          }
+          return (
+            <Marker
+              key={`market-pin-${pin.id}`}
+              position={{ lat: pin.lat, lng: pin.lng }}
+              icon={svgIcon}
+              zIndex={50}
+              onClick={() => setSelectedMarketPinId(pin.id)}
+            >
+              {selectedMarketPinId === pin.id && (
+                <InfoWindow onCloseClick={() => setSelectedMarketPinId(null)}>
+                  <div className="text-sm">
+                    <div className="font-semibold text-gray-900">{pin.label}</div>
+                    {pin.subtitle && <div className="text-xs text-gray-600 mt-0.5">{pin.subtitle}</div>}
+                    <div className="flex flex-col gap-0.5 mt-1.5">
+                      {pin.href && (
+                        <a href={pin.href} className="text-xs text-olive-700 underline">Apri pagina →</a>
+                      )}
+                      <a
+                        href={`https://www.google.com/maps/dir/?api=1&destination=${pin.lat},${pin.lng}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-olive-700 underline"
+                      >
+                        Indicazioni
+                      </a>
+                    </div>
+                  </div>
+                </InfoWindow>
+              )}
+            </Marker>
+          )
+        })}
+
         {parkings
           .filter((parking) => {
             const validPos = parking.location && parking.location.lat && parking.location.lng &&
