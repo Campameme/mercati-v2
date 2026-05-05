@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
     const city = resolved.kind === 'market' ? resolved.market.city : resolved.city
     const marketDays = resolved.kind === 'market' ? (resolved.market.market_days ?? []) : null
 
-    const MAX_DISTANCE = 2000
+    const MAX_DISTANCE = 1500
     const apiKey = process.env.GOOGLE_PLACES_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
     if (!apiKey) {
       return NextResponse.json(

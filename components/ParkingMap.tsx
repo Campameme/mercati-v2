@@ -243,14 +243,44 @@ export default function ParkingMap({ onSelectParking, filter, coordsOverride, ma
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [marketSlug, coordsOverride?.lat, coordsOverride?.lng, pinsKey])
 
-  // Auto-fit bounds quando ci sono multi pin
+  // Auto-fit bounds: include sia pin mercato che parcheggi visibili.
+  // Cap del zoom massimo per evitare di "zoomare troppo" quando i punti sono pochi.
   useEffect(() => {
-    if (!useMulti || !marketPins || marketPins.length < 2 || !mapRef.current) return
+    if (!mapRef.current || loading) return
+
+    // Punti che dovrebbero essere visibili
+    const points: google.maps.LatLngLiteral[] = []
+    if (useMulti && marketPins) {
+      marketPins.forEach((p) => points.push({ lat: p.lat, lng: p.lng }))
+    } else if (coordsOverride) {
+      points.push({ lat: coordsOverride.lat, lng: coordsOverride.lng })
+    } else if (center && center !== defaultCenter) {
+      points.push(center)
+    }
+    parkings.forEach((p) => {
+      if (p?.location?.lat && p?.location?.lng) {
+        points.push({ lat: p.location.lat, lng: p.location.lng })
+      }
+    })
+
+    if (points.length === 0) return
+    if (points.length === 1) {
+      // Solo un punto → centra e zoom 16 (vista a livello strada utile)
+      mapRef.current.setCenter(points[0])
+      mapRef.current.setZoom(16)
+      return
+    }
+
     const bounds = new google.maps.LatLngBounds()
-    marketPins.forEach((p) => bounds.extend({ lat: p.lat, lng: p.lng }))
-    parkings.forEach((p) => bounds.extend({ lat: p.location.lat, lng: p.location.lng }))
-    mapRef.current.fitBounds(bounds, 60)
-  }, [useMulti, pinsKey, parkings.length]) // eslint-disable-line react-hooks/exhaustive-deps
+    points.forEach((p) => bounds.extend(p))
+    mapRef.current.fitBounds(bounds, 80)
+    // Cap zoom max 16 per non andare troppo vicino
+    const listener = google.maps.event.addListenerOnce(mapRef.current, 'bounds_changed', () => {
+      const z = mapRef.current?.getZoom() ?? 14
+      if (z > 16) mapRef.current?.setZoom(16)
+    })
+    return () => google.maps.event.removeListener(listener)
+  }, [useMulti, pinsKey, parkings.length, loading, coordsOverride?.lat, coordsOverride?.lng]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sincronizza selezione dalla lista
   useEffect(() => {

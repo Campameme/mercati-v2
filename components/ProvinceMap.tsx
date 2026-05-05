@@ -1,8 +1,8 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import { MapContainer, TileLayer, CircleMarker, Popup, Tooltip } from 'react-leaflet'
+import { MapContainer, TileLayer, CircleMarker, Popup, Tooltip, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 
 interface Session {
@@ -24,6 +24,22 @@ interface ComunePoint {
   market_slug: string
   market_name: string
   sessions: Session[]
+}
+
+function FitToPoints({ points }: { points: ComunePoint[] }) {
+  const map = useMap()
+  useEffect(() => {
+    if (points.length === 0) return
+    if (points.length === 1) {
+      map.setView([points[0].lat, points[0].lng], 13)
+      return
+    }
+    const bounds: [number, number][] = points.map((p) => [p.lat, p.lng])
+    try {
+      map.fitBounds(bounds as any, { padding: [40, 40], maxZoom: 12 })
+    } catch {}
+  }, [points.map((p) => p.comune).join('|')]) // eslint-disable-line react-hooks/exhaustive-deps
+  return null
 }
 
 export default function ProvinceMap({ sessions }: { sessions: Session[] }) {
@@ -60,6 +76,7 @@ export default function ProvinceMap({ sessions }: { sessions: Session[] }) {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        <FitToPoints points={points} />
         {points.map((p) => (
           <CircleMarker
             key={p.comune}
