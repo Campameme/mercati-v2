@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, MapPin, Instagram, Facebook, Globe, Navigation2, CalendarDays } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import FavoriteButton from '@/components/FavoriteButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -56,7 +57,10 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
       <div className="border-b border-cream-300 pb-6 mb-8">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="min-w-0 flex-1">
-            <h1 className="font-serif text-3xl md:text-5xl text-ink">{operator.name}</h1>
+            <div className="flex items-start gap-2">
+              <h1 className="font-serif text-3xl md:text-5xl text-ink flex-1">{operator.name}</h1>
+              <FavoriteButton kind="operator" id={operator.id} label={operator.name} />
+            </div>
             <div className="flex items-center gap-2 mt-3 flex-wrap text-sm text-ink-soft">
               <span className="px-2 py-0.5 bg-cream-200 text-ink rounded-sm text-xs uppercase tracking-wider">{operator.category}</span>
               {operator.stall_number && (

@@ -105,44 +105,34 @@ export default function UnifiedMap({ pins, height = 460, showParkingNearby = fal
     let cancelled = false
     ;(async () => {
       try {
-        const lists = await Promise.all(
-          marketPins.map(async (pin) => {
-            const params = new URLSearchParams()
-            params.set('lat', String(pin.lat))
-            params.set('lng', String(pin.lng))
-            params.set('city', pin.title)
-            try {
-              const r = await fetch(`/api/parking?${params.toString()}`)
-              if (!r.ok) return [] as any[]
-              const j = await r.json()
-              return Array.isArray(j?.data) && j?.success ? j.data : []
-            } catch {
-              return []
-            }
-          }),
-        )
+        // UNA sola chiamata server-side con tutti i punti → niente race condition
+        // Google Places, niente rate-limit, dedup garantito sul backend.
+        const points = marketPins.map((p) => `${p.lat.toFixed(6)},${p.lng.toFixed(6)}`).join('|')
+        const params = new URLSearchParams()
+        params.set('points', points)
+        params.set('city', marketPins[0]?.title ?? 'Liguria')
+        const r = await fetch(`/api/parking?${params.toString()}`)
         if (cancelled) return
+        if (!r.ok) {
+          setParkingPins([])
+          return
+        }
+        const j = await r.json()
+        const list: any[] = Array.isArray(j?.data) && j?.success ? j.data : []
         const merged: UnifiedMapPin[] = []
-        for (const list of lists) {
-          for (const p of list) {
-            const lat = p?.location?.lat
-            const lng = p?.location?.lng
-            if (typeof lat !== 'number' || typeof lng !== 'number') continue
-            // dedup ~30m (~0.0003 deg)
-            const dup = merged.some(
-              (m) => Math.abs(m.lat - lat) < 0.0003 && Math.abs(m.lng - lng) < 0.0003,
-            )
-            if (dup) continue
-            merged.push({
-              id: `parking-${p.id ?? `${lat},${lng}`}`,
-              lat,
-              lng,
-              kind: 'parking',
-              title: p.name ?? 'Parcheggio',
-              subtitle: p.address ?? undefined,
-              distance: typeof p.distance === 'number' ? p.distance : undefined,
-            })
-          }
+        for (const p of list) {
+          const lat = p?.location?.lat
+          const lng = p?.location?.lng
+          if (typeof lat !== 'number' || typeof lng !== 'number') continue
+          merged.push({
+            id: `parking-${p.id ?? `${lat},${lng}`}`,
+            lat,
+            lng,
+            kind: 'parking',
+            title: p.name ?? 'Parcheggio',
+            subtitle: p.address ?? undefined,
+            distance: typeof p.distance === 'number' ? p.distance : undefined,
+          })
         }
         setParkingPins(merged)
       } catch {

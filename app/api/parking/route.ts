@@ -91,9 +91,83 @@ async function getParkingFromGooglePlaces(lat: number, lng: number, radius: numb
   }).filter((p) => p !== null)
 }
 
+// Parsing: ?points=lat1,lng1|lat2,lng2|... (max 12 punti per evitare quote esplosive)
+function parsePoints(s: string | null): Array<{ lat: number; lng: number }> {
+  if (!s) return []
+  return s
+    .split('|')
+    .map((seg) => {
+      const [latStr, lngStr] = seg.split(',')
+      const lat = parseFloat(latStr)
+      const lng = parseFloat(lngStr)
+      return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null
+    })
+    .filter((x): x is { lat: number; lng: number } => x !== null)
+    .slice(0, 12)
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
+    const MAX_DISTANCE = 1500
+    const DUP = 30
+    const apiKey = process.env.GOOGLE_PLACES_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    if (!apiKey) {
+      return NextResponse.json({ success: false, error: 'Google Places API key non configurata' }, { status: 500 })
+    }
+
+    // === Modalità multi-punto (preferita per zone con più mercati) ===========
+    const pointsParam = searchParams.get('points')
+    const cityParam = searchParams.get('city') ?? ''
+    if (pointsParam) {
+      const points = parsePoints(pointsParam)
+      if (points.length === 0) {
+        return NextResponse.json({ success: false, error: 'points malformato' }, { status: 400 })
+      }
+      // Lancia in serie per evitare rate-limit Google Places (parallelo causa errori OVER_QUERY_LIMIT
+      // con risultati vuoti silenziosi per le chiamate successive).
+      const lists: any[][] = []
+      for (const p of points) {
+        try {
+          const list = await getParkingFromGooglePlaces(p.lat, p.lng, MAX_DISTANCE, cityParam || 'Liguria')
+          lists.push(list)
+        } catch (e) {
+          console.warn('Parking fetch failed for point', p, e)
+          lists.push([])
+        }
+      }
+      const merged: any[] = []
+      const seen: Array<{ lat: number; lng: number }> = []
+      for (const list of lists) {
+        for (const p of list) {
+          if (!p?.location) continue
+          // calcola la distanza al pin più vicino (per il filtro 1.5km e per il popup)
+          let minDist = Infinity
+          for (const pt of points) {
+            const d = calculateDistance(pt.lat, pt.lng, p.location.lat, p.location.lng)
+            if (d < minDist) minDist = d
+          }
+          if (minDist > MAX_DISTANCE) continue
+          const dup = seen.some((s) => calculateDistance(s.lat, s.lng, p.location.lat, p.location.lng) < DUP)
+          if (dup) continue
+          p.distance = minDist
+          merged.push(p)
+          seen.push({ lat: p.location.lat, lng: p.location.lng })
+        }
+      }
+      merged.sort((a, b) => (a.distance || 0) - (b.distance || 0))
+      return NextResponse.json({
+        success: true,
+        data: merged,
+        source: 'Google Places (multi-point)',
+        points,
+        maxDistance: MAX_DISTANCE,
+        count: merged.length,
+        lastUpdated: new Date().toISOString(),
+      })
+    }
+
+    // === Modalità single-point (legacy) ======================================
     const resolved = await resolveMarketFromRequest(searchParams)
     if (resolved.kind === 'not_found') {
       return NextResponse.json({ success: false, error: 'Mercato non trovato' }, { status: 404 })
@@ -103,19 +177,9 @@ export async function GET(request: NextRequest) {
     const city = resolved.kind === 'market' ? resolved.market.city : resolved.city
     const marketDays = resolved.kind === 'market' ? (resolved.market.market_days ?? []) : null
 
-    const MAX_DISTANCE = 1500
-    const apiKey = process.env.GOOGLE_PLACES_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-    if (!apiKey) {
-      return NextResponse.json(
-        { success: false, error: 'Google Places API key non configurata' },
-        { status: 500 }
-      )
-    }
-
     const allParkings = await getParkingFromGooglePlaces(lat, lng, MAX_DISTANCE, city)
     const filtered: any[] = []
     const seenPositions: Array<{ lat: number; lng: number }> = []
-    const DUP = 30
 
     for (const p of allParkings) {
       if (!p || !p.location) continue
@@ -129,7 +193,6 @@ export async function GET(request: NextRequest) {
     }
     filtered.sort((a, b) => (a.distance || 0) - (b.distance || 0))
 
-    // Enrich with crowding score (Distance Matrix + heuristic), cached 5 min per market
     try {
       const key = resolved.kind === 'market' ? `slug:${resolved.market.slug}` : `coords:${lat.toFixed(3)},${lng.toFixed(3)}`
       const fiveMinBucket = Math.floor(Date.now() / (5 * 60 * 1000))

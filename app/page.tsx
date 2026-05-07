@@ -7,6 +7,8 @@ import type { UnifiedMapPin } from '@/components/UnifiedMap'
 import { MountainSea, WaveDivider, OliveSprig } from '@/components/decorations'
 import ZoneImage from '@/components/ZoneImage'
 import Reveal from '@/components/Reveal'
+import FavoriteButton from '@/components/FavoriteButton'
+import FavoritesSection from '@/components/FavoritesSection'
 
 export const dynamic = 'force-dynamic'
 
@@ -127,6 +129,9 @@ export default async function HomePage() {
       </section>
 
       <div className="container mx-auto px-4 md:px-6">
+        {/* Preferiti (compare solo se ci sono) */}
+        <FavoritesSection />
+
         {/* Dati salienti */}
         <Reveal as="section" className="grid grid-cols-3 gap-6 md:gap-10 py-10 md:py-14 border-b border-cream-300">
           <div>
@@ -183,47 +188,52 @@ export default async function HomePage() {
                 const heroQuery = heroQueryFor(m.slug, m.city)
                 return (
                   <Reveal as="li" key={m.id} delayMs={Math.min(idx, 5) * 70} className="border-t border-cream-300 last:border-b">
-                    <Link
-                      href={`/${m.slug}`}
-                      className="group grid grid-cols-[auto_6.5rem_1fr_auto] md:grid-cols-[auto_10rem_1fr_auto] gap-4 md:gap-6 items-center py-5 md:py-6 hover:bg-cream-50 -mx-4 px-4 md:-mx-6 md:px-6 transition-all"
-                    >
-                      <div className="font-serif italic text-xl md:text-2xl text-olive-500 w-8 flex-shrink-0 tabular-nums self-start mt-1.5">
-                        {num}
-                      </div>
-
-                      <div className="rounded-sm overflow-hidden">
-                        <ZoneImage
-                          query={heroQuery}
-                          fallbackQuery={comuni[0] ?? m.city}
-                          alt={m.name}
-                          aspect="aspect-[4/3] md:aspect-[5/4]"
-                          hoverZoom
-                        />
-                      </div>
-
-                      <div className="min-w-0">
-                        <h3 className="font-serif text-xl md:text-2xl text-ink leading-tight group-hover:text-olive-700 transition-colors">
-                          {m.name}
-                        </h3>
-                        {comuni.length > 0 && (
-                          <p className="mt-1.5 text-sm text-ink-soft line-clamp-2">
-                            {isAgg ? comuni.join(' · ') : m.city}
-                          </p>
-                        )}
-                        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-muted">
-                          {m.market_days && m.market_days.length > 0 && (
-                            <span className="uppercase tracking-wider">{formatMarketDays(m.market_days)}</span>
-                          )}
-                          <span className="tabular-nums">
-                            {sessionsCount} {sessionsCount === 1 ? 'mercato' : 'mercati'}
-                          </span>
+                    <div className="relative group">
+                      <Link
+                        href={`/${m.slug}`}
+                        className="grid grid-cols-[auto_6.5rem_1fr_auto] md:grid-cols-[auto_10rem_1fr_auto] gap-4 md:gap-6 items-center py-5 md:py-6 hover:bg-cream-50 -mx-4 px-4 md:-mx-6 md:px-6 transition-all"
+                      >
+                        <div className="font-serif italic text-xl md:text-2xl text-olive-500 w-8 flex-shrink-0 tabular-nums self-start mt-1.5">
+                          {num}
                         </div>
-                      </div>
 
-                      <span className="text-ink-muted group-hover:text-olive-600 group-hover:translate-x-1.5 transition-all self-center text-xl">
-                        →
-                      </span>
-                    </Link>
+                        <div className="rounded-sm overflow-hidden">
+                          <ZoneImage
+                            query={heroQuery}
+                            fallbackQuery={comuni[0] ?? m.city}
+                            alt={m.name}
+                            aspect="aspect-[4/3] md:aspect-[5/4]"
+                            hoverZoom
+                          />
+                        </div>
+
+                        <div className="min-w-0">
+                          <h3 className="font-serif text-xl md:text-2xl text-ink leading-tight group-hover:text-olive-700 transition-colors">
+                            {m.name}
+                          </h3>
+                          {comuni.length > 0 && (
+                            <p className="mt-1.5 text-sm text-ink-soft line-clamp-2">
+                              {isAgg ? comuni.join(' · ') : m.city}
+                            </p>
+                          )}
+                          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-muted">
+                            {m.market_days && m.market_days.length > 0 && (
+                              <span className="uppercase tracking-wider">{formatMarketDays(m.market_days)}</span>
+                            )}
+                            <span className="tabular-nums">
+                              {sessionsCount} {sessionsCount === 1 ? 'mercato' : 'mercati'}
+                            </span>
+                          </div>
+                        </div>
+
+                        <span className="text-ink-muted group-hover:text-olive-600 group-hover:translate-x-1.5 transition-all self-center text-xl">
+                          →
+                        </span>
+                      </Link>
+                      <div className="absolute top-3 right-3 md:top-4 md:right-2">
+                        <FavoriteButton kind="market" id={m.slug} label={m.name} />
+                      </div>
+                    </div>
                   </Reveal>
                 )
               })}

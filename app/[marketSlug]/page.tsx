@@ -9,6 +9,7 @@ import { classifySchedule, CATEGORY_COLOR } from '@/lib/schedules/classify'
 import ZoneImage from '@/components/ZoneImage'
 import Reveal from '@/components/Reveal'
 import MarketViewer from '@/components/MarketViewer'
+import FavoriteButton from '@/components/FavoriteButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -109,9 +110,12 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                     {comuni.length > 1 ? `${comuni.length} comuni` : marketFull.city}
                   </p>
                 </div>
-                <h1 className="font-serif text-3xl md:text-5xl leading-[1.04] tracking-tight text-ink">
-                  {marketFull.name}
-                </h1>
+                <div className="flex items-start gap-2">
+                  <h1 className="font-serif text-3xl md:text-5xl leading-[1.04] tracking-tight text-ink flex-1">
+                    {marketFull.name}
+                  </h1>
+                  <FavoriteButton kind="market" id={marketFull.slug} label={marketFull.name} />
+                </div>
                 {marketFull.description && (
                   <p className="mt-4 text-sm md:text-base text-ink-soft max-w-2xl leading-relaxed">
                     {marketFull.description}
