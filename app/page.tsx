@@ -37,8 +37,9 @@ export default async function HomePage() {
       .order('name', { ascending: true }),
     supabase
       .from('market_schedules')
-      .select('id, market_id, comune, giorno, orario, luogo, lat, lng, is_active')
-      .eq('is_active', true),
+      .select('id, market_id, comune, giorno, orario, luogo, lat, lng, is_active, markets!inner(is_active)')
+      .eq('is_active', true)
+      .eq('markets.is_active', true),
   ])
 
   const comuniByMarket = new Map<string, string[]>()

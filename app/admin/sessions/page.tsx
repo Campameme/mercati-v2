@@ -64,6 +64,20 @@ export default function AdminSessionsPage() {
   }
 
   async function toggleMarket(id: string, isActive: boolean) {
+    // Avviso cascade: spegnere una zona nasconde TUTTE le sue sessioni dal sito pubblico
+    if (isActive) {
+      const m = markets.find((x) => x.id === id)
+      const activeSessions = sessions.filter((s) => s.marketId === id && (s.isActive ?? true)).length
+      const ok = confirm(
+        `Spegnere "${m?.name ?? 'questa zona'}"?\n\n` +
+        `Tutte le ${activeSessions} sessioni di mercato attive in questa zona ` +
+        `verranno nascoste dal sito pubblico (mappa, calendario, ricerca) ` +
+        `finché la zona non viene riaccesa.\n\n` +
+        `Le sessioni mantengono il loro stato individuale: riaccendendo la zona, ` +
+        `torneranno visibili quelle già attive.`,
+      )
+      if (!ok) return
+    }
     setBusyId(id)
     const r = await fetch(`/api/markets/${id}`, {
       method: 'PUT',
@@ -126,34 +140,46 @@ export default function AdminSessionsPage() {
 
       {/* Zone (markets) */}
       <section className="mb-10">
-        <p className="text-xs uppercase tracking-widest-plus text-ink-muted mb-3">Zone aggregate</p>
+        <div className="flex items-baseline justify-between mb-3 flex-wrap gap-2">
+          <p className="text-xs uppercase tracking-widest-plus text-ink-muted">Zone aggregate</p>
+          <p className="text-[11px] text-ink-muted italic">
+            Spegnere una zona nasconde tutte le sue sessioni dal sito pubblico (cascade).
+          </p>
+        </div>
         {markets.length === 0 ? (
           <p className="text-sm text-ink-muted italic">Caricamento…</p>
         ) : (
           <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
-            {markets.map((m) => (
-              <li key={m.id}>
-                <button
-                  type="button"
-                  onClick={() => toggleMarket(m.id, m.is_active)}
-                  disabled={busyId === m.id}
-                  className={`w-full text-left px-3 py-2.5 rounded-sm border transition-all ${
-                    m.is_active
-                      ? 'bg-olive-50 border-olive-300 hover:border-olive-500'
-                      : 'bg-cream-100 border-cream-300 opacity-60 hover:opacity-100'
-                  } disabled:opacity-40`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-serif text-sm text-ink truncate">{m.name}</span>
-                    <span className={`text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm ${
-                      m.is_active ? 'bg-olive-600 text-cream-100' : 'bg-cream-300 text-ink-muted'
-                    }`}>
-                      {m.is_active ? 'ON' : 'OFF'}
-                    </span>
-                  </div>
-                </button>
-              </li>
-            ))}
+            {markets.map((m) => {
+              const sessionsCount = sessions.filter((s) => s.marketId === m.id).length
+              const activeSessionsCount = sessions.filter((s) => s.marketId === m.id && (s.isActive ?? true)).length
+              return (
+                <li key={m.id}>
+                  <button
+                    type="button"
+                    onClick={() => toggleMarket(m.id, m.is_active)}
+                    disabled={busyId === m.id}
+                    className={`w-full text-left px-3 py-2.5 rounded-sm border transition-all ${
+                      m.is_active
+                        ? 'bg-olive-50 border-olive-300 hover:border-olive-500'
+                        : 'bg-cream-100 border-cream-300 opacity-60 hover:opacity-100'
+                    } disabled:opacity-40`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-serif text-sm text-ink truncate">{m.name}</span>
+                      <span className={`text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm flex-shrink-0 ${
+                        m.is_active ? 'bg-olive-600 text-cream-100' : 'bg-cream-300 text-ink-muted'
+                      }`}>
+                        {m.is_active ? 'ON' : 'OFF'}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-ink-muted mt-0.5 tabular-nums">
+                      {activeSessionsCount}/{sessionsCount} sessioni attive
+                    </p>
+                  </button>
+                </li>
+              )
+            })}
           </ul>
         )}
       </section>

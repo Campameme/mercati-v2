@@ -18,10 +18,10 @@ export default async function ComunePage({
   const supabase = createClient()
   const { data: market } = await supabase
     .from('markets')
-    .select('id, slug, name, city')
+    .select('id, slug, name, city, is_active')
     .ilike('slug', params.marketSlug)
     .maybeSingle()
-  if (!market) notFound()
+  if (!market || !market.is_active) notFound()
 
   const { data: schedules } = await supabase
     .from('market_schedules')

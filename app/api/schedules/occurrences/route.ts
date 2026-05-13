@@ -17,8 +17,9 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await supabase
     .from('market_schedules')
-    .select('id, market_id, comune, giorno, orario, luogo, settori, is_active, markets(slug, name)')
+    .select('id, market_id, comune, giorno, orario, luogo, settori, is_active, markets!inner(slug, name, is_active)')
     .eq('is_active', true)
+    .eq('markets.is_active', true)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
