@@ -28,7 +28,27 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     .select()
     .single()
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
-  return NextResponse.json({ data })
+
+  // Cascade fisico: se cambia is_active sulla zona, propaga lo stesso
+  // valore a tutte le market_schedules figlie. Garantisce che spegnere/riaccendere
+  // una zona modifichi anche fisicamente lo stato delle sessioni (più intuitivo
+  // di un filtro virtuale: l'admin vede subito coerenza tra zona e sessioni).
+  let sessionsUpdated = 0
+  if ('is_active' in update) {
+    const { data: cascaded, error: cascadeErr } = await supabase
+      .from('market_schedules')
+      .update({ is_active: update.is_active })
+      .eq('market_id', params.id)
+      .select('id')
+    if (cascadeErr) {
+      // non bloccante: la zona è già stata aggiornata
+      console.warn('Cascade is_active to schedules failed:', cascadeErr)
+    } else {
+      sessionsUpdated = (cascaded ?? []).length
+    }
+  }
+
+  return NextResponse.json({ data, sessionsUpdated })
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {

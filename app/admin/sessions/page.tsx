@@ -64,17 +64,20 @@ export default function AdminSessionsPage() {
   }
 
   async function toggleMarket(id: string, isActive: boolean) {
-    // Avviso cascade: spegnere una zona nasconde TUTTE le sue sessioni dal sito pubblico
+    const m = markets.find((x) => x.id === id)
+    const zoneSessions = sessions.filter((s) => s.marketId === id)
     if (isActive) {
-      const m = markets.find((x) => x.id === id)
-      const activeSessions = sessions.filter((s) => s.marketId === id && (s.isActive ?? true)).length
       const ok = confirm(
         `Spegnere "${m?.name ?? 'questa zona'}"?\n\n` +
-        `Tutte le ${activeSessions} sessioni di mercato attive in questa zona ` +
-        `verranno nascoste dal sito pubblico (mappa, calendario, ricerca) ` +
-        `finché la zona non viene riaccesa.\n\n` +
-        `Le sessioni mantengono il loro stato individuale: riaccendendo la zona, ` +
-        `torneranno visibili quelle già attive.`,
+        `Tutte le ${zoneSessions.length} sessioni di mercato di questa zona ` +
+        `verranno SPENTE in cascata. Per riattivarle dovrai riaccendere la zona ` +
+        `(che le riaccende tutte) oppure attivarle una per una.`,
+      )
+      if (!ok) return
+    } else if (zoneSessions.length > 0) {
+      const ok = confirm(
+        `Riaccendere "${m?.name ?? 'questa zona'}"?\n\n` +
+        `Tutte le ${zoneSessions.length} sessioni della zona verranno riaccese.`,
       )
       if (!ok) return
     }
@@ -86,7 +89,9 @@ export default function AdminSessionsPage() {
     })
     setBusyId(null)
     if (r.ok) {
-      setMarkets((cur) => cur.map((m) => (m.id === id ? { ...m, is_active: !isActive } : m)))
+      // Aggiorna lo stato locale di market E delle sue sessioni (cascade)
+      setMarkets((cur) => cur.map((mm) => (mm.id === id ? { ...mm, is_active: !isActive } : mm)))
+      setSessions((cur) => cur.map((s) => (s.marketId === id ? { ...s, isActive: !isActive } : s)))
     } else {
       const j = await r.json()
       alert(j.error ?? 'Errore')
