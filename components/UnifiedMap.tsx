@@ -146,7 +146,13 @@ export default function UnifiedMap({ pins, height = 460, showParkingNearby = fal
   }, [marketsKey, showParkingNearby])
 
   const allPins = useMemo(() => [...pins, ...parkingPins], [pins, parkingPins])
-  const fitPoints = useMemo<[number, number][]>(() => allPins.map((p) => [p.lat, p.lng]), [allPins])
+  // FitBounds SOLO su pin "primari" (market/operator), non sui parcheggi:
+  // i parcheggi sono satellite, possono allargare troppo il bounding e
+  // far perdere fuoco sull'area mercato effettiva.
+  const fitPoints = useMemo<[number, number][]>(
+    () => pins.filter((p) => p.kind !== 'parking').map((p) => [p.lat, p.lng]),
+    [pins],
+  )
 
   // Centro iniziale: media o default Liguria
   const initialCenter = useMemo<[number, number]>(() => {

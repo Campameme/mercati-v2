@@ -9,6 +9,7 @@ import ZoneImage from '@/components/ZoneImage'
 import Reveal from '@/components/Reveal'
 import FavoriteButton from '@/components/FavoriteButton'
 import FavoritesSection from '@/components/FavoritesSection'
+import MarketsQuickFinder from '@/components/MarketsQuickFinder'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,7 +37,7 @@ export default async function HomePage() {
       .order('name', { ascending: true }),
     supabase
       .from('market_schedules')
-      .select('market_id, comune, giorno, orario, luogo, lat, lng, is_active')
+      .select('id, market_id, comune, giorno, orario, luogo, lat, lng, is_active')
       .eq('is_active', true),
   ])
 
@@ -55,6 +56,7 @@ export default async function HomePage() {
       const mi = marketInfo.get(s.market_id)
       if (!mi) return null
       return {
+        id: s.id as string,
         market_id: s.market_id, market_slug: mi.slug, market_name: mi.name,
         comune: s.comune, giorno: s.giorno, orario: s.orario, luogo: s.luogo,
         lat: s.lat, lng: s.lng,
@@ -129,6 +131,22 @@ export default async function HomePage() {
       </section>
 
       <div className="container mx-auto px-4 md:px-6">
+        {/* Trova un mercato — search prominent + chip giorno */}
+        {mapSessions.length > 0 && (
+          <section className="border-b border-cream-300">
+            <MarketsQuickFinder sessions={mapSessions.map((s) => ({
+              id: (s as any).id ?? `${s.market_id}-${s.comune}-${s.giorno}`,
+              comune: s.comune,
+              giorno: s.giorno,
+              orario: s.orario,
+              luogo: s.luogo,
+              market_id: s.market_id,
+              market_slug: s.market_slug,
+              market_name: s.market_name,
+            }))} />
+          </section>
+        )}
+
         {/* Preferiti (compare solo se ci sono) */}
         <FavoritesSection />
 

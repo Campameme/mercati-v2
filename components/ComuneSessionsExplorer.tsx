@@ -1,7 +1,8 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { MapPin, Store, Navigation2 } from 'lucide-react'
 import MarketViewer from '@/components/MarketViewer'
 import { classifySchedule, CATEGORY_COLOR, CATEGORY_LABEL } from '@/lib/schedules/classify'
@@ -70,7 +71,21 @@ export default function ComuneSessionsExplorer({
   sessions,
   operators,
 }: Props) {
-  const [activeId, setActiveId] = useState<string>(sessions[0]?.id ?? '')
+  const searchParams = useSearchParams()
+  const initialId = (() => {
+    const q = searchParams?.get('s')
+    if (q && sessions.some((s) => s.id === q)) return q
+    return sessions[0]?.id ?? ''
+  })()
+  const [activeId, setActiveId] = useState<string>(initialId)
+
+  // Se l'utente cambia query string mentre è sulla pagina, aggiorna la tab
+  useEffect(() => {
+    const q = searchParams?.get('s')
+    if (q && sessions.some((s) => s.id === q) && q !== activeId) setActiveId(q)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams])
+
   const active = sessions.find((s) => s.id === activeId) ?? sessions[0]
   const cat = active ? classifySchedule(active.settori) : 'varie'
 

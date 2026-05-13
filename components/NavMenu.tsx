@@ -275,9 +275,14 @@ export default function NavMenu({ open, onClose }: Props) {
               <div className="space-y-1">
                 {userEmail && <p className="px-3 text-xs text-ink-muted mb-1">{userEmail}</p>}
                 {role === 'super_admin' && (
-                  <Link href="/admin/markets" onClick={onClose} className="flex items-center gap-3 px-3 py-2.5 rounded-sm hover:bg-cream-200 text-ink text-sm">
-                    <Shield className="w-4 h-4 text-olive-500" /> Admin — Zone
-                  </Link>
+                  <>
+                    <Link href="/admin" onClick={onClose} className="flex items-center gap-3 px-3 py-2.5 rounded-sm hover:bg-cream-200 text-ink text-sm">
+                      <Shield className="w-4 h-4 text-olive-500" /> Admin — Dashboard
+                    </Link>
+                    <Link href="/admin/sessions" onClick={onClose} className="flex items-center gap-3 px-3 py-2.5 rounded-sm hover:bg-cream-200 text-ink text-sm">
+                      <Shield className="w-4 h-4 text-olive-500" /> Accendi / Spegni mercati
+                    </Link>
+                  </>
                 )}
                 <Link href="/operator" onClick={onClose} className="flex items-center gap-3 px-3 py-2.5 rounded-sm hover:bg-cream-200 text-ink text-sm">
                   <Store className="w-4 h-4 text-olive-500" /> Area operatore
