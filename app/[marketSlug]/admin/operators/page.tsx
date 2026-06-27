@@ -115,120 +115,122 @@ export default function AdminMarketOperatorsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <Link href={`/${slug}/admin`} className="text-sm text-gray-600 hover:text-primary-600">← Gestione mercato</Link>
-          <h1 className="text-3xl font-bold text-gray-900 mt-1">Operatori</h1>
-        </div>
-        <button onClick={() => setShowCreate((s) => !s)} className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">
-          <Plus className="w-4 h-4" /> <span>Nuovo operatore</span>
-        </button>
-      </div>
-
-      <div className="mb-6">
-        <ExcelOperatorsTools marketSlug={slug} onImported={load} />
-      </div>
-
-      {showCreate && (
-        <form onSubmit={handleCreate} className="bg-white rounded-xl shadow p-6 mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700">Nome</span>
-            <input required value={createForm.name} onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
-          </label>
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700">Categoria</span>
-            <select value={createForm.category} onChange={(e) => setCreateForm({ ...createForm, category: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md">
-              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
-          </label>
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700">Banco (opz.)</span>
-            <input value={createForm.stall_number} onChange={(e) => setCreateForm({ ...createForm, stall_number: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
-          </label>
-          <label className="block md:col-span-3">
-            <span className="text-sm font-medium text-gray-700">Sessione mercato (opz.)</span>
-            <select
-              value={createForm.schedule_id}
-              onChange={(e) => {
-                const scheduleId = e.target.value
-                // Se sceglie una sessione e non ha ancora coord, centra sulle coord della sessione
-                const s = sessions.find((x) => x.id === scheduleId)
-                setCreateForm((prev) => ({
-                  ...prev,
-                  schedule_id: scheduleId,
-                  location_lat: prev.location_lat ?? s?.lat ?? null,
-                  location_lng: prev.location_lng ?? s?.lng ?? null,
-                }))
-              }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            >
-              <option value="">— Tutta la zona (non legato a una sessione specifica)</option>
-              {sessions.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.comune} · {s.giorno}{s.luogo ? ` — ${s.luogo}` : ''}
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-gray-500 mt-1">
-              Collega questo operatore a una sessione specifica (es. Imperia Martedì) per mostrarlo solo quando l&apos;utente apre quel mercato.
-            </p>
-          </label>
-
-          {marketCenter && (
-            <div className="md:col-span-3 border-t border-gray-200 pt-4">
-              <LocationFields
-                center={(() => {
-                  // Se c'è una sessione selezionata con coord, centra lì; altrimenti centro zona
-                  const s = sessions.find((x) => x.id === createForm.schedule_id)
-                  if (s?.lat != null && s?.lng != null) return [s.lat, s.lng]
-                  return marketCenter
-                })()}
-                zoom={17}
-                lat={createForm.location_lat}
-                lng={createForm.location_lng}
-                onChange={(lat, lng) => setCreateForm({ ...createForm, location_lat: lat, location_lng: lng })}
-                areaPositions={areaPositions}
-                label="Posizione del banco"
-                helperText="Clicca sulla mappa, trascina il marker, inserisci coord manualmente o premi Sono qui."
-              />
-            </div>
-          )}
-
-          {error && <p className="md:col-span-3 text-sm text-red-600">{error}</p>}
-          <div className="md:col-span-3 flex justify-end space-x-2">
-            <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">Annulla</button>
-            <button type="submit" className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">Crea</button>
+    <div className="min-h-screen bg-paper">
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <Link href={`/${slug}/admin`} className="text-xs font-alt uppercase tracking-wider text-ink-muted hover:text-ink transition-colors">← Gestione mercato</Link>
+            <h1 className="font-display text-3xl text-ink mt-1">Operatori</h1>
           </div>
-        </form>
-      )}
+          <button onClick={() => setShowCreate((s) => !s)} className="flex items-center gap-2 px-4 py-2.5 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 transition-colors">
+            <Plus className="w-4 h-4" /> <span>Nuovo operatore</span>
+          </button>
+        </div>
 
-      {loading ? (
-        <p className="text-gray-600">Caricamento…</p>
-      ) : (
-        <div className="bg-white rounded-xl shadow divide-y">
-          {operators.length === 0 && <p className="p-6 text-center text-gray-500">Nessun operatore ancora.</p>}
-          {operators.map((o) => (
-            <div key={o.id} className="p-4 flex items-center justify-between">
-              <div>
-                <div className="flex items-center space-x-2">
-                  <h2 className="font-semibold text-gray-900">{o.name}</h2>
-                  <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded">{o.category}</span>
-                  {o.stall_number && <span className="text-xs text-gray-500">• {o.stall_number}</span>}
+        <div className="mb-6">
+          <ExcelOperatorsTools marketSlug={slug} onImported={load} />
+        </div>
+
+        {showCreate && (
+          <form onSubmit={handleCreate} className="bg-white rounded-xl border-2 border-ink/10 p-6 mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <label className="block">
+              <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Nome</span>
+              <input required value={createForm.name} onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+            </label>
+            <label className="block">
+              <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Categoria</span>
+              <select value={createForm.category} onChange={(e) => setCreateForm({ ...createForm, category: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors">
+                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </label>
+            <label className="block">
+              <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Banco (opz.)</span>
+              <input value={createForm.stall_number} onChange={(e) => setCreateForm({ ...createForm, stall_number: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+            </label>
+            <label className="block md:col-span-3">
+              <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Sessione mercato (opz.)</span>
+              <select
+                value={createForm.schedule_id}
+                onChange={(e) => {
+                  const scheduleId = e.target.value
+                  // Se sceglie una sessione e non ha ancora coord, centra sulle coord della sessione
+                  const s = sessions.find((x) => x.id === scheduleId)
+                  setCreateForm((prev) => ({
+                    ...prev,
+                    schedule_id: scheduleId,
+                    location_lat: prev.location_lat ?? s?.lat ?? null,
+                    location_lng: prev.location_lng ?? s?.lng ?? null,
+                  }))
+                }}
+                className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors"
+              >
+                <option value="">— Tutta la zona (non legato a una sessione specifica)</option>
+                {sessions.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.comune} · {s.giorno}{s.luogo ? ` — ${s.luogo}` : ''}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-ink-muted mt-1">
+                Collega questo operatore a una sessione specifica (es. Imperia Martedì) per mostrarlo solo quando l&apos;utente apre quel mercato.
+              </p>
+            </label>
+
+            {marketCenter && (
+              <div className="md:col-span-3 border-t-2 border-ink/10 pt-4">
+                <LocationFields
+                  center={(() => {
+                    // Se c'è una sessione selezionata con coord, centra lì; altrimenti centro zona
+                    const s = sessions.find((x) => x.id === createForm.schedule_id)
+                    if (s?.lat != null && s?.lng != null) return [s.lat, s.lng]
+                    return marketCenter
+                  })()}
+                  zoom={17}
+                  lat={createForm.location_lat}
+                  lng={createForm.location_lng}
+                  onChange={(lat, lng) => setCreateForm({ ...createForm, location_lat: lat, location_lng: lng })}
+                  areaPositions={areaPositions}
+                  label="Posizione del banco"
+                  helperText="Clicca sulla mappa, trascina il marker, inserisci coord manualmente o premi Sono qui."
+                />
+              </div>
+            )}
+
+            {error && <p className="md:col-span-3 text-sm text-coral-600">{error}</p>}
+            <div className="md:col-span-3 flex justify-end gap-2">
+              <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 bg-paper border-2 border-ink/15 text-ink-soft rounded-full hover:border-ink/30 transition-colors">Annulla</button>
+              <button type="submit" className="px-4 py-2 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 transition-colors">Crea</button>
+            </div>
+          </form>
+        )}
+
+        {loading ? (
+          <p className="text-ink-soft">Caricamento…</p>
+        ) : (
+          <div className="bg-white rounded-xl border-2 border-ink/10 divide-y divide-ink/10">
+            {operators.length === 0 && <p className="p-6 text-center text-ink-muted">Nessun operatore ancora.</p>}
+            {operators.map((o) => (
+              <div key={o.id} className="p-4 flex items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-alt text-base text-ink">{o.name}</h2>
+                    <span className="text-[10px] font-alt uppercase tracking-wider px-2 py-0.5 bg-pesto/15 text-pesto-700 rounded-full">{o.category}</span>
+                    {o.stall_number && <span className="text-xs text-ink-muted">• {o.stall_number}</span>}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Link href={`/${slug}/admin/operators/${o.id}`} className="p-2 text-ink-muted hover:text-pesto-600 transition-colors" title="Modifica">
+                    <Pencil className="w-5 h-5" />
+                  </Link>
+                  <button onClick={() => handleDelete(o.id)} className="p-2 text-ink-muted hover:text-coral-600 transition-colors" title="Elimina">
+                    <Trash2 className="w-5 h-5" />
+                  </button>
                 </div>
               </div>
-              <div className="flex items-center space-x-1">
-                <Link href={`/${slug}/admin/operators/${o.id}`} className="p-2 text-gray-600 hover:text-primary-600" title="Modifica">
-                  <Pencil className="w-5 h-5" />
-                </Link>
-                <button onClick={() => handleDelete(o.id)} className="p-2 text-gray-600 hover:text-red-600" title="Elimina">
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

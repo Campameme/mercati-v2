@@ -20,8 +20,8 @@ const EVT_LABEL: Record<string, string> = {
   art: 'Arte', sport: 'Sport', other: 'Altro',
 }
 const EVT_COLOR: Record<string, string> = {
-  market: '#B75A40', fair: '#8B5CF6', food: '#6B7F3A', music: '#2A5A75',
-  art: '#EC4899', sport: '#06B6D4', other: '#4A4F3B',
+  market: '#EF4B27', fair: '#8B5CF6', food: '#2FA84F', music: '#1E73E8',
+  art: '#EC4899', sport: '#0E2A33', other: '#4A4F3B',
 }
 const ALL_EVT_CATS = Object.keys(EVT_LABEL)
 const ALL_SCH_CATS: ScheduleCategory[] = ['alimentare', 'antiquariato', 'artigianato', 'varie']
@@ -90,7 +90,7 @@ export default function GlobalCalendarPage() {
           end: e.end_at ?? undefined,
           backgroundColor: color,
           borderColor: color,
-          textColor: '#FCFAF5',
+          textColor: '#FBF6EA',
           extendedProps: { kind: 'event', e },
         })
       }
@@ -161,9 +161,9 @@ export default function GlobalCalendarPage() {
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-10 md:py-14">
-      <div className="mb-8 md:mb-10 border-b border-cream-300 pb-6">
-        <p className="text-[0.72rem] uppercase tracking-widest-plus text-ink-muted mb-2">Liguria · Provincia di Imperia</p>
-        <h1 className="font-serif text-3xl md:text-5xl text-ink leading-tight">Calendario</h1>
+      <div className="mb-8 md:mb-10 border-b-2 border-ink/10 pb-6">
+        <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-2">Liguria · Provincia di Imperia</p>
+        <h1 className="font-display text-3xl md:text-5xl text-ink leading-tight">Calendario</h1>
         <p className="text-sm text-ink-soft mt-3 max-w-xl">
           Mercati ricorrenti ed eventi speciali, filtrabili per zona, tipologia e categoria.
         </p>
@@ -171,7 +171,7 @@ export default function GlobalCalendarPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3">
-          <div className="bg-cream-50 border border-cream-300 rounded-sm p-4">
+          <div className="bg-white border-2 border-ink/10 rounded-xl p-4">
             {loading ? (
               <p className="text-center py-12 text-ink-muted text-sm">Caricamento…</p>
             ) : (
@@ -193,8 +193,8 @@ export default function GlobalCalendarPage() {
         </div>
 
         <aside className="space-y-4 text-sm">
-          <div className="bg-cream-50 border border-cream-300 rounded-sm p-4">
-            <h2 className="font-serif text-ink text-base mb-3">Cosa mostrare</h2>
+          <div className="bg-white border-2 border-ink/10 rounded-xl p-4">
+            <h2 className="font-display text-ink text-base mb-3">Cosa mostrare</h2>
             <label className="flex items-center gap-2.5 mb-2 cursor-pointer">
               <input type="checkbox" checked={showMarkets} onChange={(e) => setShowMarkets(e.target.checked)} />
               <span className="text-ink">Mercati ricorrenti</span>
@@ -206,8 +206,8 @@ export default function GlobalCalendarPage() {
           </div>
 
           {showMarkets && (
-            <div className="bg-cream-50 border border-cream-300 rounded-sm p-4">
-              <h2 className="font-serif text-ink text-base mb-3">Tipologia mercato</h2>
+            <div className="bg-white border-2 border-ink/10 rounded-xl p-4">
+              <h2 className="font-display text-ink text-base mb-3">Tipologia mercato</h2>
               <div className="space-y-1.5">
                 {ALL_SCH_CATS.map((c) => {
                   const active = selectedSchCats.has(c)
@@ -230,8 +230,8 @@ export default function GlobalCalendarPage() {
           )}
 
           {showEvents && (
-            <div className="bg-cream-50 border border-cream-300 rounded-sm p-4">
-              <h2 className="font-serif text-ink text-base mb-3">Categorie eventi</h2>
+            <div className="bg-white border-2 border-ink/10 rounded-xl p-4">
+              <h2 className="font-display text-ink text-base mb-3">Categorie eventi</h2>
               <div className="flex flex-wrap gap-1.5">
                 {ALL_EVT_CATS.map((c) => {
                   const active = selectedEvtCats.has(c)
@@ -239,8 +239,8 @@ export default function GlobalCalendarPage() {
                     <button
                       key={c}
                       onClick={() => toggleEvtCat(c)}
-                      className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
-                        active ? 'text-cream-50' : 'bg-cream-50 text-ink-muted border-cream-300 hover:text-ink'
+                      className={`font-alt font-semibold text-xs px-2.5 py-1 rounded-full border-2 transition-colors ${
+                        active ? 'text-paper' : 'bg-white text-ink-muted border-ink/15 hover:text-ink hover:border-ink/30'
                       }`}
                       style={active ? { backgroundColor: EVT_COLOR[c], borderColor: EVT_COLOR[c] } : undefined}
                     >
@@ -252,8 +252,8 @@ export default function GlobalCalendarPage() {
             </div>
           )}
 
-          <div className="bg-cream-50 border border-cream-300 rounded-sm p-4">
-            <h2 className="font-serif text-ink text-base mb-3">Zone</h2>
+          <div className="bg-white border-2 border-ink/10 rounded-xl p-4">
+            <h2 className="font-display text-ink text-base mb-3">Zone</h2>
             <div className="space-y-1 max-h-60 overflow-y-auto pr-1">
               {markets.map((m) => (
                 <label key={m.id} className="flex items-center gap-2.5 cursor-pointer">
@@ -266,10 +266,10 @@ export default function GlobalCalendarPage() {
                 </label>
               ))}
             </div>
-            <div className="flex gap-3 mt-3 pt-3 border-t border-cream-300">
+            <div className="flex gap-3 mt-3 pt-3 border-t-2 border-ink/10">
               <button
                 onClick={() => setSelectedMarkets(new Set(markets.map((m) => m.id)))}
-                className="text-xs text-ink hover:underline font-medium"
+                className="font-alt text-xs text-pesto-600 hover:underline font-semibold"
               >
                 Tutte
               </button>
@@ -282,8 +282,8 @@ export default function GlobalCalendarPage() {
             </div>
           </div>
 
-          <div className="bg-cream-50 border border-cream-300 rounded-sm p-4">
-            <h2 className="font-serif text-ink text-base mb-3">Prossimi</h2>
+          <div className="bg-white border-2 border-ink/10 rounded-xl p-4">
+            <h2 className="font-display text-ink text-base mb-3">Prossimi</h2>
             {upcoming.length === 0 ? (
               <p className="text-xs text-ink-muted">Nessun appuntamento coi filtri correnti.</p>
             ) : (
@@ -311,16 +311,16 @@ export default function GlobalCalendarPage() {
       </div>
 
       {selected && (
-        <div className="fixed inset-0 z-50 bg-ink/50 flex items-center justify-center p-4" onClick={() => setSelected(null)}>
-          <div onClick={(e) => e.stopPropagation()} className="bg-cream-50 rounded-sm max-w-lg w-full p-6 border border-cream-300">
+        <div className="fixed inset-0 z-50 bg-night/55 backdrop-blur-[2px] flex items-center justify-center p-4" onClick={() => setSelected(null)}>
+          <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-xl max-w-lg w-full p-6 border-2 border-ink/10 shadow-2xl">
             {selected.kind === 'event' ? (
               <>
                 <div className="flex items-center gap-2 mb-2 flex-wrap text-xs">
-                  <span className="px-2 py-0.5 rounded-sm text-cream-50" style={{ backgroundColor: EVT_COLOR[selected.e.category] ?? '#4A4F3B' }}>
+                  <span className="font-alt font-semibold px-2.5 py-0.5 rounded-full text-paper" style={{ backgroundColor: EVT_COLOR[selected.e.category] ?? '#4A4F3B' }}>
                     {EVT_LABEL[selected.e.category] ?? selected.e.category}
                   </span>
                   {selected.e.markets?.slug && (
-                    <Link href={`/${selected.e.markets.slug}`} className="px-2 py-0.5 rounded-sm bg-cream-200 text-ink hover:bg-cream-300">
+                    <Link href={`/${selected.e.markets.slug}`} className="font-alt font-semibold px-2.5 py-0.5 rounded-full bg-paper border-2 border-ink/10 text-ink hover:border-pesto">
                       {selected.e.markets.name}
                     </Link>
                   )}
@@ -328,7 +328,7 @@ export default function GlobalCalendarPage() {
                     <span className="text-ink-muted flex items-center"><Repeat className="w-3 h-3 mr-1" />ricorrente</span>
                   )}
                 </div>
-                <h3 className="font-serif text-xl text-ink mb-1">{selected.e.title}</h3>
+                <h3 className="font-display text-xl text-ink mb-1">{selected.e.title}</h3>
                 <p className="text-sm text-ink-soft mb-3">
                   {new Date(selected.e.start_at).toLocaleString('it-IT')}
                   {selected.e.end_at ? ` → ${new Date(selected.e.end_at).toLocaleString('it-IT')}` : ''}
@@ -342,16 +342,16 @@ export default function GlobalCalendarPage() {
               <>
                 <div className="flex items-center gap-2 mb-2 flex-wrap text-xs">
                   <span
-                    className="px-2 py-0.5 rounded-sm text-cream-50"
+                    className="font-alt font-semibold px-2.5 py-0.5 rounded-full text-paper"
                     style={{ backgroundColor: SCH_COLOR[selected.o.category] }}
                   >
                     {SCH_LABEL[selected.o.category]}
                   </span>
-                  <Link href={`/${selected.o.market_slug}`} className="px-2 py-0.5 rounded-sm bg-cream-200 text-ink hover:bg-cream-300">
+                  <Link href={`/${selected.o.market_slug}`} className="font-alt font-semibold px-2.5 py-0.5 rounded-full bg-paper border-2 border-ink/10 text-ink hover:border-pesto">
                     {selected.o.market_name}
                   </Link>
                 </div>
-                <h3 className="font-serif text-xl text-ink mb-1">{selected.o.comune}</h3>
+                <h3 className="font-display text-xl text-ink mb-1">{selected.o.comune}</h3>
                 <p className="text-sm text-ink-soft mb-1">
                   {selected.o.giorno}
                   {selected.o.orario ? ` · ${selected.o.orario}` : ''}
@@ -364,7 +364,7 @@ export default function GlobalCalendarPage() {
                 )}
               </>
             )}
-            <button onClick={() => setSelected(null)} className="mt-6 px-4 py-2 bg-cream-200 hover:bg-cream-300 rounded-sm w-full text-sm text-ink">
+            <button onClick={() => setSelected(null)} className="mt-6 px-4 py-2.5 bg-paper border-2 border-ink/15 hover:border-ink rounded-full w-full font-alt text-sm font-semibold text-ink transition-colors">
               Chiudi
             </button>
           </div>

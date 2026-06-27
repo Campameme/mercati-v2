@@ -69,75 +69,77 @@ export default function AdminMarketEditPage() {
     load()
   }
 
-  if (!market) return <div className="container mx-auto px-4 py-8">Caricamento…</div>
+  if (!market) return <div className="min-h-screen bg-paper"><div className="container mx-auto px-4 py-8 text-ink-soft">Caricamento…</div></div>
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <Link href="/admin/markets" className="inline-flex items-center text-sm text-gray-600 hover:text-primary-600 mb-4">
-        <ArrowLeft className="w-4 h-4 mr-1" /> Torna ai mercati
-      </Link>
+    <div className="min-h-screen bg-paper">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <Link href="/admin/markets" className="inline-flex items-center text-xs font-alt uppercase tracking-wider text-ink-muted hover:text-ink mb-4 transition-colors">
+          <ArrowLeft className="w-4 h-4 mr-1" /> Torna ai mercati
+        </Link>
 
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">{market.name}</h1>
+        <h1 className="font-display text-3xl text-ink mb-6">{market.name}</h1>
 
-      <form onSubmit={handleSave} className="bg-white rounded-xl shadow p-6 mb-6 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <F label="Slug" value={market.slug} onChange={(v) => setMarket({ ...market, slug: v })} />
-          <F label="Nome" value={market.name} onChange={(v) => setMarket({ ...market, name: v })} />
-          <F label="Città" value={market.city} onChange={(v) => setMarket({ ...market, city: v })} />
-          <div className="md:col-span-2">
-            <span className="text-sm font-medium text-gray-700 block mb-2">Giorni di mercato</span>
-            <DaySelector value={market.market_days ?? []} onChange={(market_days) => setMarket({ ...market, market_days })} />
+        <form onSubmit={handleSave} className="bg-white rounded-xl border-2 border-ink/10 p-6 mb-6 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <F label="Slug" value={market.slug} onChange={(v) => setMarket({ ...market, slug: v })} />
+            <F label="Nome" value={market.name} onChange={(v) => setMarket({ ...market, name: v })} />
+            <F label="Città" value={market.city} onChange={(v) => setMarket({ ...market, city: v })} />
+            <div className="md:col-span-2">
+              <span className="text-xs font-alt uppercase tracking-wider text-ink-soft block mb-2">Giorni di mercato</span>
+              <DaySelector value={market.market_days ?? []} onChange={(market_days) => setMarket({ ...market, market_days })} />
+            </div>
+            <F label="Latitudine" value={market.center_lat.toString()} onChange={(v) => setMarket({ ...market, center_lat: parseFloat(v) || 0 })} />
+            <F label="Longitudine" value={market.center_lng.toString()} onChange={(v) => setMarket({ ...market, center_lng: parseFloat(v) || 0 })} />
+            <F label="Zoom parcheggi" value={market.default_zoom.toString()} onChange={(v) => setMarket({ ...market, default_zoom: parseInt(v, 10) || 15 })} />
+            <F label="Zoom operatori" value={(market.default_zoom_operators ?? 17).toString()} onChange={(v) => setMarket({ ...market, default_zoom_operators: parseInt(v, 10) || 17 })} />
+            <label className="flex items-center gap-2 mt-6">
+              <input type="checkbox" checked={market.is_active} onChange={(e) => setMarket({ ...market, is_active: e.target.checked })} className="accent-pesto w-4 h-4" />
+              <span className="text-sm text-ink">Attivo</span>
+            </label>
           </div>
-          <F label="Latitudine" value={market.center_lat.toString()} onChange={(v) => setMarket({ ...market, center_lat: parseFloat(v) || 0 })} />
-          <F label="Longitudine" value={market.center_lng.toString()} onChange={(v) => setMarket({ ...market, center_lng: parseFloat(v) || 0 })} />
-          <F label="Zoom parcheggi" value={market.default_zoom.toString()} onChange={(v) => setMarket({ ...market, default_zoom: parseInt(v, 10) || 15 })} />
-          <F label="Zoom operatori" value={(market.default_zoom_operators ?? 17).toString()} onChange={(v) => setMarket({ ...market, default_zoom_operators: parseInt(v, 10) || 17 })} />
-          <label className="flex items-center space-x-2 mt-6">
-            <input type="checkbox" checked={market.is_active} onChange={(e) => setMarket({ ...market, is_active: e.target.checked })} />
-            <span className="text-sm">Attivo</span>
+          <label className="block">
+            <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Descrizione</span>
+            <textarea value={market.description ?? ''} onChange={(e) => setMarket({ ...market, description: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" rows={3} />
           </label>
-        </div>
-        <label className="block">
-          <span className="text-sm font-medium text-gray-700">Descrizione</span>
-          <textarea value={market.description ?? ''} onChange={(e) => setMarket({ ...market, description: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md" rows={3} />
-        </label>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <div className="flex justify-between">
-          <button type="button" onClick={handleDelete} className="flex items-center space-x-2 px-4 py-2 bg-red-50 text-red-700 border border-red-200 rounded-md hover:bg-red-100">
-            <Trash2 className="w-4 h-4" /> <span>Elimina</span>
-          </button>
-          <button type="submit" disabled={saving} className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50">
-            <Save className="w-4 h-4" /> <span>{saving ? 'Salvataggio…' : 'Salva'}</span>
-          </button>
-        </div>
-      </form>
-
-      <div className="bg-white rounded-xl shadow p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Amministratori del mercato</h2>
-        <form onSubmit={handleInvite} className="flex items-center space-x-2 mb-4">
-          <input
-            type="email"
-            required
-            placeholder="email@utente.it (deve essere già registrato)"
-            value={inviteEmail}
-            onChange={(e) => setInviteEmail(e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
-          />
-          <button type="submit" className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">
-            <UserPlus className="w-4 h-4" /> <span>Aggiungi</span>
-          </button>
+          {error && <p className="text-sm text-coral-600">{error}</p>}
+          <div className="flex justify-between">
+            <button type="button" onClick={handleDelete} className="flex items-center gap-2 px-4 py-2 bg-coral/10 text-coral-600 border-2 border-coral/30 rounded-full hover:bg-coral/20 transition-colors">
+              <Trash2 className="w-4 h-4" /> <span>Elimina</span>
+            </button>
+            <button type="submit" disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 disabled:opacity-50 transition-colors">
+              <Save className="w-4 h-4" /> <span>{saving ? 'Salvataggio…' : 'Salva'}</span>
+            </button>
+          </div>
         </form>
-        {inviteMsg && <p className="text-sm text-gray-700 mb-2">{inviteMsg}</p>}
-        <ul className="divide-y">
-          {admins.map((a) => (
-            <li key={a.user_id} className="py-2 flex items-center justify-between">
-              <span className="text-sm text-gray-800">{a.profiles?.full_name ?? a.user_id}</span>
-              <button onClick={() => handleRemoveAdmin(a.user_id)} className="text-sm text-red-600 hover:underline">rimuovi</button>
-            </li>
-          ))}
-          {admins.length === 0 && <li className="py-2 text-sm text-gray-500">Nessun admin assegnato</li>}
-        </ul>
-        <p className="text-xs text-gray-500 mt-3">Gli utenti devono registrarsi su <code>/login</code> prima di poter essere nominati admin.</p>
+
+        <div className="bg-white rounded-xl border-2 border-ink/10 p-6">
+          <h2 className="font-display text-xl text-ink mb-4">Amministratori del mercato</h2>
+          <form onSubmit={handleInvite} className="flex items-center gap-2 mb-4">
+            <input
+              type="email"
+              required
+              placeholder="email@utente.it (deve essere già registrato)"
+              value={inviteEmail}
+              onChange={(e) => setInviteEmail(e.target.value)}
+              className="flex-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors"
+            />
+            <button type="submit" className="flex items-center gap-2 px-4 py-2 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 transition-colors">
+              <UserPlus className="w-4 h-4" /> <span>Aggiungi</span>
+            </button>
+          </form>
+          {inviteMsg && <p className="text-sm text-ink-soft mb-2">{inviteMsg}</p>}
+          <ul className="divide-y divide-ink/10">
+            {admins.map((a) => (
+              <li key={a.user_id} className="py-2 flex items-center justify-between">
+                <span className="text-sm text-ink">{a.profiles?.full_name ?? a.user_id}</span>
+                <button onClick={() => handleRemoveAdmin(a.user_id)} className="text-sm text-coral-600 hover:underline">rimuovi</button>
+              </li>
+            ))}
+            {admins.length === 0 && <li className="py-2 text-sm text-ink-muted">Nessun admin assegnato</li>}
+          </ul>
+          <p className="text-xs text-ink-muted mt-3">Gli utenti devono registrarsi su <code className="text-ink-soft">/login</code> prima di poter essere nominati admin.</p>
+        </div>
       </div>
     </div>
   )
@@ -146,8 +148,8 @@ export default function AdminMarketEditPage() {
 function F({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <label className="block">
-      <span className="text-sm font-medium text-gray-700">{label}</span>
-      <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500" />
+      <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">{label}</span>
+      <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
     </label>
   )
 }

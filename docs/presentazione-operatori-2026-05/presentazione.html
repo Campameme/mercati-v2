@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IMercati — Presentazione ai primi 10 operatori</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream-50: #faf7f1;
+    --cream-100: #f4ede0;
+    --cream-200: #ebe0cc;
+    --cream-300: #ddcdb0;
+    --cream-400: #c9b48d;
+    --ink: #2a2620;
+    --ink-soft: #4a4339;
+    --ink-muted: #7a6f60;
+    --olive-50: #f0f1e4;
+    --olive-300: #b8c182;
+    --olive-500: #7d8f4e;
+    --olive-600: #5d6e3b;
+    --olive-700: #44522a;
+    --terra: #b85c3a;
+    --sea: #4a7a8c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .deck {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    background: var(--cream-50);
+    padding: 6vh 8vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease;
+    overflow-y: auto;
+  }
+  .slide.active { opacity: 1; visibility: visible; }
+
+  .serif { font-family: 'Fraunces', 'Georgia', serif; font-weight: 500; letter-spacing: -0.01em; }
+  .uppercase-label {
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.7rem;
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+
+  /* Slide 1 — Cover */
+  .cover {
+    background: linear-gradient(135deg, var(--cream-50) 0%, var(--cream-100) 100%);
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+  }
+  .cover .brand-mark {
+    width: 80px;
+    height: 4px;
+    background: var(--olive-500);
+    margin-bottom: 2.5rem;
+  }
+  .cover h1 {
+    font-size: clamp(4rem, 10vw, 9rem);
+    line-height: 0.95;
+    color: var(--ink);
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.03em;
+  }
+  .cover .tagline {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.4rem, 2.4vw, 2rem);
+    color: var(--ink-soft);
+    font-style: italic;
+    font-weight: 400;
+    max-width: 720px;
+    line-height: 1.3;
+  }
+  .cover .footer-meta {
+    position: absolute;
+    bottom: 6vh;
+    left: 8vw;
+    right: 8vw;
+    display: flex;
+    justify-content: space-between;
+    color: var(--ink-muted);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* Generic content slides */
+  .slide-content {
+    max-width: 1100px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .slide-number {
+    position: absolute;
+    bottom: 4vh;
+    right: 6vw;
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    font-variant-numeric: tabular-nums;
+  }
+  .slide-eyebrow {
+    color: var(--olive-600);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+  }
+  .slide h2 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2.4rem, 5.2vw, 4.2rem);
+    line-height: 1.05;
+    color: var(--ink);
+    margin-bottom: 2.5rem;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+  }
+  .slide h2 em {
+    color: var(--olive-600);
+    font-style: italic;
+  }
+
+  /* Big stat list — slide 2 */
+  .fact-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+  }
+  .fact-list li {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.5rem, 2.6vw, 2.2rem);
+    line-height: 1.3;
+    color: var(--ink-soft);
+    padding-left: 2.2rem;
+    position: relative;
+    font-weight: 400;
+  }
+  .fact-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 1.1em;
+    width: 1.4rem;
+    height: 1px;
+    background: var(--olive-500);
+  }
+
+  /* Bullet column — slide 3 */
+  .bullets {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+  .bullets li {
+    font-size: clamp(1.05rem, 1.6vw, 1.4rem);
+    color: var(--ink-soft);
+    line-height: 1.5;
+    padding-left: 2rem;
+    position: relative;
+  }
+  .bullets li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 8px;
+    height: 8px;
+    background: var(--olive-500);
+    border-radius: 50%;
+  }
+  .bullets li strong { color: var(--ink); font-weight: 600; }
+
+  /* Slide 4 — two-line big statement */
+  .big-statement {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.6rem, 3vw, 2.6rem);
+    line-height: 1.35;
+    color: var(--ink);
+    font-weight: 400;
+    max-width: 900px;
+  }
+  .big-statement em { color: var(--olive-600); font-style: italic; }
+
+  /* Demo slide */
+  .demo-list {
+    counter-reset: step;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 800px;
+  }
+  .demo-list li {
+    counter-increment: step;
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .demo-list li::before {
+    content: counter(step);
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    color: var(--olive-600);
+    font-size: 1.8em;
+    line-height: 1;
+    min-width: 1.5em;
+  }
+
+  /* Comparison table */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--cream-300);
+    border-radius: 4px;
+    overflow: hidden;
+    background: white;
+  }
+  .compare > div {
+    padding: 1.1rem 1.4rem;
+    border-bottom: 1px solid var(--cream-200);
+    font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+    line-height: 1.45;
+  }
+  .compare > div:nth-child(odd) {
+    background: var(--cream-100);
+    color: var(--ink-muted);
+    border-right: 1px solid var(--cream-300);
+  }
+  .compare > div:nth-child(even) {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .compare > div:nth-last-child(-n+2) { border-bottom: none; }
+  .compare-header {
+    font-family: 'Fraunces', serif !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.75rem !important;
+    background: var(--olive-50) !important;
+    color: var(--olive-700) !important;
+  }
+
+  /* Ask slide — three big asks */
+  .asks {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .ask-card {
+    background: white;
+    border: 1px solid var(--cream-300);
+    border-radius: 4px;
+    padding: 1.8rem;
+    position: relative;
+  }
+  .ask-card .num {
+    font-family: 'Fraunces', serif;
+    font-size: 3rem;
+    color: var(--olive-500);
+    line-height: 1;
+    margin-bottom: 0.8rem;
+    font-weight: 500;
+  }
+  .ask-card h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem;
+    color: var(--ink);
+    margin-bottom: 0.6rem;
+    font-weight: 600;
+  }
+  .ask-card p {
+    font-size: 0.95rem;
+    color: var(--ink-muted);
+    line-height: 1.5;
+  }
+  .zero-badge {
+    background: var(--olive-600);
+    color: var(--cream-50);
+    padding: 1.2rem 2rem;
+    text-align: center;
+    border-radius: 4px;
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.4rem, 2.4vw, 2rem);
+    font-weight: 500;
+  }
+  .zero-badge small {
+    display: block;
+    font-size: 0.65em;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    opacity: 0.85;
+    margin-top: 0.3rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* Why-free slide */
+  .reasons {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+  }
+  .reasons li {
+    display: flex;
+    gap: 1.2rem;
+    align-items: flex-start;
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
+    color: var(--ink-soft);
+    line-height: 1.55;
+    list-style: none;
+  }
+  .reasons li .marker {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    background: var(--olive-50);
+    border: 1px solid var(--olive-300);
+    color: var(--olive-700);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  /* Timeline */
+  .timeline {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  .timeline-step {
+    border-top: 2px solid var(--olive-500);
+    padding-top: 1rem;
+  }
+  .timeline-step .label {
+    color: var(--olive-700);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+  }
+  .timeline-step h4 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+  .timeline-step p {
+    font-size: 0.95rem;
+    color: var(--ink-muted);
+    line-height: 1.5;
+  }
+
+  /* Pact slide */
+  .pact {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+  .pact-col h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    color: var(--ink);
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid var(--olive-500);
+    font-weight: 600;
+  }
+  .pact-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
+  .pact-col li {
+    font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+    color: var(--ink-soft);
+    line-height: 1.5;
+    padding-left: 1.5rem;
+    position: relative;
+  }
+  .pact-col li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--olive-500);
+    font-weight: 700;
+  }
+
+  /* CTA final slide */
+  .cta {
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+  }
+  .cta h2 { margin-bottom: 1rem; }
+  .cta .sub {
+    font-size: 1.3rem;
+    color: var(--ink-soft);
+    margin-bottom: 3rem;
+    max-width: 600px;
+  }
+  .cta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    max-width: 800px;
+    width: 100%;
+  }
+  .cta-card {
+    padding: 1.8rem 1.2rem;
+    background: white;
+    border: 1px solid var(--cream-300);
+    border-radius: 4px;
+  }
+  .cta-card .icon {
+    font-size: 2rem;
+    margin-bottom: 0.8rem;
+  }
+  .cta-card .label {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    color: var(--ink);
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+  }
+  .cta-card .value {
+    font-size: 0.9rem;
+    color: var(--ink-muted);
+  }
+
+  /* Speaker notes */
+  .notes-toggle {
+    position: fixed;
+    bottom: 1rem;
+    left: 1rem;
+    z-index: 100;
+    background: rgba(0,0,0,0.5);
+    color: var(--cream-100);
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    font-family: inherit;
+  }
+  .notes {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--ink);
+    color: var(--cream-100);
+    padding: 1.5rem 8vw;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    max-height: 40vh;
+    overflow-y: auto;
+    z-index: 50;
+    border-top: 2px solid var(--olive-500);
+  }
+  .notes.visible { transform: translateY(0); }
+  .notes .label {
+    color: var(--olive-300);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 0.7rem;
+    margin-bottom: 0.6rem;
+    font-weight: 600;
+  }
+  .notes p {
+    font-family: 'Fraunces', serif;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    font-style: italic;
+    color: var(--cream-50);
+  }
+
+  /* Navigation */
+  .nav {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.5rem;
+    z-index: 100;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(8px);
+    border-radius: 100px;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--cream-300);
+  }
+  .nav button {
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    padding: 0.3rem 0.8rem;
+    border-radius: 100px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+    transition: background 0.2s;
+  }
+  .nav button:hover { background: var(--cream-200); }
+  .nav .progress {
+    color: var(--ink-muted);
+    padding: 0.3rem 0.6rem;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.85rem;
+  }
+
+  /* Print / PDF */
+  @media print {
+    @page { size: 1920px 1080px; margin: 0; }
+    html, body { height: auto; overflow: visible; background: white; }
+    .deck { height: auto; }
+    .slide {
+      position: relative;
+      opacity: 1 !important;
+      visibility: visible !important;
+      width: 1920px;
+      height: 1080px;
+      page-break-after: always;
+      break-after: page;
+    }
+    .nav, .notes-toggle, .notes { display: none !important; }
+  }
+
+  /* Step path overview — slide percorso */
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.2rem;
+    margin-top: 1rem;
+  }
+  .step-card {
+    background: white;
+    border: 1px solid var(--cream-300);
+    border-radius: 4px;
+    padding: 1.4rem 1.2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .step-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--olive-500);
+  }
+  .step-card .step-num {
+    font-family: 'Fraunces', serif;
+    font-size: 2.4rem;
+    color: var(--olive-500);
+    line-height: 1;
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+  }
+  .step-card .step-when {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-muted);
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+  }
+  .step-card h4 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.15rem;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .step-card p {
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+
+  /* Single-step deep dive */
+  .step-detail {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2.5rem;
+    align-items: start;
+    margin-top: 1rem;
+  }
+  .step-detail .step-badge {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(5rem, 9vw, 7rem);
+    line-height: 0.85;
+    color: var(--olive-500);
+    font-weight: 500;
+  }
+  .step-detail .step-badge .step-when {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-muted);
+    font-weight: 600;
+    display: block;
+    margin-top: 0.5rem;
+  }
+  .step-detail .step-body h3 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    color: var(--ink);
+    line-height: 1.15;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .step-detail .step-body h3 em { color: var(--olive-600); font-style: italic; }
+  .step-detail .step-body .lead-line {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
+    color: var(--ink-soft);
+    margin-bottom: 1.2rem;
+  }
+  .step-detail .step-body ul.bullets li { font-size: clamp(0.95rem, 1.4vw, 1.15rem); }
+  .step-detail .step-body .my-role {
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--cream-300);
+    font-size: 0.9rem;
+    color: var(--ink-muted);
+    font-style: italic;
+    line-height: 1.5;
+  }
+  .step-detail .step-body .my-role strong {
+    color: var(--olive-700);
+    font-style: normal;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+  }
+
+  /* Assets grid */
+  .assets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.2rem;
+    margin-top: 1rem;
+  }
+  .asset-card {
+    background: var(--cream-100);
+    border: 1px solid var(--cream-300);
+    padding: 1.4rem 1.3rem;
+    border-radius: 4px;
+  }
+  .asset-card .ico-label {
+    font-family: 'Fraunces', serif;
+    color: var(--olive-600);
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+  .asset-card h4 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.25rem;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .asset-card p {
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .asset-card.primary {
+    background: var(--olive-50);
+    border-color: var(--olive-300);
+  }
+
+  /* Mobile fallback */
+  @media (max-width: 700px) {
+    .slide { padding: 4vh 6vw; }
+    .compare, .pact, .timeline, .asks, .cta-grid, .steps-grid, .assets, .step-detail { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <!-- SLIDE 1 — Cover -->
+  <section class="slide cover active" data-notes="Buonasera a tutti. Vi ho chiamati perché siete dieci persone che mio padre conosce e di cui si fida. E perché secondo me siete i dieci che possono far partire una cosa che, da soli, nessuno di noi può fare. Vi prendo venti minuti, poi parliamo.">
+    <div class="brand-mark"></div>
+    <h1 class="serif">IMercati</h1>
+    <p class="tagline">I mercati della provincia di Imperia.<br>Insieme.</p>
+    <div class="footer-meta">
+      <span>Maggio 2026</span>
+      <span>Presentazione ai primi 10 operatori</span>
+    </div>
+  </section>
+
+  <!-- SLIDE 2 — La verità -->
+  <section class="slide" data-notes="Non vi vendo niente. Vi sto dicendo quello che vedete voi tutti i sabati mattina. Non è colpa vostra, è il mondo che è cambiato. Però non vuol dire che dobbiamo subire e basta.">
+    <div class="slide-content">
+      <p class="uppercase-label slide-eyebrow">Il punto di partenza</p>
+      <h2 class="serif">Lo sappiamo<br>tutti.</h2>
+      <ul class="fact-list">
+        <li>I clienti dei mercati calano ogni anno.</li>
+        <li>I giovani comprano online, gli anziani escono di meno.</li>
+        <li>Chi entra al mercato per caso è sempre meno.</li>
+      </ul>
+    </div>
+    <span class="slide-number">02 / 12</span>
+  </section>
+
+  <!-- SLIDE 3 — Il vero problema -->
+  <section class="slide" data-notes="Pausa. Lasciali pensare. È la slide più importante della presentazione. Il problema non è il calo. Il problema è che siete invisibili come persone. Per il cliente siete 'il banco della frutta'. Non Mario, non Maria. Il banco. E al banco si sostituisce facile.">
+    <div class="slide-content">
+      <p class="uppercase-label slide-eyebrow">Il vero problema</p>
+      <h2 class="serif">Per i clienti<br>siete <em>"il banco".</em></h2>
+      <p class="big-statement" style="margin-top: 1.5rem;">
+        Non Mario. Non Maria.<br>
+        Non chi pesca il pesce alle quattro del mattino.<br>
+        Non chi sceglie l'olio dei contadini di Pontedassio.<br><br>
+        <em>"Il banco della frutta".</em><br>
+        E al banco — si sostituisce facile.
+      </p>
+    </div>
+    <span class="slide-number">03 / 12</span>
+  </section>
+
+  <!-- SLIDE 4 — Posizionamento -->
+  <section class="slide" data-notes="Questa è la parola chiave di oggi: POSIZIONAMENTO. Non è marketing astratto. È la risposta a una domanda semplice: 'perché un cliente nuovo dovrebbe scegliere te e non il banco accanto?'. Se la risposta è solo il prezzo, avete perso in partenza. C'è sempre il supermercato.">
+    <div class="slide-content">
+      <p class="uppercase-label slide-eyebrow">Il lavoro vero</p>
+      <h2 class="serif">Costruire il vostro<br><em>posizionamento.</em></h2>
+      <p class="big-statement" style="margin-top: 1.4rem;">
+        Una parola difficile per una cosa semplice:<br><br>
+        <em>"Perché dovrei comprare da te,<br>e non dal banco accanto?"</em><br><br>
+        Se la risposta è solo il prezzo,<br>
+        avete già perso. C'è il supermercato.
+      </p>
+    </div>
+    <span class="slide-number">04 / 12</span>
+  </section>
+
+  <!-- SLIDE 5 — Cosa avete davvero -->
+  <section class="slide" data-notes="Adesso ribaltiamo. Avete TUTTO quello che serve per costruire un posizionamento forte. Lo avete già. Solo che non lo raccontate. Lo date per scontato. Per voi è normale alzarvi alle quattro, per il cliente è una storia. Per voi è normale conoscere il contadino, per il cliente è la garanzia.">
+    <div class="slide-content">
+      <p class="uppercase-label slide-eyebrow">Però...</p>
+      <h2 class="serif">Avete tutto quello<br>che serve. Già.</h2>
+      <ul class="bullets">
+        <li>Un <strong>mestiere</strong> che fate da vent'anni — quello non si improvvisa.</li>
+        <li>Una <strong>faccia, una voce, una storia</strong>. Tre cose che Amazon non avrà mai.</li>
+        <li>Conoscete <strong>i contadini, i pescatori, i fornitori</strong> per nome.</li>
+        <li>Sapete <strong>scegliere il prodotto</strong> meglio del cliente — perché lo fate da una vita.</li>
+        <li>Lo date per scontato. <strong>Non lo raccontate.</strong> Questo è l'errore.</li>
+      </ul>
+    </div>
+    <span class="slide-number">05 / 12</span>
+  </section>
+
+  <!-- SLIDE 6 — Il percorso (4 step) -->
+  <section class="slide" data-notes="Adesso vi mostro come ci arriviamo. Quattro tappe. Quattro mesi. Alla fine voi dovete essere AUTONOMI — non dipendenti da me. Io sono il facilitatore dei primi mesi, poi voi camminate. Questa è la promessa principale dell'incontro di oggi.">
+    <div class="slide-content">
+      <p class="uppercase-label slide-eyebrow">Come ci arriviamo</p>
+      <h2 class="serif">Quattro tappe.<br>Voi al centro.</h2>
+      <p class="big-statement" style="font-size: clamp(1rem, 1.5vw, 1.25rem); color: var(--ink-soft); margin-bottom: 1.5rem;">
+        Vi accompagno all'inizio. <em>Dopo, camminate da soli.</em>
+      </p>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-when">Mese 1 — Capirvi</div>
+          <h4>Chi siete davvero</h4>
+          <p>Form, una chiacchierata, mettiamo per iscritto la vostra storia e cosa vi rende diversi.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-when">Mese 1–2 — Metterlo a fuoco</div>
+          <h4>Il vostro profilo</h4>
+          <p>Costruiamo insieme la prima versione del messaggio: foto, parole, primi contenuti.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-when">Mese 2–4 — Provare</div>
+          <h4>Pubblicare e ascoltare</h4>
+          <p>Mettete fuori contenuti, vediamo cosa funziona, aggiustiamo. Faccio io, con voi.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-when">Mese 4+ — Autonomia</div>
+          <h4>Camminate da soli</h4>
+          <p>Avete il metodo, gli strumenti, le abitudini. Io resto disponibile, ma non vi servo più ogni giorno.</p>
+        </div>
+      </div>
+    </div>
+    <span class="slide-number">06 / 13</span>
+  </section>
+
+  <!-- SLIDE 7 — Step 1 zoom -->
+  <section class="slide" data-notes="Step uno. Capire chi siete. Il form di oggi è esattamente questo — non è una registrazione burocratica. È il mio modo di farvi DIRE per iscritto cose che date per scontate. È la materia prima per tutto il resto. Senza, non si fa niente.">
+    <div class="slide-content">
+      <p class="uppercase-label slide-eyebrow">Step 1 — Mese 1</p>
+      <div class="step-detail">
+        <div class="step-badge">01<span class="step-when">Capirvi</span></div>
+        <div class="step-body">
+          <h3>Mettere per iscritto<br><em>quello che date per scontato.</em></h3>
+          <p class="lead-line">Voi sapete tutto. Ma è "implicito". Lo facciamo diventare parole.</p>
+          <ul class="bullets">
+            <li>Compilate il <strong>form di oggi</strong> — 34 domande, dieci minuti.</li>
+            <li>Una <strong>chiacchierata di 30 minuti</strong>, di persona o al telefono, per approfondire le risposte.</li>
+            <li>Tiriamo fuori <strong>tre cose</strong>: chi siete, cosa vi rende diversi, qual è la frase che vi descrive in dieci parole.</li>
+          </ul>
+          <p class="my-role">
+            <strong>Cosa faccio io</strong>
+            Vi ascolto, scrivo, vi rimando una scheda chiara. Quella scheda è la base di tutto il resto.
+          </p>
+        </div>
+      </div>
+    </div>
+    <span class="slide-number">07 / 13</span>
+  </section>
+
+  <!-- SLIDE 8 — Step 2 zoom -->
+  <section class="slide" data-notes="Step due. Dal sapere chi siete a dirlo bene. Qui costruiamo la prima versione di tutto: il vostro profilo sul sito, le prime tre foto buone, la prima volta che provate a scrivere qualcosa sui vostri canali. Non aspettiamo la perfezione — partiamo. Si aggiusta strada facendo.">
+    <div class="slide-content">
+      <p class="uppercase-label slide-eyebrow">Step 2 — Mese 1–2</p>
+      <div class="step-detail">
+        <div class="step-badge">02<span class="step-when">Metterlo a fuoco</span></div>
+        <div class="step-body">
+          <h3>Il vostro profilo<br><em>diventa visibile.</em></h3>
+          <p class="lead-line">Costruiamo insieme la prima versione del messaggio. Imperfetta, ma vostra.</p>
+          <ul class="bullets">
+            <li>Una <strong>sessione foto al banco</strong> — vi raccontate al cliente, io scatto.</li>
+            <li>Scriviamo insieme <strong>il vostro testo</strong>: chi siete, in una pagina.</li>
+            <li>Pubblichiamo il profilo su <strong>IMercati</strong> (il sito) e prepariamo <strong>3 contenuti pronti</strong> per i vostri social.</li>
+          </ul>
+          <p class="my-role">
+            <strong>Cosa faccio io</strong>
+            Scrivo, scatto, monto. Vi mostro come l'ho fatto, così la seconda volta lo facciamo insieme.
+          </p>
+        </div>
+      </div>
+    </div>
+    <span class="slide-number">08 / 13</span>
+  </section>
+
+  <!-- SLIDE 9 — Step 3 zoom -->
+  <section class="slide" data-notes="Step tre. Adesso si esce in strada. Pubblicate i contenuti, ascoltate cosa dicono i clienti, vediamo i numeri. Questa è la fase in cui passate dal SUBIRE al GUIDARE. Io vi affianco ma cominciate a prendere decisioni da soli. Imparate a riconoscere cosa funziona.">
+    <div class="slide-content">
+      <p class="uppercase-label slide-eyebrow">Step 3 — Mese 2–4</p>
+      <div class="step-detail">
+        <div class="step-badge">03<span class="step-when">Provare</span></div>
+        <div class="step-body">
+          <h3>Pubblicare,<br><em>ascoltare, aggiustare.</em></h3>
+          <p class="lead-line">Si esce in strada. Si guarda cosa funziona. Si cambia se serve.</p>
+          <ul class="bullets">
+            <li>Un <strong>contenuto a settimana</strong> minimo — facciamo insieme, voi sempre più protagonisti.</li>
+            <li>Una <strong>chiamata ogni due settimane</strong> di 30 minuti per decidere insieme cosa funziona.</li>
+            <li>Imparate a <strong>riconoscere</strong> quando un contenuto "tira" e quando no — niente magia, è esperienza.</li>
+          </ul>
+          <p class="my-role">
+            <strong>Cosa faccio io</strong>
+            Vi mostro i dati, vi do consigli, ma le decisioni sono vostre. Inizia il passaggio di mano.
+          </p>
+        </div>
+      </div>
+    </div>
+    <span class="slide-number">09 / 13</span>
+  </section>
+
+  <!-- SLIDE 10 — Step 4 zoom -->
+  <section class="slide" data-notes="Step quattro. Questo è il vero obiettivo di tutta la cosa. Dopo quattro mesi, voi camminate. Non perché vi ho mollato — perché siete VOI a saperlo fare. È come imparare a guidare: all'inizio uno in macchina con voi, poi guidate da soli. Io resto disponibile, ma non sono più necessario tutti i giorni.">
+    <div class="slide-content">
+      <p class="uppercase-label slide-eyebrow">Step 4 — Mese 4 in poi</p>
+      <div class="step-detail">
+        <div class="step-badge">04<span class="step-when">Autonomia</span></div>
+        <div class="step-body">
+          <h3>Camminate <em>da soli.</em><br>Questo è il vero obiettivo.</h3>
+          <p class="lead-line">Avete il metodo, gli strumenti, le abitudini. Io resto, ma non vi servo più ogni giorno.</p>
+          <ul class="bullets">
+            <li>Sapete <strong>fare e pubblicare contenuti</strong> da soli, anche solo col telefono.</li>
+            <li>Avete uno <strong>strumento (in arrivo) per generare post</strong> partendo da una foto e due frasi.</li>
+            <li>Il vostro <strong>profilo IMercati</strong> resta vivo, lo aggiornate voi quando serve.</li>
+            <li>Io resto disponibile per <strong>consigli, controlli, decisioni grandi</strong>. Non per la routine.</li>
+          </ul>
+          <p class="my-role">
+            <strong>Cosa faccio io</strong>
+            Mi tolgo di mezzo. Resto allenatore — non più assistente.
+          </p>
+        </div>
+      </div>
+    </div>
+    <span class="slide-number">10 / 13</span>
+  </section>
+
+  <!-- SLIDE 11 — Gli asset della strategia -->
+  <section class="slide" data-notes="Tutto questo percorso si appoggia su tre asset. Il vostro brand è il principale — siete voi, la vostra storia, la vostra faccia. Poi i social personali, che già qualcuno di voi usa. E poi IMercati: il SITO è lo strumento che mette ordine, ma è uno strumento, non IL progetto. Voglio che lo abbiate chiaro: il sito serve a voi, non viceversa.">
+    <div class="slide-content">
+      <p class="uppercase-label slide-eyebrow">Su cosa ci appoggiamo</p>
+      <h2 class="serif">Gli asset della<br><em>strategia.</em></h2>
+      <div class="assets">
+        <div class="asset-card primary">
+          <div class="ico-label">Asset principale</div>
+          <h4>Voi.</h4>
+          <p>La vostra faccia, la vostra storia, il vostro mestiere. Tutto il resto è al servizio di questo.</p>
+        </div>
+        <div class="asset-card">
+          <div class="ico-label">Strumento</div>
+          <h4>I vostri canali</h4>
+          <p>Facebook, Instagram, WhatsApp. Quelli che già usate. Li valorizziamo, non ne aggiungiamo di nuovi.</p>
+        </div>
+        <div class="asset-card">
+          <div class="ico-label">Strumento</div>
+          <h4>IMercati</h4>
+          <p>Il sito dove la gente vi cerca. Profilo, foto, prodotti, orari. È già online — lo guardate dopo.</p>
+        </div>
+      </div>
+    </div>
+    <span class="slide-number">11 / 13</span>
+  </section>
+
+  <!-- SLIDE 12 — Il patto -->
+  <section class="slide" data-notes="Il patto. Non c'è da firmare niente di legale. È una stretta di mano. Funziona se ci credete davvero, altrimenti meglio dirmelo adesso. La cosa importante: io vi accompagno fino al quarto mese, poi siete voi a guidare.">
+    <div class="slide-content">
+      <p class="uppercase-label slide-eyebrow">Il patto</p>
+      <h2 class="serif">Tra noi.</h2>
+      <div class="pact">
+        <div class="pact-col">
+          <h3>Io mi impegno a</h3>
+          <ul>
+            <li>Accompagnarvi <strong>per quattro mesi</strong>, fino all'autonomia.</li>
+            <li><strong>Non chiedervi soldi</strong>, mai, voi dieci.</li>
+            <li>Darvi <strong>metodo, strumenti, abitudini</strong> — non solo contenuti.</li>
+            <li>Restare disponibile <strong>anche dopo</strong>, su decisioni grandi.</li>
+          </ul>
+        </div>
+        <div class="pact-col">
+          <h3>Voi vi impegnate a</h3>
+          <ul>
+            <li>Compilare il form, <strong>oggi o entro una settimana</strong>.</li>
+            <li><strong>Partecipare attivamente</strong> ai quattro step. Non passivamente.</li>
+            <li>Provare a <strong>pubblicare con costanza</strong> nei mesi 2–4.</li>
+            <li>Dirmi <strong>la verità</strong> quando vi chiedo cosa ne pensate.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <span class="slide-number">12 / 13</span>
+  </section>
+
+  <!-- SLIDE 13 — Adesso il form -->
+  <section class="slide cta" data-notes="E adesso si comincia. Step uno è esattamente questo: il form. Se siete con me, lo riempiamo qui, insieme. Dieci minuti. È il primo gesto concreto di tutto il percorso. Dopo, parliamo, domande, dubbi, tutto.">
+    <div class="slide-content">
+      <p class="uppercase-label slide-eyebrow">Step 1 inizia adesso</p>
+      <h2 class="serif">Il form.<br><em>Dieci minuti.</em></h2>
+      <p class="sub">Il primo gesto concreto del percorso. Si riempie qui, insieme. Poi domande, dubbi, tutto.</p>
+      <div class="cta-grid">
+        <div class="cta-card">
+          <div class="icon">📋</div>
+          <div class="label">Form cartaceo</div>
+          <div class="value">10 copie sul tavolo, pronte</div>
+        </div>
+        <div class="cta-card">
+          <div class="icon">📱</div>
+          <div class="label">Versione online</div>
+          <div class="value">QR code (da inserire)</div>
+        </div>
+        <div class="cta-card">
+          <div class="icon">📞</div>
+          <div class="label">Per dopo</div>
+          <div class="value">[Telefono]<br>[Email]</div>
+        </div>
+      </div>
+    </div>
+    <span class="slide-number">13 / 13</span>
+  </section>
+
+</div>
+
+<!-- Speaker notes panel -->
+<div class="notes" id="notes">
+  <div class="label">Note per chi parla</div>
+  <p id="notes-text"></p>
+</div>
+
+<button class="notes-toggle" id="notesToggle">N — Note speaker</button>
+
+<nav class="nav">
+  <button id="prev">←</button>
+  <span class="progress" id="progress">1 / 13</span>
+  <button id="next">→</button>
+</nav>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  const progressEl = document.getElementById('progress');
+  const notesEl = document.getElementById('notes');
+  const notesText = document.getElementById('notes-text');
+  const notesToggle = document.getElementById('notesToggle');
+
+  function show(i) {
+    current = (i + total) % total;
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === current));
+    progressEl.textContent = `${current + 1} / ${total}`;
+    notesText.textContent = slides[current].dataset.notes || '';
+  }
+
+  function next() { show(current + 1); }
+  function prev() { show(current - 1); }
+
+  document.getElementById('next').addEventListener('click', next);
+  document.getElementById('prev').addEventListener('click', prev);
+
+  notesToggle.addEventListener('click', () => {
+    notesEl.classList.toggle('visible');
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { next(); e.preventDefault(); }
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') { prev(); e.preventDefault(); }
+    if (e.key === 'Home') show(0);
+    if (e.key === 'End') show(total - 1);
+    if (e.key === 'n' || e.key === 'N') notesEl.classList.toggle('visible');
+    if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+
+  // Touch swipe
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; });
+  document.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    if (Math.abs(dx) > 60) { if (dx < 0) next(); else prev(); }
+  });
+
+  show(0);
+</script>
+</body>
+</html>

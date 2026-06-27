@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>IMercati — Volantino A4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream-50: #faf7f1;
+    --cream-100: #f4ede0;
+    --cream-200: #ebe0cc;
+    --cream-300: #ddcdb0;
+    --ink: #2a2620;
+    --ink-soft: #4a4339;
+    --ink-muted: #7a6f60;
+    --olive-50: #f0f1e4;
+    --olive-300: #b8c182;
+    --olive-500: #7d8f4e;
+    --olive-600: #5d6e3b;
+    --olive-700: #44522a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  html, body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: var(--ink);
+    background: #555;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    width: 210mm;
+    height: 297mm;
+    background: var(--cream-50);
+    margin: 1rem auto;
+    padding: 16mm 18mm;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    page-break-after: always;
+  }
+
+  .serif { font-family: 'Fraunces', 'Georgia', serif; letter-spacing: -0.01em; }
+
+  /* FRONTE */
+  .brand-mark {
+    width: 60px;
+    height: 3px;
+    background: var(--olive-500);
+    margin-bottom: 0.8rem;
+  }
+  .brand {
+    font-family: 'Fraunces', serif;
+    font-size: 3.2rem;
+    line-height: 1;
+    color: var(--ink);
+    font-weight: 500;
+    letter-spacing: -0.025em;
+  }
+  .brand-sub {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+    margin-top: 0.4rem;
+    margin-bottom: 2rem;
+  }
+
+  .lead {
+    font-family: 'Fraunces', serif;
+    font-size: 1.5rem;
+    line-height: 1.35;
+    color: var(--ink);
+    font-weight: 500;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--cream-300);
+  }
+  .lead em { color: var(--olive-600); font-style: italic; }
+
+  .body-text {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    margin-bottom: 0.9rem;
+  }
+  .body-text strong { color: var(--ink); font-weight: 600; }
+
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.15rem;
+    color: var(--ink);
+    font-weight: 600;
+    margin-top: 1.4rem;
+    margin-bottom: 0.7rem;
+  }
+
+  .check-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .check-list li {
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    padding-left: 1.4rem;
+    position: relative;
+  }
+  .check-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--olive-600);
+    font-weight: 700;
+  }
+  .check-list li strong { color: var(--ink); font-weight: 600; }
+
+  .num-list {
+    counter-reset: n;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .num-list li {
+    counter-increment: n;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    padding-left: 2.2rem;
+    position: relative;
+  }
+  .num-list li::before {
+    content: counter(n);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1.6rem;
+    height: 1.6rem;
+    background: var(--olive-500);
+    color: var(--cream-50);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .num-list li strong { color: var(--ink); font-weight: 600; }
+
+  .zero-box {
+    margin-top: 1.4rem;
+    background: var(--olive-600);
+    color: var(--cream-50);
+    padding: 1rem 1.4rem;
+    border-radius: 4px;
+    text-align: center;
+  }
+  .zero-box .big {
+    font-family: 'Fraunces', serif;
+    font-size: 1.8rem;
+    font-weight: 500;
+    line-height: 1;
+  }
+  .zero-box .small {
+    font-size: 0.78rem;
+    margin-top: 0.4rem;
+    opacity: 0.92;
+    letter-spacing: 0.04em;
+  }
+
+  .footer-strip {
+    position: absolute;
+    bottom: 12mm;
+    left: 18mm;
+    right: 18mm;
+    border-top: 1px solid var(--cream-300);
+    padding-top: 0.6rem;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+    letter-spacing: 0.04em;
+  }
+  .footer-strip .url { color: var(--olive-700); font-weight: 600; }
+
+  /* RETRO */
+  .retro-header {
+    border-bottom: 1px solid var(--cream-300);
+    padding-bottom: 0.8rem;
+    margin-bottom: 1.2rem;
+  }
+  .retro-header .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 0.72rem;
+    color: var(--olive-700);
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+  }
+  .retro-header h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    color: var(--ink);
+    font-weight: 500;
+    line-height: 1.15;
+  }
+
+  .pact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    margin-top: 0.8rem;
+    margin-bottom: 1.2rem;
+  }
+  .pact-grid h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    color: var(--ink);
+    font-weight: 600;
+    padding-bottom: 0.3rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 2px solid var(--olive-500);
+  }
+  .pact-grid ul { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+  .pact-grid li {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    padding-left: 1rem;
+    position: relative;
+  }
+  .pact-grid li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--olive-500);
+    font-weight: 700;
+  }
+  .pact-grid li strong { color: var(--ink); font-weight: 600; }
+
+  .timeline {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.8rem;
+    margin-top: 0.8rem;
+  }
+  .timeline-step {
+    border-top: 2px solid var(--olive-500);
+    padding-top: 0.5rem;
+  }
+  .timeline-step .label {
+    color: var(--olive-700);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.65rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+  .timeline-step h4 {
+    font-family: 'Fraunces', serif;
+    font-size: 0.9rem;
+    color: var(--ink);
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    line-height: 1.2;
+  }
+  .timeline-step p {
+    font-size: 0.75rem;
+    color: var(--ink-muted);
+    line-height: 1.4;
+  }
+
+  .contact-box {
+    margin-top: 1.4rem;
+    background: white;
+    border: 1px solid var(--cream-300);
+    border-radius: 4px;
+    padding: 1rem 1.2rem;
+  }
+  .contact-box h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    color: var(--ink);
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+  }
+  .contact-box .row {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin-bottom: 0.4rem;
+  }
+  .contact-box .row .ico {
+    width: 22px;
+    height: 22px;
+    background: var(--olive-50);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  .closing {
+    position: absolute;
+    bottom: 12mm;
+    left: 18mm;
+    right: 18mm;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+    text-align: center;
+    border-top: 1px solid var(--cream-300);
+    padding-top: 0.6rem;
+  }
+
+  .me-section {
+    background: var(--olive-50);
+    border-left: 3px solid var(--olive-500);
+    padding: 0.9rem 1.1rem;
+    margin-top: 1.2rem;
+    border-radius: 0 4px 4px 0;
+  }
+  .me-section .label {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.7rem;
+    color: var(--olive-700);
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+  }
+  .me-section p {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin-bottom: 0.5rem;
+  }
+  .me-section p:last-child { margin-bottom: 0; }
+
+  /* Toolbar (non-print) */
+  .toolbar {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: var(--ink);
+    color: var(--cream-50);
+    padding: 0.6rem 1rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    z-index: 100;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+  }
+
+  @media print {
+    body { background: white; }
+    .page { margin: 0; box-shadow: none; }
+    .toolbar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<button class="toolbar" onclick="window.print()">Stampa / Salva PDF</button>
+
+<!-- FRONTE -->
+<div class="page">
+  <div class="brand-mark"></div>
+  <div class="brand serif">IMercati</div>
+  <div class="brand-sub">I mercati della provincia di Imperia. Insieme.</div>
+
+  <p class="lead serif">
+    <em>Voi siete i primi dieci.</em>
+  </p>
+
+  <p class="body-text">
+    Avete il banco da anni. Sapete chi viene, chi compra, chi guarda e va via. E sapete anche che i clienti calano. <strong>Non è colpa vostra</strong>: il mondo è cambiato.
+  </p>
+  <p class="body-text">
+    Quello che vi manca non è il prodotto. È che oggi la gente, prima di uscire di casa, guarda il telefono. E sul telefono, voi, non ci siete.
+  </p>
+  <p class="body-text" style="color: var(--ink); font-weight: 500;">
+    <strong>IMercati è il sito che vi mette lì.</strong>
+  </p>
+  <p class="body-text">
+    Tutti i mercati della provincia, in una mappa. Ogni banco con una scheda. Foto, storia, prodotti, dove e quando vi trova la gente.
+  </p>
+
+  <div class="section-title">Cosa cambia per voi</div>
+  <ul class="check-list">
+    <li>Avete un <strong>profilo vostro</strong>, non siete "uno dei banchi".</li>
+    <li>Chi cerca "olio extravergine Imperia" vi <strong>trova per nome</strong>.</li>
+    <li>Chi viene una volta può mettervi tra i <strong>preferiti</strong>.</li>
+    <li>I vostri prodotti <strong>vivono online tutta la settimana</strong>.</li>
+    <li>Vi diamo <strong>contenuti già pronti</strong> per i vostri canali social.</li>
+  </ul>
+
+  <div class="section-title">Cosa vi chiediamo</div>
+  <ol class="num-list">
+    <li><strong>Compilare un form</strong> di dieci minuti. Anche su carta.</li>
+    <li><strong>Una mezza giornata insieme</strong> al banco. Faccio io le foto, voi lavorate.</li>
+    <li><strong>Provarci per 6 mesi</strong>. Poi ne riparliamo, dati in mano.</li>
+  </ol>
+
+  <div class="zero-box">
+    <div class="big">Zero euro.</div>
+    <div class="small">Per i primi dieci. Mai. Lo mettiamo per iscritto.</div>
+  </div>
+
+  <div class="footer-strip">
+    <span>Maggio 2026</span>
+    <span class="url">mercati-fiere.netlify.app</span>
+  </div>
+</div>
+
+<!-- RETRO -->
+<div class="page">
+  <div class="retro-header">
+    <div class="eyebrow">Perché lo faccio io</div>
+    <h2 class="serif">Una cosa seria,<br>fatta da uno solo. Per ora.</h2>
+  </div>
+
+  <p class="body-text">
+    Mi chiamo <strong>[TUO NOME]</strong>. Lavoro nel digitale e mio padre mi parla dei mercati da vent'anni. Vedo che la situazione si è incartata e ho deciso di provarci.
+  </p>
+  <p class="body-text">
+    Non sono un grande gruppo, non vendo software. Sono uno che ha costruito uno strumento e cerca <strong>dieci persone serie</strong> per farlo crescere.
+  </p>
+  <p class="body-text">
+    Se funziona, troviamo insieme il modo di scalarlo. Se non funziona, restano comunque i contenuti vostri e qualche foto in più di voi al lavoro.
+  </p>
+
+  <div class="section-title" style="margin-top: 1.3rem;">Il patto</div>
+  <div class="pact-grid">
+    <div>
+      <h3>Io mi impegno a</h3>
+      <ul>
+        <li>Tenere viva la piattaforma per <strong>24 mesi</strong>.</li>
+        <li><strong>Non chiedervi soldi</strong>, mai.</li>
+        <li><strong>Report ogni due mesi</strong>.</li>
+        <li>Ascoltare e cambiare.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Voi vi impegnate a</h3>
+      <ul>
+        <li>Form compilato <strong>entro una settimana</strong>.</li>
+        <li><strong>Mezza giornata al banco</strong> entro un mese.</li>
+        <li><strong>Provarci sul serio</strong>.</li>
+        <li>Dirmi la verità a 6 mesi.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-title">Quello che faremo insieme</div>
+  <div class="timeline">
+    <div class="timeline-step">
+      <div class="label">Mese 1</div>
+      <h4>Profilo online</h4>
+      <p>Prime foto e scheda completa.</p>
+    </div>
+    <div class="timeline-step">
+      <div class="label">Mese 2–3</div>
+      <h4>Contenuti vivi</h4>
+      <p>Primi post social, prima newsletter ai cittadini.</p>
+    </div>
+    <div class="timeline-step">
+      <div class="label">Mese 4–6</div>
+      <h4>Misuriamo</h4>
+      <p>Visite, preferiti, clienti nuovi.</p>
+    </div>
+    <div class="timeline-step">
+      <div class="label">Mese 6</div>
+      <h4>Bilancio</h4>
+      <p>Ci sediamo, contiamo, decidiamo.</p>
+    </div>
+  </div>
+
+  <div class="contact-box">
+    <h3>Per partire, oggi stesso</h3>
+    <div class="row"><span class="ico">📱</span><span>QR code o link → form di onboarding</span></div>
+    <div class="row"><span class="ico">📞</span><span>Telefono: <strong>[INSERIRE]</strong></span></div>
+    <div class="row"><span class="ico">✉️</span><span>Email: <strong>[INSERIRE]</strong></span></div>
+    <div class="row"><span class="ico">📋</span><span>Oppure: form cartaceo, restituibile entro una settimana.</span></div>
+  </div>
+
+  <div class="closing">
+    IMercati è un progetto indipendente per i mercati di Imperia e provincia · Maggio 2026
+  </div>
+</div>
+
+</body>
+</html>

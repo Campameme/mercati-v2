@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { Search, MapPin, CalendarDays } from 'lucide-react'
-import { OliveSprig } from '@/components/decorations'
+import { Search, CalendarDays } from 'lucide-react'
+import { WaveTaglia } from '@/components/decorations'
 
 interface HubOperator {
   id: string
@@ -91,14 +91,14 @@ export default function OperatoriHubPage() {
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-10 md:py-14">
-      <div className="mb-8 border-b border-cream-300 pb-6">
+      <div className="mb-8 border-b-2 border-ink/10 pb-6">
         <div className="flex items-center gap-3 mb-2 text-ink-soft">
-          <OliveSprig className="w-8 h-2.5 text-olive-500" />
-          <p className="text-[0.72rem] uppercase tracking-widest-plus">Provincia · panoramica</p>
+          <WaveTaglia className="w-8 h-2.5 text-pesto" aria-hidden="true" />
+          <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">Provincia · panoramica</p>
         </div>
         <div className="flex items-baseline justify-between gap-4 flex-wrap">
-          <h1 className="font-serif text-3xl md:text-5xl text-ink leading-tight">
-            Banchi <span className="italic font-light text-olive-600">della provincia</span>
+          <h1 className="font-display text-3xl md:text-5xl text-ink leading-tight">
+            Banchi <span className="text-pesto-600">della provincia</span>
           </h1>
           <p className="text-xs text-ink-muted tabular-nums">
             {operators.length} operator{operators.length === 1 ? 'e' : 'i'}
@@ -113,18 +113,20 @@ export default function OperatoriHubPage() {
       {/* Filtri */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-8">
         <div className="relative md:col-span-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted" aria-hidden="true" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Cerca banco, comune…"
-            className="w-full pl-9 pr-3 py-2.5 bg-cream-50 border border-cream-300 rounded-sm text-sm focus:outline-none focus:border-olive-500"
+            aria-label="Cerca banco o comune"
+            className="w-full pl-10 pr-3 py-3 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-pesto"
           />
         </div>
         <select
           value={marketFilter}
           onChange={(e) => setMarketFilter(e.target.value)}
-          className="py-2.5 px-3 bg-cream-50 border border-cream-300 rounded-sm text-sm focus:outline-none focus:border-olive-500"
+          aria-label="Filtra per zona"
+          className="py-3 px-3 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-pesto"
         >
           <option value="all">Tutte le zone</option>
           {markets.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
@@ -132,7 +134,8 @@ export default function OperatoriHubPage() {
         <select
           value={comuneFilter}
           onChange={(e) => setComuneFilter(e.target.value)}
-          className="py-2.5 px-3 bg-cream-50 border border-cream-300 rounded-sm text-sm focus:outline-none focus:border-olive-500"
+          aria-label="Filtra per comune"
+          className="py-3 px-3 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-pesto"
         >
           <option value="all">Tutti i comuni</option>
           {comuni.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -140,7 +143,8 @@ export default function OperatoriHubPage() {
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="py-2.5 px-3 bg-cream-50 border border-cream-300 rounded-sm text-sm focus:outline-none focus:border-olive-500"
+          aria-label="Filtra per categoria"
+          className="py-3 px-3 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-pesto"
         >
           <option value="all">Tutte le categorie</option>
           {categories.map((c) => <option key={c} value={c}>{CAT_LABEL[c] ?? c}</option>)}
@@ -151,7 +155,7 @@ export default function OperatoriHubPage() {
       {loading ? (
         <p className="text-center py-12 text-ink-muted text-sm">Caricamento…</p>
       ) : filtered.length === 0 ? (
-        <div className="bg-cream-50 border border-cream-300 rounded-sm p-10 text-center text-ink-muted">
+        <div className="bg-white border-2 border-ink/10 rounded-xl p-10 text-center text-ink-muted">
           Nessun operatore coi filtri correnti.
           {operators.length === 0 && (
             <p className="text-xs mt-2">Gli admin di zona possono aggiungere banchi dall&apos;area di gestione.</p>
@@ -168,25 +172,25 @@ export default function OperatoriHubPage() {
               <Link
                 key={op.id}
                 href={href}
-                className="group bg-cream-50 border border-cream-300 rounded-sm overflow-hidden flex flex-col hover:border-olive-500 hover:-translate-y-0.5 transition-all"
+                className="imk-lift group bg-white border-2 border-ink/10 rounded-xl overflow-hidden flex flex-col hover:border-pesto transition-colors"
               >
                 {op.photos?.[0] ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={op.photos[0]} alt={op.name} className="w-full h-40 object-cover" />
                 ) : (
-                  <div className="w-full h-40 bg-cream-100 border-b border-cream-300 flex items-center justify-center">
-                    <OliveSprig className="w-12 h-4 text-olive-300" />
+                  <div className="w-full h-40 bg-paper border-b-2 border-ink/10 flex items-center justify-center">
+                    <WaveTaglia className="w-14 h-4 text-pesto/40" aria-hidden="true" />
                   </div>
                 )}
                 <div className="p-5 flex-1 flex flex-col">
                   <div className="flex items-start justify-between gap-2 mb-1">
-                    <h3 className="font-serif text-xl text-ink leading-tight group-hover:text-olive-700 transition-colors">{op.name}</h3>
-                    <span className="flex-shrink-0 text-[10px] uppercase tracking-wider px-2 py-0.5 bg-cream-200 text-ink rounded-sm">
+                    <h3 className="font-display text-lg text-ink leading-tight group-hover:text-pesto-600 transition-colors">{op.name}</h3>
+                    <span className="flex-shrink-0 font-alt text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 bg-mimosa/30 text-ink rounded-full">
                       {CAT_LABEL[op.category] ?? op.category}
                     </span>
                   </div>
                   {op.market && (
-                    <p className="text-xs text-ink-muted uppercase tracking-wider mb-2">{op.market.name}</p>
+                    <p className="font-alt text-xs font-semibold text-ink-muted uppercase tracking-wider mb-2">{op.market.name}</p>
                   )}
                   {op.description && (
                     <p className="text-sm text-ink-soft line-clamp-2 mb-3">{op.description}</p>
@@ -197,7 +201,7 @@ export default function OperatoriHubPage() {
                     ) : (
                       preview.map((s) => (
                         <div key={s.scheduleId} className="flex items-center gap-1.5 text-xs text-ink-soft">
-                          <CalendarDays className="w-3 h-3 text-olive-500 flex-shrink-0" />
+                          <CalendarDays className="w-3.5 h-3.5 text-pesto flex-shrink-0" aria-hidden="true" />
                           <span className="truncate">
                             <strong className="text-ink">{s.comune}</strong> · {s.giorno}
                             {s.luogo && <span className="text-ink-muted"> — {s.luogo}</span>}

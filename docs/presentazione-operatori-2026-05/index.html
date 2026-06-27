@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>IMercati — Materiale per la presentazione</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream-50: #faf7f1;
+    --cream-100: #f4ede0;
+    --cream-300: #ddcdb0;
+    --ink: #2a2620;
+    --ink-soft: #4a4339;
+    --ink-muted: #7a6f60;
+    --olive-500: #7d8f4e;
+    --olive-600: #5d6e3b;
+    --olive-700: #44522a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, var(--cream-50) 0%, var(--cream-100) 100%);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 4rem 2rem;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  .mark { width: 60px; height: 3px; background: var(--olive-500); margin-bottom: 1.4rem; }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 3rem;
+    line-height: 1;
+    margin-bottom: 0.8rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .sub {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 1.2rem;
+    margin-bottom: 3rem;
+  }
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 0.75rem;
+    color: var(--olive-700);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+  }
+  .card {
+    background: white;
+    border: 1px solid var(--cream-300);
+    border-radius: 6px;
+    padding: 1.6rem 1.8rem;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: all 0.2s;
+  }
+  .card:hover {
+    border-color: var(--olive-500);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  }
+  .card .num {
+    font-family: 'Fraunces', serif;
+    font-size: 2.4rem;
+    color: var(--olive-500);
+    line-height: 1;
+    margin-bottom: 0.6rem;
+    font-weight: 500;
+  }
+  .card h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    color: var(--ink);
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+  }
+  .card p {
+    font-size: 0.92rem;
+    color: var(--ink-muted);
+    line-height: 1.5;
+  }
+  .card .meta {
+    margin-top: 0.8rem;
+    font-size: 0.78rem;
+    color: var(--olive-700);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .full-card {
+    grid-column: 1 / -1;
+    background: var(--ink);
+    color: var(--cream-100);
+    border-color: var(--ink);
+  }
+  .full-card:hover {
+    border-color: var(--olive-500);
+    background: #1f1c17;
+  }
+  .full-card h2 { color: var(--cream-50); }
+  .full-card p { color: var(--cream-300); }
+  .full-card .num { color: var(--olive-500); }
+  .full-card .meta { color: var(--olive-300); }
+
+  .checklist {
+    margin-top: 3rem;
+    background: white;
+    border: 1px solid var(--cream-300);
+    border-radius: 6px;
+    padding: 1.8rem 2rem;
+  }
+  .checklist h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    color: var(--ink);
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+  .checklist ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .checklist li {
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    padding-left: 1.6rem;
+    position: relative;
+  }
+  .checklist li::before {
+    content: '☐';
+    position: absolute;
+    left: 0;
+    color: var(--olive-500);
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+  .checklist li strong { color: var(--ink); font-weight: 600; }
+
+  .kbd {
+    display: inline-block;
+    padding: 0.1rem 0.4rem;
+    background: var(--cream-200);
+    border: 1px solid var(--cream-300);
+    border-radius: 3px;
+    font-family: 'Inter', monospace;
+    font-size: 0.78rem;
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .tips {
+    margin-top: 1.5rem;
+    background: var(--cream-100);
+    border-left: 3px solid var(--olive-500);
+    padding: 1rem 1.2rem;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    line-height: 1.55;
+  }
+  .tips strong { color: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="mark"></div>
+  <p class="eyebrow">IMercati · Maggio 2026</p>
+  <h1>Materiale per la presentazione</h1>
+  <p class="sub">Tre artefatti pronti all'uso, più una guida operativa.</p>
+
+  <div class="grid">
+    <a class="card full-card" href="presentazione.html">
+      <div class="num">01</div>
+      <h2>Presentazione slide (HTML)</h2>
+      <p>13 slide, navigabili con frecce o spazio. Pensata per essere proiettata davanti ai dieci operatori. Note speaker incluse — premi <span class="kbd">N</span> per mostrarle.</p>
+      <div class="meta">Apri nel browser →</div>
+    </a>
+
+    <a class="card" href="presentazione.pptx" download>
+      <div class="num">01·b</div>
+      <h2>Versione PPTX editabile</h2>
+      <p>Stessa presentazione in PowerPoint (Keynote / Google Slides compatibile). Modificabile slide per slide, note speaker incluse.</p>
+      <div class="meta">Scarica .pptx ↓</div>
+    </a>
+
+    <a class="card" href="volantino.html">
+      <div class="num">02</div>
+      <h2>Volantino A4</h2>
+      <p>Due facciate da stampare e lasciare ai partecipanti. Sintetizza l'offerta e il "patto".</p>
+      <div class="meta">Apri e stampa →</div>
+    </a>
+
+    <a class="card" href="form-onboarding.html">
+      <div class="num">03</div>
+      <h2>Form di onboarding</h2>
+      <p>34 domande in 6 sezioni. Stampabile e compilabile a mano. Si fa in dieci minuti.</p>
+      <div class="meta">Apri e stampa →</div>
+    </a>
+  </div>
+
+  <div class="checklist">
+    <h3>Checklist prima della presentazione</h3>
+    <ul>
+      <li>Sostituisci <strong>[TUO NOME]</strong>, <strong>[Telefono]</strong>, <strong>[Email]</strong> nei file (cerca le parentesi quadre).</li>
+      <li>Stampa <strong>10 copie del volantino</strong> a colori (fronte/retro).</li>
+      <li>Stampa <strong>10–15 copie del form</strong> (sì, anche di più — qualcuno lo passa a un collega).</li>
+      <li>Salva la <strong>presentazione in PDF</strong> di backup, nel caso la proiezione faccia i capricci (Stampa → Salva come PDF dal browser).</li>
+      <li>Genera un <strong>QR code</strong> per il form online (quando sarà online) e inseriscilo nelle ultime slide e nel volantino.</li>
+      <li>Prova la <strong>demo live</strong> della slide 5: connessione, audio, sito raggiungibile, profilo operatore di esempio già pronto.</li>
+      <li>Porta <strong>penne</strong>. Almeno 15.</li>
+      <li>Rileggi le <strong>FAQ obiezioni</strong> (file <code>04-faq-obiezioni.md</code>) il giorno prima.</li>
+      <li>Se modifichi la versione PPTX in PowerPoint, ricordati che <strong>la versione HTML non si aggiorna da sola</strong> (e viceversa). Scegline una come "master".</li>
+    </ul>
+  </div>
+
+  <div class="tips">
+    <strong>Tips per la proiezione</strong> — Apri <em>Presentazione slide</em> in fullscreen (premi <span class="kbd">F</span>). Naviga con <span class="kbd">←</span> <span class="kbd">→</span> o <span class="kbd">Spazio</span>. Premi <span class="kbd">N</span> per mostrare/nascondere le note speaker in basso (vedi tu, gli operatori vedono solo la slide). Per esportare in PDF: <span class="kbd">Ctrl+P</span> → Salva come PDF.
+  </div>
+</div>
+</body>
+</html>

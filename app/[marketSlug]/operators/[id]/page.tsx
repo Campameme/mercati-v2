@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, MapPin, Instagram, Facebook, Globe, Navigation2, CalendarDays } from 'lucide-react'
+import { ArrowLeft, MapPin, Instagram, Facebook, Globe, Navigation2, CalendarDays, MessageCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import FavoriteButton from '@/components/FavoriteButton'
+import PageviewTracker from '@/components/analytics/PageviewTracker'
 
 export const dynamic = 'force-dynamic'
 
@@ -47,6 +48,7 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-4xl">
+      <PageviewTracker type="view_operator" operatorId={operator.id} />
       <Link
         href={`/${params.marketSlug}/operators`}
         className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest-plus text-ink-muted hover:text-ink mb-3 transition-colors"
@@ -68,16 +70,28 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
               )}
             </div>
           </div>
-          {operator.location_lat != null && operator.location_lng != null && (
-            <a
-              href={`https://www.google.com/maps/dir/?api=1&destination=${operator.location_lat},${operator.location_lng}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-cream-100 rounded-full text-sm hover:bg-ink/90 transition-colors"
-            >
-              <Navigation2 className="w-4 h-4" /> Indicazioni
-            </a>
-          )}
+          <div className="flex-shrink-0 flex items-center gap-2">
+            {social.whatsapp && (
+              <a
+                href={social.whatsapp.startsWith('http') ? social.whatsapp : `https://wa.me/${social.whatsapp.replace(/[^0-9]/g, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#25D366] text-white rounded-full text-sm hover:opacity-90 transition-opacity"
+              >
+                <MessageCircle className="w-4 h-4" /> WhatsApp
+              </a>
+            )}
+            {operator.location_lat != null && operator.location_lng != null && (
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${operator.location_lat},${operator.location_lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-cream-100 rounded-full text-sm hover:bg-ink/90 transition-colors"
+              >
+                <Navigation2 className="w-4 h-4" /> Indicazioni
+              </a>
+            )}
+          </div>
         </div>
         {operator.description && <p className="text-ink-soft mt-4 max-w-2xl">{operator.description}</p>}
       </div>

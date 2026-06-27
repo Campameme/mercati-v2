@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>IMercati — Form di onboarding operatore</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream-50: #faf7f1;
+    --cream-100: #f4ede0;
+    --cream-200: #ebe0cc;
+    --cream-300: #ddcdb0;
+    --ink: #2a2620;
+    --ink-soft: #4a4339;
+    --ink-muted: #7a6f60;
+    --olive-50: #f0f1e4;
+    --olive-300: #b8c182;
+    --olive-500: #7d8f4e;
+    --olive-600: #5d6e3b;
+    --olive-700: #44522a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  @page { size: A4; margin: 14mm 16mm; }
+
+  html, body {
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    background: #555;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.45;
+  }
+
+  .doc {
+    width: 210mm;
+    min-height: 297mm;
+    background: var(--cream-50);
+    margin: 1rem auto;
+    padding: 16mm 18mm;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+
+  .serif { font-family: 'Fraunces', serif; letter-spacing: -0.01em; }
+
+  header {
+    border-bottom: 2px solid var(--olive-500);
+    padding-bottom: 0.9rem;
+    margin-bottom: 1.4rem;
+  }
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 0.7rem;
+    color: var(--olive-700);
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 2rem;
+    color: var(--ink);
+    font-weight: 500;
+    line-height: 1.1;
+    margin-bottom: 0.4rem;
+  }
+  .lede {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+  }
+
+  section {
+    margin-bottom: 1.4rem;
+    page-break-inside: avoid;
+  }
+
+  .section-head {
+    background: var(--olive-50);
+    border-left: 3px solid var(--olive-500);
+    padding: 0.6rem 0.9rem;
+    margin-bottom: 0.9rem;
+  }
+  .section-head h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.15rem;
+    color: var(--olive-700);
+    font-weight: 600;
+  }
+  .section-head .sub {
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+    margin-top: 0.15rem;
+    font-style: italic;
+  }
+
+  .q {
+    margin-bottom: 0.9rem;
+    font-size: 0.88rem;
+  }
+  .q-num {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    color: var(--olive-700);
+    margin-right: 0.3rem;
+  }
+  .q-text {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .q-hint {
+    color: var(--ink-muted);
+    font-style: italic;
+    font-size: 0.78rem;
+    margin-top: 0.15rem;
+    display: block;
+  }
+
+  .line {
+    border-bottom: 1px solid var(--cream-300);
+    height: 1.6rem;
+    margin-top: 0.4rem;
+  }
+  .line.short { width: 50%; display: inline-block; vertical-align: bottom; }
+
+  .check-row {
+    margin-top: 0.4rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem 1.3rem;
+  }
+  .check-row label {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+  }
+  .check-row .box {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid var(--ink-soft);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .check-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-top: 0.4rem;
+  }
+  .check-stack label {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .check-stack .box {
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid var(--ink-soft);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  table.markets {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.6rem;
+    font-size: 0.8rem;
+  }
+  table.markets th {
+    text-align: left;
+    background: var(--cream-200);
+    color: var(--ink);
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    padding: 0.4rem 0.5rem;
+    border: 1px solid var(--cream-300);
+    font-size: 0.78rem;
+  }
+  table.markets td {
+    border: 1px solid var(--cream-300);
+    height: 1.8rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .scale {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.4rem;
+    align-items: center;
+  }
+  .scale .opt {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+  .scale .opt .box {
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid var(--ink-soft);
+    border-radius: 2px;
+  }
+  .scale-hint {
+    font-size: 0.75rem;
+    color: var(--ink-muted);
+    font-style: italic;
+    margin-top: 0.3rem;
+  }
+
+  .signature {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--cream-300);
+  }
+  .signature .consent {
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .signature .consent .box {
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid var(--ink-soft);
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .sig-line {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1.4rem;
+    align-items: flex-end;
+  }
+  .sig-line .field {
+    flex: 1;
+  }
+  .sig-line .field .lbl {
+    font-size: 0.7rem;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.2rem;
+  }
+  .sig-line .field .underline {
+    border-bottom: 1px solid var(--ink-soft);
+    height: 1.6rem;
+  }
+  .sig-line .field.date { max-width: 140px; }
+
+  .footer-doc {
+    margin-top: 1.4rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--cream-300);
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+    text-align: center;
+    font-style: italic;
+  }
+
+  .toolbar {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: var(--ink);
+    color: var(--cream-50);
+    padding: 0.6rem 1rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    z-index: 100;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+  }
+
+  @media print {
+    body { background: white; }
+    .doc { margin: 0; box-shadow: none; padding: 0; min-height: auto; }
+    .toolbar { display: none; }
+    .section-head, .q, table.markets { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<button class="toolbar" onclick="window.print()">Stampa / Salva PDF</button>
+
+<div class="doc">
+  <header>
+    <div class="eyebrow">Form di onboarding · IMercati</div>
+    <h1 class="serif">Operatore di mercato</h1>
+    <p class="lede">Dieci minuti, domande semplici. Le risposte servono per fare il vostro profilo e raccontare la vostra storia.</p>
+  </header>
+
+  <!-- A. Voi -->
+  <section>
+    <div class="section-head">
+      <h2>A · Voi</h2>
+      <div class="sub">Le info di base per la scheda</div>
+    </div>
+
+    <div class="q">
+      <span class="q-num">1.</span><span class="q-text">Nome e cognome</span>
+      <div class="line"></div>
+    </div>
+    <div class="q">
+      <span class="q-num">2.</span><span class="q-text">Nome dell'attività</span>
+      <span class="q-hint">(se diverso dal vostro — es. "Da Maria Frutta e Verdura")</span>
+      <div class="line"></div>
+    </div>
+    <div class="q">
+      <span class="q-num">3.</span><span class="q-text">Da quanti anni lavorate al mercato?</span>
+      <div class="check-row">
+        <label><span class="box"></span>Meno di 5</label>
+        <label><span class="box"></span>5–10</label>
+        <label><span class="box"></span>10–20</label>
+        <label><span class="box"></span>Più di 20</label>
+        <label><span class="box"></span>Famiglia, generazione: ____</label>
+      </div>
+    </div>
+    <div class="q">
+      <span class="q-num">4.</span><span class="q-text">Telefono</span>
+      <span class="q-hint">(non sarà pubblicato senza il vostro ok)</span>
+      <div class="line"></div>
+    </div>
+    <div class="q">
+      <span class="q-num">5.</span><span class="q-text">Email</span>
+      <div class="line"></div>
+    </div>
+    <div class="q">
+      <span class="q-num">6.</span><span class="q-text">Avete WhatsApp Business?</span>
+      <div class="check-row">
+        <label><span class="box"></span>Sì</label>
+        <label><span class="box"></span>No</label>
+        <label><span class="box"></span>Non so cos'è</label>
+      </div>
+    </div>
+    <div class="q">
+      <span class="q-num">7.</span><span class="q-text">Volete che la vostra faccia compaia sul profilo?</span>
+      <div class="check-stack">
+        <label><span class="box"></span>Sì, va bene</label>
+        <label><span class="box"></span>Preferisco solo il banco / i prodotti</label>
+        <label><span class="box"></span>Decidiamo dopo aver visto le foto</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- B. Il banco -->
+  <section>
+    <div class="section-head">
+      <h2>B · Il banco</h2>
+      <div class="sub">Cosa vendete</div>
+    </div>
+
+    <div class="q">
+      <span class="q-num">8.</span><span class="q-text">Categoria principale</span>
+      <span class="q-hint">(potete sceglierne anche due)</span>
+      <div class="check-row" style="margin-top: 0.5rem;">
+        <label><span class="box"></span>Frutta e verdura</label>
+        <label><span class="box"></span>Formaggi e latticini</label>
+        <label><span class="box"></span>Salumi e carne</label>
+        <label><span class="box"></span>Pesce</label>
+        <label><span class="box"></span>Pane e prodotti da forno</label>
+        <label><span class="box"></span>Olio, conserve, tipici</label>
+        <label><span class="box"></span>Fiori e piante</label>
+        <label><span class="box"></span>Abbigliamento</label>
+        <label><span class="box"></span>Calzature, pelletteria</label>
+        <label><span class="box"></span>Casalinghi</label>
+        <label><span class="box"></span>Altro: ____________</label>
+      </div>
+    </div>
+    <div class="q">
+      <span class="q-num">9.</span><span class="q-text">3–5 prodotti che dovrebbero far venire la gente da voi</span>
+      <span class="q-hint">(i vostri "cavalli di battaglia")</span>
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+    <div class="q">
+      <span class="q-num">10.</span><span class="q-text">Lavorate solo prodotti vostri / della zona, o anche di importazione?</span>
+      <div class="check-row">
+        <label><span class="box"></span>Solo nostri / locali</label>
+        <label><span class="box"></span>Misto</label>
+        <label><span class="box"></span>Per lo più di importazione</label>
+        <label><span class="box"></span>Non si applica</label>
+      </div>
+    </div>
+    <div class="q">
+      <span class="q-num">11.</span><span class="q-text">Avete qualcosa di stagionale che vendete solo in certi periodi?</span>
+      <span class="q-hint">(es. funghi a settembre, mimose a marzo)</span>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+    <div class="q">
+      <span class="q-num">12.</span><span class="q-text">Una cosa che vendete voi e nessun altro al mercato fa?</span>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+  </section>
+
+  <!-- C. Dove e quando -->
+  <section>
+    <div class="section-head">
+      <h2>C · Dove e quando</h2>
+      <div class="sub">A quali mercati siete presenti</div>
+    </div>
+
+    <div class="q">
+      <span class="q-num">13.</span><span class="q-text">A quali mercati siete presenti?</span>
+      <table class="markets">
+        <thead>
+          <tr>
+            <th>Giorno</th>
+            <th>Comune</th>
+            <th>Da che ora</th>
+            <th>A che ora</th>
+            <th>Da quanti anni</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="q">
+      <span class="q-num">14.</span><span class="q-text">Avete una posizione fissa al banco?</span>
+      <span class="q-hint">(es. "vicino alla chiesa", "tra Maria e il bar")</span>
+      <div class="line"></div>
+    </div>
+    <div class="q">
+      <span class="q-num">15.</span><span class="q-text">Modalità di pagamento accettate</span>
+      <div class="check-row">
+        <label><span class="box"></span>Contanti</label>
+        <label><span class="box"></span>Carta / bancomat</label>
+        <label><span class="box"></span>Satispay</label>
+        <label><span class="box"></span>Bonifico</label>
+        <label><span class="box"></span>Altro: ____</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- D. La storia -->
+  <section>
+    <div class="section-head">
+      <h2>D · La storia</h2>
+      <div class="sub">Questa è la parte che vale. Risposte brevi, anche scritte a pezzi. Servono a noi per scrivere il vostro profilo con la vostra voce.</div>
+    </div>
+
+    <div class="q">
+      <span class="q-num">16.</span><span class="q-text">Perché fate questo lavoro?</span>
+      <span class="q-hint">Una riga, due. La prima cosa che vi viene in mente.</span>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+    <div class="q">
+      <span class="q-num">17.</span><span class="q-text">Una storia che raccontate sempre ai clienti</span>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+    <div class="q">
+      <span class="q-num">18.</span><span class="q-text">Chi vi ha insegnato il mestiere?</span>
+      <div class="line"></div>
+    </div>
+    <div class="q">
+      <span class="q-num">19.</span><span class="q-text">Cosa è cambiato di più, secondo voi, negli ultimi 10 anni al mercato?</span>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+    <div class="q">
+      <span class="q-num">20.</span><span class="q-text">Qual è la cosa più bella di stare al mercato?</span>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+    <div class="q">
+      <span class="q-num">21.</span><span class="q-text">E quella che vi pesa di più?</span>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+    <div class="q">
+      <span class="q-num">22.</span><span class="q-text">Un ricordo del mercato che vi è rimasto impresso</span>
+      <span class="q-hint">(bello, buffo, commovente — qualunque cosa)</span>
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+  </section>
+
+  <!-- E. Digitale -->
+  <section>
+    <div class="section-head">
+      <h2>E · Il digitale che avete già</h2>
+      <div class="sub">Per capire da dove partiamo</div>
+    </div>
+
+    <div class="q">
+      <span class="q-num">23.</span><span class="q-text">Facebook dell'attività?</span>
+      <div class="check-stack">
+        <label><span class="box"></span>Sì → link/nome: ____________________________</label>
+        <label><span class="box"></span>No, ma quello personale lo uso</label>
+        <label><span class="box"></span>No, niente</label>
+      </div>
+    </div>
+    <div class="q">
+      <span class="q-num">24.</span><span class="q-text">Instagram?</span>
+      <div class="check-stack">
+        <label><span class="box"></span>Sì → @ ____________________</label>
+        <label><span class="box"></span>No, ma vorrei</label>
+        <label><span class="box"></span>No e non mi interessa</label>
+      </div>
+    </div>
+    <div class="q">
+      <span class="q-num">25.</span><span class="q-text">TikTok?</span>
+      <div class="check-stack">
+        <label><span class="box"></span>Sì → @ ____________________</label>
+        <label><span class="box"></span>No, ma vorrei capire</label>
+        <label><span class="box"></span>No e non mi interessa</label>
+      </div>
+    </div>
+    <div class="q">
+      <span class="q-num">26.</span><span class="q-text">Sito o pagina web?</span>
+      <div class="check-stack">
+        <label><span class="box"></span>Sì → ____________________</label>
+        <label><span class="box"></span>No</label>
+      </div>
+    </div>
+    <div class="q">
+      <span class="q-num">27.</span><span class="q-text">Vendete anche online?</span>
+      <div class="check-stack">
+        <label><span class="box"></span>Sì, in modo regolare</label>
+        <label><span class="box"></span>Qualche volta, su richiesta</label>
+        <label><span class="box"></span>No, mai</label>
+        <label><span class="box"></span>Mi piacerebbe ma non so come</label>
+      </div>
+    </div>
+    <div class="q">
+      <span class="q-num">28.</span><span class="q-text">Quanto vi sentite a vostro agio col digitale?</span>
+      <div class="scale">
+        <span class="opt"><span class="box"></span>1</span>
+        <span class="opt"><span class="box"></span>2</span>
+        <span class="opt"><span class="box"></span>3</span>
+        <span class="opt"><span class="box"></span>4</span>
+        <span class="opt"><span class="box"></span>5</span>
+      </div>
+      <div class="scale-hint">1 = "lo uso solo per chiamare" · 5 = "ci faccio tutto"</div>
+    </div>
+    <div class="q">
+      <span class="q-num">29.</span><span class="q-text">Chi vi aiuta col digitale, se qualcuno?</span>
+      <div class="check-row">
+        <label><span class="box"></span>Figli / nipoti</label>
+        <label><span class="box"></span>Coniuge</label>
+        <label><span class="box"></span>Nessuno, faccio da solo</label>
+        <label><span class="box"></span>Pago qualcuno</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- F. Cosa vorreste -->
+  <section>
+    <div class="section-head">
+      <h2>F · Cosa vorreste</h2>
+      <div class="sub">Le vostre aspettative, scetticismo incluso</div>
+    </div>
+
+    <div class="q">
+      <span class="q-num">30.</span><span class="q-text">Cosa vi aspettate da IMercati nei primi 6 mesi?</span>
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+    <div class="q">
+      <span class="q-num">31.</span><span class="q-text">Che tipo di contenuti vi piacerebbe fare?</span>
+      <div class="check-stack">
+        <label><span class="box"></span>Foto dei prodotti</label>
+        <label><span class="box"></span>Brevi video al banco mentre lavorate</label>
+        <label><span class="box"></span>"Storie" — un ricordo, una ricetta, un consiglio</label>
+        <label><span class="box"></span>Annunci settimanali ("questa settimana al banco c'è…")</label>
+        <label><span class="box"></span>Ricette o suggerimenti d'uso del prodotto</label>
+        <label><span class="box"></span>Non lo so, decidiamo insieme</label>
+      </div>
+    </div>
+    <div class="q">
+      <span class="q-num">32.</span><span class="q-text">Cosa NON volete che facciamo?</span>
+      <span class="q-hint">(Importante. Limiti chiari aiutano.)</span>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+    <div class="q">
+      <span class="q-num">33.</span><span class="q-text">Un altro operatore che secondo voi dovremmo coinvolgere?</span>
+      <span class="q-hint">(Anche solo "il pescivendolo di Oneglia il sabato")</span>
+      <div class="line"></div>
+    </div>
+    <div class="q">
+      <span class="q-num">34.</span><span class="q-text">Cosa vorreste cambiare nel modo in cui i mercati vengono raccontati?</span>
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+  </section>
+
+  <!-- Consenso -->
+  <div class="signature">
+    <div class="consent"><span class="box"></span><span>Acconsento alla pubblicazione del mio profilo sul sito IMercati con le informazioni fornite (modificabili in qualsiasi momento).</span></div>
+    <div class="consent"><span class="box"></span><span>Acconsento al trattamento dei dati personali per le finalità del progetto (informativa privacy in coda).</span></div>
+    <div class="consent"><span class="box"></span><span>Acconsento all'uso delle foto e video raccolti durante la giornata al banco, per il profilo e per i canali social di IMercati.</span></div>
+
+    <div class="sig-line">
+      <div class="field">
+        <div class="lbl">Firma operatore</div>
+        <div class="underline"></div>
+      </div>
+      <div class="field date">
+        <div class="lbl">Data</div>
+        <div class="underline"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-doc">
+    Restituibile a [TUO NOME / EMAIL / TELEFONO]. Possiamo compilarlo anche insieme, di persona o al telefono.
+  </div>
+</div>
+
+</body>
+</html>

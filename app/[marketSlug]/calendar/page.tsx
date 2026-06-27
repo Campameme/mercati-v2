@@ -15,7 +15,7 @@ import {
   CATEGORY_LABEL as SCH_LABEL,
   type ScheduleCategory,
 } from '@/lib/schedules/classify'
-import { OliveSprig } from '@/components/decorations'
+import { WaveTaglia } from '@/components/decorations'
 
 const EVT_LABEL: Record<string, string> = {
   market: 'Mercato', fair: 'Fiera', food: 'Gastronomia', music: 'Musica',
@@ -161,7 +161,7 @@ export default function ZoneCalendarPage() {
           <ArrowLeft className="w-3.5 h-3.5" /> {marketName ?? 'Zona'}
         </Link>
         <div className="flex items-center gap-3 mb-2 text-ink-soft">
-          <OliveSprig className="w-8 h-2.5 text-olive-500" />
+          <WaveTaglia className="w-8 h-2.5 text-pesto" aria-hidden="true" />
           <p className="text-[0.72rem] uppercase tracking-widest-plus">{marketName ?? 'Zona'} · calendario</p>
         </div>
         <h1 className="font-serif text-3xl md:text-5xl text-ink leading-tight">Calendario della zona</h1>

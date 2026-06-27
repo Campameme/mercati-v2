@@ -10,6 +10,7 @@ export interface Operator {
     facebook?: string
     instagram?: string
     website?: string
+    whatsapp?: string
   }
   location: {
     lat: number

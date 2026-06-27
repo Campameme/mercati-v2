@@ -3,10 +3,11 @@ import { notFound } from 'next/navigation'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { slugifyName } from '@/lib/markets/slug'
-import { OliveSprig } from '@/components/decorations'
+import { WaveTaglia } from '@/components/decorations'
 import ZoneImage from '@/components/ZoneImage'
 import Reveal from '@/components/Reveal'
 import ComuneSessionsExplorer from '@/components/ComuneSessionsExplorer'
+import PageviewTracker from '@/components/analytics/PageviewTracker'
 
 export const dynamic = 'force-dynamic'
 
@@ -62,18 +63,19 @@ export default async function ComunePage({
 
   return (
     <div>
+      <PageviewTracker type="view_comune" marketId={market.id} comune={comune} />
       {/* HERO compatto: foto sx, titolo dx. Mappa è sotto in ComuneSessionsExplorer */}
-      <section className="border-b border-cream-300">
+      <section className="border-b-2 border-ink/10">
         <div className="container mx-auto px-4 md:px-6 py-8 md:py-10 max-w-6xl">
           <div className="grid md:grid-cols-[220px_1fr] gap-6 md:gap-10 items-start">
             <Reveal>
               <Link
                 href={`/${market.slug}`}
-                className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest-plus text-ink-muted hover:text-ink mb-3 transition-colors"
+                className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-pesto-600 mb-3 transition-colors"
               >
                 <ChevronLeft className="w-3.5 h-3.5" /> {market.name}
               </Link>
-              <div className="rounded-sm overflow-hidden border border-cream-300 shadow-sm bg-cream-50 p-1.5">
+              <div className="rounded-xl overflow-hidden border-2 border-ink/10 shadow-sm bg-white p-1.5">
                 <ZoneImage query={comune} alt={comune} aspect="aspect-[4/5]" priority />
               </div>
               <p className="mt-2 text-[11px] text-ink-muted italic">{comune} · via Wikipedia</p>
@@ -81,10 +83,10 @@ export default async function ComunePage({
 
             <Reveal>
               <div className="flex items-center gap-3 mb-3 text-ink-soft">
-                <OliveSprig className="w-8 h-2.5 text-olive-500" />
-                <p className="text-[0.72rem] uppercase tracking-widest-plus">Comune</p>
+                <WaveTaglia className="w-8 h-2.5 text-pesto" aria-hidden="true" />
+                <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">Comune</p>
               </div>
-              <h1 className="font-serif text-3xl md:text-5xl text-ink leading-[1.04]">{comune}</h1>
+              <h1 className="font-display text-3xl md:text-5xl text-ink leading-[1.06]">{comune}</h1>
               <p className="mt-3 text-sm text-ink-soft">
                 {forComune.length} {forComune.length === 1 ? 'mercato' : 'mercati'} · {market.name}
               </p>
@@ -105,29 +107,29 @@ export default async function ComunePage({
 
         {/* Nav prev/next tra comuni della stessa zona */}
         {(prevComune || nextComune) && (
-          <nav className="grid grid-cols-2 gap-3 mt-12 pt-8 border-t border-cream-300 text-sm">
+          <nav className="grid grid-cols-2 gap-3 mt-12 pt-8 border-t-2 border-ink/10 text-sm">
             {prevComune ? (
               <Link
                 href={`/${market.slug}/c/${slugifyName(prevComune)}`}
-                className="group flex items-center gap-3 px-4 py-3 bg-cream-50 border border-cream-300 rounded-sm hover:border-olive-500 hover:-translate-y-0.5 transition-all"
+                className="imk-lift group flex items-center gap-3 px-4 py-3 bg-white border-2 border-ink/10 rounded-xl hover:border-pesto transition-colors"
               >
-                <ChevronLeft className="w-4 h-4 text-olive-500 group-hover:-translate-x-0.5 transition-transform" />
+                <ChevronLeft className="w-4 h-4 text-pesto group-hover:-translate-x-0.5 transition-transform" />
                 <div className="min-w-0">
-                  <p className="text-[10px] uppercase tracking-widest-plus text-ink-muted">Comune precedente</p>
-                  <p className="font-serif text-base text-ink truncate">{prevComune}</p>
+                  <p className="font-alt text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Comune precedente</p>
+                  <p className="font-display text-base text-ink truncate">{prevComune}</p>
                 </div>
               </Link>
             ) : <div />}
             {nextComune ? (
               <Link
                 href={`/${market.slug}/c/${slugifyName(nextComune)}`}
-                className="group flex items-center justify-end gap-3 px-4 py-3 bg-cream-50 border border-cream-300 rounded-sm hover:border-olive-500 hover:-translate-y-0.5 transition-all text-right"
+                className="imk-lift group flex items-center justify-end gap-3 px-4 py-3 bg-white border-2 border-ink/10 rounded-xl hover:border-pesto transition-colors text-right"
               >
                 <div className="min-w-0">
-                  <p className="text-[10px] uppercase tracking-widest-plus text-ink-muted">Comune successivo</p>
-                  <p className="font-serif text-base text-ink truncate">{nextComune}</p>
+                  <p className="font-alt text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Comune successivo</p>
+                  <p className="font-display text-base text-ink truncate">{nextComune}</p>
                 </div>
-                <ChevronRight className="w-4 h-4 text-olive-500 group-hover:translate-x-0.5 transition-transform" />
+                <ChevronRight className="w-4 h-4 text-pesto group-hover:translate-x-0.5 transition-transform" />
               </Link>
             ) : <div />}
           </nav>

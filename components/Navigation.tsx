@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Menu, Shield, LogIn } from 'lucide-react'
 import WeatherWidget from './WeatherWidget'
-import { OliveSprig } from './decorations'
+import { WaveTaglia } from './decorations'
 import NavMenu from './NavMenu'
 import { useMarketSlug } from '@/lib/markets/useMarketSlug'
 import { createClient } from '@/lib/supabase/client'
@@ -33,9 +33,12 @@ export default function Navigation() {
     return () => { active = false }
   }, [pathname])
 
+  // La home (mappa-centrica) ha la propria hero/barra: niente vecchio header lì.
+  if (pathname === '/') return null
+
   return (
     <>
-      <nav className="bg-cream-100/85 backdrop-blur-sm border-b border-cream-300 sticky top-0 z-50">
+      <nav className="bg-paper/90 backdrop-blur-sm border-b-2 border-ink/10 sticky top-0 z-50">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between h-16">
             {/* Left: menu button + logo */}
@@ -43,15 +46,15 @@ export default function Navigation() {
               <button
                 onClick={() => setMenuOpen(true)}
                 aria-label="Apri menu"
-                className="flex items-center gap-2 px-3 py-2 rounded-full border border-cream-300 bg-cream-50 hover:bg-cream-200 text-ink transition-colors"
+                className="flex items-center gap-2 px-3.5 py-2 rounded-full border-2 border-ink/15 bg-white hover:border-pesto text-ink transition-colors"
               >
                 <Menu className="w-4 h-4" />
-                <span className="text-xs uppercase tracking-widest-plus hidden sm:inline">Menu</span>
+                <span className="font-alt text-xs font-semibold uppercase tracking-[0.12em] hidden sm:inline">Menu</span>
               </button>
-              <Link href="/" className="flex items-center gap-2.5" aria-label="IMercati — home">
-                <OliveSprig className="w-10 h-3 text-olive-500 -mb-1 hidden sm:block" />
-                <span className="font-serif text-[1.5rem] leading-none text-ink tracking-tight">
-                  <span className="italic">I</span><span className="font-medium">Mercati</span>
+              <Link href="/" className="flex items-center gap-2.5" aria-label="iMercati — home">
+                <WaveTaglia className="w-10 h-3 text-pesto -mb-0.5 hidden sm:block" aria-hidden="true" />
+                <span className="font-display text-[1.4rem] leading-none text-ink">
+                  i<span className="text-pesto">M</span>ercati
                 </span>
               </Link>
             </div>
@@ -62,7 +65,7 @@ export default function Navigation() {
               {(role === 'super_admin' || role === 'market_admin') && marketSlug && (
                 <Link
                   href={`/${marketSlug}/admin`}
-                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-sm text-ink-soft hover:text-ink"
+                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 font-alt text-sm font-semibold text-ink-soft hover:text-pesto-600 transition-colors"
                 >
                   <Shield className="w-4 h-4" />
                   <span>Gestisci</span>
@@ -71,7 +74,7 @@ export default function Navigation() {
               {!role && (
                 <Link
                   href="/login"
-                  className="flex items-center gap-1.5 px-4 py-1.5 bg-ink text-cream-100 rounded-full text-sm hover:bg-ink/90 transition-colors"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-ink text-paper rounded-full font-alt text-sm font-semibold hover:bg-pesto transition-colors"
                 >
                   <LogIn className="w-4 h-4" />
                   <span className="hidden sm:inline">Accedi</span>

@@ -31,7 +31,8 @@ export async function updateSession(request: NextRequest) {
 
   const needsAuth =
     pathname.startsWith('/admin') ||
-    pathname.startsWith('/operator') ||
+    pathname === '/operator' ||
+    pathname.startsWith('/operator/') || // dashboard operatore (NON la pubblica /operatori)
     pathname.match(/^\/[^\/]+\/admin/)
   if (needsAuth && !user) {
     const url = request.nextUrl.clone()

@@ -9,7 +9,7 @@ import UnifiedMapClient from '@/components/UnifiedMapClient'
 import FavoriteButton from '@/components/FavoriteButton'
 import type { UnifiedMapPin } from '@/components/UnifiedMap'
 import { Operator, OperatorCategory } from '@/types/operator'
-import { OliveSprig } from '@/components/decorations'
+import { WaveTaglia } from '@/components/decorations'
 import { useFavorites } from '@/lib/favorites'
 
 const CAT_LABEL: Record<string, string> = {
@@ -127,7 +127,7 @@ export default function OperatorsPage() {
     <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl">
       <div className="mb-8 border-b border-cream-300 pb-5">
         <div className="flex items-center gap-3 mb-2 text-ink-soft">
-          <OliveSprig className="w-8 h-2.5 text-olive-500" />
+          <WaveTaglia className="w-8 h-2.5 text-pesto" aria-hidden="true" />
           <p className="text-[0.72rem] uppercase tracking-widest-plus">{marketCity ?? 'Mercato'}</p>
         </div>
         <h1 className="font-serif text-3xl md:text-4xl text-ink leading-tight">

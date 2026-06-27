@@ -79,103 +79,105 @@ export default function AdminEventsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <Link href={`/${slug}/admin`} className="text-sm text-gray-600 hover:text-primary-600 flex items-center"><ArrowLeft className="w-4 h-4 mr-1" /> Gestione mercato</Link>
-          <h1 className="text-3xl font-bold text-gray-900 mt-1">Eventi</h1>
+    <div className="min-h-screen bg-paper">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <Link href={`/${slug}/admin`} className="text-xs font-alt uppercase tracking-wider text-ink-muted hover:text-ink flex items-center transition-colors"><ArrowLeft className="w-4 h-4 mr-1" /> Gestione mercato</Link>
+            <h1 className="font-display text-3xl text-ink mt-1">Eventi</h1>
+          </div>
+          <button onClick={openNew} className="flex items-center gap-2 px-4 py-2.5 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 transition-colors">
+            <Plus className="w-4 h-4" /> <span>Nuovo evento</span>
+          </button>
         </div>
-        <button onClick={openNew} className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">
-          <Plus className="w-4 h-4" /> <span>Nuovo evento</span>
-        </button>
-      </div>
 
-      {loading ? (
-        <p>Caricamento…</p>
-      ) : (
-        <div className="bg-white rounded-xl shadow divide-y">
-          {items.length === 0 && <p className="p-6 text-center text-gray-500">Nessun evento.</p>}
-          {items.map((e) => (
-            <div key={e.id} className="p-4 flex items-start justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1 flex-wrap">
-                  <span className="text-xs px-2 py-0.5 bg-primary-100 text-primary-700 rounded">{CAT_LABEL[e.category] ?? e.category}</span>
-                  {e.is_recurring && <span className="text-xs text-gray-500 flex items-center"><Repeat className="w-3 h-3 mr-1" />ricorrente</span>}
+        {loading ? (
+          <p className="text-ink-soft">Caricamento…</p>
+        ) : (
+          <div className="bg-white rounded-xl border-2 border-ink/10 divide-y divide-ink/10">
+            {items.length === 0 && <p className="p-6 text-center text-ink-muted">Nessun evento.</p>}
+            {items.map((e) => (
+              <div key={e.id} className="p-4 flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <span className="text-[10px] font-alt uppercase tracking-wider px-2 py-0.5 bg-pesto/15 text-pesto-700 rounded-full">{CAT_LABEL[e.category] ?? e.category}</span>
+                    {e.is_recurring && <span className="text-xs text-ink-muted flex items-center"><Repeat className="w-3 h-3 mr-1" />ricorrente</span>}
+                  </div>
+                  <h3 className="font-alt text-base text-ink">{e.title}</h3>
+                  {e.description && <p className="text-sm text-ink-soft line-clamp-2 mt-1">{e.description}</p>}
+                  <p className="text-xs text-ink-muted mt-2">
+                    {new Date(e.start_at).toLocaleString('it-IT')}{e.end_at ? ` → ${new Date(e.end_at).toLocaleString('it-IT')}` : ''}
+                    {e.location ? ` • ${e.location}` : ''}
+                  </p>
                 </div>
-                <h3 className="font-semibold text-gray-900">{e.title}</h3>
-                {e.description && <p className="text-sm text-gray-600 line-clamp-2 mt-1">{e.description}</p>}
-                <p className="text-xs text-gray-500 mt-2">
-                  {new Date(e.start_at).toLocaleString('it-IT')}{e.end_at ? ` → ${new Date(e.end_at).toLocaleString('it-IT')}` : ''}
-                  {e.location ? ` • ${e.location}` : ''}
-                </p>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <button onClick={() => setEditing(e)} className="p-2 text-ink-muted hover:text-pesto-600 transition-colors" title="Modifica"><Pencil className="w-4 h-4" /></button>
+                  <button onClick={() => remove(e.id)} className="p-2 text-ink-muted hover:text-coral-600 transition-colors" title="Elimina"><Trash2 className="w-4 h-4" /></button>
+                </div>
               </div>
-              <div className="flex items-center gap-1 flex-shrink-0">
-                <button onClick={() => setEditing(e)} className="p-2 text-gray-600 hover:text-primary-600" title="Modifica"><Pencil className="w-4 h-4" /></button>
-                <button onClick={() => remove(e.id)} className="p-2 text-gray-600 hover:text-red-600" title="Elimina"><Trash2 className="w-4 h-4" /></button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
 
-      {editing && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-xl font-semibold">{editing.id ? 'Modifica evento' : 'Nuovo evento'}</h2>
-              <button onClick={() => setEditing(null)} className="text-gray-500 hover:text-gray-700"><X className="w-5 h-5" /></button>
-            </div>
-            <div className="p-6 space-y-4">
-              <label className="block">
-                <span className="text-sm font-medium text-gray-700">Titolo</span>
-                <input value={editing.title ?? ''} onChange={(ev) => setEditing({ ...editing, title: ev.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
-              </label>
-              <label className="block">
-                <span className="text-sm font-medium text-gray-700">Descrizione</span>
-                <textarea value={editing.description ?? ''} onChange={(ev) => setEditing({ ...editing, description: ev.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                <label className="block">
-                  <span className="text-sm font-medium text-gray-700">Categoria</span>
-                  <select value={editing.category ?? 'other'} onChange={(ev) => setEditing({ ...editing, category: ev.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md">
-                    {CATEGORIES.map((c) => <option key={c} value={c}>{CAT_LABEL[c]}</option>)}
-                  </select>
-                </label>
-                <label className="block">
-                  <span className="text-sm font-medium text-gray-700">Luogo</span>
-                  <input value={editing.location ?? ''} onChange={(ev) => setEditing({ ...editing, location: ev.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
-                </label>
+        {editing && (
+          <div className="fixed inset-0 z-50 bg-night/60 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl border-2 border-ink/10 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between p-6 border-b-2 border-ink/10">
+                <h2 className="font-display text-xl text-ink">{editing.id ? 'Modifica evento' : 'Nuovo evento'}</h2>
+                <button onClick={() => setEditing(null)} className="text-ink-muted hover:text-ink transition-colors"><X className="w-5 h-5" /></button>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="p-6 space-y-4">
                 <label className="block">
-                  <span className="text-sm font-medium text-gray-700">Inizio</span>
-                  <input type="datetime-local" value={toLocalInput(editing.start_at)} onChange={(ev) => setEditing({ ...editing, start_at: fromLocalInput(ev.target.value) ?? new Date().toISOString() })} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
+                  <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Titolo</span>
+                  <input value={editing.title ?? ''} onChange={(ev) => setEditing({ ...editing, title: ev.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-medium text-gray-700">Fine (opz.)</span>
-                  <input type="datetime-local" value={toLocalInput(editing.end_at)} onChange={(ev) => setEditing({ ...editing, end_at: fromLocalInput(ev.target.value) })} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
+                  <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Descrizione</span>
+                  <textarea value={editing.description ?? ''} onChange={(ev) => setEditing({ ...editing, description: ev.target.value })} rows={3} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
                 </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="block">
+                    <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Categoria</span>
+                    <select value={editing.category ?? 'other'} onChange={(ev) => setEditing({ ...editing, category: ev.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors">
+                      {CATEGORIES.map((c) => <option key={c} value={c}>{CAT_LABEL[c]}</option>)}
+                    </select>
+                  </label>
+                  <label className="block">
+                    <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Luogo</span>
+                    <input value={editing.location ?? ''} onChange={(ev) => setEditing({ ...editing, location: ev.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+                  </label>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="block">
+                    <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Inizio</span>
+                    <input type="datetime-local" value={toLocalInput(editing.start_at)} onChange={(ev) => setEditing({ ...editing, start_at: fromLocalInput(ev.target.value) ?? new Date().toISOString() })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+                  </label>
+                  <label className="block">
+                    <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Fine (opz.)</span>
+                    <input type="datetime-local" value={toLocalInput(editing.end_at)} onChange={(ev) => setEditing({ ...editing, end_at: fromLocalInput(ev.target.value) })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+                  </label>
+                </div>
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" checked={editing.is_recurring ?? false} onChange={(ev) => setEditing({ ...editing, is_recurring: ev.target.checked })} className="accent-pesto w-4 h-4" />
+                  <span className="text-sm text-ink">Evento ricorrente</span>
+                </label>
+                {editing.is_recurring && (
+                  <label className="block">
+                    <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Regola ricorrenza (testo libero)</span>
+                    <input value={editing.recurrence_rule ?? ''} onChange={(ev) => setEditing({ ...editing, recurrence_rule: ev.target.value })} placeholder="es. ogni venerdì 8:00-14:00" className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+                  </label>
+                )}
               </div>
-              <label className="flex items-center space-x-2">
-                <input type="checkbox" checked={editing.is_recurring ?? false} onChange={(ev) => setEditing({ ...editing, is_recurring: ev.target.checked })} />
-                <span className="text-sm">Evento ricorrente</span>
-              </label>
-              {editing.is_recurring && (
-                <label className="block">
-                  <span className="text-sm font-medium text-gray-700">Regola ricorrenza (testo libero)</span>
-                  <input value={editing.recurrence_rule ?? ''} onChange={(ev) => setEditing({ ...editing, recurrence_rule: ev.target.value })} placeholder="es. ogni venerdì 8:00-14:00" className="w-full px-3 py-2 border border-gray-300 rounded-md" />
-                </label>
-              )}
-            </div>
-            <div className="flex items-center justify-end gap-2 p-6 border-t bg-gray-50 rounded-b-xl">
-              <button onClick={() => setEditing(null)} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md">Annulla</button>
-              <button onClick={save} disabled={saving} className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50">
-                <Save className="w-4 h-4" /> <span>{saving ? 'Salvo…' : 'Salva'}</span>
-              </button>
+              <div className="flex items-center justify-end gap-2 p-6 border-t-2 border-ink/10 bg-paper rounded-b-xl">
+                <button onClick={() => setEditing(null)} className="px-4 py-2 bg-white border-2 border-ink/15 hover:border-ink/30 text-ink-soft rounded-full transition-colors">Annulla</button>
+                <button onClick={save} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 disabled:opacity-50 transition-colors">
+                  <Save className="w-4 h-4" /> <span>{saving ? 'Salvo…' : 'Salva'}</span>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

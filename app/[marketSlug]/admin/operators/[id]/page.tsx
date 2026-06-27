@@ -174,33 +174,34 @@ export default function AdminEditOperatorPage() {
     load()
   }
 
-  if (!operator || !market) return <div className="container mx-auto px-4 py-8">Caricamento…</div>
+  if (!operator || !market) return <div className="min-h-screen bg-paper"><div className="container mx-auto px-4 py-8 text-ink-soft">Caricamento…</div></div>
 
   const availableSessions = allSessions.filter(
     (s) => !presences.some((p) => p.scheduleId === s.id),
   )
 
   return (
+    <div className="min-h-screen bg-paper">
     <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-5xl">
       <Link
         href={`/${slug}/admin/operators`}
-        className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest-plus text-ink-muted hover:text-ink mb-3 transition-colors"
+        className="inline-flex items-center gap-1.5 text-xs font-alt uppercase tracking-wider text-ink-muted hover:text-ink mb-3 transition-colors"
       >
         <ArrowLeft className="w-3.5 h-3.5" /> Tutti i banchi
       </Link>
-      <h1 className="font-serif text-3xl md:text-4xl text-ink mb-6">{operator.name}</h1>
+      <h1 className="font-display text-3xl md:text-4xl text-ink mb-6">{operator.name}</h1>
 
       {/* Profilo */}
-      <form onSubmit={handleSave} className="bg-cream-50 border border-cream-300 rounded-sm p-5 md:p-6 mb-6 space-y-4">
-        <p className="text-xs uppercase tracking-widest-plus text-ink-muted">Profilo banco</p>
+      <form onSubmit={handleSave} className="bg-white border-2 border-ink/10 rounded-xl p-5 md:p-6 mb-6 space-y-4">
+        <p className="text-xs font-alt uppercase tracking-wider text-ink-muted">Profilo banco</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <F label="Nome" value={operator.name} onChange={(v) => setOperator({ ...operator, name: v })} />
           <label className="block">
-            <span className="text-sm font-medium text-ink">Categoria</span>
+            <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Categoria</span>
             <select
               value={operator.category}
               onChange={(e) => setOperator({ ...operator, category: e.target.value })}
-              className="w-full px-3 py-2 border border-cream-300 rounded-sm bg-cream-100"
+              className="w-full mt-1 px-3 py-2 border-2 border-ink/15 rounded-xl bg-paper text-ink focus:outline-none focus:border-pesto transition-colors"
             >
               {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
@@ -217,12 +218,12 @@ export default function AdminEditOperatorPage() {
           />
         </div>
         <label className="block">
-          <span className="text-sm font-medium text-ink">Descrizione</span>
+          <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Descrizione</span>
           <textarea
             value={operator.description ?? ''}
             onChange={(e) => setOperator({ ...operator, description: e.target.value })}
             rows={3}
-            className="w-full px-3 py-2 border border-cream-300 rounded-sm bg-cream-100"
+            className="w-full mt-1 px-3 py-2 border-2 border-ink/15 rounded-xl bg-paper text-ink focus:outline-none focus:border-pesto transition-colors"
           />
         </label>
 
@@ -231,7 +232,7 @@ export default function AdminEditOperatorPage() {
           <button
             type="submit"
             disabled={saving}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-cream-100 rounded-full text-sm hover:bg-ink/90 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 disabled:opacity-50 transition-colors"
           >
             <Save className="w-4 h-4" /> {saving ? 'Salvataggio…' : 'Salva profilo'}
           </button>
@@ -242,24 +243,24 @@ export default function AdminEditOperatorPage() {
       <section className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-xs uppercase tracking-widest-plus text-ink-muted">Presenze nei mercati</p>
-            <h2 className="font-serif text-2xl text-ink">
+            <p className="text-xs font-alt uppercase tracking-wider text-ink-muted">Presenze nei mercati</p>
+            <h2 className="font-display text-2xl text-ink">
               {presences.length} presenz{presences.length === 1 ? 'a' : 'e'}
             </h2>
           </div>
           <button
             type="button"
             onClick={() => setShowAddPresence((s) => !s)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-cream-100 rounded-full text-sm hover:bg-ink/90"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 transition-colors"
           >
             <Plus className="w-4 h-4" /> Aggiungi sessione
           </button>
         </div>
 
         {showAddPresence && (
-          <form onSubmit={handleAddPresence} className="bg-cream-50 border border-cream-300 rounded-sm p-5 mb-5 space-y-4">
+          <form onSubmit={handleAddPresence} className="bg-white border-2 border-ink/10 rounded-xl p-5 mb-5 space-y-4">
             <label className="block">
-              <span className="text-sm font-medium text-ink">Sessione mercato</span>
+              <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Sessione mercato</span>
               <select
                 required
                 value={newPresence.scheduleId}
@@ -272,7 +273,7 @@ export default function AdminEditOperatorPage() {
                     stall: '',
                   })
                 }}
-                className="w-full px-3 py-2 border border-cream-300 rounded-sm bg-cream-100"
+                className="w-full mt-1 px-3 py-2 border-2 border-ink/15 rounded-xl bg-paper text-ink focus:outline-none focus:border-pesto transition-colors"
               >
                 <option value="">— scegli una sessione —</option>
                 {availableSessions.map((s) => (
@@ -281,7 +282,7 @@ export default function AdminEditOperatorPage() {
                   </option>
                 ))}
               </select>
-              <p className="text-xs text-ink-muted mt-1">
+              <p className="text-xs text-ink-muted mt-1.5">
                 L&apos;operatore può essere presente su più sessioni della stessa zona. Per altre zone, duplica dalla pagina di quella zona.
               </p>
             </label>
@@ -315,11 +316,11 @@ export default function AdminEditOperatorPage() {
               <button
                 type="button"
                 onClick={() => setShowAddPresence(false)}
-                className="px-4 py-2 bg-cream-200 hover:bg-cream-300 text-ink rounded-sm text-sm"
+                className="px-4 py-2 bg-paper border-2 border-ink/15 hover:border-ink/30 text-ink-soft rounded-full text-sm transition-colors"
               >
                 Annulla
               </button>
-              <button type="submit" className="px-4 py-2 bg-ink text-cream-100 rounded-full text-sm hover:bg-ink/90">
+              <button type="submit" className="px-4 py-2 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 transition-colors">
                 Aggiungi
               </button>
             </div>
@@ -327,18 +328,18 @@ export default function AdminEditOperatorPage() {
         )}
 
         {presences.length === 0 ? (
-          <div className="bg-cream-50 border border-cream-300 rounded-sm p-6 text-center text-ink-muted text-sm">
+          <div className="bg-white border-2 border-ink/10 rounded-xl p-6 text-center text-ink-muted text-sm">
             Nessuna presenza configurata. Aggiungi almeno una sessione per far apparire l&apos;operatore nei mercati.
           </div>
         ) : (
-          <ul className="border-y border-cream-300 divide-y divide-cream-300">
+          <ul className="bg-white border-2 border-ink/10 rounded-xl divide-y divide-ink/10 px-4">
             {presences.map((p) => (
               <li key={p.scheduleId} className="py-4">
                 <div className="flex items-center gap-3 flex-wrap">
-                  <CalendarDays className="w-4 h-4 text-olive-500 flex-shrink-0" />
+                  <CalendarDays className="w-4 h-4 text-pesto flex-shrink-0" />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline gap-2 flex-wrap">
-                      <span className="font-serif text-lg text-ink">{p.session?.comune ?? '—'}</span>
+                      <span className="font-alt text-lg text-ink">{p.session?.comune ?? '—'}</span>
                       <span className="text-sm text-ink-muted">· {p.session?.giorno}</span>
                       {p.session?.orario && <span className="text-xs text-ink-muted tabular-nums">{p.session.orario}</span>}
                     </div>
@@ -357,7 +358,7 @@ export default function AdminEditOperatorPage() {
                   <button
                     type="button"
                     onClick={() => handleRemovePresence(p.scheduleId)}
-                    className="p-2 text-ink-soft hover:text-terra-500"
+                    className="p-2 text-ink-soft hover:text-coral-600 transition-colors"
                     title="Rimuovi presenza"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -386,10 +387,10 @@ export default function AdminEditOperatorPage() {
       </section>
 
       {/* Account */}
-      <div className="bg-cream-50 border border-cream-300 rounded-sm p-5 md:p-6">
-        <p className="text-xs uppercase tracking-widest-plus text-ink-muted mb-2">Account operatore</p>
+      <div className="bg-white border-2 border-ink/10 rounded-xl p-5 md:p-6">
+        <p className="text-xs font-alt uppercase tracking-wider text-ink-muted mb-2">Account operatore</p>
         {operator.user_id ? (
-          <p className="flex items-center text-olive-700 text-sm">
+          <p className="flex items-center text-pesto-600 text-sm">
             <CheckCircle2 className="w-5 h-5 mr-2" /> Account collegato
           </p>
         ) : (
@@ -400,11 +401,11 @@ export default function AdminEditOperatorPage() {
               placeholder="email@operatore.it"
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
-              className="flex-1 px-3 py-2 border border-cream-300 rounded-sm bg-cream-100"
+              className="flex-1 px-3 py-2 border-2 border-ink/15 rounded-xl bg-paper text-ink focus:outline-none focus:border-pesto transition-colors"
             />
             <button
               type="submit"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-cream-100 rounded-full text-sm hover:bg-ink/90"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 transition-colors"
             >
               <Mail className="w-4 h-4" /> Invita
             </button>
@@ -416,18 +417,19 @@ export default function AdminEditOperatorPage() {
         </p>
       </div>
     </div>
+    </div>
   )
 }
 
 function F({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <label className="block">
-      <span className="text-sm font-medium text-ink">{label}</span>
+      <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">{label}</span>
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2 border border-cream-300 rounded-sm bg-cream-100"
+        className="w-full mt-1 px-3 py-2 border-2 border-ink/15 rounded-xl bg-paper text-ink focus:outline-none focus:border-pesto transition-colors"
       />
     </label>
   )

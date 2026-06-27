@@ -29,15 +29,15 @@ export const CATEGORY_LABEL: Record<ScheduleCategory, string> = {
 }
 
 /**
- * Palette coerente con la palette ligure della UI.
- *   alimentare   → olive (terra, campi)
- *   antiquariato → terracotta (vecchio, rustico)
- *   artigianato  → sea blue (mestieri)
- *   varie        → grigio inchiostro
+ * Palette coerente con il brand "bold" (Riviera).
+ *   alimentare   → pesto (verde, campi/agrumi)
+ *   antiquariato → coral (rosso facciate dei caruggi)
+ *   artigianato  → riviera (blu mare, mestieri)
+ *   varie        → inchiostro tenue
  */
 export const CATEGORY_COLOR: Record<ScheduleCategory, string> = {
-  alimentare:   '#6B7F3A',
-  antiquariato: '#B75A40',
-  artigianato:  '#2A5A75',
+  alimentare:   '#2FA84F',
+  antiquariato: '#EF4B27',
+  artigianato:  '#1E73E8',
   varie:        '#4A4F3B',
 }

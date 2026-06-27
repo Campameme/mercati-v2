@@ -26,6 +26,26 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   if (Object.keys(update).length === 0) {
     return NextResponse.json({ error: 'Nessun campo da aggiornare' }, { status: 400 })
   }
+
+  // Coerenza: non si puo accendere una sessione se la zona parent e spenta.
+  // Il trigger DB silenzia comunque is_active=false, ma qui restituiamo un errore
+  // esplicito cosi l'UI puo informare l'utente invece di mostrare un "successo"
+  // che in realta non ha cambiato nulla.
+  if (update.is_active === true) {
+    const { data: schedule } = await supabase
+      .from('market_schedules')
+      .select('market_id, markets!inner(is_active)')
+      .eq('id', params.id)
+      .maybeSingle()
+    const parentActive = (schedule as any)?.markets?.is_active
+    if (parentActive === false) {
+      return NextResponse.json(
+        { error: 'Impossibile attivare: la zona di questo mercato è spenta. Riaccendi prima la zona dalla dashboard admin.' },
+        { status: 409 },
+      )
+    }
+  }
+
   const { data, error } = await supabase
     .from('market_schedules')
     .update(update)

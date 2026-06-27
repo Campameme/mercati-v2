@@ -7,7 +7,7 @@ import { LogIn, Mail, Lock, UserPlus } from 'lucide-react'
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="container mx-auto px-4 py-12 max-w-md text-center text-gray-500">Caricamento…</div>}>
+    <Suspense fallback={<div className="container mx-auto px-4 py-12 max-w-md text-center text-ink-muted">Caricamento…</div>}>
       <LoginPageInner />
     </Suspense>
   )
@@ -76,58 +76,61 @@ function LoginPageInner() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12 max-w-md">
-      <div className="bg-white rounded-xl shadow-md p-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-          {mode === 'signin' ? 'Accedi' : 'Registrati'}
-        </h1>
+    <div className="min-h-[80vh] bg-paper flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md">
+        <div className="bg-white rounded-xl border-2 border-ink/10 shadow-sm p-8">
+          <p className="text-center text-xs font-alt uppercase tracking-[0.18em] text-pesto-600 mb-1">iMercati · Riviera</p>
+          <h1 className="font-display text-3xl text-ink mb-6 text-center">
+            {mode === 'signin' ? 'Accedi' : 'Registrati'}
+          </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <label className="block">
-            <span className="flex items-center text-sm font-medium text-gray-700 mb-1">
-              <Mail className="w-4 h-4 mr-1" /> Email
-            </span>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-            />
-          </label>
-          <label className="block">
-            <span className="flex items-center text-sm font-medium text-gray-700 mb-1">
-              <Lock className="w-4 h-4 mr-1" /> Password
-            </span>
-            <input
-              type="password"
-              required
-              minLength={6}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-            />
-          </label>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <label className="block">
+              <span className="flex items-center text-xs font-alt uppercase tracking-wider text-ink-soft mb-1.5">
+                <Mail className="w-4 h-4 mr-1.5 text-pesto" /> Email
+              </span>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-3 py-2.5 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors"
+              />
+            </label>
+            <label className="block">
+              <span className="flex items-center text-xs font-alt uppercase tracking-wider text-ink-soft mb-1.5">
+                <Lock className="w-4 h-4 mr-1.5 text-pesto" /> Password
+              </span>
+              <input
+                type="password"
+                required
+                minLength={6}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-3 py-2.5 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors"
+              />
+            </label>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <p className="text-sm text-coral-600">{error}</p>}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 disabled:opacity-50 transition-colors"
+            >
+              {mode === 'signin' ? <LogIn className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+              <span>{loading ? 'Attendi…' : mode === 'signin' ? 'Accedi' : 'Registrati'}</span>
+            </button>
+          </form>
 
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50"
+            type="button"
+            onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
+            className="w-full mt-4 text-sm text-ink-muted hover:text-pesto-600 transition-colors"
           >
-            {mode === 'signin' ? <LogIn className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
-            <span>{loading ? 'Attendi…' : mode === 'signin' ? 'Accedi' : 'Registrati'}</span>
+            {mode === 'signin' ? 'Non hai un account? Registrati' : 'Hai già un account? Accedi'}
           </button>
-        </form>
-
-        <button
-          type="button"
-          onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
-          className="w-full mt-4 text-sm text-gray-600 hover:text-primary-600"
-        >
-          {mode === 'signin' ? 'Non hai un account? Registrati' : 'Hai già un account? Accedi'}
-        </button>
+        </div>
       </div>
     </div>
   )

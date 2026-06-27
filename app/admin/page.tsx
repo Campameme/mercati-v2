@@ -1,83 +1,309 @@
 import Link from 'next/link'
-import { Power, Settings, MapPin, ArrowRight } from 'lucide-react'
+import { Power, Settings, MapPin, ArrowRight, BarChart3, Mail, TrendingUp, Eye, Users } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
+interface MarketStat {
+  market_id: string
+  market_slug: string
+  market_name: string
+  views_30d: number
+  unique_visitors_30d: number
+  views_7d: number
+  last_view_at: string | null
+}
+
+interface OperatorStat {
+  operator_id: string
+  operator_name: string
+  market_id: string
+  views_30d: number
+  unique_visitors_30d: number
+  views_7d: number
+  last_view_at: string | null
+}
+
+interface AdesioneRow {
+  id: string
+  created_at: string
+  nome: string
+  email: string
+  attivita: string
+  stato: string
+}
+
 export default async function AdminRoot() {
   const supabase = createClient()
-  const [{ count: marketsTotal }, { count: marketsActive }, { count: sessionsTotal }, { count: sessionsActive }] = await Promise.all([
+  const [
+    { count: marketsTotal },
+    { count: marketsActive },
+    { count: sessionsTotal },
+    { count: sessionsActive },
+    { count: operatorsTotal },
+    { count: adesioniNuove },
+    { count: viewsTotal7d },
+    { data: topMarkets },
+    { data: topOperators },
+    { data: recentAdesioni },
+  ] = await Promise.all([
     supabase.from('markets').select('*', { count: 'exact', head: true }),
     supabase.from('markets').select('*', { count: 'exact', head: true }).eq('is_active', true),
     supabase.from('market_schedules').select('*', { count: 'exact', head: true }),
     supabase.from('market_schedules').select('*', { count: 'exact', head: true }).eq('is_active', true),
+    supabase.from('operators').select('*', { count: 'exact', head: true }),
+    supabase.from('adesioni_operatori').select('*', { count: 'exact', head: true }).eq('stato', 'nuovo'),
+    supabase
+      .from('analytics_events')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString()),
+    supabase
+      .from('market_stats_30d')
+      .select('*')
+      .order('views_30d', { ascending: false })
+      .limit(8),
+    supabase
+      .from('operator_stats_30d')
+      .select('*')
+      .order('views_30d', { ascending: false })
+      .limit(10),
+    supabase
+      .from('adesioni_operatori')
+      .select('id, created_at, nome, email, attivita, stato')
+      .order('created_at', { ascending: false })
+      .limit(5),
   ])
 
+  const topMarketsRows = (topMarkets ?? []) as MarketStat[]
+  const topOperatorsRows = (topOperators ?? []) as OperatorStat[]
+  const adesioniRows = (recentAdesioni ?? []) as AdesioneRow[]
+
   return (
-    <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-5xl">
-      <div className="mb-8 border-b border-cream-300 pb-5">
-        <p className="text-[0.72rem] uppercase tracking-widest-plus text-ink-muted mb-1">Super-admin</p>
-        <h1 className="font-serif text-3xl md:text-4xl text-ink leading-tight">Dashboard provincia</h1>
-        <p className="text-sm text-ink-soft mt-2">Gestione globale di zone e singole sessioni di mercato.</p>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-        <div className="bg-cream-50 border border-cream-300 rounded-sm p-4">
-          <p className="text-[10px] uppercase tracking-widest-plus text-ink-muted">Zone</p>
-          <p className="font-serif text-2xl text-ink tabular-nums mt-1">
-            {marketsActive ?? 0}<span className="text-ink-muted text-sm">/{marketsTotal ?? 0}</span>
+    <div className="min-h-screen bg-paper">
+      <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl">
+        <div className="mb-8 border-b-2 border-ink/10 pb-5">
+          <p className="text-xs font-alt uppercase tracking-[0.18em] text-pesto-600 mb-1">Super-admin</p>
+          <h1 className="font-display text-3xl md:text-4xl text-ink leading-tight">Dashboard iMercati</h1>
+          <p className="text-sm text-ink-soft mt-2">
+            Stato del progetto, accendi/spegni zone, analytics anonime di visita, gestione adesioni.
           </p>
-          <p className="text-[10px] text-ink-muted mt-0.5">attive</p>
         </div>
-        <div className="bg-cream-50 border border-cream-300 rounded-sm p-4">
-          <p className="text-[10px] uppercase tracking-widest-plus text-ink-muted">Sessioni</p>
-          <p className="font-serif text-2xl text-ink tabular-nums mt-1">
-            {sessionsActive ?? 0}<span className="text-ink-muted text-sm">/{sessionsTotal ?? 0}</span>
-          </p>
-          <p className="text-[10px] text-ink-muted mt-0.5">attive</p>
+
+        {/* Statistiche di stato */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-10">
+          <Stat label="Zone" value={`${marketsActive ?? 0}/${marketsTotal ?? 0}`} sub="attive" icon={MapPin} />
+          <Stat label="Sessioni" value={`${sessionsActive ?? 0}/${sessionsTotal ?? 0}`} sub="attive" icon={Power} />
+          <Stat label="Operatori" value={`${operatorsTotal ?? 0}`} sub="totali" icon={Users} />
+          <Stat label="Views 7g" value={`${viewsTotal7d ?? 0}`} sub="totali" icon={Eye} />
+          <Stat label="Adesioni" value={`${adesioniNuove ?? 0}`} sub="da gestire" icon={Mail} highlight={(adesioniNuove ?? 0) > 0} />
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Link
-          href="/admin/sessions"
-          className="group bg-cream-50 border border-cream-300 rounded-sm p-5 hover:border-olive-500 hover:-translate-y-0.5 transition-all"
-        >
-          <Power className="w-8 h-8 text-olive-500 mb-3" />
-          <h2 className="font-serif text-lg text-ink mb-1 group-hover:text-olive-700 transition-colors">
-            Accendi / Spegni mercati
-          </h2>
-          <p className="text-sm text-ink-soft">
-            Toggle rapido per zone e singole sessioni. I mercati spenti scompaiono da mappa, calendario e ricerca.
-          </p>
-          <span className="inline-flex items-center gap-1 mt-3 text-xs text-olive-700 group-hover:translate-x-0.5 transition-transform">
-            Apri <ArrowRight className="w-3 h-3" />
-          </span>
-        </Link>
+        {/* Quick actions */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+          <ActionCard
+            href="/admin/sessions"
+            icon={Power}
+            title="Accendi / Spegni"
+            desc="Toggle zone e singole sessioni. Cascade automatica zona → sessioni."
+          />
+          <ActionCard
+            href="/admin/markets"
+            icon={Settings}
+            title="Gestione zone"
+            desc="Crea e modifica zone. Import/export Excel operatori."
+          />
+          <ActionCard
+            href="/admin/adesioni"
+            icon={Mail}
+            title="Adesioni operatori"
+            desc={`${adesioniNuove ?? 0} richieste da gestire. Risposte entro 48h.`}
+            badge={adesioniNuove ?? 0}
+          />
+        </div>
 
-        <Link
-          href="/admin/markets"
-          className="group bg-cream-50 border border-cream-300 rounded-sm p-5 hover:border-olive-500 hover:-translate-y-0.5 transition-all"
-        >
-          <Settings className="w-8 h-8 text-olive-500 mb-3" />
-          <h2 className="font-serif text-lg text-ink mb-1 group-hover:text-olive-700 transition-colors">
-            Gestione zone
-          </h2>
-          <p className="text-sm text-ink-soft">
-            Crea, modifica e archivia le zone aggregate. Importa/esporta operatori in Excel.
-          </p>
-          <span className="inline-flex items-center gap-1 mt-3 text-xs text-olive-700 group-hover:translate-x-0.5 transition-transform">
-            Apri <ArrowRight className="w-3 h-3" />
-          </span>
-        </Link>
-      </div>
+        {/* Analytics: zone piu viste */}
+        <section className="mb-10">
+          <div className="flex items-baseline justify-between mb-4 border-b-2 border-ink/10 pb-2">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-pesto" />
+              <h2 className="font-display text-lg text-ink">Zone più viste · ultimi 30 giorni</h2>
+            </div>
+            <p className="text-[11px] text-ink-muted italic">Statistiche anonime cookieless</p>
+          </div>
+          {topMarketsRows.length === 0 ? (
+            <p className="text-sm text-ink-muted italic py-6">Nessun dato ancora. Le views appariranno con il traffico.</p>
+          ) : (
+            <div className="bg-white border-2 border-ink/10 rounded-xl overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="text-[10px] font-alt uppercase tracking-wider text-ink-muted bg-paper">
+                  <tr className="text-left">
+                    <th className="py-2.5 pl-4">Zona</th>
+                    <th className="py-2.5 text-right tabular-nums">Views 30g</th>
+                    <th className="py-2.5 text-right tabular-nums">Unici</th>
+                    <th className="py-2.5 text-right tabular-nums">Views 7g</th>
+                    <th className="py-2.5 pr-4 text-right">Ultima</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-ink/10">
+                  {topMarketsRows.map((m) => (
+                    <tr key={m.market_id} className="hover:bg-paper">
+                      <td className="py-2.5 pl-4">
+                        <Link href={`/${m.market_slug}`} className="font-alt text-ink hover:text-pesto-600">
+                          {m.market_name}
+                        </Link>
+                      </td>
+                      <td className="py-2.5 text-right tabular-nums text-ink">{m.views_30d}</td>
+                      <td className="py-2.5 text-right tabular-nums text-ink-soft">{m.unique_visitors_30d}</td>
+                      <td className="py-2.5 text-right tabular-nums text-ink-soft">{m.views_7d}</td>
+                      <td className="py-2.5 pr-4 text-right text-xs text-ink-muted">{formatRelative(m.last_view_at)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
 
-      <div className="mt-10 pt-6 border-t border-cream-300 text-xs text-ink-muted">
-        <p className="flex items-center gap-2">
-          <MapPin className="w-3 h-3" />
-          Per gestire una zona specifica (banchi, area sessione, notizie), entra dalla scheda zona e clicca &ldquo;Gestione&rdquo;.
-        </p>
+        {/* Analytics: operatori piu visti */}
+        <section className="mb-10">
+          <div className="flex items-baseline justify-between mb-4 border-b-2 border-ink/10 pb-2">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-pesto" />
+              <h2 className="font-display text-lg text-ink">Operatori più visti · ultimi 30 giorni</h2>
+            </div>
+          </div>
+          {topOperatorsRows.length === 0 ? (
+            <p className="text-sm text-ink-muted italic py-6">Nessun operatore ha ancora ricevuto views.</p>
+          ) : (
+            <div className="bg-white border-2 border-ink/10 rounded-xl overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="text-[10px] font-alt uppercase tracking-wider text-ink-muted bg-paper">
+                  <tr className="text-left">
+                    <th className="py-2.5 pl-4">Operatore</th>
+                    <th className="py-2.5 text-right tabular-nums">Views 30g</th>
+                    <th className="py-2.5 text-right tabular-nums">Unici</th>
+                    <th className="py-2.5 text-right tabular-nums">Views 7g</th>
+                    <th className="py-2.5 pr-4 text-right">Ultima</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-ink/10">
+                  {topOperatorsRows.map((o) => (
+                    <tr key={o.operator_id} className="hover:bg-paper">
+                      <td className="py-2.5 pl-4">
+                        <span className="text-ink">{o.operator_name}</span>
+                      </td>
+                      <td className="py-2.5 text-right tabular-nums text-ink">{o.views_30d}</td>
+                      <td className="py-2.5 text-right tabular-nums text-ink-soft">{o.unique_visitors_30d}</td>
+                      <td className="py-2.5 text-right tabular-nums text-ink-soft">{o.views_7d}</td>
+                      <td className="py-2.5 pr-4 text-right text-xs text-ink-muted">{formatRelative(o.last_view_at)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+
+        {/* Ultime adesioni */}
+        <section>
+          <div className="flex items-baseline justify-between mb-4 border-b-2 border-ink/10 pb-2">
+            <div className="flex items-center gap-2">
+              <Mail className="w-4 h-4 text-pesto" />
+              <h2 className="font-display text-lg text-ink">Ultime adesioni</h2>
+            </div>
+            <Link href="/admin/adesioni" className="text-xs font-alt uppercase tracking-wider text-pesto-600 hover:text-pesto-700">
+              Vedi tutte →
+            </Link>
+          </div>
+          {adesioniRows.length === 0 ? (
+            <p className="text-sm text-ink-muted italic py-6">Nessuna richiesta ricevuta finora.</p>
+          ) : (
+            <ul className="bg-white border-2 border-ink/10 rounded-xl divide-y divide-ink/10">
+              {adesioniRows.map((a) => (
+                <li key={a.id} className="px-4 py-3 flex items-center justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-alt text-ink text-base">{a.nome}</p>
+                    <p className="text-xs text-ink-muted">
+                      {a.attivita} · {a.email} · {formatRelative(a.created_at)}
+                    </p>
+                  </div>
+                  <StatoBadge stato={a.stato} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       </div>
     </div>
   )
+}
+
+function Stat({ label, value, sub, icon: Icon, highlight }: {
+  label: string; value: string; sub: string; icon: any; highlight?: boolean
+}) {
+  return (
+    <div className={`rounded-xl p-4 border-2 ${
+      highlight ? 'bg-mimosa/15 border-mimosa' : 'bg-white border-ink/10'
+    }`}>
+      <div className="flex items-center gap-2 mb-1">
+        <Icon className={`w-3.5 h-3.5 ${highlight ? 'text-coral-600' : 'text-pesto'}`} />
+        <p className="text-[10px] font-alt uppercase tracking-wider text-ink-muted">{label}</p>
+      </div>
+      <p className="font-display text-2xl text-ink tabular-nums">{value}</p>
+      <p className="text-[10px] text-ink-muted mt-0.5">{sub}</p>
+    </div>
+  )
+}
+
+function ActionCard({ href, icon: Icon, title, desc, badge }: {
+  href: string; icon: any; title: string; desc: string; badge?: number
+}) {
+  return (
+    <Link
+      href={href}
+      className="group relative bg-white border-2 border-ink/10 rounded-xl p-5 hover:border-pesto hover:-translate-y-0.5 transition-all"
+    >
+      <Icon className="w-8 h-8 text-pesto mb-3" />
+      {typeof badge === 'number' && badge > 0 && (
+        <span className="absolute top-3 right-3 bg-coral text-white text-[10px] font-bold rounded-full px-2 py-0.5">
+          {badge}
+        </span>
+      )}
+      <h2 className="font-display text-lg text-ink mb-1 group-hover:text-pesto-600 transition-colors">
+        {title}
+      </h2>
+      <p className="text-sm text-ink-soft">{desc}</p>
+      <span className="inline-flex items-center gap-1 mt-3 text-xs font-alt uppercase tracking-wider text-pesto-600 group-hover:translate-x-0.5 transition-transform">
+        Apri <ArrowRight className="w-3 h-3" />
+      </span>
+    </Link>
+  )
+}
+
+function StatoBadge({ stato }: { stato: string }) {
+  const config: Record<string, { label: string; cls: string }> = {
+    nuovo:        { label: 'Nuovo',         cls: 'bg-pesto/15 text-pesto-700 border-pesto/40' },
+    in_contatto:  { label: 'In contatto',   cls: 'bg-mimosa/20 text-ink-soft border-mimosa' },
+    aderito:      { label: 'Aderito',       cls: 'bg-pesto text-white border-pesto' },
+    scartato:     { label: 'Scartato',      cls: 'bg-paper text-ink-muted border-ink/15' },
+  }
+  const c = config[stato] ?? config.nuovo
+  return (
+    <span className={`flex-shrink-0 text-[10px] font-alt uppercase tracking-wider px-2 py-1 rounded-full border-2 ${c.cls}`}>
+      {c.label}
+    </span>
+  )
+}
+
+function formatRelative(iso: string | null): string {
+  if (!iso) return '—'
+  const d = new Date(iso)
+  const diff = Date.now() - d.getTime()
+  const min = Math.floor(diff / 60000)
+  if (min < 60) return `${min}m fa`
+  const h = Math.floor(min / 60)
+  if (h < 24) return `${h}h fa`
+  const days = Math.floor(h / 24)
+  if (days < 30) return `${days}g fa`
+  return d.toLocaleDateString('it-IT')
 }

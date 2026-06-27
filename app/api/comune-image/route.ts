@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
+// Endpoint cacheabile: le foto Wikipedia non cambiano spesso, e ogni call costa
+// ~500ms-2s tra fetch generator/images + filtri. Cache 12h server-side, 1h client.
+// (export dynamic rimosso: era 'force-dynamic' e annullava la cache HTTP)
+export const revalidate = 43200 // 12h
 
 /**
  * Restituisce una foto di luogo (non stemma) per un comune italiano, interrogando
@@ -134,6 +137,11 @@ export async function GET(request: NextRequest) {
   const q = new URL(request.url).searchParams.get('q')?.trim()
   if (!q) return NextResponse.json({ error: 'q richiesto' }, { status: 400 })
 
+  // Header cache aggressivo per il client/CDN: queste immagini cambiano raramente.
+  const cacheHeaders = {
+    'Cache-Control': 'public, s-maxage=43200, max-age=3600, stale-while-revalidate=86400',
+  }
+
   // Prova prima le varianti disambiguate: se la pagina "Nome (Italia)" esiste,
   // è quasi sempre il comune (es. "Cervo (Italia)" vs "Cervo" = animale).
   // Se non esiste il fetch ritorna 0 pagine e passiamo al nome nudo.
@@ -147,15 +155,15 @@ export async function GET(request: NextRequest) {
         title: t,
         filename: photo.filename,
         pageUrl: `https://it.wikipedia.org/wiki/${encodeURIComponent(t.replace(/ /g, '_'))}`,
-      })
+      }, { headers: cacheHeaders })
     }
   }
 
   // Fallback sul summary (meno affidabile ma a volte basta)
   for (const t of tries) {
     const src = await getSummaryFallback(t)
-    if (src) return NextResponse.json({ imageUrl: src, originalUrl: src, title: t, filename: null, pageUrl: null })
+    if (src) return NextResponse.json({ imageUrl: src, originalUrl: src, title: t, filename: null, pageUrl: null }, { headers: cacheHeaders })
   }
 
-  return NextResponse.json({ imageUrl: null, originalUrl: null, title: q, filename: null, pageUrl: null })
+  return NextResponse.json({ imageUrl: null, originalUrl: null, title: q, filename: null, pageUrl: null }, { headers: cacheHeaders })
 }

@@ -1,279 +1,97 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { formatMarketDays } from '@/lib/markets/days'
-import UnifiedMapClient from '@/components/UnifiedMapClient'
 import { slugifyName } from '@/lib/markets/slug'
-import type { UnifiedMapPin } from '@/components/UnifiedMap'
-import { MountainSea, WaveDivider, OliveSprig } from '@/components/decorations'
-import ZoneImage from '@/components/ZoneImage'
-import Reveal from '@/components/Reveal'
-import FavoriteButton from '@/components/FavoriteButton'
-import FavoritesSection from '@/components/FavoritesSection'
-import MarketsQuickFinder from '@/components/MarketsQuickFinder'
+import MapHome from '@/components/home/MapHome'
+import type { MarketPin } from '@/components/home/types'
+import PageviewTracker from '@/components/analytics/PageviewTracker'
 
 export const dynamic = 'force-dynamic'
-
-// Comune di riferimento per l'immagine hero delle zone aggregate (Wikipedia IT).
-// Per le zone a città singola si usa direttamente market.city.
-const ZONE_HERO_COMUNE: Record<string, string> = {
-  'val-nervia':             'Camporosso',
-  'bordighera-ospedaletti': 'Bordighera',
-  'taggia-e-costa':         'Taggia',
-  'golfo-dianese':          'Diano Marina',
-  'entroterra':             'Pieve di Teco',
-}
-
-function heroQueryFor(slug: string, city: string): string {
-  return ZONE_HERO_COMUNE[slug] ?? city
-}
 
 export default async function HomePage() {
   const supabase = createClient()
   const [{ data: markets }, { data: schedules }] = await Promise.all([
     supabase
       .from('markets')
-      .select('id, slug, name, city, description, market_days')
-      .eq('is_active', true)
-      .order('name', { ascending: true }),
+      .select('id, slug, name, city, market_days')
+      .eq('is_active', true),
     supabase
       .from('market_schedules')
-      .select('id, market_id, comune, giorno, orario, luogo, lat, lng, is_active, markets!inner(is_active)')
+      .select('id, market_id, comune, giorno, orario, settori, luogo, lat, lng, is_active, markets!inner(is_active)')
       .eq('is_active', true)
       .eq('markets.is_active', true),
   ])
 
-  const comuniByMarket = new Map<string, string[]>()
-  const sessionsByMarket = new Map<string, number>()
+  // Indice mercato → info (slug, nome, giorni)
+  const marketInfo = new Map(
+    (markets ?? []).map((m: any) => [
+      m.id as string,
+      { slug: m.slug as string, name: m.name as string, market_days: (m.market_days ?? []) as number[] },
+    ]),
+  )
+
+  // Un pin per LUOGO fisico (mercato + comune + luogo): così ogni mercato
+  // distinto dello stesso comune (es. le tante piazze di Sanremo) appare a sé.
+  // Le diverse giornate dello stesso luogo confluiscono nelle sue sessioni.
+  const byKey = new Map<string, MarketPin>()
   for (const s of schedules ?? []) {
-    const arr = comuniByMarket.get(s.market_id) ?? []
-    if (!arr.includes(s.comune)) arr.push(s.comune)
-    comuniByMarket.set(s.market_id, arr)
-    sessionsByMarket.set(s.market_id, (sessionsByMarket.get(s.market_id) ?? 0) + 1)
-  }
-
-  const marketInfo = new Map((markets ?? []).map((m) => [m.id, { slug: m.slug, name: m.name }]))
-  const mapSessions = (schedules ?? [])
-    .map((s) => {
-      const mi = marketInfo.get(s.market_id)
-      if (!mi) return null
-      return {
-        id: s.id as string,
-        market_id: s.market_id, market_slug: mi.slug, market_name: mi.name,
-        comune: s.comune, giorno: s.giorno, orario: s.orario, luogo: s.luogo,
-        lat: s.lat, lng: s.lng,
+    const row = s as any
+    const mi = marketInfo.get(row.market_id)
+    if (!mi) continue
+    // Coordinate robuste: Supabase può restituire numeric come stringa.
+    const lat = typeof row.lat === 'number' ? row.lat : parseFloat(row.lat)
+    const lng = typeof row.lng === 'number' ? row.lng : parseFloat(row.lng)
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue
+    const comune = row.comune as string
+    const luogo = (row.luogo as string | null) ?? null
+    const comuneSlug = slugifyName(comune)
+    const luogoSlug = slugifyName(luogo ?? 'centro') || 'centro'
+    const key = `${mi.slug}:${comuneSlug}:${luogoSlug}`
+    let pin = byKey.get(key)
+    if (!pin) {
+      pin = {
+        id: key,
+        marketId: row.market_id,
+        marketSlug: mi.slug,
+        marketName: mi.name,
+        marketDays: mi.market_days,
+        comune,
+        comuneSlug,
+        luogo,
+        lat,
+        lng,
+        sessions: [],
       }
-    })
-    .filter((x): x is NonNullable<typeof x> => x !== null)
-
-  const totalComuni = new Set(mapSessions.map((s) => s.comune)).size
-  const totalMercati = mapSessions.length
-
-  // Pin per UnifiedMap: 1 pin per coppia (comune, market_slug) — il primo trovato
-  // (un comune può avere più sessioni dello stesso market: prendi uno solo per non sovrapporre)
-  const seen = new Set<string>()
-  const mapPins: UnifiedMapPin[] = []
-  for (const s of mapSessions) {
-    if (s.lat == null || s.lng == null) continue
-    const key = `${s.market_slug}:${s.comune}`
-    if (seen.has(key)) continue
-    seen.add(key)
-    mapPins.push({
-      id: key,
-      lat: s.lat,
-      lng: s.lng,
-      kind: 'market',
-      title: s.comune,
-      subtitle: s.market_name,
-      href: `/${s.market_slug}/c/${slugifyName(s.comune)}`,
+      byKey.set(key, pin)
+    }
+    pin.sessions.push({
+      scheduleId: row.id,
+      giorno: row.giorno ?? null,
+      orario: row.orario ?? null,
+      luogo,
+      settori: (row.settori as string | null) ?? null,
     })
   }
+
+  const pins = Array.from(byKey.values()).sort((a, b) => a.comune.localeCompare(b.comune, 'it'))
 
   return (
-    <div>
-      {/* HERO */}
-      <section className="relative overflow-hidden border-b border-cream-300">
-        <MountainSea className="absolute -top-4 right-0 w-[620px] text-olive-500 opacity-60 pointer-events-none hidden md:block animate-float-soft" />
-        <div className="container mx-auto px-4 md:px-6 py-20 md:py-28 relative">
-          <div className="max-w-3xl reveal is-visible">
-            <div className="flex items-center gap-3 mb-8 text-ink-soft">
-              <OliveSprig className="w-10 h-3 text-olive-500" />
-              <p className="text-[0.72rem] uppercase tracking-widest-plus">
-                Liguria · Provincia di Imperia
-              </p>
-            </div>
-
-            <h1 className="font-serif text-5xl md:text-7xl leading-[1.02] tracking-tight text-ink">
-              Mercati di
-              <br />
-              <span className="italic font-light text-olive-600">terra e di mare</span>.
-            </h1>
-
-            <p className="mt-8 text-lg md:text-xl text-ink-soft max-w-xl leading-relaxed">
-              Dall&apos;entroterra d&apos;ulivi al blu del Mar Ligure: ogni settimana, ogni valle, ogni borgo.
-              Mercatini, fiere, prodotti locali — in un unico calendario.
-            </p>
-
-            <div className="mt-10 flex flex-wrap gap-3">
-              <Link
-                href="/calendar"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-ink text-cream-100 text-sm hover:bg-olive-700 transition-all hover:-translate-y-0.5"
-              >
-                Vedi il calendario
-              </Link>
-              <a
-                href="#zone"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-ink/20 text-ink text-sm hover:bg-cream-50 transition-all hover:-translate-y-0.5"
-              >
-                Esplora le zone
-              </a>
-            </div>
-          </div>
+    <>
+      <PageviewTracker type="view_homepage" />
+      <MapHome pins={pins} />
+      <footer className="bg-paper border-t-2 border-ink/10 py-8">
+        <div className="container mx-auto px-4 md:px-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-ink-muted">
+          <span className="font-display text-sm text-ink">iMercati</span>
+          <span className="text-ink-muted/70">Guida ai mercati della provincia di Imperia.</span>
+          <span className="flex-1" />
+          <Link href="/operatori" className="hover:text-ink">Ambulanti</Link>
+          <Link href="/eventi" className="hover:text-ink">Eventi</Link>
+          <Link href="/calendar" className="hover:text-ink">Calendario</Link>
+          <Link href="/aderisci" className="hover:text-ink">Aderisci</Link>
+          <Link href="/privacy" className="hover:text-ink">Privacy</Link>
+          <Link href="/cookie" className="hover:text-ink">Cookie</Link>
+          <a href="mailto:emanueleecampanini@gmail.com" className="hover:text-ink">Contatti</a>
         </div>
-      </section>
-
-      <div className="container mx-auto px-4 md:px-6">
-        {/* Trova un mercato — search prominent + chip giorno */}
-        {mapSessions.length > 0 && (
-          <section className="border-b border-cream-300">
-            <MarketsQuickFinder sessions={mapSessions.map((s) => ({
-              id: (s as any).id ?? `${s.market_id}-${s.comune}-${s.giorno}`,
-              comune: s.comune,
-              giorno: s.giorno,
-              orario: s.orario,
-              luogo: s.luogo,
-              market_id: s.market_id,
-              market_slug: s.market_slug,
-              market_name: s.market_name,
-            }))} />
-          </section>
-        )}
-
-        {/* Preferiti (compare solo se ci sono) */}
-        <FavoritesSection />
-
-        {/* Dati salienti */}
-        <Reveal as="section" className="grid grid-cols-3 gap-6 md:gap-10 py-10 md:py-14 border-b border-cream-300">
-          <div>
-            <div className="font-serif text-3xl md:text-4xl text-ink tabular-nums">{markets?.length ?? 0}</div>
-            <div className="mt-1 text-xs uppercase tracking-widest-plus text-ink-muted">Zone</div>
-          </div>
-          <div>
-            <div className="font-serif text-3xl md:text-4xl text-ink tabular-nums">{totalComuni}</div>
-            <div className="mt-1 text-xs uppercase tracking-widest-plus text-ink-muted">Comuni</div>
-          </div>
-          <div>
-            <div className="font-serif text-3xl md:text-4xl text-ink tabular-nums">{totalMercati}</div>
-            <div className="mt-1 text-xs uppercase tracking-widest-plus text-ink-muted">Mercati</div>
-          </div>
-        </Reveal>
-
-        {/* Mappa */}
-        {mapSessions.length > 0 && (
-          <Reveal as="section" className="py-12 md:py-16">
-            <div className="flex items-end justify-between mb-5">
-              <div>
-                <p className="text-xs uppercase tracking-widest-plus text-ink-muted mb-1">La mappa</p>
-                <h2 className="font-serif text-2xl md:text-3xl text-ink">Dove trovarli</h2>
-              </div>
-              <WaveDivider className="w-32 text-sea-500 opacity-60 hidden md:block" />
-            </div>
-            <div className="border border-cream-300 bg-cream-50 rounded-sm p-1.5">
-              <UnifiedMapClient pins={mapPins} height={520} maxZoom={12} />
-            </div>
-            <p className="mt-3 text-xs text-ink-muted">
-              {totalComuni} comuni · {totalMercati} mercati · tocca un pin per i dettagli
-            </p>
-          </Reveal>
-        )}
-
-        {/* Zone — lista editoriale con foto */}
-        {markets && markets.length > 0 && (
-          <section id="zone" className="py-12 md:py-20 scroll-mt-24">
-            <Reveal className="mb-10">
-              <p className="text-xs uppercase tracking-widest-plus text-ink-muted mb-1">Le zone</p>
-              <h2 className="font-serif text-3xl md:text-4xl text-ink">Otto tappe, un territorio</h2>
-              <div className="mt-3 flex items-center gap-3">
-                <span className="block w-12 h-px bg-olive-500" />
-                <OliveSprig className="w-8 h-2.5 text-olive-500" />
-              </div>
-            </Reveal>
-
-            <ul className="space-y-0">
-              {markets.map((m, idx) => {
-                const comuni = comuniByMarket.get(m.id) ?? []
-                const sessionsCount = sessionsByMarket.get(m.id) ?? 0
-                const isAgg = comuni.length > 1
-                const num = String(idx + 1).padStart(2, '0')
-                const heroQuery = heroQueryFor(m.slug, m.city)
-                return (
-                  <Reveal as="li" key={m.id} delayMs={Math.min(idx, 5) * 70} className="border-t border-cream-300 last:border-b">
-                    <div className="relative group">
-                      <Link
-                        href={`/${m.slug}`}
-                        className="grid grid-cols-[auto_6.5rem_1fr_auto] md:grid-cols-[auto_10rem_1fr_auto] gap-4 md:gap-6 items-center py-5 md:py-6 hover:bg-cream-50 -mx-4 px-4 md:-mx-6 md:px-6 transition-all"
-                      >
-                        <div className="font-serif italic text-xl md:text-2xl text-olive-500 w-8 flex-shrink-0 tabular-nums self-start mt-1.5">
-                          {num}
-                        </div>
-
-                        <div className="rounded-sm overflow-hidden">
-                          <ZoneImage
-                            query={heroQuery}
-                            fallbackQuery={comuni[0] ?? m.city}
-                            alt={m.name}
-                            aspect="aspect-[4/3] md:aspect-[5/4]"
-                            hoverZoom
-                          />
-                        </div>
-
-                        <div className="min-w-0">
-                          <h3 className="font-serif text-xl md:text-2xl text-ink leading-tight group-hover:text-olive-700 transition-colors">
-                            {m.name}
-                          </h3>
-                          {comuni.length > 0 && (
-                            <p className="mt-1.5 text-sm text-ink-soft line-clamp-2">
-                              {isAgg ? comuni.join(' · ') : m.city}
-                            </p>
-                          )}
-                          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-muted">
-                            {m.market_days && m.market_days.length > 0 && (
-                              <span className="uppercase tracking-wider">{formatMarketDays(m.market_days)}</span>
-                            )}
-                            <span className="tabular-nums">
-                              {sessionsCount} {sessionsCount === 1 ? 'mercato' : 'mercati'}
-                            </span>
-                          </div>
-                        </div>
-
-                        <span className="text-ink-muted group-hover:text-olive-600 group-hover:translate-x-1.5 transition-all self-center text-xl">
-                          →
-                        </span>
-                      </Link>
-                      <div className="absolute top-3 right-3 md:top-4 md:right-2">
-                        <FavoriteButton kind="market" id={m.slug} label={m.name} />
-                      </div>
-                    </div>
-                  </Reveal>
-                )
-              })}
-            </ul>
-          </section>
-        )}
-
-        {/* Footer */}
-        <footer className="py-10 border-t border-cream-300 mt-10">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-xs text-ink-muted">
-            <div className="flex items-center gap-3">
-              <OliveSprig className="w-8 h-2.5 text-olive-500" />
-              <span className="font-serif italic text-ink">IMercati</span>
-              <span>· Liguria · Provincia di Imperia</span>
-            </div>
-            <div>
-              Immagini da Wikipedia. Dati aggiornati in tempo reale.
-            </div>
-          </div>
-        </footer>
-      </div>
-    </div>
+      </footer>
+    </>
   )
 }

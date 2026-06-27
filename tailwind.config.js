@@ -37,6 +37,13 @@ module.exports = {
           500: '#B75A40',
           600: '#9A4733',
         },
+        // --- Brand "bold" v2: mappa-centrica (Imperia / Riviera) ---
+        paper:  '#FBF6EA',
+        night:  '#0E2A33',
+        pesto:  { DEFAULT: '#2FA84F', 600: '#1E7D39', 700: '#15622C' },
+        mimosa: { DEFAULT: '#FFC22E', 600: '#E0A511' },
+        coral:  { DEFAULT: '#EF4B27', 600: '#C63A1B' },
+        riviera:{ DEFAULT: '#1E73E8', 600: '#1559B8' },
         // retrocompat
         primary: {
           50:  '#FCFAF5',
@@ -54,6 +61,9 @@ module.exports = {
       fontFamily: {
         sans: ['var(--font-sans)', 'Inter', 'system-ui', 'sans-serif'],
         serif: ['var(--font-serif)', 'Fraunces', 'Georgia', 'serif'],
+        display: ['var(--font-display)', 'Archivo Black', 'system-ui', 'sans-serif'],
+        alt: ['var(--font-alt)', 'system-ui', 'sans-serif'],
+        accent: ['var(--font-accent)', 'Comic Sans MS', 'cursive'],
       },
       letterSpacing: {
         'widest-plus': '0.22em',
