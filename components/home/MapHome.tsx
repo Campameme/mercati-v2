@@ -6,6 +6,7 @@ import { gsap } from 'gsap'
 import { Search, Crosshair, Clock, Store, MapPin } from 'lucide-react'
 import UnifiedMapClient from '@/components/UnifiedMapClient'
 import Logo from '@/components/Logo'
+import SeaCanvas from '@/components/motion/SeaCanvas'
 import type { UnifiedMapPin } from '@/components/UnifiedMap'
 import MarketPanel from './MarketPanel'
 import type { MarketPin, MarketSession } from './types'
@@ -202,7 +203,10 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
   return (
     <>
       {/* HERO — brand forte, motivi liguri (sole + mare), titolo cinetico */}
-      <section ref={heroRef} className="relative overflow-hidden bg-night text-paper">
+      <section ref={heroRef} className="relative overflow-hidden bg-notte text-paper">
+        {/* Mare liquido (WebGL) + velo per leggibilità del testo */}
+        <SeaCanvas className="absolute inset-0 w-full h-full pointer-events-none" />
+        <div className="absolute inset-0 bg-notte/45 pointer-events-none" aria-hidden="true" />
         {/* Sole di Riviera */}
         <svg
           aria-hidden="true"

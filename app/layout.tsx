@@ -3,6 +3,7 @@ import { Inter, Fraunces, Archivo_Black, Bricolage_Grotesque, Caveat } from 'nex
 import './globals.css'
 import Providers from '@/components/Providers'
 import CookieNotice from '@/components/CookieNotice'
+import SmoothScroll from '@/components/motion/SmoothScroll'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -64,6 +65,7 @@ export default function RootLayout({
   return (
     <html lang="it" className={`${inter.variable} ${fraunces.variable} ${archivoBlack.variable} ${bricolage.variable} ${caveat.variable}`}>
       <body className="font-sans bg-paper text-ink antialiased">
+        <SmoothScroll />
         <Providers>
           <main className="min-h-screen">
             {children}
