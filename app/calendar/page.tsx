@@ -90,7 +90,7 @@ export default function GlobalCalendarPage() {
           end: e.end_at ?? undefined,
           backgroundColor: color,
           borderColor: color,
-          textColor: '#FBF6EA',
+          textColor: '#F7EFDD',
           extendedProps: { kind: 'event', e },
         })
       }
@@ -240,7 +240,7 @@ export default function GlobalCalendarPage() {
                       key={c}
                       onClick={() => toggleEvtCat(c)}
                       className={`font-alt font-semibold text-xs px-2.5 py-1 rounded-full border-2 transition-colors ${
-                        active ? 'text-paper' : 'bg-white text-ink-muted border-ink/15 hover:text-ink hover:border-ink/30'
+                        active ? 'text-carta' : 'bg-white text-ink-muted border-ink/15 hover:text-ink hover:border-ink/30'
                       }`}
                       style={active ? { backgroundColor: EVT_COLOR[c], borderColor: EVT_COLOR[c] } : undefined}
                     >
@@ -269,7 +269,7 @@ export default function GlobalCalendarPage() {
             <div className="flex gap-3 mt-3 pt-3 border-t-2 border-ink/10">
               <button
                 onClick={() => setSelectedMarkets(new Set(markets.map((m) => m.id)))}
-                className="font-alt text-xs text-pesto-600 hover:underline font-semibold"
+                className="font-alt text-xs text-mare-600 hover:underline font-semibold"
               >
                 Tutte
               </button>
@@ -311,16 +311,16 @@ export default function GlobalCalendarPage() {
       </div>
 
       {selected && (
-        <div className="fixed inset-0 z-50 bg-night/55 backdrop-blur-[2px] flex items-center justify-center p-4" onClick={() => setSelected(null)}>
+        <div className="fixed inset-0 z-50 bg-notte/55 backdrop-blur-[2px] flex items-center justify-center p-4" onClick={() => setSelected(null)}>
           <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-xl max-w-lg w-full p-6 border-2 border-ink/10 shadow-2xl">
             {selected.kind === 'event' ? (
               <>
                 <div className="flex items-center gap-2 mb-2 flex-wrap text-xs">
-                  <span className="font-alt font-semibold px-2.5 py-0.5 rounded-full text-paper" style={{ backgroundColor: EVT_COLOR[selected.e.category] ?? '#4A4F3B' }}>
+                  <span className="font-alt font-semibold px-2.5 py-0.5 rounded-full text-carta" style={{ backgroundColor: EVT_COLOR[selected.e.category] ?? '#4A4F3B' }}>
                     {EVT_LABEL[selected.e.category] ?? selected.e.category}
                   </span>
                   {selected.e.markets?.slug && (
-                    <Link href={`/${selected.e.markets.slug}`} className="font-alt font-semibold px-2.5 py-0.5 rounded-full bg-paper border-2 border-ink/10 text-ink hover:border-pesto">
+                    <Link href={`/${selected.e.markets.slug}`} className="font-alt font-semibold px-2.5 py-0.5 rounded-full bg-carta border-2 border-ink/10 text-ink hover:border-mare">
                       {selected.e.markets.name}
                     </Link>
                   )}
@@ -342,12 +342,12 @@ export default function GlobalCalendarPage() {
               <>
                 <div className="flex items-center gap-2 mb-2 flex-wrap text-xs">
                   <span
-                    className="font-alt font-semibold px-2.5 py-0.5 rounded-full text-paper"
+                    className="font-alt font-semibold px-2.5 py-0.5 rounded-full text-carta"
                     style={{ backgroundColor: SCH_COLOR[selected.o.category] }}
                   >
                     {SCH_LABEL[selected.o.category]}
                   </span>
-                  <Link href={`/${selected.o.market_slug}`} className="font-alt font-semibold px-2.5 py-0.5 rounded-full bg-paper border-2 border-ink/10 text-ink hover:border-pesto">
+                  <Link href={`/${selected.o.market_slug}`} className="font-alt font-semibold px-2.5 py-0.5 rounded-full bg-carta border-2 border-ink/10 text-ink hover:border-mare">
                     {selected.o.market_name}
                   </Link>
                 </div>
@@ -364,7 +364,7 @@ export default function GlobalCalendarPage() {
                 )}
               </>
             )}
-            <button onClick={() => setSelected(null)} className="mt-6 px-4 py-2.5 bg-paper border-2 border-ink/15 hover:border-ink rounded-full w-full font-alt text-sm font-semibold text-ink transition-colors">
+            <button onClick={() => setSelected(null)} className="mt-6 px-4 py-2.5 bg-carta border-2 border-ink/15 hover:border-ink rounded-full w-full font-alt text-sm font-semibold text-ink transition-colors">
               Chiudi
             </button>
           </div>

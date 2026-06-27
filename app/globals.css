@@ -7,8 +7,8 @@ html {
 }
 
 body {
-  color: #16130D; /* ink */
-  background: #FBF6EA; /* paper */
+  color: #1A1714; /* ink */
+  background: #F7EFDD; /* paper */
 }
 
 /* Reveal on scroll */
@@ -40,7 +40,7 @@ body {
 .fc {
   --fc-border-color: rgba(22, 19, 13, 0.12);
   --fc-today-bg-color: #FFF8E6;
-  --fc-neutral-bg-color: #FBF6EA;
+  --fc-neutral-bg-color: #F7EFDD;
   --fc-page-bg-color: transparent;
   font-family: var(--font-sans), system-ui, sans-serif;
 }
@@ -49,11 +49,11 @@ body {
   font-weight: 400;
   font-size: 1.25rem;
   letter-spacing: -0.01em;
-  color: #16130D;
+  color: #1A1714;
 }
 .fc .fc-button {
   background: #FFFFFF !important;
-  color: #16130D !important;
+  color: #1A1714 !important;
   border: 2px solid rgba(22, 19, 13, 0.15) !important;
   border-radius: 9999px !important;
   box-shadow: none !important;
@@ -65,8 +65,8 @@ body {
   padding: 0.4rem 0.9rem !important;
 }
 .fc .fc-button:hover {
-  background: #FBF6EA !important;
-  border-color: #2FA84F !important;
+  background: #F7EFDD !important;
+  border-color: #15607C !important;
 }
 .fc .fc-button:focus-visible {
   outline: 2px solid #1E73E8 !important;
@@ -74,9 +74,9 @@ body {
 }
 .fc .fc-button.fc-button-active,
 .fc .fc-button-primary:not(:disabled).fc-button-active {
-  background: #16130D !important;
-  color: #FBF6EA !important;
-  border-color: #16130D !important;
+  background: #1A1714 !important;
+  color: #F7EFDD !important;
+  border-color: #1A1714 !important;
 }
 .fc .fc-col-header-cell-cushion {
   color: #4A4F3B;
@@ -91,7 +91,7 @@ body {
   font-weight: 600;
   text-decoration: none !important;
 }
-.fc .fc-day-today .fc-daygrid-day-number { color: #16130D; }
+.fc .fc-day-today .fc-daygrid-day-number { color: #1A1714; }
 .fc .schedule-occ {
   background-color: rgba(22, 19, 13, 0.05) !important;
   border-top: 0 !important;
@@ -102,20 +102,20 @@ body {
   border-radius: 6px;
   font-weight: 600;
 }
-.fc .schedule-cat-alimentare   { background-color: rgba( 47, 168,  79, 0.12) !important; color: #15622C !important; border-left-color: #2FA84F !important; }
+.fc .schedule-cat-alimentare   { background-color: rgba( 47, 168,  79, 0.12) !important; color: #15622C !important; border-left-color: #15607C !important; }
 .fc .schedule-cat-antiquariato { background-color: rgba(239,  75,  39, 0.12) !important; color: #C63A1B !important; border-left-color: #EF4B27 !important; }
 .fc .schedule-cat-artigianato  { background-color: rgba( 30, 115, 232, 0.12) !important; color: #1559B8 !important; border-left-color: #1E73E8 !important; }
-.fc .schedule-cat-varie        { background-color: rgba( 22,  19, 13, 0.08) !important; color: #16130D !important; border-left-color: #4A4F3B !important; }
+.fc .schedule-cat-varie        { background-color: rgba( 22,  19, 13, 0.08) !important; color: #1A1714 !important; border-left-color: #4A4F3B !important; }
 
 /* Stile leaflet: identita IMercati — palette brand "bold" (paper/ink/pesto). */
 .leaflet-container {
-  background: #FBF6EA;
+  background: #F7EFDD;
   font-family: var(--font-sans), 'Inter', -apple-system, sans-serif;
 }
 
 .leaflet-control-zoom a {
-  color: #16130D !important;
-  background: #FBF6EA !important;
+  color: #1A1714 !important;
+  background: #F7EFDD !important;
   border-color: rgba(22, 19, 13, 0.18) !important;
   font-family: var(--font-alt), 'Inter', sans-serif !important;
   font-weight: 700;
@@ -123,7 +123,7 @@ body {
 
 .leaflet-control-zoom a:hover {
   background: #FFC22E !important;
-  color: #16130D !important;
+  color: #1A1714 !important;
 }
 
 .leaflet-control-attribution {
@@ -162,7 +162,7 @@ body {
 
 /* --- Texture "carta" leggera, opzionale (.bg-paper-grain) --- */
 .bg-paper-grain {
-  background-color: #FBF6EA;
+  background-color: #F7EFDD;
   background-image:
     radial-gradient(rgba(22, 19, 13, 0.035) 1px, transparent 1px),
     radial-gradient(rgba(22, 19, 13, 0.025) 1px, transparent 1px);
@@ -195,7 +195,7 @@ body {
   display: block;
   width: 100%;
   height: 18px;
-  color: #2FA84F; /* override via text-* */
+  color: #15607C; /* override via text-* */
   overflow: hidden;
 }
 .imk-wave-divider svg {
@@ -242,9 +242,9 @@ body {
   margin-left: 12px;
 }
 .imk-map .leaflet-control-zoom a {
-  background: #FBF6EA !important;
-  color: #16130D !important;
-  border: 2px solid #16130D !important;
+  background: #F7EFDD !important;
+  color: #1A1714 !important;
+  border: 2px solid #1A1714 !important;
   font-weight: 700;
 }
 .imk-map .leaflet-control-zoom a:first-child { border-bottom: none !important; }

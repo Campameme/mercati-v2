@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
-import { WaveTaglia } from '@/components/decorations'
+import { SunRay } from '@/components/decorations'
 
 export const metadata = {
-  title: 'Cookie Policy — iMercati',
-  description: 'Come usiamo cookie e storage del browser su iMercati.',
+  title: 'Cookie Policy — Mercati di Ponente',
+  description: 'Come usiamo cookie e storage del browser su Mercati di Ponente.',
 }
 
 const LAST_UPDATE = '14 maggio 2026'
@@ -12,24 +12,24 @@ const LAST_UPDATE = '14 maggio 2026'
 export default function CookiePage() {
   return (
     <div className="container mx-auto px-4 md:px-6 max-w-3xl py-10 md:py-14">
-      <Link href="/" className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-pesto-600 mb-6 transition-colors">
+      <Link href="/" className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-mare-600 mb-6 transition-colors">
         <ChevronLeft className="w-3.5 h-3.5" /> Homepage
       </Link>
 
       <div className="flex items-center gap-3 mb-4 text-ink-soft">
-        <WaveTaglia className="w-10 h-3 text-pesto" aria-hidden="true" />
+        <SunRay className="w-5 h-5 text-sole" aria-hidden="true" />
         <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">Informativa</p>
       </div>
 
       <h1 className="font-display text-3xl md:text-5xl text-ink leading-[1.06] mb-3">
-        Cookie <span className="text-pesto-600">Policy</span>
+        Cookie <span className="text-mare-600">Policy</span>
       </h1>
       <p className="text-sm text-ink-muted mb-10">Ultimo aggiornamento: {LAST_UPDATE}</p>
 
       <div className="space-y-8 text-ink-soft leading-relaxed">
         <section>
           <p className="text-lg text-ink mb-4">
-            <strong>iMercati non usa cookie di profilazione, tracciamento o pubblicità.</strong>
+            <strong>Mercati di Ponente non usa cookie di profilazione, tracciamento o pubblicità.</strong>
           </p>
           <p>
             Le nostre statistiche di visita sono <em>cookieless</em>: usiamo un identificatore tecnico
@@ -41,11 +41,11 @@ export default function CookiePage() {
 
         <section>
           <h2 className="font-display text-2xl text-ink mb-3">Cookie tecnici (strettamente necessari)</h2>
-          <p className="mb-4">Sono gli unici cookie che iMercati impone, solo quando servono davvero:</p>
+          <p className="mb-4">Sono gli unici cookie che Mercati di Ponente impone, solo quando servono davvero:</p>
 
           <div className="border-2 border-ink/10 rounded-xl overflow-hidden bg-white">
             <table className="w-full text-sm">
-              <thead className="bg-paper">
+              <thead className="bg-carta">
                 <tr className="text-left">
                   <th className="px-4 py-2.5 font-alt font-semibold uppercase tracking-[0.08em] text-xs text-ink-soft">Nome</th>
                   <th className="px-4 py-2.5 font-alt font-semibold uppercase tracking-[0.08em] text-xs text-ink-soft">Origine</th>
@@ -73,7 +73,7 @@ export default function CookiePage() {
           <p className="mb-3">Per ricordare le tue preferenze sul tuo dispositivo, usiamo localStorage:</p>
           <div className="border-2 border-ink/10 rounded-xl overflow-hidden bg-white">
             <table className="w-full text-sm">
-              <thead className="bg-paper">
+              <thead className="bg-carta">
                 <tr className="text-left">
                   <th className="px-4 py-2.5 font-alt font-semibold uppercase tracking-[0.08em] text-xs text-ink-soft">Chiave</th>
                   <th className="px-4 py-2.5 font-alt font-semibold uppercase tracking-[0.08em] text-xs text-ink-soft">Contiene</th>
@@ -107,8 +107,8 @@ export default function CookiePage() {
         <section>
           <h2 className="font-display text-2xl text-ink mb-3">Domande?</h2>
           <p>
-            Scrivi a <a href="mailto:emanueleecampanini@gmail.com" className="text-pesto-700 underline underline-offset-2 hover:text-pesto-600">emanueleecampanini@gmail.com</a>.
-            Per il quadro completo, vedi la <Link href="/privacy" className="text-pesto-700 underline underline-offset-2 hover:text-pesto-600">Privacy Policy</Link>.
+            Scrivi a <a href="mailto:emanueleecampanini@gmail.com" className="text-mare-700 underline underline-offset-2 hover:text-mare-600">emanueleecampanini@gmail.com</a>.
+            Per il quadro completo, vedi la <Link href="/privacy" className="text-mare-700 underline underline-offset-2 hover:text-mare-600">Privacy Policy</Link>.
           </p>
         </section>
       </div>

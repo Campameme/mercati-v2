@@ -5,6 +5,7 @@ import { gsap } from 'gsap'
 import { X, Navigation as NavIcon, Star, MapPin, Clock, Car, MessageCircle } from 'lucide-react'
 import type { Operator } from '@/types/operator'
 import type { Parking } from '@/types/parking'
+import BancoAvatar from '@/components/BancoAvatar'
 import type { MarketPin, MarketSession } from './types'
 import { type Lang, type HomeDict, categoryLabel } from '@/lib/i18n/home'
 import { type MarketStatus, fmtHour } from '@/lib/markets/hours'
@@ -29,11 +30,11 @@ function waHref(value: string): string {
 }
 
 const CROWD_COLOR: Record<string, string> = {
-  empty: '#2FA84F',
-  low: '#2FA84F',
-  medium: '#FFC22E',
-  high: '#EF4B27',
-  full: '#C63A1B',
+  empty: '#15607C',
+  low: '#15607C',
+  medium: '#F4B62C',
+  high: '#EC6A5E',
+  full: '#D24B3F',
 }
 
 export default function MarketPanel({ pin, session, status, lang, dict, onClose }: Props) {
@@ -104,11 +105,11 @@ export default function MarketPanel({ pin, session, status, lang, dict, onClose 
 
   const statusBadge = (() => {
     if (status.state === 'open')
-      return { bg: '#2FA84F', fg: '#fff', text: `${dict.openUntil} ${fmtHour(status.hour ?? 0)}` }
+      return { bg: '#15607C', fg: '#fff', text: `${dict.openUntil} ${fmtHour(status.hour ?? 0)}` }
     if (status.state === 'opens')
-      return { bg: '#FFC22E', fg: '#16130D', text: `${dict.opensAt} ${fmtHour(status.hour ?? 0)}` }
-    if (status.state === 'closed') return { bg: '#EDE4CB', fg: '#6a6450', text: dict.closedToday }
-    return { bg: '#EDE4CB', fg: '#6a6450', text: dict.hoursUnknown }
+      return { bg: '#F4B62C', fg: '#1A1714', text: `${dict.opensAt} ${fmtHour(status.hour ?? 0)}` }
+    if (status.state === 'closed') return { bg: '#EFE3C8', fg: '#8A8275', text: dict.closedToday }
+    return { bg: '#EFE3C8', fg: '#8A8275', text: dict.hoursUnknown }
   })()
 
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${pin.lat},${pin.lng}`
@@ -210,7 +211,7 @@ export default function MarketPanel({ pin, session, status, lang, dict, onClose 
           <ul className="space-y-2 mb-5">
             {operators.map((op) => (
               <li key={op.id} className="imk-op flex items-center gap-3 rounded-xl border-2 border-ink/10 bg-white px-3 py-2.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-pesto flex-shrink-0" aria-hidden="true" />
+                <BancoAvatar name={op.name} size={36} />
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-[15px] leading-tight truncate">{op.name}</div>
                   <div className="text-xs text-ink-muted truncate">

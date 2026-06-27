@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
-import { WaveTaglia } from '@/components/decorations'
+import { SunRay } from '@/components/decorations'
 
 export const metadata = {
-  title: 'Privacy Policy — iMercati',
-  description: 'Come trattiamo i dati personali su iMercati.',
+  title: 'Privacy Policy — Mercati di Ponente',
+  description: 'Come trattiamo i dati personali su Mercati di Ponente.',
 }
 
 const LAST_UPDATE = '14 maggio 2026'
@@ -12,17 +12,17 @@ const LAST_UPDATE = '14 maggio 2026'
 export default function PrivacyPage() {
   return (
     <div className="container mx-auto px-4 md:px-6 max-w-3xl py-10 md:py-14">
-      <Link href="/" className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-pesto-600 mb-6 transition-colors">
+      <Link href="/" className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-mare-600 mb-6 transition-colors">
         <ChevronLeft className="w-3.5 h-3.5" /> Homepage
       </Link>
 
       <div className="flex items-center gap-3 mb-4 text-ink-soft">
-        <WaveTaglia className="w-10 h-3 text-pesto" aria-hidden="true" />
+        <SunRay className="w-5 h-5 text-sole" aria-hidden="true" />
         <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">Informativa</p>
       </div>
 
       <h1 className="font-display text-3xl md:text-5xl text-ink leading-[1.06] mb-3">
-        Privacy <span className="text-pesto-600">Policy</span>
+        Privacy <span className="text-mare-600">Policy</span>
       </h1>
       <p className="text-sm text-ink-muted mb-10">Ultimo aggiornamento: {LAST_UPDATE}</p>
 
@@ -30,15 +30,15 @@ export default function PrivacyPage() {
         <section>
           <h2 className="font-display text-2xl text-ink mb-3">Chi siamo</h2>
           <p>
-            iMercati è un progetto indipendente che raccoglie e racconta i mercati settimanali
+            Mercati di Ponente è un progetto indipendente che raccoglie e racconta i mercati settimanali
             della provincia di Imperia. Il titolare del trattamento dei dati è <strong>Emanuele Campanini</strong>,
-            contattabile all&apos;indirizzo <a href="mailto:emanueleecampanini@gmail.com" className="text-pesto-700 underline underline-offset-2 hover:text-pesto-600">emanueleecampanini@gmail.com</a>.
+            contattabile all&apos;indirizzo <a href="mailto:emanueleecampanini@gmail.com" className="text-mare-700 underline underline-offset-2 hover:text-mare-600">emanueleecampanini@gmail.com</a>.
           </p>
         </section>
 
         <section>
           <h2 className="font-display text-2xl text-ink mb-3">Cosa raccogliamo</h2>
-          <p className="mb-3">iMercati raccoglie il minimo indispensabile per funzionare. Specificamente:</p>
+          <p className="mb-3">Mercati di Ponente raccoglie il minimo indispensabile per funzionare. Specificamente:</p>
           <ul className="list-disc pl-6 space-y-2">
             <li><strong>Statistiche di visita anonime</strong>: ogni pagina pubblica registra una view aggregata
               (tipo evento, pagina, dispositivo generico). Per evitare doppi conteggi, generiamo un
@@ -55,7 +55,7 @@ export default function PrivacyPage() {
         <section>
           <h2 className="font-display text-2xl text-ink mb-3">Cookie e tecnologie simili</h2>
           <p className="mb-3">
-            iMercati <strong>non usa cookie di tracciamento, profilazione o pubblicità</strong>.
+            Mercati di Ponente <strong>non usa cookie di tracciamento, profilazione o pubblicità</strong>.
             Le statistiche di visita non sono basate su cookie, quindi non hai bisogno di prestare consenso.
           </p>
           <p>
@@ -68,7 +68,7 @@ export default function PrivacyPage() {
               (la stellina). Restano sul tuo dispositivo, non vengono inviati a noi.</li>
           </ul>
           <p className="mt-3 text-sm">
-            Per i dettagli completi: <Link href="/cookie" className="text-pesto-700 underline underline-offset-2 hover:text-pesto-600">Cookie Policy</Link>.
+            Per i dettagli completi: <Link href="/cookie" className="text-mare-700 underline underline-offset-2 hover:text-mare-600">Cookie Policy</Link>.
           </p>
         </section>
 
@@ -115,10 +115,10 @@ export default function PrivacyPage() {
             <li>Limitarne il trattamento.</li>
             <li>Riceverli in un formato leggibile da macchina (portabilità).</li>
             <li>Opporti al trattamento.</li>
-            <li>Reclamare al Garante Privacy italiano (<a href="https://www.garanteprivacy.it" target="_blank" rel="noopener noreferrer" className="text-pesto-700 underline underline-offset-2 hover:text-pesto-600">garanteprivacy.it</a>).</li>
+            <li>Reclamare al Garante Privacy italiano (<a href="https://www.garanteprivacy.it" target="_blank" rel="noopener noreferrer" className="text-mare-700 underline underline-offset-2 hover:text-mare-600">garanteprivacy.it</a>).</li>
           </ul>
           <p className="mt-3">
-            Per esercitare uno qualunque di questi diritti, scrivi a <a href="mailto:emanueleecampanini@gmail.com" className="text-pesto-700 underline underline-offset-2 hover:text-pesto-600">emanueleecampanini@gmail.com</a>.
+            Per esercitare uno qualunque di questi diritti, scrivi a <a href="mailto:emanueleecampanini@gmail.com" className="text-mare-700 underline underline-offset-2 hover:text-mare-600">emanueleecampanini@gmail.com</a>.
             Rispondiamo entro 30 giorni.
           </p>
         </section>

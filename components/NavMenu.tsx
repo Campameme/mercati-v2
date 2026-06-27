@@ -7,7 +7,7 @@ import {
   X, Map as MapIcon, Store, Calendar, Newspaper, Cloud, MapPin, ChevronDown,
   Search, Shield, LogIn,
 } from 'lucide-react'
-import { WaveTaglia } from './decorations'
+import Logo from '@/components/Logo'
 import { slugifyName } from '@/lib/markets/slug'
 import { createClient } from '@/lib/supabase/client'
 import type { UserRole } from '@/types/market'
@@ -122,23 +122,20 @@ export default function NavMenu({ open, onClose }: Props) {
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-night/45 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-notte/45 backdrop-blur-[2px]"
         onClick={onClose}
       />
 
       {/* Drawer */}
       <aside
-        className={`absolute top-0 right-0 h-full w-full max-w-md md:max-w-lg bg-paper shadow-2xl border-l-2 border-ink/10 flex flex-col transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${open ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`absolute top-0 right-0 h-full w-full max-w-md md:max-w-lg bg-carta shadow-2xl border-l-2 border-ink/10 flex flex-col transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${open ? 'translate-x-0' : 'translate-x-full'}`}
         role="dialog"
         aria-label="Menu di navigazione"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 md:px-7 h-16 border-b-2 border-ink/10 flex-shrink-0">
-          <Link href="/" onClick={onClose} className="flex items-center gap-2.5 group">
-            <WaveTaglia className="w-10 h-3 text-pesto" aria-hidden="true" />
-            <span className="font-display text-[1.4rem] leading-none text-ink">
-              i<span className="text-pesto">M</span>ercati
-            </span>
+          <Link href="/" onClick={onClose} className="group text-ink">
+            <Logo inline className="text-[1.05rem]" />
           </Link>
           <button
             onClick={onClose}
@@ -159,7 +156,7 @@ export default function NavMenu({ open, onClose }: Props) {
               onChange={(e) => setQ(e.target.value)}
               placeholder="Cerca zona, comune, banco…"
               aria-label="Cerca zona, comune o banco"
-              className="w-full pl-10 pr-3 py-3 bg-white border-2 border-ink/15 rounded-xl text-[15px] focus:outline-none focus:border-pesto"
+              className="w-full pl-10 pr-3 py-3 bg-white border-2 border-ink/15 rounded-xl text-[15px] focus:outline-none focus:border-mare"
             />
           </div>
         </div>
@@ -179,10 +176,10 @@ export default function NavMenu({ open, onClose }: Props) {
                       href={l.href}
                       onClick={onClose}
                       className={`group flex items-center gap-3 px-3 py-3 rounded-xl border-2 transition-colors ${
-                        active ? 'bg-ink text-paper border-ink' : 'border-transparent hover:border-ink/10 hover:bg-white text-ink'
+                        active ? 'bg-ink text-carta border-ink' : 'border-transparent hover:border-ink/10 hover:bg-white text-ink'
                       }`}
                     >
-                      <Icon className={`w-4 h-4 ${active ? 'text-paper' : 'text-pesto'}`} aria-hidden="true" />
+                      <Icon className={`w-4 h-4 ${active ? 'text-carta' : 'text-mare'}`} aria-hidden="true" />
                       <span className="font-alt text-sm font-semibold">{l.label}</span>
                     </Link>
                   </li>
@@ -213,7 +210,7 @@ export default function NavMenu({ open, onClose }: Props) {
                           className="group flex-1 flex items-center justify-between gap-3 px-3 py-3 hover:bg-white rounded-xl transition-colors"
                         >
                           <div className="min-w-0">
-                            <span className="font-display text-base text-ink leading-tight block group-hover:text-pesto-600 transition-colors">
+                            <span className="font-display text-base text-ink leading-tight block group-hover:text-mare-600 transition-colors">
                               {m.name}
                             </span>
                             {isAgg ? (
@@ -247,7 +244,7 @@ export default function NavMenu({ open, onClose }: Props) {
                                 onClick={onClose}
                                 className="flex items-center gap-2 px-2 py-1.5 text-sm text-ink-soft hover:text-ink hover:bg-white rounded-lg transition-colors"
                               >
-                                <MapPin className="w-3.5 h-3.5 text-pesto" aria-hidden="true" />
+                                <MapPin className="w-3.5 h-3.5 text-mare" aria-hidden="true" />
                                 {c}
                               </Link>
                             </li>
@@ -258,9 +255,9 @@ export default function NavMenu({ open, onClose }: Props) {
                       {/* Shortcut sotto ogni zona */}
                       {!isAgg && (
                         <div className="flex gap-1.5 pb-2 pl-3 text-xs">
-                          <Link href={`/${m.slug}/operators`} onClick={onClose} className="font-alt font-semibold px-2.5 py-1 rounded-full border-2 border-ink/10 bg-white text-ink hover:border-pesto transition-colors">Banchi</Link>
-                          <Link href={`/${m.slug}/calendar`} onClick={onClose} className="font-alt font-semibold px-2.5 py-1 rounded-full border-2 border-ink/10 bg-white text-ink hover:border-pesto transition-colors">Calendario</Link>
-                          <Link href={`/${m.slug}/news`} onClick={onClose} className="font-alt font-semibold px-2.5 py-1 rounded-full border-2 border-ink/10 bg-white text-ink hover:border-pesto transition-colors">Notizie</Link>
+                          <Link href={`/${m.slug}/operators`} onClick={onClose} className="font-alt font-semibold px-2.5 py-1 rounded-full border-2 border-ink/10 bg-white text-ink hover:border-mare transition-colors">Banchi</Link>
+                          <Link href={`/${m.slug}/calendar`} onClick={onClose} className="font-alt font-semibold px-2.5 py-1 rounded-full border-2 border-ink/10 bg-white text-ink hover:border-mare transition-colors">Calendario</Link>
+                          <Link href={`/${m.slug}/news`} onClick={onClose} className="font-alt font-semibold px-2.5 py-1 rounded-full border-2 border-ink/10 bg-white text-ink hover:border-mare transition-colors">Notizie</Link>
                         </div>
                       )}
                     </li>
@@ -279,22 +276,22 @@ export default function NavMenu({ open, onClose }: Props) {
                 {role === 'super_admin' && (
                   <>
                     <Link href="/admin" onClick={onClose} className="flex items-center gap-3 px-3 py-3 rounded-xl border-2 border-transparent hover:border-ink/10 hover:bg-white text-ink font-alt text-sm font-semibold">
-                      <Shield className="w-4 h-4 text-pesto" aria-hidden="true" /> Admin — Dashboard
+                      <Shield className="w-4 h-4 text-mare" aria-hidden="true" /> Admin — Dashboard
                     </Link>
                     <Link href="/admin/sessions" onClick={onClose} className="flex items-center gap-3 px-3 py-3 rounded-xl border-2 border-transparent hover:border-ink/10 hover:bg-white text-ink font-alt text-sm font-semibold">
-                      <Shield className="w-4 h-4 text-pesto" aria-hidden="true" /> Accendi / Spegni mercati
+                      <Shield className="w-4 h-4 text-mare" aria-hidden="true" /> Accendi / Spegni mercati
                     </Link>
                   </>
                 )}
                 <Link href="/operator" onClick={onClose} className="flex items-center gap-3 px-3 py-3 rounded-xl border-2 border-transparent hover:border-ink/10 hover:bg-white text-ink font-alt text-sm font-semibold">
-                  <Store className="w-4 h-4 text-pesto" aria-hidden="true" /> Area operatore
+                  <Store className="w-4 h-4 text-mare" aria-hidden="true" /> Area operatore
                 </Link>
               </div>
             ) : (
               <Link
                 href="/login"
                 onClick={onClose}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-ink text-paper rounded-full font-alt text-sm font-semibold hover:bg-pesto transition-colors w-fit"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-ink text-carta rounded-full font-alt text-sm font-semibold hover:bg-mare transition-colors w-fit"
               >
                 <LogIn className="w-4 h-4" /> Accedi
               </Link>
@@ -303,10 +300,9 @@ export default function NavMenu({ open, onClose }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="px-5 md:px-7 py-4 border-t-2 border-ink/10 text-[11px] text-ink-muted flex items-center gap-2 flex-shrink-0">
-          <WaveTaglia className="w-8 h-2.5 text-pesto" aria-hidden="true" />
-          <span className="font-display text-ink">iMercati</span>
-          <span>· Liguria · Provincia di Imperia</span>
+        <div className="px-5 md:px-7 py-4 border-t-2 border-ink/10 text-[11px] text-ink-muted flex items-center gap-2 flex-shrink-0 text-ink">
+          <Logo inline className="text-[0.9rem]" />
+          <span className="text-ink-muted">· Liguria · Provincia di Imperia</span>
         </div>
       </aside>
     </div>

@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Menu, Shield, LogIn } from 'lucide-react'
 import WeatherWidget from './WeatherWidget'
-import { WaveTaglia } from './decorations'
+import Logo from './Logo'
 import NavMenu from './NavMenu'
 import { useMarketSlug } from '@/lib/markets/useMarketSlug'
 import { createClient } from '@/lib/supabase/client'
@@ -51,11 +51,8 @@ export default function Navigation() {
                 <Menu className="w-4 h-4" />
                 <span className="font-alt text-xs font-semibold uppercase tracking-[0.12em] hidden sm:inline">Menu</span>
               </button>
-              <Link href="/" className="flex items-center gap-2.5" aria-label="iMercati — home">
-                <WaveTaglia className="w-10 h-3 text-pesto -mb-0.5 hidden sm:block" aria-hidden="true" />
-                <span className="font-display text-[1.4rem] leading-none text-ink">
-                  i<span className="text-pesto">M</span>ercati
-                </span>
+              <Link href="/" aria-label="Mercati di Ponente — home" className="text-ink text-[1.05rem]">
+                <Logo inline />
               </Link>
             </div>
 

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { gsap } from 'gsap'
 import { Search, Crosshair, Clock, Store, MapPin } from 'lucide-react'
 import UnifiedMapClient from '@/components/UnifiedMapClient'
+import Logo from '@/components/Logo'
 import type { UnifiedMapPin } from '@/components/UnifiedMap'
 import MarketPanel from './MarketPanel'
 import type { MarketPin, MarketSession } from './types'
@@ -227,9 +228,9 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
 
         <div className="container mx-auto px-4 md:px-6 pt-8 pb-12 relative z-10">
           <div className="flex items-start justify-between gap-3">
-            <p data-anim className="font-alt text-[11px] md:text-xs uppercase tracking-[0.22em] text-mimosa">
-              Provincia di Imperia · Riviera di Ponente
-            </p>
+            <div data-anim className="text-paper text-base">
+              <Logo inline />
+            </div>
             <div data-anim className="flex gap-1">
               {LANGS.map((l) => (
                 <button
@@ -246,7 +247,10 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
             </div>
           </div>
 
-          <h1 className="font-display text-4xl md:text-6xl leading-[0.95] tracking-tight mt-4 max-w-4xl">
+          <p data-anim className="font-alt text-[11px] md:text-xs uppercase tracking-[0.22em] text-sole mt-5">
+            Provincia di Imperia · Riviera di Ponente
+          </p>
+          <h1 className="font-display text-4xl md:text-6xl leading-[0.95] tracking-tight mt-2 max-w-4xl">
             {headlineWords.map((w, i) => (
               <span key={i} className="inline-block overflow-hidden align-bottom">
                 <span data-word className="inline-block">

@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { Search, CalendarDays } from 'lucide-react'
+import { Search, CalendarDays, BadgeCheck, MessageCircle } from 'lucide-react'
 import { WaveTaglia } from '@/components/decorations'
+import { BancoPlaceholder } from '@/components/BancoAvatar'
 
 interface HubOperator {
   id: string
@@ -11,6 +12,9 @@ interface HubOperator {
   category: string
   description: string
   photos: string[]
+  socialLinks?: { facebook?: string; instagram?: string; website?: string; whatsapp?: string }
+  rating?: number
+  verified?: boolean
   location: { lat: number; lng: number; stallNumber: string }
   market: { id: string; slug: string; name: string; city: string } | null
   schedules: Array<{
@@ -37,6 +41,11 @@ const CAT_LABEL: Record<string, string> = {
   bakery: 'Panificio',
   meat_fish: 'Carne e pesce',
   dairy: 'Latticini',
+}
+
+function waHref(value: string): string {
+  if (/^https?:\/\//i.test(value)) return value
+  return `https://wa.me/${value.replace(/[^0-9]/g, '')}`
 }
 
 export default function OperatoriHubPage() {
@@ -93,19 +102,19 @@ export default function OperatoriHubPage() {
     <div className="container mx-auto px-4 md:px-6 py-10 md:py-14">
       <div className="mb-8 border-b-2 border-ink/10 pb-6">
         <div className="flex items-center gap-3 mb-2 text-ink-soft">
-          <WaveTaglia className="w-8 h-2.5 text-pesto" aria-hidden="true" />
-          <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">Provincia · panoramica</p>
+          <WaveTaglia className="w-8 h-2.5 text-mare" aria-hidden="true" />
+          <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">Riviera di Ponente · la carta del banco</p>
         </div>
         <div className="flex items-baseline justify-between gap-4 flex-wrap">
           <h1 className="font-display text-3xl md:text-5xl text-ink leading-tight">
-            Banchi <span className="text-pesto-600">della provincia</span>
+            I banchi <span className="text-mare-600">della provincia</span>
           </h1>
           <p className="text-xs text-ink-muted tabular-nums">
             {operators.length} operator{operators.length === 1 ? 'e' : 'i'}
           </p>
         </div>
         <p className="text-sm text-ink-soft mt-3 max-w-xl">
-          Tutti gli operatori del territorio, con la lista dei mercati che frequentano ogni settimana.
+          Ogni venditore della Riviera con la sua figurina e i mercati che frequenta ogni settimana.
           Filtra per zona, comune o categoria per trovare subito quello che cerchi.
         </p>
       </div>
@@ -119,14 +128,14 @@ export default function OperatoriHubPage() {
             onChange={(e) => setQ(e.target.value)}
             placeholder="Cerca banco, comune…"
             aria-label="Cerca banco o comune"
-            className="w-full pl-10 pr-3 py-3 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-pesto"
+            className="w-full pl-10 pr-3 py-3 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-mare"
           />
         </div>
         <select
           value={marketFilter}
           onChange={(e) => setMarketFilter(e.target.value)}
           aria-label="Filtra per zona"
-          className="py-3 px-3 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-pesto"
+          className="py-3 px-3 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-mare"
         >
           <option value="all">Tutte le zone</option>
           {markets.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
@@ -135,7 +144,7 @@ export default function OperatoriHubPage() {
           value={comuneFilter}
           onChange={(e) => setComuneFilter(e.target.value)}
           aria-label="Filtra per comune"
-          className="py-3 px-3 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-pesto"
+          className="py-3 px-3 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-mare"
         >
           <option value="all">Tutti i comuni</option>
           {comuni.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -144,7 +153,7 @@ export default function OperatoriHubPage() {
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
           aria-label="Filtra per categoria"
-          className="py-3 px-3 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-pesto"
+          className="py-3 px-3 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-mare"
         >
           <option value="all">Tutte le categorie</option>
           {categories.map((c) => <option key={c} value={c}>{CAT_LABEL[c] ?? c}</option>)}
@@ -172,20 +181,26 @@ export default function OperatoriHubPage() {
               <Link
                 key={op.id}
                 href={href}
-                className="imk-lift group bg-white border-2 border-ink/10 rounded-xl overflow-hidden flex flex-col hover:border-pesto transition-colors"
+                className="imk-lift group bg-white border-2 border-ink/10 rounded-xl overflow-hidden flex flex-col hover:border-mare transition-colors"
               >
-                {op.photos?.[0] ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={op.photos[0]} alt={op.name} className="w-full h-40 object-cover" />
-                ) : (
-                  <div className="w-full h-40 bg-paper border-b-2 border-ink/10 flex items-center justify-center">
-                    <WaveTaglia className="w-14 h-4 text-pesto/40" aria-hidden="true" />
-                  </div>
-                )}
+                {/* Testata figurina: foto o placeholder duotone mare→sole */}
+                <div className="relative">
+                  {op.photos?.[0] ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={op.photos[0]} alt={op.name} className="w-full h-40 object-cover" />
+                  ) : (
+                    <BancoPlaceholder name={op.name} className="w-full h-40 border-b-2 border-ink/10" />
+                  )}
+                  {op.verified && (
+                    <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 bg-sole text-ink rounded-full font-alt text-[10px] font-semibold uppercase tracking-wider shadow-sm">
+                      <BadgeCheck className="w-3.5 h-3.5" /> Verificato
+                    </span>
+                  )}
+                </div>
                 <div className="p-5 flex-1 flex flex-col">
                   <div className="flex items-start justify-between gap-2 mb-1">
-                    <h3 className="font-display text-lg text-ink leading-tight group-hover:text-pesto-600 transition-colors">{op.name}</h3>
-                    <span className="flex-shrink-0 font-alt text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 bg-mimosa/30 text-ink rounded-full">
+                    <h3 className="font-display text-lg text-ink leading-tight group-hover:text-mare-600 transition-colors">{op.name}</h3>
+                    <span className="flex-shrink-0 font-alt text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 bg-sole/30 text-ink rounded-full">
                       {CAT_LABEL[op.category] ?? op.category}
                     </span>
                   </div>
@@ -201,7 +216,7 @@ export default function OperatoriHubPage() {
                     ) : (
                       preview.map((s) => (
                         <div key={s.scheduleId} className="flex items-center gap-1.5 text-xs text-ink-soft">
-                          <CalendarDays className="w-3.5 h-3.5 text-pesto flex-shrink-0" aria-hidden="true" />
+                          <CalendarDays className="w-3.5 h-3.5 text-mare flex-shrink-0" aria-hidden="true" />
                           <span className="truncate">
                             <strong className="text-ink">{s.comune}</strong> · {s.giorno}
                             {s.luogo && <span className="text-ink-muted"> — {s.luogo}</span>}
@@ -213,6 +228,28 @@ export default function OperatoriHubPage() {
                       <p className="text-xs text-ink-muted italic">+ altri {more} mercat{more === 1 ? 'o' : 'i'}</p>
                     )}
                   </div>
+                  {op.socialLinks?.whatsapp && (
+                    <span
+                      role="link"
+                      tabIndex={0}
+                      aria-label={`WhatsApp — ${op.name}`}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        window.open(waHref(op.socialLinks!.whatsapp!), '_blank', 'noopener,noreferrer')
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          window.open(waHref(op.socialLinks!.whatsapp!), '_blank', 'noopener,noreferrer')
+                        }
+                      }}
+                      className="mt-3 inline-flex items-center gap-1.5 self-start px-3 py-1.5 bg-[#25D366] text-white rounded-full font-alt text-[11px] font-semibold uppercase tracking-wider hover:opacity-90 transition-opacity cursor-pointer"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+                    </span>
+                  )}
                 </div>
               </Link>
             )

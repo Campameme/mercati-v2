@@ -8,54 +8,35 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Palette Ligure
-        cream: {
-          50:  '#FCFAF5',
-          100: '#F7F2E7',
-          200: '#EDE4CE',
-          300: '#E1D5B5',
-        },
-        ink: {
-          DEFAULT: '#1F2813', // olive-black per testo
-          soft: '#4A4F3B',
-          muted: '#7A7968',
-        },
-        olive: {
-          100: '#EAEDDA',
-          400: '#8FA05A',
-          500: '#6B7F3A',
-          600: '#54662B',
-          700: '#3E4C1F',
-        },
-        sea: {
-          100: '#DCEAF0',
-          500: '#2A5A75',
-          600: '#1F4A62',
-        },
-        terra: {
-          100: '#F4DFD4',
-          500: '#B75A40',
-          600: '#9A4733',
-        },
-        // --- Brand "bold" v2: mappa-centrica (Imperia / Riviera) ---
-        paper:  '#FBF6EA',
-        night:  '#0E2A33',
-        pesto:  { DEFAULT: '#2FA84F', 600: '#1E7D39', 700: '#15622C' },
-        mimosa: { DEFAULT: '#FFC22E', 600: '#E0A511' },
-        coral:  { DEFAULT: '#EF4B27', 600: '#C63A1B' },
-        riviera:{ DEFAULT: '#1E73E8', 600: '#1559B8' },
-        // retrocompat
+        // ============================================================
+        // BRAND "Mercati di Ponente" — Riviera di Ponente (Imperia)
+        // Palette coerente: Mare (primario) · Sole (oggi/aperto) ·
+        // Fiore (accento) · Carta · Inchiostro. Niente verde generico.
+        // ============================================================
+        carta: '#F7EFDD',
+        marel: '#DCEBEC', // mare chiaro (sfondi)
+        notte: '#0E3040',
+        ink: { DEFAULT: '#1A1714', soft: '#4A4438', muted: '#8A8275' },
+        mare: { DEFAULT: '#15607C', 600: '#114F66', 700: '#0E3F52' },
+        sole: { DEFAULT: '#F4B62C', 600: '#D69A12' },
+        fiore: { DEFAULT: '#EC6A5E', 600: '#D24B3F' },
+
+        // --- Alias legacy → rimappati alla nuova palette (deprecati,
+        //     usare mare/sole/fiore/carta/notte nel codice nuovo) ---
+        paper: '#F7EFDD',
+        night: '#0E3040',
+        pesto: { DEFAULT: '#15607C', 600: '#114F66', 700: '#0E3F52' },
+        riviera: { DEFAULT: '#15607C', 600: '#114F66' },
+        mimosa: { DEFAULT: '#F4B62C', 600: '#D69A12' },
+        coral: { DEFAULT: '#EC6A5E', 600: '#D24B3F' },
+        cream: { 50: '#FDF8EC', 100: '#F7EFDD', 200: '#EFE3C8', 300: '#E2D6BC' },
+        olive: { 100: '#DCEBEC', 400: '#2E84A3', 500: '#15607C', 600: '#114F66', 700: '#0E3F52' },
+        sea: { 100: '#DCEBEC', 500: '#15607C', 600: '#114F66' },
+        terra: { 100: '#FBE0D9', 500: '#EC6A5E', 600: '#D24B3F' },
         primary: {
-          50:  '#FCFAF5',
-          100: '#F7F2E7',
-          200: '#EAEDDA',
-          300: '#E1D5B5',
-          400: '#8FA05A',
-          500: '#6B7F3A',
-          600: '#54662B',
-          700: '#3E4C1F',
-          800: '#2B3520',
-          900: '#1F2813',
+          50: '#EAF2F5', 100: '#DCEBEC', 200: '#B9D6DE', 300: '#8FBDCB',
+          400: '#2E84A3', 500: '#15607C', 600: '#114F66', 700: '#0E3F52',
+          800: '#0E3040', 900: '#0A2533',
         },
       },
       fontFamily: {

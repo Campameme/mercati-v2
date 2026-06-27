@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { slugifyName } from '@/lib/markets/slug'
 import MapHome from '@/components/home/MapHome'
+import Logo from '@/components/Logo'
 import type { MarketPin } from '@/components/home/types'
 import PageviewTracker from '@/components/analytics/PageviewTracker'
 
@@ -80,7 +81,7 @@ export default async function HomePage() {
       <MapHome pins={pins} />
       <footer className="bg-paper border-t-2 border-ink/10 py-8">
         <div className="container mx-auto px-4 md:px-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-ink-muted">
-          <span className="font-display text-sm text-ink">iMercati</span>
+          <Logo inline className="text-ink text-xs" />
           <span className="text-ink-muted/70">Guida ai mercati della provincia di Imperia.</span>
           <span className="flex-1" />
           <Link href="/operatori" className="hover:text-ink">Ambulanti</Link>

@@ -4,6 +4,7 @@ import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { LogIn, Mail, Lock, UserPlus } from 'lucide-react'
+import Logo from '@/components/Logo'
 
 export default function LoginPage() {
   return (
@@ -79,7 +80,10 @@ function LoginPageInner() {
     <div className="min-h-[80vh] bg-paper flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-xl border-2 border-ink/10 shadow-sm p-8">
-          <p className="text-center text-xs font-alt uppercase tracking-[0.18em] text-pesto-600 mb-1">iMercati · Riviera</p>
+          <div className="flex items-center justify-center gap-2 text-pesto-600 mb-1">
+            <Logo inline className="text-sm" />
+            <span className="text-xs font-alt uppercase tracking-[0.18em]">· Riviera</span>
+          </div>
           <h1 className="font-display text-3xl text-ink mb-6 text-center">
             {mode === 'signin' ? 'Accedi' : 'Registrati'}
           </h1>

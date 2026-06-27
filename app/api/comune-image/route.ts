@@ -50,7 +50,7 @@ function isGenericIcon(filename: string): boolean {
 async function wikiFetch(url: string) {
   return fetch(url, {
     next: { revalidate: 86400 },
-    headers: { 'User-Agent': 'IMercati/1.0', Accept: 'application/json' },
+    headers: { 'User-Agent': 'MercatiDiPonente/1.0', Accept: 'application/json' },
   })
 }
 

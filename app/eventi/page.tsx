@@ -51,36 +51,36 @@ export default async function EventiPage() {
   const total = events.length
 
   return (
-    <div className="min-h-screen bg-paper text-ink">
+    <div className="min-h-screen bg-carta text-ink">
       {/* ============ HEADER ============ */}
-      <header className="relative overflow-hidden border-b-2 border-ink/10 bg-night text-paper">
+      <header className="relative overflow-hidden border-b-2 border-ink/10 bg-notte text-carta">
         {/* Sole di Riviera */}
-        <RivieraSun className="pointer-events-none absolute -right-6 -top-6 h-40 w-40 text-mimosa/80 md:right-10 md:top-8 md:h-44 md:w-44" />
+        <RivieraSun className="pointer-events-none absolute -right-6 -top-6 h-40 w-40 text-sole/80 md:right-10 md:top-8 md:h-44 md:w-44" />
         {/* Limone */}
-        <Lemon className="pointer-events-none absolute right-1/3 top-10 hidden h-16 w-16 rotate-12 text-mimosa/40 lg:block" />
+        <Lemon className="pointer-events-none absolute right-1/3 top-10 hidden h-16 w-16 rotate-12 text-sole/40 lg:block" />
 
         <div className="container relative mx-auto px-4 py-12 md:px-6 md:py-16">
           <Link
             href="/"
-            className="mb-6 inline-flex items-center gap-1.5 rounded-full bg-paper/10 px-3 py-1 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-paper/90 ring-1 ring-paper/20 transition-colors hover:bg-paper/20"
+            className="mb-6 inline-flex items-center gap-1.5 rounded-full bg-carta/10 px-3 py-1 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-carta/90 ring-1 ring-carta/20 transition-colors hover:bg-carta/20"
           >
             <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
             Torna alla mappa
           </Link>
 
-          <p className="font-alt text-xs font-semibold uppercase tracking-[0.22em] text-mimosa">
+          <p className="font-alt text-xs font-semibold uppercase tracking-[0.22em] text-sole">
             Liguria · Provincia di Imperia
           </p>
           <h1 className="mt-2 max-w-3xl font-display text-4xl leading-[0.95] md:text-6xl">
             Eventi sulla Riviera
           </h1>
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-paper/80 md:text-lg">
+          <p className="mt-4 max-w-xl text-base leading-relaxed text-carta/80 md:text-lg">
             Fiere, sagre, gastronomia, musica e appuntamenti speciali nei mercati del Ponente
             ligure. Tutti gli eventi in arrivo, in ordine di data.
           </p>
 
           {total > 0 && (
-            <p className="mt-5 inline-flex items-center gap-2 rounded-full bg-pesto px-4 py-1.5 font-alt text-sm font-semibold text-white">
+            <p className="mt-5 inline-flex items-center gap-2 rounded-full bg-mare px-4 py-1.5 font-alt text-sm font-semibold text-white">
               <CalendarDays className="h-4 w-4" aria-hidden="true" />
               {total} {total === 1 ? 'evento in programma' : 'eventi in programma'}
             </p>
@@ -88,7 +88,7 @@ export default async function EventiPage() {
         </div>
 
         {/* Onde del mare a chiudere l'header */}
-        <SeaWaves className="absolute bottom-0 left-0 h-4 w-[200%] text-riviera/60 md:h-5" preserveAspectRatio="none" />
+        <SeaWaves className="absolute bottom-0 left-0 h-4 w-[200%] text-mare/60 md:h-5" preserveAspectRatio="none" />
       </header>
 
       {/* ============ CONTENUTO ============ */}
@@ -123,15 +123,15 @@ export default async function EventiPage() {
 
         {/* Rimando al calendario completo */}
         <div className="mt-14 flex flex-col items-center gap-4 rounded-xl border-2 border-ink/10 bg-white px-6 py-8 text-center">
-          <ArchRow className="h-10 w-56 text-pesto/30" count={7} />
-          <p className="font-accent text-2xl text-pesto-600">Vuoi vedere tutto a colpo d&apos;occhio?</p>
+          <ArchRow className="h-10 w-56 text-mare/30" count={7} />
+          <p className="font-accent text-2xl text-mare-600">Vuoi vedere tutto a colpo d&apos;occhio?</p>
           <p className="max-w-md text-sm text-ink-soft">
             Eventi speciali e mercati ricorrenti, filtrabili per zona e categoria, nel calendario
             completo della Riviera.
           </p>
           <Link
             href="/calendar"
-            className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 font-alt text-sm font-semibold text-paper transition-colors hover:bg-pesto"
+            className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 font-alt text-sm font-semibold text-carta transition-colors hover:bg-mare"
           >
             <CalendarDays className="h-4 w-4" aria-hidden="true" />
             Apri il calendario
@@ -146,19 +146,19 @@ export default async function EventiPage() {
 function EmptyState() {
   return (
     <div className="mx-auto flex max-w-lg flex-col items-center rounded-xl border-2 border-ink/10 bg-white px-6 py-14 text-center">
-      <div className="relative mb-6 grid h-24 w-24 place-items-center rounded-full bg-paper ring-2 ring-ink/10">
-        <RivieraSun className="h-12 w-12 text-mimosa-600" />
-        <Lemon className="absolute -bottom-1 -right-1 h-8 w-8 text-pesto" />
+      <div className="relative mb-6 grid h-24 w-24 place-items-center rounded-full bg-carta ring-2 ring-ink/10">
+        <RivieraSun className="h-12 w-12 text-sole-600" />
+        <Lemon className="absolute -bottom-1 -right-1 h-8 w-8 text-mare" />
       </div>
       <h2 className="font-display text-2xl text-ink">Nessun evento in programma</h2>
       <p className="mt-3 text-sm leading-relaxed text-ink-soft">
         Per ora non ci sono appuntamenti speciali in calendario. Torna a trovarci: i mercati della
         Riviera non si fermano mai a lungo.
       </p>
-      <SeaWaves className="my-6 h-4 w-40 text-riviera/50" />
+      <SeaWaves className="my-6 h-4 w-40 text-mare/50" />
       <Link
         href="/calendar"
-        className="inline-flex items-center gap-2 rounded-full bg-pesto px-5 py-2.5 font-alt text-sm font-semibold text-white transition-colors hover:bg-pesto-600"
+        className="inline-flex items-center gap-2 rounded-full bg-mare px-5 py-2.5 font-alt text-sm font-semibold text-white transition-colors hover:bg-mare-600"
       >
         <CalendarDays className="h-4 w-4" aria-hidden="true" />
         Guarda i mercati ricorrenti

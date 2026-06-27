@@ -8,11 +8,11 @@ const STORAGE_KEY = 'imercati:cookie-notice-dismissed:v1'
 
 /**
  * Banner informativo, non bloccante.
- * IMercati non usa cookie di tracciamento ne richiede consenso preventivo,
- * ma e doveroso informare l'utente sulla nostra scelta privacy-friendly e
- * sui cookie tecnici di Supabase per chi accede all'area admin.
- * Quando l'utente clicca "Ho capito", salviamo in localStorage e il banner non
- * compare piu su questo dispositivo.
+ * Mercati di Ponente non usa cookie di tracciamento ne richiede consenso
+ * preventivo, ma e doveroso informare l'utente sulla nostra scelta
+ * privacy-friendly e sui cookie tecnici di Supabase per chi accede all'area
+ * admin. Quando l'utente clicca "Ho capito", salviamo in localStorage e il
+ * banner non compare piu su questo dispositivo.
  */
 export default function CookieNotice() {
   const [visible, setVisible] = useState(false)
@@ -44,13 +44,13 @@ export default function CookieNotice() {
         <div className="flex-1 text-sm text-ink-soft leading-relaxed">
           <p className="font-display text-base text-ink mb-1">Niente cookie di tracciamento.</p>
           <p>
-            iMercati raccoglie solo statistiche aggregate anonime (senza cookie, senza IP).
+            Mercati di Ponente raccoglie solo statistiche aggregate anonime (senza cookie, senza IP).
             Maggiori dettagli nella{' '}
-            <Link href="/privacy" className="text-pesto-700 underline underline-offset-2 hover:text-pesto-600">
+            <Link href="/privacy" className="text-mare-700 underline underline-offset-2 hover:text-mare-600">
               Privacy Policy
             </Link>{' '}
             e nella{' '}
-            <Link href="/cookie" className="text-pesto-700 underline underline-offset-2 hover:text-pesto-600">
+            <Link href="/cookie" className="text-mare-700 underline underline-offset-2 hover:text-mare-600">
               Cookie Policy
             </Link>.
           </p>
@@ -67,7 +67,7 @@ export default function CookieNotice() {
       <button
         type="button"
         onClick={dismiss}
-        className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-ink text-paper font-alt text-xs font-semibold hover:bg-pesto transition-colors"
+        className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-ink text-carta font-alt text-xs font-semibold hover:bg-mare transition-colors"
       >
         Ho capito
       </button>

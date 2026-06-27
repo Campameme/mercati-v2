@@ -1,12 +1,12 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import AdesioneForm from '@/components/AdesioneForm'
-import { WaveTaglia } from '@/components/decorations'
+import { SunRay } from '@/components/decorations'
 import Reveal from '@/components/Reveal'
 
 export const metadata = {
-  title: 'Aderisci — iMercati',
-  description: 'Sei un operatore di mercato della Riviera ligure di Ponente? Entra nei primi dieci banchi raccontati da iMercati. Gratis per sempre.',
+  title: 'Aderisci — Mercati di Ponente',
+  description: 'Sei un operatore di mercato della Riviera ligure di Ponente? Entra nei primi dieci banchi raccontati da Mercati di Ponente. Gratis per sempre.',
 }
 
 const SCHEDA = [
@@ -20,7 +20,7 @@ const SCHEDA = [
   },
   {
     title: 'Turismo di prossimità, non turisti di passaggio.',
-    body: 'iMercati arriva a chi vive a 15–60 minuti da voi: i cugini di Cuneo, i ponentini di Genova, i francesi della Costa Azzurra. Non promettiamo "tanti follower" — promettiamo persone che entrano al banco e vi chiamano per nome.',
+    body: 'Mercati di Ponente arriva a chi vive a 15–60 minuti da voi: i cugini di Cuneo, i ponentini di Genova, i francesi della Costa Azzurra. Non promettiamo "tanti follower" — promettiamo persone che entrano al banco e vi chiamano per nome.',
   },
 ]
 
@@ -29,23 +29,23 @@ export default function AderisciPage() {
     <div className="container mx-auto px-4 md:px-6 max-w-3xl py-10 md:py-16">
       <Link
         href="/"
-        className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-pesto-600 mb-6 transition-colors"
+        className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-mare-600 mb-6 transition-colors"
       >
         <ChevronLeft className="w-3.5 h-3.5" /> Homepage
       </Link>
 
       <Reveal>
         <div className="flex items-center gap-3 mb-4 text-ink-soft">
-          <WaveTaglia className="w-10 h-3 text-pesto" aria-hidden="true" />
+          <SunRay className="w-5 h-5 text-sole" aria-hidden="true" />
           <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">Per gli operatori</p>
         </div>
         <h1 className="font-display text-3xl md:text-5xl text-ink leading-[1.06] mb-5">
           State al mercato da anni.
           <br />
-          <span className="text-pesto-600">Fatevi trovare anche fuori.</span>
+          <span className="text-mare-600">Fatevi trovare anche fuori.</span>
         </h1>
         <p className="text-base md:text-lg text-ink-soft leading-relaxed mb-3">
-          iMercati racconta i banchi della Riviera ligure di Ponente ai cittadini di prossimità
+          Mercati di Ponente racconta i banchi della Riviera ligure di Ponente ai cittadini di prossimità
           — quelli che vivono a 15–60 minuti da voi. Persone che cercano una mattina diversa il
           sabato, non una vetrina online qualunque.
         </p>
@@ -61,13 +61,13 @@ export default function AderisciPage() {
           <h2 className="font-display text-2xl md:text-3xl text-ink leading-tight mb-2">
             Cosa cambia per voi,
             <br />
-            <span className="text-pesto-600">in concreto.</span>
+            <span className="text-mare-600">in concreto.</span>
           </h2>
           <p className="text-sm text-ink-muted mb-8">Non è marketing. È il lavoro che facciamo insieme nei primi tre mesi.</p>
           <ul className="space-y-7">
             {SCHEDA.map((s, i) => (
               <li key={s.title} className="grid grid-cols-[2.5rem_1fr] gap-4 items-start">
-                <span className="font-display text-2xl text-pesto tabular-nums leading-none pt-1">
+                <span className="font-display text-2xl text-mare tabular-nums leading-none pt-1">
                   {String(i + 1).padStart(2, '0')}
                 </span>
                 <div>
@@ -95,7 +95,7 @@ export default function AderisciPage() {
           <p className="mb-2 font-medium text-ink">Preferite scriverci direttamente?</p>
           <p>
             Email:{' '}
-            <a href="mailto:emanueleecampanini@gmail.com" className="text-pesto-700 underline underline-offset-2 hover:text-pesto-600">
+            <a href="mailto:emanueleecampanini@gmail.com" className="text-mare-700 underline underline-offset-2 hover:text-mare-600">
               emanueleecampanini@gmail.com
             </a>
           </p>

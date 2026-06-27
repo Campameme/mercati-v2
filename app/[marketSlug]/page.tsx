@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { MapPin, Store, Newspaper, Calendar, Cloud, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { formatMarketDays } from '@/lib/markets/days'
-import { WaveTaglia, WaveDivider } from '@/components/decorations'
+import { SunRay, WaveDivider } from '@/components/decorations'
 import { slugifyName } from '@/lib/markets/slug'
 import { classifySchedule, CATEGORY_COLOR } from '@/lib/schedules/classify'
 import ZoneImage from '@/components/ZoneImage'
@@ -87,7 +87,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
             <Reveal>
               <Link
                 href="/"
-                className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-pesto-600 mb-4 transition-colors"
+                className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-mare-600 mb-4 transition-colors"
               >
                 <ChevronLeft className="w-3.5 h-3.5" /> Provincia
               </Link>
@@ -107,7 +107,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
             <div>
               <Reveal>
                 <div className="flex items-center gap-3 mb-4 text-ink-soft">
-                  <WaveTaglia className="w-10 h-3 text-pesto" aria-hidden="true" />
+                  <SunRay className="w-5 h-5 text-sole" aria-hidden="true" />
                   <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">
                     {comuni.length > 1 ? `${comuni.length} comuni` : marketFull.city}
                   </p>
@@ -153,14 +153,14 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
               <Link
                 key={f.href}
                 href={f.href}
-                className="imk-lift group flex items-center justify-between gap-3 px-4 py-3 border-2 border-ink/10 rounded-xl bg-white hover:border-pesto transition-colors"
+                className="imk-lift group flex items-center justify-between gap-3 px-4 py-3 border-2 border-ink/10 rounded-xl bg-white hover:border-mare transition-colors"
                 style={{ transitionDelay: `${i * 20}ms` }}
               >
                 <span className="flex items-center gap-2.5 font-alt text-sm text-ink font-semibold">
-                  <Icon className="w-4 h-4 text-pesto" aria-hidden="true" />
+                  <Icon className="w-4 h-4 text-mare" aria-hidden="true" />
                   {f.label}
                 </span>
-                <ArrowRight className="w-3.5 h-3.5 text-ink-muted group-hover:text-pesto-600 group-hover:translate-x-0.5 transition-all" />
+                <ArrowRight className="w-3.5 h-3.5 text-ink-muted group-hover:text-mare-600 group-hover:translate-x-0.5 transition-all" />
               </Link>
             )
           })}
@@ -174,7 +174,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                 <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-1">I borghi</p>
                 <h2 className="font-display text-2xl md:text-3xl text-ink">I comuni della zona</h2>
               </div>
-              <WaveDivider className="w-24 text-riviera opacity-60 hidden md:block" aria-hidden="true" />
+              <WaveDivider className="w-24 text-mare opacity-60 hidden md:block" aria-hidden="true" />
             </Reveal>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -184,12 +184,12 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                   <Reveal key={c} delayMs={Math.min(i, 5) * 60}>
                     <Link
                       href={`/${marketFull.slug}/c/${slug}`}
-                      className="imk-lift group block bg-white border-2 border-ink/10 rounded-xl overflow-hidden hover:border-pesto transition-colors"
+                      className="imk-lift group block bg-white border-2 border-ink/10 rounded-xl overflow-hidden hover:border-mare transition-colors"
                     >
                       <ZoneImage query={c} aspect="aspect-[3/2]" hoverZoom />
                       <div className="p-4 flex items-baseline justify-between">
-                        <h3 className="font-display text-lg text-ink leading-tight group-hover:text-pesto-600 transition-colors">{c}</h3>
-                        <span className="text-ink-muted group-hover:text-pesto-600 group-hover:translate-x-0.5 transition-all">→</span>
+                        <h3 className="font-display text-lg text-ink leading-tight group-hover:text-mare-600 transition-colors">{c}</h3>
+                        <span className="text-ink-muted group-hover:text-mare-600 group-hover:translate-x-0.5 transition-all">→</span>
                       </div>
                     </Link>
                   </Reveal>
@@ -207,7 +207,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                 <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-1">Il calendario locale</p>
                 <h2 className="font-display text-2xl md:text-3xl text-ink">Mercati di questa zona</h2>
               </div>
-              <Link href={`/${marketFull.slug}/calendar`} className="font-alt text-xs font-semibold text-ink-muted hover:text-pesto-600 underline underline-offset-2">
+              <Link href={`/${marketFull.slug}/calendar`} className="font-alt text-xs font-semibold text-ink-muted hover:text-mare-600 underline underline-offset-2">
                 Calendario completo →
               </Link>
             </Reveal>
@@ -224,7 +224,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                     >
                       <div className="md:col-span-3 flex items-center gap-2.5">
                         <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: CATEGORY_COLOR[cat] }} />
-                        <h3 className="font-display text-lg md:text-xl text-ink group-hover:text-pesto-600 transition-colors">{s.comune}</h3>
+                        <h3 className="font-display text-lg md:text-xl text-ink group-hover:text-mare-600 transition-colors">{s.comune}</h3>
                       </div>
                       <div className="md:col-span-4">
                         <p className="text-sm text-ink">{s.giorno}</p>
@@ -235,7 +235,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                         {s.settori && <p className="text-xs text-ink-muted mt-1 italic line-clamp-1">{s.settori}</p>}
                       </div>
                       <div className="md:col-span-1 flex md:justify-end items-center">
-                        <span className="text-ink-muted group-hover:text-pesto-600 group-hover:translate-x-1 transition-all">→</span>
+                        <span className="text-ink-muted group-hover:text-mare-600 group-hover:translate-x-1 transition-all">→</span>
                       </div>
                     </Link>
                   </Reveal>
@@ -250,9 +250,9 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
           {prevMarket ? (
             <Link
               href={`/${prevMarket.slug}`}
-              className="imk-lift group flex items-center gap-3 px-4 py-3 bg-white border-2 border-ink/10 rounded-xl hover:border-pesto transition-colors"
+              className="imk-lift group flex items-center gap-3 px-4 py-3 bg-white border-2 border-ink/10 rounded-xl hover:border-mare transition-colors"
             >
-              <ChevronLeft className="w-4 h-4 text-pesto group-hover:-translate-x-0.5 transition-transform" />
+              <ChevronLeft className="w-4 h-4 text-mare group-hover:-translate-x-0.5 transition-transform" />
               <div className="min-w-0">
                 <p className="font-alt text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Zona precedente</p>
                 <p className="font-display text-base text-ink truncate">{prevMarket.name}</p>
@@ -262,13 +262,13 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
           {nextMarket ? (
             <Link
               href={`/${nextMarket.slug}`}
-              className="imk-lift group flex items-center justify-end gap-3 px-4 py-3 bg-white border-2 border-ink/10 rounded-xl hover:border-pesto transition-colors text-right"
+              className="imk-lift group flex items-center justify-end gap-3 px-4 py-3 bg-white border-2 border-ink/10 rounded-xl hover:border-mare transition-colors text-right"
             >
               <div className="min-w-0">
                 <p className="font-alt text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Zona successiva</p>
                 <p className="font-display text-base text-ink truncate">{nextMarket.name}</p>
               </div>
-              <ChevronRight className="w-4 h-4 text-pesto group-hover:translate-x-0.5 transition-transform" />
+              <ChevronRight className="w-4 h-4 text-mare group-hover:translate-x-0.5 transition-transform" />
             </Link>
           ) : <div />}
         </nav>

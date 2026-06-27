@@ -40,11 +40,11 @@ const caveat = Caveat({
 })
 
 export const metadata: Metadata = {
-  title: 'IMercati — Mercati della Riviera ligure di Ponente',
-  description: 'Vicino, ma da scoprire. La guida ai mercati settimanali della Riviera ligure di Ponente \u2014 orari, luoghi, banchi e operatori, raccontati da chi ci va davvero.',
+  title: 'Mercati di Ponente — i mercati della provincia di Imperia',
+  description: 'La mappa dei mercati della provincia di Imperia, Riviera di Ponente: dove e quando, cosa trovi, gli ambulanti e i parcheggi. La mattina, vicino a te.',
   openGraph: {
-    title: 'IMercati \u2014 Vicino, ma da scoprire',
-    description: 'I mercati settimanali della Riviera ligure di Ponente: orari, luoghi, banchi, persone. Scegli per giorno o per comune.',
+    title: 'Mercati di Ponente \u2014 la mattina, vicino a te',
+    description: 'I mercati della provincia di Imperia su una mappa: giorni e orari, cosa trovi, ambulanti, parcheggi.',
     locale: 'it_IT',
     type: 'website',
   },

@@ -43,21 +43,21 @@ interface Props {
 
 const marketIcon = L.divIcon({
   className: '',
-  html: `<div style="background:#5d6e3b;color:#fff;width:40px;height:40px;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-weight:700;font-size:16px;box-shadow:0 1px 4px rgba(0,0,0,0.3)">M</div>`,
+  html: `<div style="background:#15607C;color:#fff;width:40px;height:40px;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-weight:700;font-size:16px;box-shadow:0 1px 4px rgba(0,0,0,0.3)">M</div>`,
   iconSize: [40, 40],
   iconAnchor: [20, 20],
 })
 
 const parkingIcon = L.divIcon({
   className: '',
-  html: `<div style="background:#3a6a8a;color:#fff;width:26px;height:26px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;font-weight:700;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,0.3)">P</div>`,
+  html: `<div style="background:#0E3040;color:#fff;width:26px;height:26px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;font-weight:700;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,0.3)">P</div>`,
   iconSize: [26, 26],
   iconAnchor: [13, 13],
 })
 
 const operatorIcon = L.divIcon({
   className: '',
-  html: `<div style="background:#7d8f4e;width:18px;height:18px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>`,
+  html: `<div style="background:#15607C;width:18px;height:18px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>`,
   iconSize: [18, 18],
   iconAnchor: [9, 9],
 })
@@ -72,31 +72,31 @@ function defaultIcon(kind: UnifiedMapPin['kind']): L.DivIcon {
 
 function boldIcon(kind: UnifiedMapPin['kind'], selected: boolean): L.DivIcon {
   if (kind === 'parking') {
-    const html = `<div style="width:24px;height:24px;border-radius:8px;background:#16130D;color:#FFC22E;border:2px solid #FBF6EA;display:flex;align-items:center;justify-content:center;font-family:'Archivo Black',sans-serif;font-weight:700;font-size:13px;box-shadow:0 2px 6px rgba(0,0,0,0.35)">P</div>`
+    const html = `<div style="width:24px;height:24px;border-radius:8px;background:#1A1714;color:#F4B62C;border:2px solid #F7EFDD;display:flex;align-items:center;justify-content:center;font-family:'Archivo Black',sans-serif;font-weight:700;font-size:13px;box-shadow:0 2px 6px rgba(0,0,0,0.35)">P</div>`
     return L.divIcon({ className: '', html, iconSize: [24, 24], iconAnchor: [12, 12] })
   }
   if (kind === 'operator') {
-    const html = `<div style="width:14px;height:14px;border-radius:50%;background:#1E73E8;border:2px solid #FBF6EA;box-shadow:0 1px 4px rgba(0,0,0,0.35)"></div>`
+    const html = `<div style="width:14px;height:14px;border-radius:50%;background:#15607C;border:2px solid #F7EFDD;box-shadow:0 1px 4px rgba(0,0,0,0.35)"></div>`
     return L.divIcon({ className: '', html, iconSize: [14, 14], iconAnchor: [7, 7] })
   }
   // market
   const d = selected ? 30 : 20
   const wrap = selected ? 56 : 30
-  const color = selected ? '#EF4B27' : '#2FA84F'
+  const color = selected ? '#F4B62C' : '#15607C'
   const ring = selected
     ? `<span class="imk-pin-ring" style="color:${color}"></span>`
     : ''
   const html =
     `<div style="position:relative;width:${wrap}px;height:${wrap}px;display:flex;align-items:center;justify-content:center">` +
     ring +
-    `<div style="width:${d}px;height:${d}px;border-radius:50%;background:${color};border:3px solid #16130D;box-shadow:0 3px 8px rgba(0,0,0,0.4)"></div>` +
+    `<div style="width:${d}px;height:${d}px;border-radius:50%;background:${color};border:3px solid #1A1714;box-shadow:0 3px 8px rgba(0,0,0,0.4)"></div>` +
     `</div>`
   return L.divIcon({ className: '', html, iconSize: [wrap, wrap], iconAnchor: [wrap / 2, wrap / 2] })
 }
 
 const userIcon = L.divIcon({
   className: '',
-  html: `<div style="position:relative;width:22px;height:22px"><span class="imk-pin-ring" style="color:#1E73E8"></span><div style="width:16px;height:16px;margin:3px;border-radius:50%;background:#1E73E8;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div></div>`,
+  html: `<div style="position:relative;width:22px;height:22px"><span class="imk-pin-ring" style="color:#EC6A5E"></span><div style="width:16px;height:16px;margin:3px;border-radius:50%;background:#EC6A5E;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div></div>`,
   iconSize: [22, 22],
   iconAnchor: [11, 11],
 })
@@ -273,8 +273,8 @@ export default function UnifiedMap({
               data={pin.polygon}
               style={
                 {
-                  color: isBold ? '#16130D' : '#44522a',
-                  fillColor: isBold ? '#2FA84F' : '#7d8f4e',
+                  color: isBold ? '#1A1714' : '#0E3040',
+                  fillColor: isBold ? '#15607C' : '#15607C',
                   fillOpacity: 0.3,
                   weight: 3,
                   opacity: 0.95,

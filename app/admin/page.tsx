@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Power, Settings, MapPin, ArrowRight, BarChart3, Mail, TrendingUp, Eye, Users } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import Logo from '@/components/Logo'
 
 export const dynamic = 'force-dynamic'
 
@@ -83,7 +84,9 @@ export default async function AdminRoot() {
       <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl">
         <div className="mb-8 border-b-2 border-ink/10 pb-5">
           <p className="text-xs font-alt uppercase tracking-[0.18em] text-pesto-600 mb-1">Super-admin</p>
-          <h1 className="font-display text-3xl md:text-4xl text-ink leading-tight">Dashboard iMercati</h1>
+          <h1 className="font-display text-3xl md:text-4xl text-ink leading-tight flex items-center gap-3">
+            Dashboard <Logo inline />
+          </h1>
           <p className="text-sm text-ink-soft mt-2">
             Stato del progetto, accendi/spegni zone, analytics anonime di visita, gestione adesioni.
           </p>

@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
   const html = `
     <div style="font-family: -apple-system, sans-serif; max-width: 600px; color: #2a2620;">
       <h2 style="font-family: Georgia, serif; color: #5d6e3b;">Nuova richiesta di adesione</h2>
-      <p style="color: #7a6f60;">Ricevuta su IMercati il ${new Date().toLocaleString('it-IT')}</p>
+      <p style="color: #7a6f60;">Ricevuta su Mercati di Ponente il ${new Date().toLocaleString('it-IT')}</p>
       <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
         <tr><td style="padding: 8px 0; color: #7a6f60; vertical-align: top; width: 140px;">Nome</td><td style="padding: 8px 0;">${escapeHtml(nome)}</td></tr>
         <tr><td style="padding: 8px 0; color: #7a6f60; vertical-align: top;">Email</td><td style="padding: 8px 0;"><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td></tr>
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
 
   const result = await sendEmail({
     to: DESTINATARIO,
-    subject: `Adesione IMercati — ${nome}`,
+    subject: `Adesione Mercati di Ponente — ${nome}`,
     html,
     replyTo: email,
   })
