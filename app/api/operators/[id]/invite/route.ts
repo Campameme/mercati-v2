@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
+import { requireAdmin } from '@/lib/auth/guard'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,6 +18,10 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     .maybeSingle()
   if (!op) return NextResponse.json({ error: 'Operatore non trovato' }, { status: 404 })
   if (op.user_id) return NextResponse.json({ error: 'Operatore già collegato a un account' }, { status: 400 })
+
+  // Invitare via email è un'operazione admin (invia mail e crea account).
+  const guard = await requireAdmin({ marketId: op.market_id })
+  if (!guard.ok) return guard.res
 
   // Store invite record (RLS enforces market_admin/super_admin)
   const { error: invErr } = await supabase

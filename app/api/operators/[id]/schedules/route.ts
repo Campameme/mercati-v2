@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { requireOperatorAccess } from '@/lib/auth/guard'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,7 +39,9 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 
 // POST: aggiunge/aggiorna (upsert) una presenza su una sessione
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createClient()
+  const guard = await requireOperatorAccess(params.id)
+  if (!guard.ok) return guard.res
+  const supabase = guard.supabase
   const body = await request.json()
   const { schedule_id, location_lat, location_lng, stall_number, notes } = body
   if (!schedule_id) return NextResponse.json({ error: 'schedule_id obbligatorio' }, { status: 400 })
@@ -61,7 +64,9 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
 // DELETE: rimuove una presenza ?schedule_id=...
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createClient()
+  const guard = await requireOperatorAccess(params.id)
+  if (!guard.ok) return guard.res
+  const supabase = guard.supabase
   const { searchParams } = new URL(request.url)
   const scheduleId = searchParams.get('schedule_id')
   if (!scheduleId) return NextResponse.json({ error: 'schedule_id obbligatorio' }, { status: 400 })

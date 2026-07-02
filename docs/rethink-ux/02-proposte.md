@@ -1,3 +1,9 @@
+> ⚠️ **ARCHIVIO STORICO — direzione MAI implementata.** Questo documento descrive
+> la proposta "Slow Compass / magazine editoriale" (Fraunces+Inter, cream/olive,
+> route /agenda /banchi /colophon) generata dal workflow del 2026-05-14 e poi
+> **scartata**. Il sito reale è un'altra cosa: vedi `../brand-system.md` e
+> `../brand-voice.md`. Non usare questi file come riferimento di implementazione.
+
 # 02 · Quattro proposte di design
 
 Quattro lenti indipendenti hanno proposto ciascuna una direzione UX. Per ogni proposta, 3 verifier adversariali (admin / vera semplicità / brand) hanno tentato di smontarla. Risultato qui sotto.

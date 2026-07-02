@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { MapPin, Store, Newspaper, Calendar, Cloud, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
@@ -11,8 +12,30 @@ import Reveal from '@/components/Reveal'
 import MarketViewer from '@/components/MarketViewer'
 import FavoriteButton from '@/components/FavoriteButton'
 import PageviewTracker from '@/components/analytics/PageviewTracker'
+import DriftBackdrop from '@/components/motion/DriftBackdrop'
+import Cartolina from '@/components/Cartolina'
 
 export const dynamic = 'force-dynamic'
+
+// Il lookup in generateMetadata avviene PRIMA che lo streaming parta (i
+// loading.tsx creano Suspense boundary): così uno slug inesistente produce un
+// VERO 404 HTTP (non un soft-404 con status 200) e ogni zona ha title propri.
+export async function generateMetadata({ params }: { params: { marketSlug: string } }): Promise<Metadata> {
+  const supabase = createClient()
+  const { data: market } = await supabase
+    .from('markets')
+    .select('name, city, description')
+    .eq('slug', params.marketSlug)
+    .eq('is_active', true)
+    .maybeSingle()
+  if (!market) notFound()
+  return {
+    title: market.name,
+    description:
+      market.description?.slice(0, 160) ||
+      `Il mercato di ${market.city ?? market.name}: giorni e orari, banchi, ambulanti e come arrivarci — Riviera dei Fiori, provincia di Imperia.`,
+  }
+}
 
 const ZONE_HERO_COMUNE: Record<string, string> = {
   'val-nervia':             'Camporosso',
@@ -80,10 +103,11 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
     <div>
       <PageviewTracker type="view_market" marketId={marketFull.id} />
       {/* HERO: foto a sinistra (piccola) + testo + mappa above-the-fold a destra */}
-      <section className="border-b-2 border-ink/10">
-        <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl">
+      <section className="relative overflow-hidden bg-paper bg-paper-grain border-b-2 border-ink/10">
+        <DriftBackdrop tone="light" variant="section" />
+        <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl relative z-10">
           <div className="grid md:grid-cols-[280px_1fr] gap-8 md:gap-10 items-start">
-            {/* Foto a sinistra, leggermente più piccola */}
+            {/* Foto a sinistra, leggermente più piccola — cartolina */}
             <Reveal>
               <Link
                 href="/"
@@ -91,16 +115,16 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
               >
                 <ChevronLeft className="w-3.5 h-3.5" /> Provincia
               </Link>
-              <div className="relative rounded-xl overflow-hidden border-2 border-ink/10 shadow-sm bg-white p-1.5">
-                <ZoneImage
-                  query={heroQuery}
-                  fallbackQuery={comuni[0] ?? marketFull.city}
-                  alt={marketFull.name}
-                  aspect="aspect-[4/5]"
-                  priority
-                />
-              </div>
-              <p className="mt-2 text-[11px] text-ink-muted italic">{heroQuery} · via Wikipedia</p>
+              <Cartolina
+                query={heroQuery}
+                fallbackQuery={comuni[0] ?? marketFull.city}
+                alt={marketFull.name}
+                caption={`${heroQuery} · via Wikipedia`}
+                aspect="aspect-[4/5]"
+                tilt="l"
+                tape
+                priority
+              />
             </Reveal>
 
             {/* Testo + mappa */}
@@ -114,7 +138,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                 </div>
                 <div className="flex items-start gap-2">
                   <h1 className="font-display text-3xl md:text-5xl leading-[1.06] text-ink flex-1">
-                    {marketFull.name}
+                    <span className="imk-mark text-ink">{marketFull.name}</span>
                   </h1>
                   <FavoriteButton kind="market" id={marketFull.slug} label={marketFull.name} />
                 </div>
@@ -153,7 +177,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
               <Link
                 key={f.href}
                 href={f.href}
-                className="imk-lift group flex items-center justify-between gap-3 px-4 py-3 border-2 border-ink/10 rounded-xl bg-white hover:border-mare transition-colors"
+                className="imk-water imk-edge imk-lift group flex items-center justify-between gap-3 px-4 py-3 border-2 border-ink/10 bg-white hover:border-mare transition-colors"
                 style={{ transitionDelay: `${i * 20}ms` }}
               >
                 <span className="flex items-center gap-2.5 font-alt text-sm text-ink font-semibold">
@@ -184,7 +208,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                   <Reveal key={c} delayMs={Math.min(i, 5) * 60}>
                     <Link
                       href={`/${marketFull.slug}/c/${slug}`}
-                      className="imk-lift group block bg-white border-2 border-ink/10 rounded-xl overflow-hidden hover:border-mare transition-colors"
+                      className={`imk-water imk-edge imk-lift ${i % 3 === 0 ? 'imk-tilt-l' : i % 3 === 2 ? 'imk-tilt-r' : ''} group block bg-white border-2 border-ink/10 overflow-hidden hover:border-mare transition-colors`}
                     >
                       <ZoneImage query={c} aspect="aspect-[3/2]" hoverZoom />
                       <div className="p-4 flex items-baseline justify-between">
@@ -205,7 +229,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
             <Reveal className="flex items-end justify-between mb-8">
               <div>
                 <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-1">Il calendario locale</p>
-                <h2 className="font-display text-2xl md:text-3xl text-ink">Mercati di questa zona</h2>
+                <h2 className="font-display text-2xl md:text-3xl text-ink"><span className="imk-mark text-ink">Mercati di questa zona</span></h2>
               </div>
               <Link href={`/${marketFull.slug}/calendar`} className="font-alt text-xs font-semibold text-ink-muted hover:text-mare-600 underline underline-offset-2">
                 Calendario completo →
@@ -245,12 +269,26 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
           </section>
         )}
 
+        {/* Sulla Riviera: cartoline di costa e borghi */}
+        <section className="py-12 md:py-16 border-t-2 border-ink/10">
+          <Reveal className="mb-8">
+            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-fiore-600 mb-1">Sulla Riviera</p>
+            <h2 className="font-display text-2xl md:text-3xl text-ink">Mare, borghi e colori del Ponente</h2>
+          </Reveal>
+          <Reveal delayMs={60} className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Cartolina query={heroQuery} fallbackQuery={marketFull.city} caption={`${heroQuery}`} tilt="l" aspect="aspect-[4/5]" />
+            <Cartolina query="Riviera dei Fiori mare" fallbackQuery="Liguria mare" caption="Il mare di Ponente" tilt="r" aspect="aspect-[4/5]" />
+            <Cartolina query="Sanremo Liguria fiori" fallbackQuery="Sanremo Liguria" caption="La città dei fiori" tilt="l" aspect="aspect-[4/5]" />
+            <Cartolina query="Liguria borgo mercato" fallbackQuery="Liguria borgo" caption="Un banco di paese" tilt="r" aspect="aspect-[4/5]" />
+          </Reveal>
+        </section>
+
         {/* Nav prev/next tra zone */}
         <nav className="grid grid-cols-2 gap-3 py-8 border-t-2 border-ink/10 text-sm">
           {prevMarket ? (
             <Link
               href={`/${prevMarket.slug}`}
-              className="imk-lift group flex items-center gap-3 px-4 py-3 bg-white border-2 border-ink/10 rounded-xl hover:border-mare transition-colors"
+              className="imk-water imk-edge imk-lift group flex items-center gap-3 px-4 py-3 bg-white border-2 border-ink/10 hover:border-mare transition-colors"
             >
               <ChevronLeft className="w-4 h-4 text-mare group-hover:-translate-x-0.5 transition-transform" />
               <div className="min-w-0">
@@ -262,7 +300,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
           {nextMarket ? (
             <Link
               href={`/${nextMarket.slug}`}
-              className="imk-lift group flex items-center justify-end gap-3 px-4 py-3 bg-white border-2 border-ink/10 rounded-xl hover:border-mare transition-colors text-right"
+              className="imk-water imk-edge imk-lift group flex items-center justify-end gap-3 px-4 py-3 bg-white border-2 border-ink/10 hover:border-mare transition-colors text-right"
             >
               <div className="min-w-0">
                 <p className="font-alt text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Zona successiva</p>

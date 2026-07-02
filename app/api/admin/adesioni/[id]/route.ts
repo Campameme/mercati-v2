@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/auth/guard'
 
 export const dynamic = 'force-dynamic'
 
 const ALLOWED_STATI = new Set(['nuovo', 'in_contatto', 'aderito', 'scartato'])
 
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createClient()
+  const guard = await requireAdmin({ superOnly: true })
+  if (!guard.ok) return guard.res
+  const supabase = guard.supabase
   const body = await request.json()
   const update: Record<string, unknown> = {}
   if (typeof body.stato === 'string' && ALLOWED_STATI.has(body.stato)) update.stato = body.stato
@@ -25,7 +27,9 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createClient()
+  const guard = await requireAdmin({ superOnly: true })
+  if (!guard.ok) return guard.res
+  const supabase = guard.supabase
   const { error } = await supabase.from('adesioni_operatori').delete().eq('id', params.id)
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
   return NextResponse.json({ ok: true })

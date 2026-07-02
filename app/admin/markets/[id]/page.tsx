@@ -94,20 +94,20 @@ export default function AdminMarketEditPage() {
             <F label="Zoom parcheggi" value={market.default_zoom.toString()} onChange={(v) => setMarket({ ...market, default_zoom: parseInt(v, 10) || 15 })} />
             <F label="Zoom operatori" value={(market.default_zoom_operators ?? 17).toString()} onChange={(v) => setMarket({ ...market, default_zoom_operators: parseInt(v, 10) || 17 })} />
             <label className="flex items-center gap-2 mt-6">
-              <input type="checkbox" checked={market.is_active} onChange={(e) => setMarket({ ...market, is_active: e.target.checked })} className="accent-pesto w-4 h-4" />
+              <input type="checkbox" checked={market.is_active} onChange={(e) => setMarket({ ...market, is_active: e.target.checked })} className="accent-mare w-4 h-4" />
               <span className="text-sm text-ink">Attivo</span>
             </label>
           </div>
           <label className="block">
             <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Descrizione</span>
-            <textarea value={market.description ?? ''} onChange={(e) => setMarket({ ...market, description: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" rows={3} />
+            <textarea value={market.description ?? ''} onChange={(e) => setMarket({ ...market, description: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" rows={3} />
           </label>
-          {error && <p className="text-sm text-coral-600">{error}</p>}
+          {error && <p className="text-sm text-fiore-600">{error}</p>}
           <div className="flex justify-between">
-            <button type="button" onClick={handleDelete} className="flex items-center gap-2 px-4 py-2 bg-coral/10 text-coral-600 border-2 border-coral/30 rounded-full hover:bg-coral/20 transition-colors">
+            <button type="button" onClick={handleDelete} className="flex items-center gap-2 px-4 py-2 bg-fiore/10 text-fiore-600 border-2 border-fiore/30 rounded-full hover:bg-fiore/20 transition-colors">
               <Trash2 className="w-4 h-4" /> <span>Elimina</span>
             </button>
-            <button type="submit" disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 disabled:opacity-50 transition-colors">
+            <button type="submit" disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-mare text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-mare-600 disabled:opacity-50 transition-colors">
               <Save className="w-4 h-4" /> <span>{saving ? 'Salvataggio…' : 'Salva'}</span>
             </button>
           </div>
@@ -122,9 +122,9 @@ export default function AdminMarketEditPage() {
               placeholder="email@utente.it (deve essere già registrato)"
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
-              className="flex-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors"
+              className="flex-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors"
             />
-            <button type="submit" className="flex items-center gap-2 px-4 py-2 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 transition-colors">
+            <button type="submit" className="flex items-center gap-2 px-4 py-2 bg-mare text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-mare-600 transition-colors">
               <UserPlus className="w-4 h-4" /> <span>Aggiungi</span>
             </button>
           </form>
@@ -133,7 +133,7 @@ export default function AdminMarketEditPage() {
             {admins.map((a) => (
               <li key={a.user_id} className="py-2 flex items-center justify-between">
                 <span className="text-sm text-ink">{a.profiles?.full_name ?? a.user_id}</span>
-                <button onClick={() => handleRemoveAdmin(a.user_id)} className="text-sm text-coral-600 hover:underline">rimuovi</button>
+                <button onClick={() => handleRemoveAdmin(a.user_id)} className="text-sm text-fiore-600 hover:underline">rimuovi</button>
               </li>
             ))}
             {admins.length === 0 && <li className="py-2 text-sm text-ink-muted">Nessun admin assegnato</li>}
@@ -149,7 +149,7 @@ function F({ label, value, onChange }: { label: string; value: string; onChange:
   return (
     <label className="block">
       <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">{label}</span>
-      <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+      <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
     </label>
   )
 }

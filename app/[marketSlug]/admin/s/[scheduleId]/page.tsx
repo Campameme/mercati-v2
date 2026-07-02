@@ -238,7 +238,7 @@ export default function AdminSessionPage() {
         </div>
         {session.luogo && (
           <p className="text-sm text-ink flex items-center gap-1.5 mt-2">
-            <MapPin className="w-4 h-4 text-olive-500" /> {session.luogo}
+            <MapPin className="w-4 h-4 text-mare" /> {session.luogo}
             {session.lat != null && session.lng != null && (
               <a
                 href={`https://www.google.com/maps/dir/?api=1&destination=${session.lat},${session.lng}`}
@@ -257,7 +257,7 @@ export default function AdminSessionPage() {
       {/* Info area del luogo (place) */}
       {placeInfo && (
         <div className="mb-6 bg-cream-50 border border-cream-300 rounded-sm p-4 flex items-start gap-3 flex-wrap">
-          <MapIcon className="w-4 h-4 text-olive-500 mt-0.5 flex-shrink-0" />
+          <MapIcon className="w-4 h-4 text-mare mt-0.5 flex-shrink-0" />
           <div className="min-w-0 flex-1">
             <p className="text-sm text-ink">
               {placeInfo.hasPolygon ? (
@@ -355,7 +355,7 @@ export default function AdminSessionPage() {
                       type="button"
                       onClick={() => linkExistingOperator(op.id)}
                       disabled={linkBusy}
-                      className="px-3 py-1.5 text-xs bg-olive-600 hover:bg-olive-700 text-cream-100 rounded-full disabled:opacity-50"
+                      className="px-3 py-1.5 text-xs bg-mare-600 hover:bg-mare-700 text-cream-100 rounded-full disabled:opacity-50"
                     >
                       Aggiungi qui
                     </button>
@@ -417,7 +417,7 @@ export default function AdminSessionPage() {
               />
             </div>
 
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <p className="text-sm text-fiore-600">{error}</p>}
             <div className="flex justify-end gap-2">
               <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 bg-cream-200 hover:bg-cream-300 text-ink rounded-sm text-sm">Annulla</button>
               <button type="submit" className="px-4 py-2 bg-ink text-cream-100 rounded-full text-sm hover:bg-ink/90">Crea</button>
@@ -455,7 +455,7 @@ export default function AdminSessionPage() {
                   </Link>
                   <button
                     onClick={() => handleDelete(o.id)}
-                    className="p-2 text-ink-soft hover:text-terra-500"
+                    className="p-2 text-ink-soft hover:text-fiore"
                     title="Elimina"
                   >
                     <Trash2 className="w-4 h-4" />

@@ -29,11 +29,16 @@ export async function updateSession(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const pathname = request.nextUrl.pathname
 
+  // Il gate con redirect a /login vale solo per le PAGINE: le route /api/**
+  // rispondono 401/403 dalle proprie guardie (lib/auth/guard.ts), niente redirect
+  // (la regex /^\/[^\/]+\/admin/ altrimenti cattura anche /api/admin/*).
   const needsAuth =
-    pathname.startsWith('/admin') ||
-    pathname === '/operator' ||
-    pathname.startsWith('/operator/') || // dashboard operatore (NON la pubblica /operatori)
-    pathname.match(/^\/[^\/]+\/admin/)
+    !pathname.startsWith('/api') && (
+      pathname.startsWith('/admin') ||
+      pathname === '/operator' ||
+      pathname.startsWith('/operator/') || // dashboard operatore (NON la pubblica /operatori)
+      !!pathname.match(/^\/[^\/]+\/admin/)
+    )
   if (needsAuth && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'

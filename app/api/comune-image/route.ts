@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// Endpoint cacheabile: le foto Wikipedia non cambiano spesso, e ogni call costa
-// ~500ms-2s tra fetch generator/images + filtri. Cache 12h server-side, 1h client.
-// (export dynamic rimosso: era 'force-dynamic' e annullava la cache HTTP)
-export const revalidate = 43200 // 12h
+// L'handler gira a ogni richiesta (force-dynamic) così un MISS transitorio non
+// resta "congelato" come risposta cacheata. Le chiamate upstream a Wikipedia
+// restano cacheate (next.revalidate) → veloci sui successi; i SUCCESSI vengono
+// cacheati lato client/CDN via header, i MISS no-store (si ritenta).
+export const dynamic = 'force-dynamic'
 
 /**
  * Restituisce una foto di luogo (non stemma) per un comune italiano, interrogando
@@ -165,5 +166,6 @@ export async function GET(request: NextRequest) {
     if (src) return NextResponse.json({ imageUrl: src, originalUrl: src, title: t, filename: null, pageUrl: null }, { headers: cacheHeaders })
   }
 
-  return NextResponse.json({ imageUrl: null, originalUrl: null, title: q, filename: null, pageUrl: null }, { headers: cacheHeaders })
+  // MISS: non cacheare (un fallimento transitorio non deve persistere)
+  return NextResponse.json({ imageUrl: null, originalUrl: null, title: q, filename: null, pageUrl: null }, { headers: { 'Cache-Control': 'no-store' } })
 }

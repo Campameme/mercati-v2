@@ -87,12 +87,19 @@ export default function ComuneSessionsExplorer({
   }, [searchParams])
 
   const active = sessions.find((s) => s.id === activeId) ?? sessions[0]
-  const cat = active ? classifySchedule(active.settori) : 'varie'
+  const cat = active ? classifySchedule(active.settori) : 'generale'
 
-  const operatorsForSession = useMemo(() => {
-    if (!active) return []
-    return operators.filter((o) => o.schedule_id === active.id)
-  }, [operators, active])
+  // TUTTI i banchi del comune con il giorno della loro sessione — niente banchi
+  // "nascosti" dietro i tab: prima quelli dell'appuntamento attivo, poi gli altri.
+  const sessionById = useMemo(() => new Map(sessions.map((s) => [s.id, s])), [sessions])
+  const comuneOperators = useMemo(() => {
+    const list = operators.filter((o) => o.schedule_id && sessionById.has(o.schedule_id))
+    return list.sort((a, b) => {
+      const aActive = a.schedule_id === active?.id ? 0 : 1
+      const bActive = b.schedule_id === active?.id ? 0 : 1
+      return aActive - bActive || a.name.localeCompare(b.name, 'it')
+    })
+  }, [operators, sessionById, active])
 
   const mapPins = useMemo(() => {
     if (!active || active.lat == null || active.lng == null) return []
@@ -128,7 +135,7 @@ export default function ComuneSessionsExplorer({
                   className={`group flex items-center gap-2 pl-3 pr-4 py-2.5 rounded-full border-2 text-left transition-colors ${
                     isActive
                       ? 'bg-ink text-paper border-ink'
-                      : 'bg-white text-ink border-ink/15 hover:border-pesto'
+                      : 'bg-white text-ink border-ink/15 hover:border-mare'
                   }`}
                 >
                   <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: isActive ? '#FBF6EA' : color }} />
@@ -164,7 +171,7 @@ export default function ComuneSessionsExplorer({
               </div>
               {active.luogo && (
                 <p className="text-sm text-ink flex items-center gap-1.5 mt-1">
-                  <MapPin className="w-4 h-4 text-pesto" aria-hidden="true" /> {active.luogo}
+                  <MapPin className="w-4 h-4 text-mare" aria-hidden="true" /> {active.luogo}
                 </p>
               )}
               {active.settori && <p className="text-xs text-ink-muted italic mt-2">{active.settori}</p>}
@@ -174,7 +181,7 @@ export default function ComuneSessionsExplorer({
                 href={`https://www.google.com/maps/dir/?api=1&destination=${active.lat},${active.lng}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="imk-lift inline-flex items-center gap-1.5 px-4 py-2.5 bg-ink text-paper rounded-full font-alt text-sm font-semibold hover:bg-pesto transition-colors flex-shrink-0"
+                className="imk-lift inline-flex items-center gap-1.5 px-4 py-2.5 bg-ink text-paper rounded-full font-alt text-sm font-semibold hover:bg-mare transition-colors flex-shrink-0"
               >
                 <Navigation2 className="w-4 h-4" /> Indicazioni
               </a>
@@ -190,21 +197,21 @@ export default function ComuneSessionsExplorer({
         </section>
       )}
 
-      {/* Operatori della sessione */}
+      {/* Banchi del comune (tutte le sessioni, col giorno in evidenza) */}
       <section className="mb-6">
         <div className="flex items-center gap-2 mb-4 text-ink-muted">
           <Store className="w-4 h-4" aria-hidden="true" />
           <h3 className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">
-            Banchi · {operatorsForSession.length}
+            Banchi · {comuneOperators.length}
           </h3>
         </div>
-        {operatorsForSession.length === 0 ? (
+        {comuneOperators.length === 0 ? (
           <div className="bg-white border-2 border-ink/10 rounded-xl p-6 text-sm text-ink-muted">
             Nessun operatore ancora registrato per questo mercato.
           </div>
         ) : (
           <ul className="divide-y-2 divide-ink/10 border-y-2 border-ink/10">
-            {operatorsForSession.map((op) => (
+            {comuneOperators.map((op) => (
               <li key={op.id}>
                 <Link
                   href={`/${marketSlug}/operators/${op.id}`}
@@ -216,9 +223,14 @@ export default function ComuneSessionsExplorer({
                     <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-ink-muted mt-1">
                       <span className="font-alt font-semibold uppercase tracking-wider">{CAT_LABEL[op.category] ?? op.category}</span>
                       {op.stall_number && <span>· Banco {op.stall_number}</span>}
+                      {sessions.length > 1 && op.schedule_id && sessionById.get(op.schedule_id) && (
+                        <span className={`font-alt font-semibold ${op.schedule_id === active.id ? 'text-mare-600' : ''}`}>
+                          · {shortLabel(sessionById.get(op.schedule_id)!.giorno)}
+                        </span>
+                      )}
                     </div>
                   </div>
-                  <span className="text-ink-muted group-hover:text-pesto-600 group-hover:translate-x-0.5 transition-all">→</span>
+                  <span className="text-ink-muted group-hover:text-mare-600 group-hover:translate-x-0.5 transition-all">→</span>
                 </Link>
               </li>
             ))}

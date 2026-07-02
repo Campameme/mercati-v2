@@ -88,6 +88,11 @@ export async function POST(request: NextRequest) {
   const form = await request.formData()
   const file = form.get('file')
   if (!(file instanceof File)) return NextResponse.json({ error: 'File mancante' }, { status: 400 })
+  // Limite dimensione: evita OOM su istanze serverless con upload enormi.
+  const MAX_BYTES = 10 * 1024 * 1024
+  if (file.size > MAX_BYTES) {
+    return NextResponse.json({ error: 'File troppo grande (max 10 MB)' }, { status: 413 })
+  }
   const arrayBuffer = await file.arrayBuffer()
 
   let wb: XLSX.WorkBook

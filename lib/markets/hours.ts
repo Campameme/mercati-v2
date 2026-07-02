@@ -41,6 +41,22 @@ function daysInMonth(date: Date): number {
   return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
 }
 
+/** True se il testo contiene un vincolo stagionale (range date/mesi o mesi citati). */
+function hasSeasonConstraint(giorno: string): boolean {
+  const lower = giorno.toLowerCase()
+  if (/(\d{1,2})\/(\d{1,2})\s+al\s+(\d{1,2})\/(\d{1,2})/.test(lower)) return true
+  const monthNames = Object.keys(MONTHS).join('|')
+  if (new RegExp(`da\\s+(${monthNames})\\s+a\\s+(${monthNames})`).test(lower)) return true
+  if (Object.keys(MONTHS).some((name) => lower.includes(name))) return true
+  return false
+}
+
+/** True se riusciamo a interpretare il giorno/stagione (per stato 'unknown'). */
+function isParseableDay(giorno?: string | null): boolean {
+  if (!giorno) return false
+  return weekdaysOf(giorno).length > 0 || hasSeasonConstraint(giorno)
+}
+
 /** True se `date` rientra negli eventuali vincoli stagionali del testo. */
 function inSeason(giorno: string, date: Date): boolean {
   const lower = giorno.toLowerCase()
@@ -81,7 +97,11 @@ function inSeason(giorno: string, date: Date): boolean {
 export function occursOn(giorno: string | null | undefined, date: Date): boolean {
   if (!giorno) return false
   const wds = weekdaysOf(giorno)
-  if (wds.length === 0) return false
+  // Nessun giorno della settimana ma con stagione (es. "Dal 30/05 al 13/09",
+  // "Sere dal 20/06 al 20/09"): il mercato si tiene ogni giorno in stagione.
+  if (wds.length === 0) {
+    return hasSeasonConstraint(giorno) ? inSeason(giorno, date) : false
+  }
   if (!wds.includes(date.getDay())) return false
   if (!inSeason(giorno, date)) return false
   const ords = ordinalsOf(giorno)
@@ -133,8 +153,7 @@ export interface MarketStatus {
  */
 export function marketStatus(now: Date, giorno?: string | null, orario?: string | null): MarketStatus {
   const ranges = parseOrarioRanges(orario)
-  const wds = weekdaysOf(giorno)
-  if (ranges.length === 0 || wds.length === 0) return { state: 'unknown' }
+  if (ranges.length === 0 || !isParseableDay(giorno)) return { state: 'unknown' }
   if (!occursOn(giorno, now)) return { state: 'closed' }
   const h = now.getHours() + now.getMinutes() / 60
   let opensAt = Infinity

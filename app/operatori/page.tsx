@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { Search, CalendarDays, BadgeCheck, MessageCircle } from 'lucide-react'
 import { WaveTaglia } from '@/components/decorations'
 import { BancoPlaceholder } from '@/components/BancoAvatar'
+import DriftBackdrop from '@/components/motion/DriftBackdrop'
+import Cartolina from '@/components/Cartolina'
 
 interface HubOperator {
   id: string
@@ -99,26 +101,41 @@ export default function OperatoriHubPage() {
   }, [operators, marketFilter, categoryFilter, comuneFilter, q])
 
   return (
-    <div className="container mx-auto px-4 md:px-6 py-10 md:py-14">
-      <div className="mb-8 border-b-2 border-ink/10 pb-6">
-        <div className="flex items-center gap-3 mb-2 text-ink-soft">
-          <WaveTaglia className="w-8 h-2.5 text-mare" aria-hidden="true" />
-          <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">Riviera di Ponente · la carta del banco</p>
-        </div>
-        <div className="flex items-baseline justify-between gap-4 flex-wrap">
-          <h1 className="font-display text-3xl md:text-5xl text-ink leading-tight">
-            I banchi <span className="text-mare-600">della provincia</span>
-          </h1>
-          <p className="text-xs text-ink-muted tabular-nums">
-            {operators.length} operator{operators.length === 1 ? 'e' : 'i'}
-          </p>
-        </div>
-        <p className="text-sm text-ink-soft mt-3 max-w-xl">
-          Ogni venditore della Riviera con la sua figurina e i mercati che frequenta ogni settimana.
-          Filtra per zona, comune o categoria per trovare subito quello che cerchi.
-        </p>
-      </div>
+    <div>
+      {/* Header di sezione: sfondo carta con silhouette che derivano + cartoline */}
+      <section className="relative overflow-hidden bg-paper bg-paper-grain border-b-2 border-ink/10">
+        <DriftBackdrop tone="light" variant="section" />
+        <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 relative z-10">
+          <div className="grid lg:grid-cols-[1fr_auto] gap-8 lg:gap-10 items-end">
+            <div>
+              <div className="flex items-center gap-3 mb-2 text-ink-soft">
+                <WaveTaglia className="w-8 h-2.5 text-mare" aria-hidden="true" />
+                <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">Riviera di Ponente · la carta del banco</p>
+              </div>
+              <div className="flex items-baseline justify-between gap-4 flex-wrap">
+                <h1 className="font-display text-3xl md:text-5xl text-ink leading-tight imk-tilt-l">
+                  I banchi <span className="imk-mark text-ink">della provincia</span>
+                </h1>
+                <p className="text-xs text-ink-muted tabular-nums">
+                  {operators.length} operator{operators.length === 1 ? 'e' : 'i'}
+                </p>
+              </div>
+              <p className="text-sm text-ink-soft mt-3 max-w-xl">
+                Ogni venditore della Riviera con la sua figurina e i mercati che frequenta ogni settimana.
+                Filtra per zona, comune o categoria per trovare subito quello che cerchi.
+              </p>
+            </div>
 
+            {/* Cartoline: i mercati della Riviera */}
+            <div className="hidden lg:flex gap-3 flex-shrink-0 w-[300px]">
+              <Cartolina query="Sanremo mercato" fallbackQuery="Sanremo Liguria" caption="I banchi di Sanremo" tilt="r" aspect="aspect-[3/4]" className="w-1/2" />
+              <Cartolina query="Bordighera Liguria" caption="Lungomare di Bordighera" tilt="l" aspect="aspect-[3/4]" className="w-1/2 mt-6" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="container mx-auto px-4 md:px-6 py-10 md:py-14">
       {/* Filtri */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-8">
         <div className="relative md:col-span-1">
@@ -164,15 +181,16 @@ export default function OperatoriHubPage() {
       {loading ? (
         <p className="text-center py-12 text-ink-muted text-sm">Caricamento…</p>
       ) : filtered.length === 0 ? (
-        <div className="bg-white border-2 border-ink/10 rounded-xl p-10 text-center text-ink-muted">
-          Nessun operatore coi filtri correnti.
+        <div className="imk-water imk-edge bg-white border-2 border-ink/10 p-10 text-center text-ink-muted max-w-lg mx-auto">
+          <p className="font-accent text-2xl text-mare-600">Nessun banco, per ora</p>
+          <p className="mt-1 text-sm">Nessun operatore coi filtri correnti.</p>
           {operators.length === 0 && (
             <p className="text-xs mt-2">Gli admin di zona possono aggiungere banchi dall&apos;area di gestione.</p>
           )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filtered.map((op) => {
+          {filtered.map((op, i) => {
             const sessions = op.schedules ?? []
             const preview = sessions.slice(0, 3)
             const more = sessions.length - preview.length
@@ -181,7 +199,7 @@ export default function OperatoriHubPage() {
               <Link
                 key={op.id}
                 href={href}
-                className="imk-lift group bg-white border-2 border-ink/10 rounded-xl overflow-hidden flex flex-col hover:border-mare transition-colors"
+                className={`imk-water imk-edge imk-lift ${i % 3 === 0 ? 'imk-tilt-l' : i % 3 === 2 ? 'imk-tilt-r' : ''} group bg-white border-2 border-ink/10 overflow-hidden flex flex-col hover:border-mare transition-colors`}
               >
                 {/* Testata figurina: foto o placeholder duotone mare→sole */}
                 <div className="relative">
@@ -256,6 +274,7 @@ export default function OperatoriHubPage() {
           })}
         </div>
       )}
+      </div>
     </div>
   )
 }

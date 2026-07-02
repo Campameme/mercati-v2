@@ -61,7 +61,7 @@ export default function LocationFields({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <p className="text-sm font-medium text-gray-700">{label}</p>
+        <p className="text-sm font-medium text-ink-soft">{label}</p>
         <button
           type="button"
           onClick={useCurrentLocation}
@@ -75,7 +75,7 @@ export default function LocationFields({
 
       <div className="grid grid-cols-2 gap-2">
         <label className="block">
-          <span className="text-xs text-gray-500">Latitudine</span>
+          <span className="text-xs text-ink-muted">Latitudine</span>
           <input
             type="number"
             step="0.000001"
@@ -84,12 +84,12 @@ export default function LocationFields({
               const v = e.target.value
               onChange(v === '' ? null : parseFloat(v), lng)
             }}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md tabular-nums text-sm"
+            className="w-full px-3 py-2 border border-ink/15 rounded-md tabular-nums text-sm"
             placeholder="43.7903"
           />
         </label>
         <label className="block">
-          <span className="text-xs text-gray-500">Longitudine</span>
+          <span className="text-xs text-ink-muted">Longitudine</span>
           <input
             type="number"
             step="0.000001"
@@ -98,14 +98,14 @@ export default function LocationFields({
               const v = e.target.value
               onChange(lat, v === '' ? null : parseFloat(v))
             }}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md tabular-nums text-sm"
+            className="w-full px-3 py-2 border border-ink/15 rounded-md tabular-nums text-sm"
             placeholder="7.6084"
           />
         </label>
       </div>
 
-      {error && <p className="text-xs text-red-600">{error}</p>}
-      {helperText && <p className="text-xs text-gray-500 flex items-center gap-1"><MapPin className="w-3 h-3" /> {helperText}</p>}
+      {error && <p className="text-xs text-fiore-600">{error}</p>}
+      {helperText && <p className="text-xs text-ink-muted flex items-center gap-1"><MapPin className="w-3 h-3" /> {helperText}</p>}
 
       {showPicker && (
         <LocationPicker

@@ -83,10 +83,10 @@ export default async function MarketAdminHome({ params }: { params: { marketSlug
                 <Link
                   key={c.href}
                   href={c.href}
-                  className="group bg-white border-2 border-ink/10 rounded-xl p-5 hover:border-pesto hover:-translate-y-0.5 transition-all"
+                  className="group bg-white border-2 border-ink/10 rounded-xl p-5 hover:border-mare hover:-translate-y-0.5 transition-all"
                 >
-                  <Icon className="w-8 h-8 text-pesto mb-3" />
-                  <h2 className="font-display text-lg text-ink mb-1 group-hover:text-pesto-600 transition-colors">{c.title}</h2>
+                  <Icon className="w-8 h-8 text-mare mb-3" />
+                  <h2 className="font-display text-lg text-ink mb-1 group-hover:text-mare-600 transition-colors">{c.title}</h2>
                   <p className="text-sm text-ink-soft">{c.desc}</p>
                 </Link>
               )
@@ -125,7 +125,7 @@ export default async function MarketAdminHome({ params }: { params: { marketSlug
                     <div className="flex items-center justify-between gap-3 px-4 md:px-5 py-4 border-b-2 border-ink/10 flex-wrap">
                       <div className="min-w-0">
                         <h3 className="font-display text-xl text-ink flex items-center gap-2 min-w-0">
-                          <MapPin className="w-4 h-4 text-pesto flex-shrink-0" />
+                          <MapPin className="w-4 h-4 text-mare flex-shrink-0" />
                           <span className="truncate">{place.comune}</span>
                           <span className="text-ink-muted">·</span>
                           <span className="truncate text-ink-soft">{place.luogo}</span>
@@ -136,7 +136,7 @@ export default async function MarketAdminHome({ params }: { params: { marketSlug
                       </div>
                       <Link
                         href={`/${market.slug}/admin/places/${place.id}/area`}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 bg-paper border-2 border-ink/15 hover:border-pesto text-ink rounded-full text-xs font-alt uppercase tracking-wider transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3 py-2 bg-paper border-2 border-ink/15 hover:border-mare text-ink rounded-full text-xs font-alt uppercase tracking-wider transition-colors"
                       >
                         <MapPinIcon className="w-3.5 h-3.5" /> Disegna area
                       </Link>
@@ -173,7 +173,7 @@ export default async function MarketAdminHome({ params }: { params: { marketSlug
                                   <span className="text-xs text-ink-muted tabular-nums">
                                     {opsCount} banc{opsCount === 1 ? 'o' : 'hi'}
                                   </span>
-                                  <ArrowRight className="w-4 h-4 text-ink-muted group-hover:text-pesto-600 group-hover:translate-x-0.5 transition-all" />
+                                  <ArrowRight className="w-4 h-4 text-ink-muted group-hover:text-mare-600 group-hover:translate-x-0.5 transition-all" />
                                 </div>
                               </Link>
                             </li>
@@ -190,7 +190,7 @@ export default async function MarketAdminHome({ params }: { params: { marketSlug
           {unboundCount > 0 && (
             <p className="mt-4 text-xs text-ink-muted">
               {unboundCount} banc{unboundCount === 1 ? 'o' : 'hi'} non legati a una sessione specifica — visibili in
-              <Link href={`/${market.slug}/admin/operators`} className="underline ml-1 hover:text-pesto-600">Tutti i banchi</Link>.
+              <Link href={`/${market.slug}/admin/operators`} className="underline ml-1 hover:text-mare-600">Tutti i banchi</Link>.
             </p>
           )}
         </section>

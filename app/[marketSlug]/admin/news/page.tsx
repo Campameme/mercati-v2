@@ -11,7 +11,7 @@ import type { UserRole } from '@/types/market'
 const TYPES: NewsType[] = ['schedule', 'notice', 'event', 'emergency']
 const PRIORITIES: NewsPriority[] = ['low', 'medium', 'high']
 const TYPE_LABEL: Record<NewsType, string> = { schedule: 'Orari', notice: 'Avviso', event: 'Evento', emergency: 'Emergenza' }
-const PRIO_COLOR: Record<NewsPriority, string> = { low: 'bg-paper text-ink-muted border-2 border-ink/15', medium: 'bg-riviera/15 text-riviera-600 border-2 border-riviera/30', high: 'bg-coral/15 text-coral-600 border-2 border-coral/30' }
+const PRIO_COLOR: Record<NewsPriority, string> = { low: 'bg-paper text-ink-muted border-2 border-ink/15', medium: 'bg-mare/15 text-mare-600 border-2 border-mare/30', high: 'bg-fiore/15 text-fiore-600 border-2 border-fiore/30' }
 
 function toLocalInput(iso: string | null | undefined): string {
   if (!iso) return ''
@@ -100,7 +100,7 @@ export default function AdminNewsPage() {
             <Link href={`/${slug}/admin`} className="text-xs font-alt uppercase tracking-wider text-ink-muted hover:text-ink flex items-center transition-colors"><ArrowLeft className="w-4 h-4 mr-1" /> Gestione mercato</Link>
             <h1 className="font-display text-3xl text-ink mt-1">News e avvisi</h1>
           </div>
-          <button onClick={openNew} className="flex items-center gap-2 px-4 py-2.5 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 transition-colors">
+          <button onClick={openNew} className="flex items-center gap-2 px-4 py-2.5 bg-mare text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-mare-600 transition-colors">
             <Plus className="w-4 h-4" /> <span>Nuova news</span>
           </button>
         </div>
@@ -122,11 +122,11 @@ export default function AdminNewsPage() {
                       <span className="text-[10px] font-alt uppercase tracking-wider px-2 py-0.5 bg-paper border-2 border-ink/15 text-ink-soft rounded-full">{TYPE_LABEL[n.type]}</span>
                       <span className={`text-[10px] font-alt uppercase tracking-wider px-2 py-0.5 rounded-full ${PRIO_COLOR[n.priority]}`}>{n.priority}</span>
                       {n.is_global && (
-                        <span className="text-[10px] font-alt uppercase tracking-wider px-2 py-0.5 rounded-full bg-mimosa/20 text-ink border-2 border-mimosa flex items-center gap-1">
+                        <span className="text-[10px] font-alt uppercase tracking-wider px-2 py-0.5 rounded-full bg-sole/20 text-ink border-2 border-sole flex items-center gap-1">
                           <Globe2 className="w-3 h-3" /> globale
                         </span>
                       )}
-                      <span className={`text-xs ${live ? 'text-pesto-600' : 'text-ink-muted'}`}>{live ? '● pubblicata' : '○ non visibile ora'}</span>
+                      <span className={`text-xs ${live ? 'text-mare-600' : 'text-ink-muted'}`}>{live ? '● pubblicata' : '○ non visibile ora'}</span>
                     </div>
                     <h3 className="font-alt text-base text-ink">{n.title}</h3>
                     <p className="text-sm text-ink-soft line-clamp-2 mt-1">{n.content}</p>
@@ -135,8 +135,8 @@ export default function AdminNewsPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    <button onClick={() => setEditing(n)} className="p-2 text-ink-muted hover:text-pesto-600 transition-colors" title="Modifica"><Pencil className="w-4 h-4" /></button>
-                    <button onClick={() => remove(n.id)} className="p-2 text-ink-muted hover:text-coral-600 transition-colors" title="Elimina"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => setEditing(n)} className="p-2 text-ink-muted hover:text-mare-600 transition-colors" title="Modifica"><Pencil className="w-4 h-4" /></button>
+                    <button onClick={() => remove(n.id)} className="p-2 text-ink-muted hover:text-fiore-600 transition-colors" title="Elimina"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </div>
               )
@@ -153,13 +153,13 @@ export default function AdminNewsPage() {
               </div>
               <div className="p-6 space-y-4">
                 {role === 'super_admin' && (
-                  <div className="p-3 rounded-xl border-2 border-mimosa bg-mimosa/15">
+                  <div className="p-3 rounded-xl border-2 border-sole bg-sole/15">
                     <label className="flex items-start gap-3 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={!!editing.is_global}
                         onChange={(e) => setEditing({ ...editing, is_global: e.target.checked })}
-                        className="mt-1 accent-pesto w-4 h-4"
+                        className="mt-1 accent-mare w-4 h-4"
                       />
                       <div>
                         <div className="text-sm font-alt uppercase tracking-wider text-ink flex items-center gap-1">
@@ -172,22 +172,22 @@ export default function AdminNewsPage() {
                 )}
                 <label className="block">
                   <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Titolo</span>
-                  <input value={editing.title ?? ''} onChange={(e) => setEditing({ ...editing, title: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+                  <input value={editing.title ?? ''} onChange={(e) => setEditing({ ...editing, title: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
                 </label>
                 <label className="block">
                   <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Contenuto</span>
-                  <textarea value={editing.content ?? ''} onChange={(e) => setEditing({ ...editing, content: e.target.value })} rows={5} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+                  <textarea value={editing.content ?? ''} onChange={(e) => setEditing({ ...editing, content: e.target.value })} rows={5} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <label className="block">
                     <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Tipo</span>
-                    <select value={editing.type ?? 'notice'} onChange={(e) => setEditing({ ...editing, type: e.target.value as NewsType })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors">
+                    <select value={editing.type ?? 'notice'} onChange={(e) => setEditing({ ...editing, type: e.target.value as NewsType })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors">
                       {TYPES.map((t) => <option key={t} value={t}>{TYPE_LABEL[t]}</option>)}
                     </select>
                   </label>
                   <label className="block">
                     <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Priorità</span>
-                    <select value={editing.priority ?? 'medium'} onChange={(e) => setEditing({ ...editing, priority: e.target.value as NewsPriority })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors">
+                    <select value={editing.priority ?? 'medium'} onChange={(e) => setEditing({ ...editing, priority: e.target.value as NewsPriority })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors">
                       {PRIORITIES.map((p) => <option key={p} value={p}>{p}</option>)}
                     </select>
                   </label>
@@ -195,17 +195,17 @@ export default function AdminNewsPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <label className="block">
                     <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Pubblica da</span>
-                    <input type="datetime-local" value={toLocalInput(editing.publish_from)} onChange={(e) => setEditing({ ...editing, publish_from: fromLocalInput(e.target.value) ?? new Date().toISOString() })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+                    <input type="datetime-local" value={toLocalInput(editing.publish_from)} onChange={(e) => setEditing({ ...editing, publish_from: fromLocalInput(e.target.value) ?? new Date().toISOString() })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
                   </label>
                   <label className="block">
                     <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Pubblica fino a (opz.)</span>
-                    <input type="datetime-local" value={toLocalInput(editing.publish_until)} onChange={(e) => setEditing({ ...editing, publish_until: fromLocalInput(e.target.value) })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+                    <input type="datetime-local" value={toLocalInput(editing.publish_until)} onChange={(e) => setEditing({ ...editing, publish_until: fromLocalInput(e.target.value) })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
                   </label>
                 </div>
               </div>
               <div className="flex items-center justify-end gap-2 p-6 border-t-2 border-ink/10 bg-paper rounded-b-xl">
                 <button onClick={() => setEditing(null)} className="px-4 py-2 bg-white border-2 border-ink/15 hover:border-ink/30 text-ink-soft rounded-full transition-colors">Annulla</button>
-                <button onClick={save} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 disabled:opacity-50 transition-colors">
+                <button onClick={save} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-mare text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-mare-600 disabled:opacity-50 transition-colors">
                   <Save className="w-4 h-4" /> <span>{saving ? 'Salvo…' : 'Salva'}</span>
                 </button>
               </div>

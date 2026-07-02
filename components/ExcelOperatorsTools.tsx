@@ -102,7 +102,7 @@ export default function ExcelOperatorsTools({ marketSlug, onImported }: Props) {
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={busy === 'import'}
-          className="inline-flex items-center gap-1.5 px-3 py-2 bg-olive-600 hover:bg-olive-700 text-cream-100 rounded-full text-xs disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 px-3 py-2 bg-mare-600 hover:bg-mare-700 text-cream-100 rounded-full text-xs disabled:opacity-50"
         >
           <Upload className="w-3.5 h-3.5" /> {busy === 'import' && !preview ? 'Analisi…' : 'Importa .xlsx'}
         </button>
@@ -117,7 +117,7 @@ export default function ExcelOperatorsTools({ marketSlug, onImported }: Props) {
 
       {resultMsg && (
         <p className="mt-3 text-sm text-ink flex items-center gap-1.5">
-          <Check className="w-4 h-4 text-olive-600" /> {resultMsg}
+          <Check className="w-4 h-4 text-mare-600" /> {resultMsg}
         </p>
       )}
 
@@ -129,15 +129,15 @@ export default function ExcelOperatorsTools({ marketSlug, onImported }: Props) {
             <span>Aggiornati: <strong className="text-ink tabular-nums">{preview.willUpdate}</strong></span>
             <span>Presenze: <strong className="text-ink tabular-nums">{preview.totalPresences}</strong></span>
             {preview.errors.length > 0 && (
-              <span className="text-terra-600">Errori: <strong className="tabular-nums">{preview.errors.length}</strong></span>
+              <span className="text-fiore-600">Errori: <strong className="tabular-nums">{preview.errors.length}</strong></span>
             )}
           </div>
 
           {preview.errors.length > 0 && (
-            <ul className="bg-terra-100/40 border border-terra-500/40 rounded-sm p-3 mb-3 max-h-40 overflow-y-auto text-xs space-y-1">
+            <ul className="bg-fiore-100/40 border border-fiore/40 rounded-sm p-3 mb-3 max-h-40 overflow-y-auto text-xs space-y-1">
               {preview.errors.slice(0, 20).map((e, i) => (
                 <li key={i} className="flex items-start gap-1.5 text-ink">
-                  <AlertTriangle className="w-3 h-3 text-terra-600 flex-shrink-0 mt-0.5" />
+                  <AlertTriangle className="w-3 h-3 text-fiore-600 flex-shrink-0 mt-0.5" />
                   <span>Riga {e.rowIndex}: {e.message}</span>
                 </li>
               ))}
@@ -159,7 +159,7 @@ export default function ExcelOperatorsTools({ marketSlug, onImported }: Props) {
                       <strong className="text-ink">{g.name}</strong>
                       <span className="text-ink-muted"> · {g.marketSlug} · {g.presencesCount} presenz{g.presencesCount === 1 ? 'a' : 'e'}</span>
                     </span>
-                    <span className={`px-2 py-0.5 rounded-sm text-[10px] uppercase tracking-wider ${g.action === 'create' ? 'bg-olive-100 text-olive-700' : 'bg-sea-100 text-sea-600'}`}>
+                    <span className={`px-2 py-0.5 rounded-sm text-[10px] uppercase tracking-wider ${g.action === 'create' ? 'bg-marel text-mare-700' : 'bg-marel text-mare-600'}`}>
                       {g.action === 'create' ? 'nuovo' : 'aggiorna'}
                     </span>
                   </li>

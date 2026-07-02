@@ -98,9 +98,9 @@ export default function NavMenu({ open, onClose }: Props) {
   }, [open, onClose])
 
   const globalLinks = [
-    { href: '/',           label: 'Mappa provincia',       icon: MapIcon },
-    { href: '/operatori',  label: 'Banchi',                icon: Store },
-    { href: '/calendar',   label: 'Calendario provincia',  icon: Calendar },
+    { href: '/mappa',      label: 'Mappa dei mercati',     icon: MapIcon },
+    { href: '/operatori',  label: 'Gli ambulanti',         icon: Store },
+    { href: '/calendar',   label: 'Calendario eventi',     icon: Calendar },
   ]
 
   // Filtro testuale su zone + comuni
@@ -161,8 +161,9 @@ export default function NavMenu({ open, onClose }: Props) {
           </div>
         </div>
 
-        {/* Body scrollable */}
-        <div className="flex-1 overflow-y-auto imk-scroll px-5 md:px-7 py-6 space-y-8">
+        {/* Body scrollable (min-h-0: indispensabile per scrollare dentro un flex-col;
+            data-lenis-prevent: altrimenti Lenis dirotta la rotella sulla finestra) */}
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain imk-scroll px-5 md:px-7 py-6 space-y-8" data-lenis-prevent>
           {/* Provincia */}
           <section>
             <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-3">Provincia</p>

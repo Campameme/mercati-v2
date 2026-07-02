@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendEmail } from '@/lib/email/send'
+import { SITE_NAME, SITE_URL } from '@/lib/site'
 import crypto from 'node:crypto'
 
 export const dynamic = 'force-dynamic'
 
-const DESTINATARIO = 'emanueleecampanini@gmail.com'
+// Destinatario delle richieste: configurabile via env (ADESIONI_TO) per non
+// legare il codice a una casella personale.
+const DESTINATARIO = process.env.ADESIONI_TO ?? 'emanueleecampanini@gmail.com'
 
 // Rate limit semplicissimo in-memory: max 3 invii nello stesso minuto dallo stesso ip.
 // In produzione su Netlify funziona per istanza, non perfetto ma scoraggia spam basic.
@@ -20,8 +23,12 @@ function ratelimit(ip: string): boolean {
 }
 
 function hashIp(ip: string): string {
-  const salt = process.env.IP_SALT ?? 'imercati-default-salt'
-  return crypto.createHash('sha256').update(ip + salt).digest('hex').slice(0, 32)
+  const salt = process.env.IP_SALT
+  if (!salt && process.env.NODE_ENV === 'production') {
+    // Col salt di default gli hash IP sono prevedibili: impostare IP_SALT nel deploy.
+    console.error('[adesioni] IP_SALT mancante in produzione: impostala nelle env del deploy')
+  }
+  return crypto.createHash('sha256').update(ip + (salt ?? 'imercati-default-salt')).digest('hex').slice(0, 32)
 }
 
 function escapeHtml(s: string): string {
@@ -94,7 +101,7 @@ export async function POST(request: NextRequest) {
   const html = `
     <div style="font-family: -apple-system, sans-serif; max-width: 600px; color: #2a2620;">
       <h2 style="font-family: Georgia, serif; color: #5d6e3b;">Nuova richiesta di adesione</h2>
-      <p style="color: #7a6f60;">Ricevuta su Mercati di Ponente il ${new Date().toLocaleString('it-IT')}</p>
+      <p style="color: #7a6f60;">Ricevuta su ${SITE_NAME} il ${new Date().toLocaleString('it-IT')}</p>
       <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
         <tr><td style="padding: 8px 0; color: #7a6f60; vertical-align: top; width: 140px;">Nome</td><td style="padding: 8px 0;">${escapeHtml(nome)}</td></tr>
         <tr><td style="padding: 8px 0; color: #7a6f60; vertical-align: top;">Email</td><td style="padding: 8px 0;"><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td></tr>
@@ -105,14 +112,14 @@ export async function POST(request: NextRequest) {
       </table>
       <p style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #ddcdb0; color: #7a6f60; font-size: 12px;">
         ID richiesta: ${row.id}<br>
-        Gestisci le richieste in <a href="https://mercati-fiere.netlify.app/admin/adesioni">Admin → Adesioni</a>
+        Gestisci le richieste in <a href="${SITE_URL}/admin/adesioni">Admin → Adesioni</a>
       </p>
     </div>
   `
 
   const result = await sendEmail({
     to: DESTINATARIO,
-    subject: `Adesione Mercati di Ponente — ${nome}`,
+    subject: `Adesione ${SITE_NAME} — ${nome}`,
     html,
     replyTo: email,
   })

@@ -3,8 +3,8 @@ import { ChevronLeft } from 'lucide-react'
 import { SunRay } from '@/components/decorations'
 
 export const metadata = {
-  title: 'Cookie Policy — Mercati di Ponente',
-  description: 'Come usiamo cookie e storage del browser su Mercati di Ponente.',
+  title: 'Cookie Policy — Mercati della Riviera di Ponente',
+  description: 'Come usiamo cookie e storage del browser su Mercati della Riviera di Ponente.',
 }
 
 const LAST_UPDATE = '14 maggio 2026'
@@ -29,7 +29,7 @@ export default function CookiePage() {
       <div className="space-y-8 text-ink-soft leading-relaxed">
         <section>
           <p className="text-lg text-ink mb-4">
-            <strong>Mercati di Ponente non usa cookie di profilazione, tracciamento o pubblicità.</strong>
+            <strong>Mercati della Riviera di Ponente non usa cookie di profilazione, tracciamento o pubblicità.</strong>
           </p>
           <p>
             Le nostre statistiche di visita sono <em>cookieless</em>: usiamo un identificatore tecnico
@@ -41,7 +41,7 @@ export default function CookiePage() {
 
         <section>
           <h2 className="font-display text-2xl text-ink mb-3">Cookie tecnici (strettamente necessari)</h2>
-          <p className="mb-4">Sono gli unici cookie che Mercati di Ponente impone, solo quando servono davvero:</p>
+          <p className="mb-4">Sono gli unici cookie che Mercati della Riviera di Ponente impone, solo quando servono davvero:</p>
 
           <div className="border-2 border-ink/10 rounded-xl overflow-hidden bg-white">
             <table className="w-full text-sm">

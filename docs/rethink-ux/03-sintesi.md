@@ -1,3 +1,9 @@
+> ⚠️ **ARCHIVIO STORICO — direzione MAI implementata.** Questo documento descrive
+> la proposta "Slow Compass / magazine editoriale" (Fraunces+Inter, cream/olive,
+> route /agenda /banchi /colophon) generata dal workflow del 2026-05-14 e poi
+> **scartata**. Il sito reale è un'altra cosa: vedi `../brand-system.md` e
+> `../brand-voice.md`. Non usare questi file come riferimento di implementazione.
+
 # 03 · Sintesi — Vicino, ma da scoprire
 
 > **AGGIORNATO 14 maggio 2026.** Il framing originale del workflow ("Slow Compass — slow editorial magazine") è stato rigettato dall'utente: *"il progetto non è un editoriale, piuttosto è l'esperienza premium al mercato, non valorizzata come esclusiva, ma di qualità e autentica."*

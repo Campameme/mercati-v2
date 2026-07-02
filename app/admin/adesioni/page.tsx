@@ -51,7 +51,7 @@ export default async function AdesioniAdminPage({ searchParams }: {
           <ArrowLeft className="w-3.5 h-3.5" /> Dashboard admin
         </Link>
         <div className="mb-8 border-b-2 border-ink/10 pb-5">
-          <p className="text-xs font-alt uppercase tracking-[0.18em] text-pesto-600 mb-1">Super-admin</p>
+          <p className="text-xs font-alt uppercase tracking-[0.18em] text-mare-600 mb-1">Super-admin</p>
           <h1 className="font-display text-3xl md:text-4xl text-ink leading-tight">Adesioni operatori</h1>
           <p className="text-sm text-ink-soft mt-2">Richieste ricevute dal form pubblico /aderisci.</p>
         </div>
@@ -64,7 +64,7 @@ export default async function AdesioniAdminPage({ searchParams }: {
               className={`px-3 py-1.5 text-xs font-alt uppercase tracking-wider rounded-full border-2 transition-colors ${
                 filter === f.value
                   ? 'bg-ink text-paper border-ink'
-                  : 'bg-white text-ink-soft border-ink/15 hover:border-pesto'
+                  : 'bg-white text-ink-soft border-ink/15 hover:border-mare'
               }`}
             >
               {f.label}
@@ -73,7 +73,7 @@ export default async function AdesioniAdminPage({ searchParams }: {
         </div>
 
         {error && (
-          <p className="text-sm text-coral-600 italic">Errore caricamento: {error.message}</p>
+          <p className="text-sm text-fiore-600 italic">Errore caricamento: {error.message}</p>
         )}
 
         {adesioni.length === 0 ? (
@@ -92,15 +92,15 @@ export default async function AdesioniAdminPage({ searchParams }: {
 
                 <div className="grid md:grid-cols-2 gap-3 text-sm text-ink-soft mb-3">
                   <div className="flex items-center gap-2">
-                    <Mail className="w-3.5 h-3.5 text-pesto" />
-                    <a href={`mailto:${a.email}`} className="text-pesto-600 underline underline-offset-2 truncate">
+                    <Mail className="w-3.5 h-3.5 text-mare" />
+                    <a href={`mailto:${a.email}`} className="text-mare-600 underline underline-offset-2 truncate">
                       {a.email}
                     </a>
                   </div>
                   {a.telefono && (
                     <div className="flex items-center gap-2">
-                      <Phone className="w-3.5 h-3.5 text-pesto" />
-                      <a href={`tel:${a.telefono}`} className="text-pesto-600">{a.telefono}</a>
+                      <Phone className="w-3.5 h-3.5 text-mare" />
+                      <a href={`tel:${a.telefono}`} className="text-mare-600">{a.telefono}</a>
                     </div>
                   )}
                   <div className="flex items-center gap-2">
@@ -124,7 +124,7 @@ export default async function AdesioniAdminPage({ searchParams }: {
                 )}
 
                 {!a.email_sent && (
-                  <p className="mt-3 text-xs text-coral-600">
+                  <p className="mt-3 text-xs text-fiore-600">
                     ⚠ Email di notifica non inviata ({a.email_error ?? 'errore sconosciuto'})
                   </p>
                 )}

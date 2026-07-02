@@ -59,7 +59,7 @@ export default function PhotoUploader({ bucket, folder, value, onChange, max = 8
             <button
               type="button"
               onClick={() => handleRemove(url)}
-              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow"
+              className="absolute -top-2 -right-2 bg-fiore text-white rounded-full p-1 shadow"
               title="Rimuovi"
             >
               <X className="w-3 h-3" />
@@ -67,14 +67,14 @@ export default function PhotoUploader({ bucket, folder, value, onChange, max = 8
           </div>
         ))}
         {value.length < max && (
-          <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-md flex flex-col items-center justify-center cursor-pointer hover:border-primary-500 text-gray-500 hover:text-primary-600 transition-colors">
+          <label className="w-24 h-24 border-2 border-dashed border-ink/15 rounded-md flex flex-col items-center justify-center cursor-pointer hover:border-primary-500 text-ink-muted hover:text-primary-600 transition-colors">
             <Upload className="w-6 h-6" />
             <span className="text-xs mt-1">{uploading ? '…' : 'Carica'}</span>
             <input type="file" accept="image/*" multiple hidden onChange={(e) => handleFiles(e.target.files)} disabled={uploading} />
           </label>
         )}
       </div>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-fiore-600">{error}</p>}
     </div>
   )
 }

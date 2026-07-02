@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { requireOperatorAccess } from '@/lib/auth/guard'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,7 +17,10 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 }
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createClient()
+  // Ammessi: proprietario della scheda (dashboard operatore) o admin del mercato.
+  const guard = await requireOperatorAccess(params.id)
+  if (!guard.ok) return guard.res
+  const supabase = guard.supabase
   const body = await request.json()
   const allowed = [
     'name', 'code', 'category', 'description', 'stall_number',
@@ -38,7 +42,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createClient()
+  // L'eliminazione è riservata agli admin (l'operatore non cancella la propria scheda).
+  const guard = await requireOperatorAccess(params.id)
+  if (!guard.ok) return guard.res
+  if (!guard.isAdmin) return NextResponse.json({ error: 'Operazione riservata agli amministratori' }, { status: 403 })
+  const supabase = guard.supabase
   const { error } = await supabase.from('operators').delete().eq('id', params.id)
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
   return NextResponse.json({ ok: true })

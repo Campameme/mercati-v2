@@ -100,7 +100,7 @@ export default function OperatorMarketDashboard() {
             <h1 className="font-display text-3xl text-ink">{operator.name}</h1>
           </div>
           <div className="flex items-center gap-2">
-            <Link href={`/operator/${operator.id}/products`} className="flex items-center gap-2 px-3 py-2 bg-white border-2 border-ink/15 hover:border-pesto text-ink rounded-full text-sm transition-colors">
+            <Link href={`/operator/${operator.id}/products`} className="flex items-center gap-2 px-3 py-2 bg-white border-2 border-ink/15 hover:border-mare text-ink rounded-full text-sm transition-colors">
               <Package className="w-4 h-4" /> <span>Prodotti</span>
             </Link>
             <button onClick={handleLogout} className="flex items-center gap-2 px-3 py-2 bg-white border-2 border-ink/15 hover:border-ink/30 text-ink rounded-full text-sm transition-colors">
@@ -112,12 +112,12 @@ export default function OperatorMarketDashboard() {
         <form onSubmit={handleSave} className="bg-white rounded-xl border-2 border-ink/10 p-6 space-y-4">
           <label className="block">
             <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Nome</span>
-            <input value={operator.name} onChange={(e) => setOperator({ ...operator, name: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+            <input value={operator.name} onChange={(e) => setOperator({ ...operator, name: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
           </label>
 
           <label className="block">
             <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Descrizione</span>
-            <textarea value={operator.description ?? ''} onChange={(e) => setOperator({ ...operator, description: e.target.value })} rows={3} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+            <textarea value={operator.description ?? ''} onChange={(e) => setOperator({ ...operator, description: e.target.value })} rows={3} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
           </label>
 
           <div>
@@ -137,7 +137,7 @@ export default function OperatorMarketDashboard() {
                 <button
                   key={l} type="button"
                   onClick={() => setOperator({ ...operator, languages: toggleArr(operator.languages, l) })}
-                  className={`px-3 py-1 rounded-full text-sm border-2 transition-colors ${operator.languages.includes(l) ? 'bg-pesto/15 text-pesto-700 border-pesto/40' : 'bg-paper text-ink-soft border-ink/15 hover:border-ink/30'}`}
+                  className={`px-3 py-1 rounded-full text-sm border-2 transition-colors ${operator.languages.includes(l) ? 'bg-mare/15 text-mare-700 border-mare/40' : 'bg-paper text-ink-soft border-ink/15 hover:border-ink/30'}`}
                 >{l}</button>
               ))}
             </div>
@@ -150,7 +150,7 @@ export default function OperatorMarketDashboard() {
                 <button
                   key={m} type="button"
                   onClick={() => setOperator({ ...operator, payment_methods: toggleArr(operator.payment_methods, m) })}
-                  className={`px-3 py-1 rounded-full text-sm border-2 transition-colors ${operator.payment_methods.includes(m) ? 'bg-pesto/15 text-pesto-700 border-pesto/40' : 'bg-paper text-ink-soft border-ink/15 hover:border-ink/30'}`}
+                  className={`px-3 py-1 rounded-full text-sm border-2 transition-colors ${operator.payment_methods.includes(m) ? 'bg-mare/15 text-mare-700 border-mare/40' : 'bg-paper text-ink-soft border-ink/15 hover:border-ink/30'}`}
                 >{m}</button>
               ))}
             </div>
@@ -159,21 +159,21 @@ export default function OperatorMarketDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <label className="block">
               <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Instagram</span>
-              <input value={operator.social_links?.instagram ?? ''} onChange={(e) => setOperator({ ...operator, social_links: { ...operator.social_links, instagram: e.target.value } })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+              <input value={operator.social_links?.instagram ?? ''} onChange={(e) => setOperator({ ...operator, social_links: { ...operator.social_links, instagram: e.target.value } })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
             </label>
             <label className="block">
               <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Facebook</span>
-              <input value={operator.social_links?.facebook ?? ''} onChange={(e) => setOperator({ ...operator, social_links: { ...operator.social_links, facebook: e.target.value } })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+              <input value={operator.social_links?.facebook ?? ''} onChange={(e) => setOperator({ ...operator, social_links: { ...operator.social_links, facebook: e.target.value } })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
             </label>
             <label className="block">
               <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Sito web</span>
-              <input value={operator.social_links?.website ?? ''} onChange={(e) => setOperator({ ...operator, social_links: { ...operator.social_links, website: e.target.value } })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+              <input value={operator.social_links?.website ?? ''} onChange={(e) => setOperator({ ...operator, social_links: { ...operator.social_links, website: e.target.value } })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
             </label>
           </div>
 
           <div className="flex items-center justify-between pt-2">
             <div className="text-sm text-ink-soft">{msg}</div>
-            <button type="submit" disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 disabled:opacity-50 transition-colors">
+            <button type="submit" disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-mare text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-mare-600 disabled:opacity-50 transition-colors">
               <Save className="w-4 h-4" /> <span>{saving ? 'Salvataggio…' : 'Salva'}</span>
             </button>
           </div>

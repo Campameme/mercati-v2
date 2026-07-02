@@ -36,7 +36,7 @@ export default function AdesioneStatoToggle({ id, initialStato }: {
       value={stato}
       onChange={(e) => change(e.target.value)}
       disabled={busy}
-      className="text-xs px-3 py-1.5 bg-cream-100 border border-cream-300 rounded-full text-ink-soft focus:outline-none focus:border-olive-500 disabled:opacity-50"
+      className="text-xs px-3 py-1.5 bg-cream-100 border border-cream-300 rounded-full text-ink-soft focus:outline-none focus:border-mare disabled:opacity-50"
     >
       {STATI.map((s) => (
         <option key={s.value} value={s.value}>{s.label}</option>

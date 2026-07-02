@@ -9,7 +9,8 @@ export const dynamic = 'force-dynamic'
 export async function GET(request: NextRequest) {
   const supabase = createClient()
   const { searchParams } = new URL(request.url)
-  const q = (searchParams.get('q') ?? '').trim()
+  // I filtri PostgREST usano , ( ) come sintassi: via i caratteri speciali (filter-injection).
+  const q = (searchParams.get('q') ?? '').replace(/[,()"'\\%]/g, ' ').trim()
   const excludeMarketId = searchParams.get('excludeMarketId')
   const limit = Math.min(50, parseInt(searchParams.get('limit') ?? '20', 10))
 

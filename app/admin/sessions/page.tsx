@@ -134,8 +134,8 @@ export default function AdminSessionsPage() {
         </Link>
         <div className="mb-8 border-b-2 border-ink/10 pb-5">
           <div className="flex items-center gap-2 mb-1">
-            <Power className="w-5 h-5 text-pesto" />
-            <p className="text-xs font-alt uppercase tracking-[0.18em] text-pesto-600">Super-admin</p>
+            <Power className="w-5 h-5 text-mare" />
+            <p className="text-xs font-alt uppercase tracking-[0.18em] text-mare-600">Super-admin</p>
           </div>
           <h1 className="font-display text-3xl md:text-4xl text-ink leading-tight">Accendi / Spegni mercati</h1>
           <p className="text-sm text-ink-soft mt-2 max-w-2xl">
@@ -167,14 +167,14 @@ export default function AdminSessionsPage() {
                       disabled={busyId === m.id}
                       className={`w-full text-left px-3 py-2.5 rounded-xl border-2 transition-all ${
                         m.is_active
-                          ? 'bg-white border-pesto/40 hover:border-pesto'
+                          ? 'bg-white border-mare/40 hover:border-mare'
                           : 'bg-paper border-ink/10 opacity-60 hover:opacity-100'
                       } disabled:opacity-40`}
                     >
                       <div className="flex items-center justify-between gap-2">
                         <span className="font-alt text-sm text-ink truncate">{m.name}</span>
                         <span className={`text-[10px] font-alt uppercase tracking-wider px-1.5 py-0.5 rounded-full flex-shrink-0 ${
-                          m.is_active ? 'bg-pesto text-white' : 'bg-ink/10 text-ink-muted'
+                          m.is_active ? 'bg-mare text-white' : 'bg-ink/10 text-ink-muted'
                         }`}>
                           {m.is_active ? 'ON' : 'OFF'}
                         </span>
@@ -200,13 +200,13 @@ export default function AdminSessionsPage() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Cerca comune, giorno, luogo…"
-                className="w-full pl-9 pr-3 py-2.5 bg-white border-2 border-ink/15 rounded-xl text-sm text-ink focus:outline-none focus:border-pesto transition-colors"
+                className="w-full pl-9 pr-3 py-2.5 bg-white border-2 border-ink/15 rounded-xl text-sm text-ink focus:outline-none focus:border-mare transition-colors"
               />
             </div>
             <select
               value={marketFilter}
               onChange={(e) => setMarketFilter(e.target.value)}
-              className="py-2.5 px-3 bg-white border-2 border-ink/15 rounded-xl text-sm text-ink focus:outline-none focus:border-pesto transition-colors"
+              className="py-2.5 px-3 bg-white border-2 border-ink/15 rounded-xl text-sm text-ink focus:outline-none focus:border-mare transition-colors"
             >
               <option value="all">Tutte le zone</option>
               {markets.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
@@ -214,7 +214,7 @@ export default function AdminSessionsPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="py-2.5 px-3 bg-white border-2 border-ink/15 rounded-xl text-sm text-ink focus:outline-none focus:border-pesto transition-colors"
+              className="py-2.5 px-3 bg-white border-2 border-ink/15 rounded-xl text-sm text-ink focus:outline-none focus:border-mare transition-colors"
             >
               <option value="all">Tutti gli stati</option>
               <option value="active">Solo attivi</option>
@@ -250,7 +250,7 @@ export default function AdminSessionsPage() {
                               {s.marketSlug && (
                                 <Link
                                   href={`/${s.marketSlug}/admin/s/${s.id}`}
-                                  className="text-xs text-ink-muted hover:text-pesto-600 underline underline-offset-2"
+                                  className="text-xs text-ink-muted hover:text-mare-600 underline underline-offset-2"
                                 >
                                   Configura
                                 </Link>
@@ -261,7 +261,7 @@ export default function AdminSessionsPage() {
                                 disabled={busyId === s.id}
                                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-alt uppercase tracking-wider transition-colors ${
                                   active
-                                    ? 'bg-pesto text-white hover:bg-pesto-600'
+                                    ? 'bg-mare text-white hover:bg-mare-600'
                                     : 'bg-paper border-2 border-ink/15 text-ink-muted hover:border-ink/30'
                                 } disabled:opacity-40`}
                               >

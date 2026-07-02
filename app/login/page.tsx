@@ -80,7 +80,7 @@ function LoginPageInner() {
     <div className="min-h-[80vh] bg-paper flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-xl border-2 border-ink/10 shadow-sm p-8">
-          <div className="flex items-center justify-center gap-2 text-pesto-600 mb-1">
+          <div className="flex items-center justify-center gap-2 text-mare-600 mb-1">
             <Logo inline className="text-sm" />
             <span className="text-xs font-alt uppercase tracking-[0.18em]">· Riviera</span>
           </div>
@@ -91,19 +91,19 @@ function LoginPageInner() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <label className="block">
               <span className="flex items-center text-xs font-alt uppercase tracking-wider text-ink-soft mb-1.5">
-                <Mail className="w-4 h-4 mr-1.5 text-pesto" /> Email
+                <Mail className="w-4 h-4 mr-1.5 text-mare" /> Email
               </span>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2.5 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors"
+                className="w-full px-3 py-2.5 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors"
               />
             </label>
             <label className="block">
               <span className="flex items-center text-xs font-alt uppercase tracking-wider text-ink-soft mb-1.5">
-                <Lock className="w-4 h-4 mr-1.5 text-pesto" /> Password
+                <Lock className="w-4 h-4 mr-1.5 text-mare" /> Password
               </span>
               <input
                 type="password"
@@ -111,16 +111,16 @@ function LoginPageInner() {
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2.5 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors"
+                className="w-full px-3 py-2.5 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors"
               />
             </label>
 
-            {error && <p className="text-sm text-coral-600">{error}</p>}
+            {error && <p className="text-sm text-fiore-600">{error}</p>}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 disabled:opacity-50 transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-mare text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-mare-600 disabled:opacity-50 transition-colors"
             >
               {mode === 'signin' ? <LogIn className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
               <span>{loading ? 'Attendi…' : mode === 'signin' ? 'Accedi' : 'Registrati'}</span>
@@ -130,7 +130,7 @@ function LoginPageInner() {
           <button
             type="button"
             onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
-            className="w-full mt-4 text-sm text-ink-muted hover:text-pesto-600 transition-colors"
+            className="w-full mt-4 text-sm text-ink-muted hover:text-mare-600 transition-colors"
           >
             {mode === 'signin' ? 'Non hai un account? Registrati' : 'Hai già un account? Accedi'}
           </button>

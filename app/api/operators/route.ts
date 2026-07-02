@@ -1,16 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { resolveMarketFromRequest } from '@/lib/markets/resolve'
+import { requireAdmin } from '@/lib/auth/guard'
 
 export const dynamic = 'force-dynamic'
 
+// I filtri PostgREST usano , ( ) come sintassi: via i caratteri speciali
+// dall'input utente prima di comporre la stringa .or() (filter-injection).
+function cleanSearch(s: string): string {
+  return s.replace(/[,()"'\\%]/g, ' ').trim()
+}
+
 export async function POST(request: NextRequest) {
-  const supabase = createClient()
   const body = await request.json()
   const { market_id, name, category } = body
   if (!market_id || !name || !category) {
     return NextResponse.json({ error: 'market_id, name, category obbligatori' }, { status: 400 })
   }
+  const guard = await requireAdmin({ marketId: market_id })
+  if (!guard.ok) return guard.res
+  const supabase = guard.supabase
   const insert = {
     market_id,
     schedule_id: body.schedule_id ?? null,
@@ -53,7 +62,8 @@ export async function GET(request: NextRequest) {
       .from('operators')
       .select('id, name, category, description, stall_number, location_lat, location_lng, photos, languages, payment_methods, social_links, rating, market_id, schedule_id, markets(slug, name, city), operator_schedules(schedule_id, location_lat, location_lng, stall_number, market_schedules(id, comune, giorno, luogo, market_id))')
     if (category && category !== 'all') q = q.eq('category', category)
-    if (search) q = q.or(`name.ilike.%${search}%,description.ilike.%${search}%,stall_number.ilike.%${search}%`)
+    const s = search ? cleanSearch(search) : ''
+    if (s) q = q.or(`name.ilike.%${s}%,description.ilike.%${s}%,stall_number.ilike.%${s}%`)
     const { data, error } = await q
     if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
     const shaped = (data ?? []).map((op: any) => ({
@@ -172,7 +182,8 @@ export async function GET(request: NextRequest) {
     .eq('market_id', resolved.market.id)
 
   if (category && category !== 'all') query = query.eq('category', category)
-  if (search) query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%,stall_number.ilike.%${search}%`)
+  const s2 = search ? cleanSearch(search) : ''
+  if (s2) query = query.or(`name.ilike.%${s2}%,description.ilike.%${s2}%,stall_number.ilike.%${s2}%`)
 
   const { data, error } = await query
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })

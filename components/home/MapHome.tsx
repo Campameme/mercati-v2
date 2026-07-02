@@ -1,76 +1,58 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import Link from 'next/link'
-import { gsap } from 'gsap'
-import { Search, Crosshair, Clock, Store, MapPin } from 'lucide-react'
-import UnifiedMapClient from '@/components/UnifiedMapClient'
+import { useRouter } from 'next/navigation'
+import { gsap } from '@/lib/motion/gsap'
+import { Search, Store, MapPin, ArrowRight, CalendarDays, ChevronDown, Sun, Crosshair, Newspaper } from 'lucide-react'
 import Logo from '@/components/Logo'
-import SeaCanvas from '@/components/motion/SeaCanvas'
-import type { UnifiedMapPin } from '@/components/UnifiedMap'
-import MarketPanel from './MarketPanel'
-import type { MarketPin, MarketSession } from './types'
+import DriftBackdrop from '@/components/motion/DriftBackdrop'
+import WaterCard from '@/components/motion/WaterCard'
+import BancoAvatar from '@/components/BancoAvatar'
+import PhotoFx from './PhotoFx'
+import { mountAqua } from '@/lib/home/aqua'
+import BorghiSection from './BorghiSection'
+import type { MarketPin } from './types'
+import type { NewsItem } from '@/types/news'
 import { HOME_I18N, LANGS, type Lang } from '@/lib/i18n/home'
-import { marketStatus, weekdaysOf, occursOn, fmtHour } from '@/lib/markets/hours'
+import { HOME_COPY } from '@/lib/i18n/homeCopy'
+import { useTypewriter } from '@/lib/useTypewriter'
 
-type DayFilter = 'all' | 'today' | number
-
-const WD_LABELS: Record<Lang, string[]> = {
-  it: ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'],
-  fr: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
-  de: ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'],
-  en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+export interface HomeEvent {
+  id: string
+  title: string
+  startAt: string
+  marketName: string | null
 }
-const WD_ORDER = [1, 2, 3, 4, 5, 6, 0]
 
 interface HubOperator {
   id: string
   name: string
   category: string
   market: { slug: string; name: string } | null
-  schedules: Array<{ comune: string | null }>
 }
 
-function pickSession(pin: MarketPin, now: Date | null): MarketSession {
-  if (now) {
-    const match = pin.sessions.find((s) => occursOn(s.giorno, now))
-    if (match) return match
-  }
-  return pin.sessions[0]
-}
+// Glifi delle qualità del mercato (stessi valori di copy.qualities, in ordine)
+const QUALITY_GLYPH = ['🤲', '🧭', '🕰', '🌅', '🧺', '🫶']
 
-function pinWeekdays(pin: MarketPin): Set<number> {
-  const set = new Set<number>()
-  for (const s of pin.sessions) for (const d of weekdaysOf(s.giorno)) set.add(d)
-  return set
-}
-
-export default function MapHome({ pins }: { pins: MarketPin[] }) {
+export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; events?: HomeEvent[] }) {
+  const router = useRouter()
   const [lang, setLang] = useState<Lang>('it')
-  const [day, setDay] = useState<DayFilter>('all')
   const [query, setQuery] = useState('')
-  const [open, setOpen] = useState(false)
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [now, setNow] = useState<Date | null>(null)
-  const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(null)
-  const [locating, setLocating] = useState(false)
   const [operators, setOperators] = useState<HubOperator[]>([])
-
+  const [news, setNews] = useState<NewsItem[]>([])
   const heroRef = useRef<HTMLDivElement>(null)
-  const barRef = useRef<HTMLDivElement>(null)
+  const aquaRef = useRef<HTMLCanvasElement>(null)
+
   const dict = HOME_I18N[lang]
-  const wd = WD_LABELS[lang]
+  const copy = HOME_COPY[lang]
+  const typed = useTypewriter(copy.searchExamples)
 
   useEffect(() => {
     const saved = (typeof localStorage !== 'undefined' && localStorage.getItem('imk:lang')) as Lang | null
     if (saved && LANGS.includes(saved)) setLang(saved)
-    setNow(new Date())
-    const t = setInterval(() => setNow(new Date()), 60_000)
-    fetch('/api/operators?all=1')
-      .then((r) => r.json())
-      .then((j) => setOperators(Array.isArray(j?.data) ? j.data : []))
-      .catch(() => {})
-    return () => clearInterval(t)
+    fetch('/api/operators?all=1').then((r) => r.json()).then((j) => setOperators(Array.isArray(j?.data) ? j.data : [])).catch(() => {})
+    fetch('/api/news?all=1').then((r) => r.json()).then((j) => setNews(Array.isArray(j?.data) ? j.data : [])).catch(() => {})
   }, [])
 
   useEffect(() => {
@@ -78,331 +60,257 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
     if (typeof localStorage !== 'undefined') localStorage.setItem('imk:lang', lang)
   }, [lang])
 
-  // Signature GSAP: titolo cinetico (solo transform → sempre leggibile) + entrate
+  // Hero: ingresso cinetico (transform-only → sempre leggibile)
   useEffect(() => {
-    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    if (reduce) return
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
     const ctx = gsap.context(() => {
-      if (heroRef.current) {
-        gsap.from(heroRef.current.querySelectorAll('[data-word]'), {
-          yPercent: 115,
-          rotate: 4,
-          stagger: 0.05,
-          duration: 0.7,
-          ease: 'back.out(1.5)',
-          clearProps: 'transform',
-        })
-        gsap.from(heroRef.current.querySelectorAll('[data-anim]'), {
-          y: 14,
-          stagger: 0.08,
-          duration: 0.5,
-          delay: 0.15,
-          ease: 'power3.out',
-          clearProps: 'transform',
-        })
-      }
-      if (barRef.current) {
-        gsap.from(barRef.current, { y: 16, duration: 0.45, delay: 0.25, ease: 'power3.out', clearProps: 'transform' })
-      }
+      const root = heroRef.current
+      if (!root) return
+      gsap.from(root.querySelectorAll('[data-word]'), { yPercent: 120, rotate: 5, stagger: 0.06, duration: 0.85, ease: 'back.out(1.5)', clearProps: 'transform' })
+      gsap.from(root.querySelectorAll('[data-anim]'), { y: 16, duration: 0.6, stagger: 0.08, delay: 0.2, ease: 'power3.out', clearProps: 'transform' })
+    }, heroRef)
+    return () => ctx.revert()
+  }, [])
+
+  // Effetto acqua nell'hero: bollicine + increspature/alone al passaggio del
+  // mouse, sopra la foto ferma. Reduced-motion safe (gestito in mountAqua).
+  useEffect(() => {
+    const c = aquaRef.current, host = heroRef.current
+    if (!c || !host) return
+    return mountAqua(c, host, { bubbles: 32 })
+  }, [])
+
+  // Reveal d'ingresso delle sezioni (solo transform → mai testo invisibile)
+  useEffect(() => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+    const ctx = gsap.context(() => {
+      gsap.utils.toArray<HTMLElement>('.home-reveal').forEach((el) => {
+        gsap.from(el, { y: 30, duration: 0.7, ease: 'power3.out', clearProps: 'transform', scrollTrigger: { trigger: el, start: 'top 88%', once: true } })
+      })
     })
     return () => ctx.revert()
   }, [])
 
-  const statuses = useMemo(() => {
-    const map = new Map<string, ReturnType<typeof marketStatus>>()
-    for (const pin of pins) {
-      const s = pickSession(pin, now)
-      map.set(pin.id, marketStatus(now ?? new Date(0), s.giorno, s.orario))
-    }
-    return map
-  }, [pins, now])
+  const headlineWords = copy.heroHeadline.split(' ')
 
-  const q = query.trim().toLowerCase()
-
-  const filteredPins = useMemo(() => {
-    return pins.filter((p) => {
-      if (day === 'today' && now) {
-        if (!p.sessions.some((s) => occursOn(s.giorno, now))) return false
-      } else if (typeof day === 'number') {
-        if (!pinWeekdays(p).has(day)) return false
-      }
-      if (q) {
-        const hay = `${p.comune} ${p.luogo ?? ''} ${p.marketName} ${p.sessions.map((s) => s.settori ?? '').join(' ')}`.toLowerCase()
-        if (!hay.includes(q)) return false
-      }
-      return true
-    })
-  }, [pins, day, now, q])
-
-  const matchedOperators = useMemo(() => {
-    if (q.length < 2) return []
-    return operators
-      .filter((o) => `${o.name} ${o.category} ${(o.schedules ?? []).map((s) => s.comune).join(' ')}`.toLowerCase().includes(q))
-      .slice(0, 5)
-  }, [operators, q])
-
-  const openCount = useMemo(() => {
-    if (!now) return 0
-    let n = 0
-    for (const p of filteredPins) if (statuses.get(p.id)?.state === 'open') n++
-    return n
-  }, [filteredPins, statuses, now])
-
-  const mapPins = useMemo<UnifiedMapPin[]>(
-    () =>
-      filteredPins.map((p) => ({
-        id: p.id,
-        lat: p.lat,
-        lng: p.lng,
-        kind: 'market' as const,
-        title: p.comune,
-        subtitle: p.luogo ?? p.marketName,
-      })),
-    [filteredPins],
-  )
-
-  const selected = useMemo(() => pins.find((p) => p.id === selectedId) ?? null, [pins, selectedId])
-  const selectedSession = selected ? pickSession(selected, now) : null
-  const selectedStatus = selected ? statuses.get(selected.id) : undefined
-
-  const nowText = now ? `${dict.nowLabel} ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}` : ''
-
-  function locate() {
-    if (typeof navigator === 'undefined' || !navigator.geolocation) return
-    setLocating(true)
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude })
-        setLocating(false)
-      },
-      () => setLocating(false),
-      { enableHighAccuracy: true, timeout: 8000 },
-    )
+  function submitSearch(e: FormEvent) {
+    e.preventDefault()
+    const q = query.trim()
+    router.push(q ? `/mappa?q=${encodeURIComponent(q)}` : '/mappa')
   }
-
-  function selectMarket(id: string) {
-    setSelectedId(id)
-    setOpen(false)
+  function fmtDate(iso: string) {
+    try { return new Date(iso).toLocaleDateString(lang === 'it' ? 'it-IT' : lang, { day: '2-digit', month: 'short' }) } catch { return '' }
   }
-
-  const dayChip = (key: DayFilter, label: string) => (
-    <button
-      key={String(key)}
-      onClick={() => setDay(key)}
-      aria-pressed={day === key}
-      className={`font-alt text-xs font-semibold px-3 py-1.5 rounded-full border-2 transition-colors whitespace-nowrap ${
-        day === key ? 'bg-ink text-paper border-ink' : 'bg-white text-ink border-ink/15 hover:border-ink'
-      }`}
-    >
-      {label}
-    </button>
-  )
-
-  const headlineWords = dict.introTitle.split(' ')
 
   return (
     <>
-      {/* HERO — brand forte, motivi liguri (sole + mare), titolo cinetico */}
-      <section ref={heroRef} className="relative overflow-hidden bg-notte text-paper">
-        {/* Mare liquido (WebGL) + velo per leggibilità del testo */}
-        <SeaCanvas className="absolute inset-0 w-full h-full pointer-events-none" />
-        <div className="absolute inset-0 bg-notte/45 pointer-events-none" aria-hidden="true" />
-        {/* Sole di Riviera */}
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 120 120"
-          className="absolute -top-8 -right-6 w-52 h-52 text-mimosa opacity-90 imk-sun"
-        >
-          <circle cx="60" cy="60" r="22" fill="currentColor" />
-          <g stroke="currentColor" strokeWidth="3" strokeLinecap="round">
-            {Array.from({ length: 12 }).map((_, i) => {
-              const a = (i * Math.PI) / 6
-              return (
-                <line
-                  key={i}
-                  x1={60 + Math.cos(a) * 32}
-                  y1={60 + Math.sin(a) * 32}
-                  x2={60 + Math.cos(a) * 44}
-                  y2={60 + Math.sin(a) * 44}
-                />
-              )
-            })}
-          </g>
-        </svg>
+      {/* ===== HERO — foto ferma + velo blu + acqua reattiva. UNA sola azione. ===== */}
+      <section ref={heroRef} className="relative min-h-[100svh] flex flex-col overflow-hidden bg-notte text-paper">
+        <div className="absolute inset-0">
+          <PhotoFx query="Sanremo" fallbackQuery="Sanremo Liguria" alt="La Riviera di Ponente" fill priority tint="none" />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-mare-700/55 via-mare-700/40 to-notte/88 pointer-events-none" aria-hidden="true" />
+        <canvas ref={aquaRef} className="pointer-events-none absolute inset-0 h-full w-full z-[1]" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-b from-notte/25 via-transparent to-notte/75 pointer-events-none z-[1]" aria-hidden="true" />
 
-        <div className="container mx-auto px-4 md:px-6 pt-8 pb-12 relative z-10">
-          <div className="flex items-start justify-between gap-3">
-            <div data-anim className="text-paper text-base">
-              <Logo inline />
-            </div>
-            <div data-anim className="flex gap-1">
-              {LANGS.map((l) => (
-                <button
-                  key={l}
-                  onClick={() => setLang(l)}
-                  aria-pressed={lang === l}
-                  className={`text-xs font-bold uppercase px-2.5 py-1 rounded-md border-2 transition-colors ${
-                    lang === l ? 'bg-paper text-ink border-paper' : 'text-paper border-paper/30 hover:border-paper'
-                  }`}
-                >
-                  {l}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <p data-anim className="font-alt text-[11px] md:text-xs uppercase tracking-[0.22em] text-sole mt-5">
-            Provincia di Imperia · Riviera di Ponente
-          </p>
-          <h1 className="font-display text-4xl md:text-6xl leading-[0.95] tracking-tight mt-2 max-w-4xl">
-            {headlineWords.map((w, i) => (
-              <span key={i} className="inline-block overflow-hidden align-bottom">
-                <span data-word className="inline-block">
-                  {w}
-                  {i < headlineWords.length - 1 ? ' ' : ''}
-                </span>
-              </span>
+        <div className="relative z-10 container mx-auto px-4 md:px-6 pt-7 flex items-start justify-between gap-3">
+          <div data-anim className="text-paper text-base"><Logo inline /></div>
+          <div data-anim className="flex gap-1">
+            {LANGS.map((l) => (
+              <button key={l} onClick={() => setLang(l)} aria-pressed={lang === l}
+                className={`text-xs font-bold uppercase px-2.5 py-1 rounded-md border-2 transition-colors ${lang === l ? 'bg-paper text-ink border-paper' : 'text-paper border-paper/30 hover:border-paper'}`}>
+                {l}
+              </button>
             ))}
-          </h1>
-
-          <p data-anim className="font-accent text-2xl md:text-3xl text-mimosa mt-3">{dict.tagline}</p>
-          <p data-anim className="text-paper/80 text-base md:text-lg mt-2 max-w-2xl leading-snug">{dict.introText}</p>
-
-          <Link
-            data-anim
-            href="/operatori"
-            className="mt-5 inline-flex items-center gap-2 font-alt font-semibold text-sm bg-pesto text-white px-5 py-2.5 rounded-full hover:bg-pesto-600 transition-colors"
-          >
-            <Store className="w-4 h-4" />
-            {dict.operatorsLink}
-          </Link>
+          </div>
         </div>
 
-        {/* Onde animate (mare) */}
-        <div className="imk-wave-divider text-riviera/70 -mb-1">
-          <svg viewBox="0 0 1200 24" preserveAspectRatio="none" fill="none" stroke="currentColor" strokeWidth="3">
-            <path d="M0 12 C 50 2, 100 22, 150 12 S 250 2, 300 12 S 400 22, 450 12 S 550 2, 600 12 S 700 22, 750 12 S 850 2, 900 12 S 1000 22, 1050 12 S 1150 2, 1200 12 M0 12 C 50 2, 100 22, 150 12 S 250 2, 300 12 S 400 22, 450 12 S 550 2, 600 12 S 700 22, 750 12 S 850 2, 900 12 S 1000 22, 1050 12 S 1150 2, 1200 12" />
-        </svg>
+        <div className="relative z-10 flex-1 flex items-center">
+          <div className="container mx-auto px-4 md:px-6 py-10">
+            <h1 className="font-display text-paper text-[14vw] leading-[0.96] tracking-[0.01em] max-w-[14ch] md:text-[8rem]">
+              {headlineWords.map((w, i) => (
+                <span key={i} className="inline-block overflow-hidden align-bottom pr-[0.14em]">
+                  <span data-word className={`inline-block ${i === headlineWords.length - 1 ? 'italic text-sole' : ''}`}>{w}</span>
+                </span>
+              ))}
+            </h1>
+            <p data-anim className="mt-6 max-w-xl text-base md:text-lg text-paper/85">{copy.heroSubtitle}</p>
+            <div data-anim className="mt-8">
+              <Link href="/mappa" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-7 py-4 rounded-full hover:bg-sole-600 transition-colors">
+                <MapPin className="w-4 h-4" /> {copy.exploreMapCta} <ArrowRight className="imk-march w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <a href="#borghi" aria-label={copy.heroScrollCue} className="relative z-10 mx-auto mb-5 mt-3 flex flex-col items-center text-paper/70 hover:text-paper">
+          <span className="font-alt text-[10px] uppercase tracking-[0.2em] mb-1">{copy.heroScrollCue}</span>
+          <span className="flex flex-col -space-y-1.5">
+            <ChevronDown className="imk-chev w-4 h-4" /><ChevronDown className="imk-chev w-4 h-4" /><ChevronDown className="imk-chev w-4 h-4" />
+          </span>
+        </a>
+      </section>
+
+      {/* ===== VALORE 1 · IL PROGETTO — tutta la Riviera in un posto solo (borghi) ===== */}
+      <BorghiSection
+        eyebrow={copy.valueProject.k}
+        title={copy.valueProject.title}
+        lead={copy.valueProject.lead}
+        cta={{ label: copy.exploreMapCta, href: '/mappa' }}
+      />
+
+      {/* ===== VALORE 2 · L'ACCESSO — la ricerca che ti porta al banco ===== */}
+      <section id="cerca" className="relative overflow-hidden bg-notte text-paper scroll-mt-16">
+        <DriftBackdrop tone="dark" variant="section" />
+        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-3xl text-center">
+          <p className="font-alt text-xs font-semibold uppercase tracking-[0.2em] text-sole mb-2">{copy.searchValueEyebrow}</p>
+          <h2 className="font-display text-3xl md:text-5xl leading-[1.05]">{copy.searchValueTitle}</h2>
+          <p className="mt-4 text-base text-paper/80 max-w-2xl mx-auto">{copy.searchValueLead}</p>
+          <form onSubmit={submitSearch} className="mt-8 flex flex-col sm:flex-row gap-2.5 max-w-xl mx-auto">
+            <div className="imk-edge relative flex-1 min-w-0 bg-white text-ink border-2 border-transparent shadow-lg focus-within:border-sole">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-muted z-10" aria-hidden="true" />
+              <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={typed} aria-label={dict.searchPlaceholder}
+                className="w-full pl-12 pr-4 py-4 bg-transparent rounded-2xl text-[16px] focus:outline-none" />
+            </div>
+            <button type="submit" className="group imk-lift inline-flex items-center justify-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-6 py-4 imk-edge hover:bg-sole-600 transition-colors flex-shrink-0">
+              {copy.searchCta} <ArrowRight className="imk-march w-4 h-4" />
+            </button>
+          </form>
+          {/* Scorciatoie pratiche (dall'hero): la risposta "che mercato c'è
+              oggi / vicino a me" — aprono la mappa già filtrata. */}
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+            {[
+              { t: copy.heroChips.today, href: '/mappa?d=oggi', Icon: Sun },
+              { t: copy.heroChips.near, href: '/mappa?vicino=1', Icon: Crosshair },
+              { t: copy.heroChips.saturday, href: '/mappa?d=sab', Icon: CalendarDays },
+            ].map(({ t, href, Icon }) => (
+              <Link key={href} href={href} className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.08em] text-paper/90 bg-white/5 border border-paper/25 rounded-full px-3.5 py-2 hover:border-sole hover:text-sole transition-colors">
+                <Icon className="w-3.5 h-3.5 text-sole" aria-hidden="true" /> {t}
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* BARRA: ricerca + filtri SOPRA la mappa */}
-      <div ref={barRef} className="sticky top-0 z-30 bg-paper border-b-2 border-ink/10">
-        <div className="container mx-auto px-4 md:px-6 py-3 flex flex-col md:flex-row md:items-center gap-3">
-          {/* Ricerca con dropdown */}
-          <div className="relative flex-1 min-w-0">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-muted" aria-hidden="true" />
-            <input
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value)
-                setOpen(true)
-              }}
-              onFocus={() => setOpen(true)}
-              onBlur={() => setTimeout(() => setOpen(false), 150)}
-              placeholder={dict.searchPlaceholder}
-              aria-label={dict.searchPlaceholder}
-              className="w-full pl-11 pr-3 py-3 bg-white border-2 border-ink/15 rounded-xl text-[15px] focus:outline-none focus:border-pesto"
-            />
-            {open && q.length >= 2 && (filteredPins.length > 0 || matchedOperators.length > 0) && (
-              <div className="absolute left-0 right-0 top-full mt-1.5 bg-white border-2 border-ink/15 rounded-xl shadow-xl z-40 max-h-80 overflow-y-auto imk-scroll">
-                {filteredPins.slice(0, 8).map((p) => (
-                  <button
-                    key={p.id}
-                    onMouseDown={(e) => {
-                      e.preventDefault()
-                      selectMarket(p.id)
-                    }}
-                    className="w-full text-left flex items-center gap-2.5 px-3 py-2.5 hover:bg-pesto/5 border-b border-ink/5"
-                  >
-                    <MapPin className="w-4 h-4 text-pesto flex-shrink-0" aria-hidden="true" />
-                    <span className="min-w-0">
-                      <span className="block font-alt font-semibold text-sm text-ink truncate">{p.comune}</span>
-                      {p.luogo && <span className="block text-xs text-ink-muted truncate">{p.luogo}</span>}
-                    </span>
-                  </button>
-                ))}
-                {matchedOperators.map((o) => (
-                  <Link
-                    key={o.id}
-                    href={o.market ? `/${o.market.slug}/operators/${o.id}` : '/operatori'}
-                    className="flex items-center gap-2.5 px-3 py-2.5 hover:bg-mimosa/10 border-b border-ink/5 last:border-0"
-                  >
-                    <Store className="w-4 h-4 text-mimosa-600 flex-shrink-0" aria-hidden="true" />
-                    <span className="min-w-0">
-                      <span className="block font-alt font-semibold text-sm text-ink truncate">{o.name}</span>
-                      <span className="block text-xs text-ink-muted truncate">{dict.operators}</span>
-                    </span>
+      {/* ===== VALORE 3 · I VALORI DEL MERCATO — le qualità (dagli ambulanti) + le persone ===== */}
+      <section id="valori" className="relative overflow-hidden bg-paper bg-paper-grain border-b-2 border-ink/10">
+        <DriftBackdrop tone="light" variant="section" />
+        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-5xl">
+          <div className="max-w-2xl mb-9">
+            <p className="font-alt text-xs font-semibold uppercase tracking-[0.2em] text-fiore-600 mb-2">{copy.valueMarket.k}</p>
+            <h2 className="font-display text-3xl md:text-4xl leading-[1.06] text-ink">{copy.valueMarket.title}</h2>
+            <p className="mt-3 text-base text-ink-soft leading-relaxed">{copy.valueMarket.lead}</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {copy.qualities.map((q, i) => (
+              <WaterCard key={q.t} tilt={i % 2 === 0 ? 'l' : 'r'} className="p-5">
+                <span className="text-3xl" aria-hidden="true">{QUALITY_GLYPH[i % QUALITY_GLYPH.length]}</span>
+                <h3 className="font-display text-lg text-ink leading-tight mt-2">{q.t}</h3>
+                <p className="mt-1.5 text-sm text-ink-soft leading-snug">{q.d}</p>
+              </WaterCard>
+            ))}
+          </div>
+          <p className="mt-4 font-accent text-lg text-mare-600">{copy.qualitiesNote}</p>
+
+          {/* ponte verso le persone: i valori hanno nomi e facce */}
+          <div className="mt-12 pt-9 border-t-2 border-ink/10">
+            <div className="max-w-2xl">
+              <p className="font-alt text-xs font-semibold uppercase tracking-[0.2em] text-mare-600 mb-2">{copy.operatorsEyebrow}</p>
+              <h3 className="font-display text-2xl md:text-4xl leading-[1.04] text-ink"><span className="imk-mark">{copy.operatorsTitle}</span></h3>
+              <p className="mt-3 text-base text-ink-soft leading-relaxed">{copy.operatorsLead}</p>
+            </div>
+            {operators.length > 0 && (
+              <div className="mt-6 flex flex-wrap gap-3">
+                {operators.slice(0, 10).map((op) => (
+                  <Link key={op.id} href={op.market ? `/${op.market.slug}/operators/${op.id}` : '/operatori'} className="imk-lift" aria-label={`Scopri ${op.name}`}>
+                    <WaterCard className="flex items-center gap-2.5 pl-1.5 pr-3.5 py-1.5 rounded-full hover:border-mare/50">
+                      <BancoAvatar name={op.name} size={32} />
+                      <span className="font-alt text-sm font-semibold text-ink">{op.name}</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-mare-600 flex-shrink-0" aria-hidden="true" />
+                    </WaterCard>
                   </Link>
                 ))}
               </div>
             )}
+            <Link href="/operatori" className="group imk-lift mt-7 inline-flex items-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-6 py-3.5 rounded-full hover:bg-sole-600 transition-colors">
+              <Store className="w-4 h-4" /> {copy.operatorsCta} <ArrowRight className="imk-march w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== LA SETTIMANA — notizie ed eventi, fianco a fianco ===== */}
+      <section id="settimana" className="relative overflow-hidden bg-marel/40 border-b-2 border-ink/10">
+        <DriftBackdrop tone="light" variant="section" />
+        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-5xl">
+          <div className="max-w-2xl mb-9">
+            <p className="font-alt text-xs font-semibold uppercase tracking-[0.2em] text-mare-600 mb-2">{copy.weekEyebrow}</p>
+            <h2 className="font-display text-3xl md:text-4xl leading-[1.04] text-ink">{copy.weekTitle}</h2>
+            <p className="mt-2 text-sm text-ink-soft">{copy.weekLead}</p>
           </div>
 
-          {/* Filtri per giorno */}
-          <div className="flex items-center gap-1.5 overflow-x-auto imk-scroll md:flex-wrap">
-            {dayChip('all', dict.filters.all)}
-            {dayChip('today', dict.filters.today)}
-            {WD_ORDER.map((d) => dayChip(d, wd[d]))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+            {/* colonna notizie */}
+            <div>
+              <p className="inline-flex items-center gap-2 font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-4">
+                <Newspaper className="w-4 h-4" aria-hidden="true" /> {copy.newsColTitle}
+              </p>
+              {news.length === 0 ? (
+                <WaterCard className="px-6 py-9 text-center">
+                  <p className="font-accent text-2xl text-mare-600">{copy.newsEmpty}</p>
+                  <p className="mt-2 text-sm text-ink-soft">{copy.newsEmptyLead}</p>
+                </WaterCard>
+              ) : (
+                <div className="space-y-4">
+                  {news.slice(0, 3).map((n, i) => (
+                    <WaterCard key={n.id} tilt={i % 2 === 0 ? 'l' : 'r'} className="p-5">
+                      <span className="font-alt text-xs font-semibold uppercase tracking-[0.1em] text-mare-600">
+                        {fmtDate(n.publish_from)}{n.markets?.name ? ` · ${n.markets.name}` : ''}
+                      </span>
+                      <h3 className="font-display text-lg text-ink leading-tight mt-1.5">{n.title}</h3>
+                      {n.content && <p className="mt-1.5 text-sm text-ink-soft leading-snug line-clamp-2">{n.content}</p>}
+                    </WaterCard>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* colonna eventi */}
+            <div>
+              <p className="inline-flex items-center gap-2 font-alt text-xs font-semibold uppercase tracking-[0.14em] text-fiore-600 mb-4">
+                <CalendarDays className="w-4 h-4" aria-hidden="true" /> {copy.eventsColTitle}
+              </p>
+              {events.length === 0 ? (
+                <WaterCard className="px-6 py-9 text-center">
+                  <p className="font-accent text-2xl text-mare-600">{copy.eventsEmpty}</p>
+                  <p className="mt-2 text-sm text-ink-soft">{copy.eventsEmptyLead}</p>
+                </WaterCard>
+              ) : (
+                <div className="space-y-4">
+                  {events.slice(0, 3).map((e, i) => (
+                    <WaterCard key={e.id} tilt={i % 2 === 0 ? 'r' : 'l'} className="imk-tape p-5 pt-6">
+                      <span className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.1em] text-fiore-600">
+                        <CalendarDays className="w-3.5 h-3.5" aria-hidden="true" /> {fmtDate(e.startAt)}
+                      </span>
+                      <h3 className="font-display text-lg text-ink leading-tight mt-1.5">{e.title}</h3>
+                      {e.marketName && <p className="mt-1 text-sm text-ink-muted">{e.marketName}</p>}
+                    </WaterCard>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* La mia posizione */}
-          <button
-            onClick={locate}
-            disabled={locating}
-            className="flex-shrink-0 inline-flex items-center justify-center gap-2 font-alt font-semibold text-sm border-2 border-ink/15 bg-white rounded-xl px-3.5 py-2.5 hover:border-riviera hover:text-riviera transition-colors disabled:opacity-60"
-          >
-            <Crosshair className="w-4 h-4" />
-            <span className="hidden sm:inline">{locating ? dict.loading : dict.locate}</span>
-          </button>
-        </div>
-      </div>
-
-      {/* MAPPA */}
-      <section className="relative w-full h-[70svh] min-h-[520px] overflow-hidden bg-night">
-        <div className="absolute inset-0">
-          <UnifiedMapClient
-            pins={mapPins}
-            height="100%"
-            variant="bold"
-            bare
-            onPinClick={(p) => selectMarket(p.id)}
-            selectedId={selectedId}
-            panToSelected
-            userLocation={userLoc}
-            maxZoom={13}
-          />
-        </div>
-
-        <div className="absolute top-3 left-3 z-[1000] inline-flex items-center gap-2 rounded-full bg-night/85 backdrop-blur-sm px-3.5 py-1.5 text-sm text-paper pointer-events-none">
-          <span className="w-2 h-2 rounded-full bg-pesto" aria-hidden="true" />
-          <span className="text-paper/80">{nowText}</span>
-          {now && (
-            <span>
-              · <b className="font-display text-mimosa">{openCount}</b> {openCount > 0 ? dict.openSuffix : dict.noneOpen}
-            </span>
-          )}
-        </div>
-
-        {!selected && (
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[900] pointer-events-none">
-            <span className="font-alt font-semibold text-sm text-paper bg-night/55 backdrop-blur-sm px-4 py-2 rounded-full">
-              {dict.hint}
-            </span>
+          {/* pulsanti evidenti verso le sezioni dedicate */}
+          <div className="mt-10 flex flex-wrap gap-3">
+            <Link href="/notizie" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-ink text-paper px-6 py-3.5 rounded-full hover:bg-mare transition-colors">
+              <Newspaper className="w-4 h-4" /> {copy.newsAllCta} <ArrowRight className="imk-march w-4 h-4" />
+            </Link>
+            <Link href="/eventi" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-6 py-3.5 rounded-full hover:bg-sole-600 transition-colors">
+              <CalendarDays className="w-4 h-4" /> {copy.eventsAllCta} <ArrowRight className="imk-march w-4 h-4" />
+            </Link>
           </div>
-        )}
-
-        {selected && selectedSession && selectedStatus && (
-          <MarketPanel
-            key={selected.id}
-            pin={selected}
-            session={selectedSession}
-            status={selectedStatus}
-            lang={lang}
-            dict={dict}
-            onClose={() => setSelectedId(null)}
-          />
-        )}
+        </div>
       </section>
     </>
   )

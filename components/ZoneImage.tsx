@@ -11,6 +11,8 @@ interface Props {
   aspect?: string
   /** Se true: applica un leggero zoom hover (parent deve avere group) */
   hoverZoom?: boolean
+  /** Se true: Ken Burns lento e continuo (zoom/pan) */
+  kenBurns?: boolean
   priority?: boolean
 }
 
@@ -21,6 +23,7 @@ export default function ZoneImage({
   className = '',
   aspect = 'aspect-[4/3]',
   hoverZoom = false,
+  kenBurns = false,
   priority = false,
 }: Props) {
   const [src, setSrc] = useState<string | null>(null)
@@ -53,8 +56,8 @@ export default function ZoneImage({
   return (
     <div className={`relative overflow-hidden bg-cream-200 ${aspect} ${className}`}>
       {/* Placeholder sempre presente sotto */}
-      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-olive-100 via-cream-200 to-terra-100">
-        <svg viewBox="0 0 120 40" className="w-24 h-8 text-olive-500 opacity-35" fill="none" stroke="currentColor" strokeWidth="1">
+      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-marel via-cream-200 to-fiore-100">
+        <svg viewBox="0 0 120 40" className="w-24 h-8 text-mare opacity-35" fill="none" stroke="currentColor" strokeWidth="1">
           <path d="M0 20 C 40 20, 80 20, 120 20" />
           <ellipse cx="25" cy="12" rx="6" ry="3" transform="rotate(-18 25 12)" fill="currentColor" opacity="0.8" />
           <ellipse cx="45" cy="28" rx="6" ry="3" transform="rotate(18 45 28)" fill="currentColor" opacity="0.8" />
@@ -71,7 +74,7 @@ export default function ZoneImage({
           loading={priority ? 'eager' : 'lazy'}
           className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out ${
             loaded ? 'opacity-100 scale-100' : 'opacity-0 scale-[1.03]'
-          } ${hoverZoom ? 'group-hover:scale-[1.04]' : ''}`}
+          } ${kenBurns ? 'imk-kenburns' : hoverZoom ? 'group-hover:scale-[1.04]' : ''}`}
           onLoad={() => setLoaded(true)}
           onError={() => setFailed(true)}
         />

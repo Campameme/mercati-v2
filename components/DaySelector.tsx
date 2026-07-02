@@ -32,7 +32,7 @@ export default function DaySelector({ value, onChange }: Props) {
             className={`w-12 py-2 rounded-md text-sm font-medium border transition-colors ${
               active
                 ? 'bg-primary-600 text-white border-primary-600'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                : 'bg-white text-ink-soft border-ink/15 hover:bg-marel/40'
             }`}
           >
             {d.short}

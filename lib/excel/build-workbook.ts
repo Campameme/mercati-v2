@@ -61,7 +61,7 @@ export async function buildOperatorsWorkbook(opts: {
   label: string
 }): Promise<ArrayBuffer> {
   const wb = new ExcelJS.Workbook()
-  wb.creator = 'Mercati di Ponente'
+  wb.creator = 'Mercati della Riviera di Ponente'
   wb.created = new Date()
 
   // Ordine creazione: Operatori (primo, tab attivo) | Sessioni | Liste (nascosto) | Istruzioni

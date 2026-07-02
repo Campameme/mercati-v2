@@ -107,10 +107,16 @@ body {
 .fc .schedule-cat-artigianato  { background-color: rgba( 30, 115, 232, 0.12) !important; color: #1559B8 !important; border-left-color: #1E73E8 !important; }
 .fc .schedule-cat-varie        { background-color: rgba( 22,  19, 13, 0.08) !important; color: #1A1714 !important; border-left-color: #4A4F3B !important; }
 
-/* Stile leaflet: identita IMercati — palette brand "bold" (paper/ink/pesto). */
+/* Stile leaflet: identita brand "bold" (paper/ink/mare). */
 .leaflet-container {
   background: #F7EFDD;
-  font-family: var(--font-sans), 'Inter', -apple-system, sans-serif;
+  font-family: var(--font-sans), -apple-system, sans-serif;
+  /* Contiene gli z-index interni di Leaflet (pane/controlli fino a ~1000) in
+     un proprio contesto di impilamento: così la mappa non finisce MAI sopra
+     nav, barre o card esterne. */
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
 }
 
 .leaflet-control-zoom a {
@@ -274,4 +280,179 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .imk-pin-ring { animation: none; }
+}
+
+/* ============================================================
+   "IMPERFETTO POP" — linguaggio coerente: silhouette SVG in ombra
+   che derivano sullo sfondo, card "acqua", bordi a mano, evidenziatore,
+   leggere rotazioni. Tutto reduced-motion safe. Vedi docs/brand-system.md.
+   ============================================================ */
+
+/* --- Silhouette "in ombra" che derivano lentamente sullo sfondo --- */
+.imk-drift { will-change: transform; }
+@keyframes imk-drift-a { 0%,100% { transform: translate3d(0,0,0) rotate(0); } 50% { transform: translate3d(20px,-16px,0) rotate(3deg); } }
+@keyframes imk-drift-b { 0%,100% { transform: translate3d(0,0,0) rotate(0); } 50% { transform: translate3d(-24px,14px,0) rotate(-4deg); } }
+@keyframes imk-drift-c { 0%,100% { transform: translate3d(0,0,0) rotate(0); } 50% { transform: translate3d(12px,20px,0) rotate(2deg); } }
+.imk-drift-a { animation: imk-drift-a 26s ease-in-out infinite; }
+.imk-drift-b { animation: imk-drift-b 34s ease-in-out infinite; }
+.imk-drift-c { animation: imk-drift-c 30s ease-in-out infinite; }
+
+/* --- Card "acqua": un velo di luce che scorre (caustica) sotto il contenuto --- */
+.imk-water { position: relative; }
+/* solleva il contenuto sopra il velo ::before, MA non toccare i figli già
+   posizionati in assoluto (es. la lente di ricerca) che hanno il proprio z. */
+.imk-water > *:not(.absolute) { position: relative; z-index: 1; }
+.imk-water::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(130px 90px at 28% 18%, rgba(21, 96, 124, 0.10), transparent 62%),
+    radial-gradient(180px 120px at 82% 78%, rgba(220, 235, 236, 0.55), transparent 60%);
+  background-repeat: no-repeat;
+  animation: imk-water-move 13s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes imk-water-move {
+  from { background-position: 0% 0%, 0% 0%; transform: translateY(0); }
+  to   { background-position: 8% 6%, -6% -4%; transform: translateY(-3px); }
+}
+/* (rimosso: l'increspatura blu "::after" che pulsava per indicare il click) */
+
+/* --- Bordi irregolari "a mano" --- */
+.imk-edge   { border-radius: 16px 20px 17px 22px / 20px 16px 22px 17px; }
+.imk-edge-2 { border-radius: 22px 15px 24px 17px / 17px 22px 15px 24px; }
+
+/* --- Evidenziatore (marker) dietro al testo (sole) --- */
+.imk-mark {
+  background-image: linear-gradient(120deg, rgba(244, 182, 44, 0.5), rgba(244, 182, 44, 0.5));
+  background-repeat: no-repeat;
+  background-position: 0 82%;
+  background-size: 100% 38%;
+  padding: 0 0.05em;
+}
+
+/* --- Leggere rotazioni "imperfette" --- */
+.imk-tilt-l { transform: rotate(-1.4deg); }
+.imk-tilt-r { transform: rotate(1.4deg); }
+
+/* --- Nastro / washi-tape decorativo (cartoline) --- */
+.imk-tape::before {
+  content: "";
+  position: absolute;
+  top: -10px; left: 50%;
+  width: 78px; height: 22px;
+  transform: translateX(-50%) rotate(-3deg);
+  background: rgba(244, 182, 44, 0.55);
+  box-shadow: 0 1px 2px rgba(14, 42, 51, 0.18);
+  z-index: 2;
+}
+
+/* --- Marquee "mercato oggi": nastro che scorre (raddoppia il contenuto) --- */
+.imk-marquee { display: inline-flex; white-space: nowrap; animation: imk-marquee 36s linear infinite; }
+@keyframes imk-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* --- Chevron scroll-cue: cascata verso il basso --- */
+.imk-chev { animation: imk-chev 1.8s ease-in-out infinite; }
+.imk-chev:nth-child(2) { animation-delay: 0.18s; }
+.imk-chev:nth-child(3) { animation-delay: 0.36s; }
+@keyframes imk-chev { 0%, 100% { opacity: 0.2; transform: translateY(-3px); } 50% { opacity: 0.95; transform: translateY(4px); } }
+
+/* --- Freccia CTA che "marcia" (su hover del gruppo) --- */
+.group:hover .imk-march { animation: imk-march 0.7s ease-in-out infinite; }
+@keyframes imk-march { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(4px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .imk-drift-a, .imk-drift-b, .imk-drift-c { animation: none !important; }
+  .imk-water::before { animation: none !important; }
+  .imk-tilt-l, .imk-tilt-r { transform: none !important; }
+  .imk-marquee, .imk-chev, .imk-march { animation: none !important; }
+}
+
+/* ============================================================
+   Foto cinematografiche (prototipo): Ken Burns + reveal "a tendina"
+   ============================================================ */
+@keyframes imk-kenburns {
+  from { transform: scale(1.03); }
+  to   { transform: scale(1.16) translate3d(-2.5%, -2%, 0); }
+}
+.imk-kenburns { animation: imk-kenburns 22s ease-in-out infinite alternate; will-change: transform; }
+
+.imk-reveal-clip {
+  clip-path: inset(0 0 100% 0);
+  opacity: 0;
+  transition: clip-path 1.05s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s ease;
+}
+.imk-reveal-clip.is-in { clip-path: inset(0 0 0 0); opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .imk-kenburns { animation: none !important; }
+  .imk-reveal-clip { clip-path: none !important; opacity: 1 !important; transition: none !important; }
+}
+
+/* ============================================================
+   Testo "ad acqua": le lettere dell'header riempite d'acqua in
+   movimento (gradiente mare + riflesso/caustica che scorre).
+   ============================================================ */
+/* Testo "ad acqua" SEMPRE leggibile: gradiente di soli toni CHIARI/opachi
+   (bianco→cielo→sabbia) che scorre dolcemente come un riflesso sull'acqua.
+   Niente stop trasparenti → nessun "buco" invisibile nelle lettere. */
+.imk-water-text {
+  background-image:
+    linear-gradient(100deg, #FFFFFF 0%, #DCEBEC 20%, #9FD2E0 42%, #F3FAFB 60%, #FFF1CF 80%, #FFFFFF 100%);
+  background-size: 260% 100%;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: imk-water-text 9s ease-in-out infinite alternate;
+}
+@keyframes imk-water-text {
+  from { background-position: 0% 0; }
+  to   { background-position: 100% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .imk-water-text { animation: none !important; background-position: 30% 0; }
+}
+
+/* ============================================================
+   Loop "punti di valore": evidenzia un punto alla volta, in ciclo.
+   ============================================================ */
+.imk-vp {
+  animation: imk-vp 7.8s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+.imk-vp:nth-child(2) { animation-delay: 2.6s; }
+.imk-vp:nth-child(3) { animation-delay: 5.2s; }
+@keyframes imk-vp {
+  0%, 22% { opacity: 1; transform: scale(1.04); border-color: rgba(244, 182, 44, 0.8); box-shadow: 0 16px 38px -18px rgba(244, 182, 44, 0.55); }
+  34%, 100% { opacity: 0.6; transform: scale(1); border-color: rgba(247, 239, 221, 0.16); box-shadow: 0 0 0 rgba(0, 0, 0, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .imk-vp { animation: none !important; opacity: 1 !important; }
+}
+
+/* ===== Skeleton di caricamento (loading.tsx) — shimmer carta, reduced-motion safe ===== */
+.imk-skel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: rgba(26, 23, 20, 0.08);
+}
+.imk-skel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(247, 239, 221, 0.7), transparent);
+  animation: imk-skel 1.4s ease infinite;
+}
+@keyframes imk-skel {
+  100% { transform: translateX(100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .imk-skel::after { animation: none; }
 }

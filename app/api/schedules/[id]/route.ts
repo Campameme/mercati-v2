@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/auth/guard'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,9 +17,17 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 }
 
 // PATCH per toggle is_active + altri campi editabili.
-// L'autenticazione/authorization è già garantita da middleware (admin only) + RLS.
+// NB: il middleware NON copre /api/** → la guardia va fatta qui (+ RLS come rete).
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createClient()
+  const { data: existing } = await createClient()
+    .from('market_schedules')
+    .select('id, market_id')
+    .eq('id', params.id)
+    .maybeSingle()
+  if (!existing) return NextResponse.json({ error: 'Sessione non trovata' }, { status: 404 })
+  const guard = await requireAdmin({ marketId: existing.market_id })
+  if (!guard.ok) return guard.res
+  const supabase = guard.supabase
   const body = await request.json()
   const allowed = ['is_active', 'orario', 'settori', 'giorno', 'luogo']
   const update: Record<string, unknown> = {}

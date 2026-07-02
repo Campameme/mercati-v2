@@ -39,7 +39,7 @@ export const CATEGORIES = [
 ] as const
 
 export const INSTRUCTIONS_ROWS: string[][] = [
-  ['Mercati di Ponente — Import/Export Operatori'],
+  ['Mercati della Riviera di Ponente — Import/Export Operatori'],
   [''],
   ['Ogni riga rappresenta UNA presenza di un operatore su UNA sessione di mercato.'],
   ["Se lo stesso operatore frequenta più mercati, inserisci una riga per ciascuno."],

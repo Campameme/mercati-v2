@@ -42,8 +42,8 @@ export default function AdesioneForm() {
 
   if (status === 'success') {
     return (
-      <div className="bg-pesto/10 border-2 border-pesto/30 rounded-xl p-8 text-center">
-        <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-pesto text-white flex items-center justify-center">
+      <div className="bg-mare/10 border-2 border-mare/30 rounded-xl p-8 text-center">
+        <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-mare text-white flex items-center justify-center">
           <Check className="w-6 h-6" />
         </div>
         <h3 className="font-display text-2xl text-ink mb-2">Richiesta ricevuta</h3>
@@ -55,7 +55,7 @@ export default function AdesioneForm() {
     )
   }
 
-  const inputClass = "w-full px-3.5 py-3 bg-white border-2 border-ink/15 rounded-xl text-sm text-ink focus:outline-none focus:border-pesto transition-colors"
+  const inputClass = "w-full px-3.5 py-3 bg-white border-2 border-ink/15 rounded-xl text-sm text-ink focus:outline-none focus:border-mare transition-colors"
   const labelClass = "block font-alt text-xs uppercase tracking-[0.12em] text-ink-muted mb-1.5 font-semibold"
 
   return (
@@ -100,7 +100,7 @@ export default function AdesioneForm() {
       </div>
 
       {status === 'error' && error && (
-        <div className="flex items-start gap-2 px-3 py-2.5 bg-coral/10 border-2 border-coral/30 rounded-xl text-sm text-coral-600">
+        <div className="flex items-start gap-2 px-3 py-2.5 bg-fiore/10 border-2 border-fiore/30 rounded-xl text-sm text-fiore-600">
           <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
           <span>{error}</span>
         </div>
@@ -110,7 +110,7 @@ export default function AdesioneForm() {
         <button
           type="submit"
           disabled={status === 'sending'}
-          className="imk-lift inline-flex items-center gap-2 px-6 py-3 rounded-full bg-ink text-paper font-alt text-sm font-semibold hover:bg-pesto transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="imk-lift inline-flex items-center gap-2 px-6 py-3 rounded-full bg-ink text-paper font-alt text-sm font-semibold hover:bg-mare transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {status === 'sending' ? (
             <>

@@ -7,68 +7,30 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import listPlugin from '@fullcalendar/list'
 import itLocale from '@fullcalendar/core/locales/it'
-import { MapPin, Repeat } from 'lucide-react'
+import { MapPin, Repeat, LayoutGrid, ArrowLeft } from 'lucide-react'
 import type { MarketEvent } from '@/types/event'
-import {
-  CATEGORY_COLOR as SCH_COLOR,
-  CATEGORY_LABEL as SCH_LABEL,
-  type ScheduleCategory,
-} from '@/lib/schedules/classify'
-
-const EVT_LABEL: Record<string, string> = {
-  market: 'Mercato', fair: 'Fiera', food: 'Gastronomia', music: 'Musica',
-  art: 'Arte', sport: 'Sport', other: 'Altro',
-}
-const EVT_COLOR: Record<string, string> = {
-  market: '#EF4B27', fair: '#8B5CF6', food: '#2FA84F', music: '#1E73E8',
-  art: '#EC4899', sport: '#0E2A33', other: '#4A4F3B',
-}
-const ALL_EVT_CATS = Object.keys(EVT_LABEL)
-const ALL_SCH_CATS: ScheduleCategory[] = ['alimentare', 'antiquariato', 'artigianato', 'varie']
+import DriftBackdrop from '@/components/motion/DriftBackdrop'
+import { SeaWaves, RivieraSun, Lemon } from '@/components/events/decorations'
+import { EVT_LABEL, EVT_COLOR, ALL_EVT_CATS } from '@/lib/events/labels'
 
 interface MarketInfo { id: string; slug: string; name: string }
 
-interface Occurrence {
-  schedule_id: string
-  market_id: string
-  market_slug: string
-  market_name: string
-  comune: string
-  luogo: string | null
-  orario: string | null
-  giorno: string
-  settori: string | null
-  category: ScheduleCategory
-  start: string
-  end: string | null
-}
-
-type CalItem =
-  | { kind: 'event'; e: MarketEvent }
-  | { kind: 'schedule'; o: Occurrence }
-
 export default function GlobalCalendarPage() {
   const [events, setEvents] = useState<MarketEvent[]>([])
-  const [occurrences, setOccurrences] = useState<Occurrence[]>([])
   const [markets, setMarkets] = useState<MarketInfo[]>([])
   const [selectedMarkets, setSelectedMarkets] = useState<Set<string>>(new Set())
-  const [selectedSchCats, setSelectedSchCats] = useState<Set<ScheduleCategory>>(new Set(ALL_SCH_CATS))
   const [selectedEvtCats, setSelectedEvtCats] = useState<Set<string>>(new Set(ALL_EVT_CATS))
-  const [showMarkets, setShowMarkets] = useState(true)
-  const [showEvents, setShowEvents] = useState(true)
   const [loading, setLoading] = useState(true)
-  const [selected, setSelected] = useState<CalItem | null>(null)
+  const [selected, setSelected] = useState<MarketEvent | null>(null)
 
   useEffect(() => {
     ;(async () => {
       setLoading(true)
-      const [eventsRes, marketsRes, occRes] = await Promise.all([
+      const [eventsRes, marketsRes] = await Promise.all([
         fetch('/api/events?all=1').then((r) => r.json()),
         fetch('/api/markets').then((r) => r.json()),
-        fetch('/api/schedules/occurrences').then((r) => r.json()),
       ])
       setEvents(eventsRes.data ?? [])
-      setOccurrences(occRes.data ?? [])
       const mk: MarketInfo[] = (marketsRes.data ?? []).map((m: any) => ({ id: m.id, slug: m.slug, name: m.name }))
       setMarkets(mk)
       setSelectedMarkets(new Set(mk.map((m) => m.id)))
@@ -78,79 +40,38 @@ export default function GlobalCalendarPage() {
 
   const fcEvents = useMemo(() => {
     const out: any[] = []
-    if (showEvents) {
-      for (const e of events) {
-        if (!selectedMarkets.has(e.market_id)) continue
-        if (!selectedEvtCats.has(e.category)) continue
-        const color = EVT_COLOR[e.category] ?? '#4A4F3B'
-        out.push({
-          id: `ev-${e.id}`,
-          title: e.title,
-          start: e.start_at,
-          end: e.end_at ?? undefined,
-          backgroundColor: color,
-          borderColor: color,
-          textColor: '#F7EFDD',
-          extendedProps: { kind: 'event', e },
-        })
-      }
-    }
-    if (showMarkets) {
-      for (const o of occurrences) {
-        if (!selectedMarkets.has(o.market_id)) continue
-        if (!selectedSchCats.has(o.category)) continue
-        const color = SCH_COLOR[o.category]
-        out.push({
-          id: `sc-${o.schedule_id}-${o.start}`,
-          title: `${o.comune} · ${o.market_name}`,
-          start: o.start,
-          end: o.end ?? undefined,
-          backgroundColor: 'transparent',
-          borderColor: color,
-          textColor: color,
-          classNames: [`schedule-occ schedule-cat-${o.category}`],
-          extendedProps: { kind: 'schedule', o },
-        })
-      }
+    for (const e of events) {
+      if (!selectedMarkets.has(e.market_id)) continue
+      if (!selectedEvtCats.has(e.category)) continue
+      const color = EVT_COLOR[e.category] ?? '#4A4F3B'
+      out.push({
+        id: `ev-${e.id}`,
+        title: e.title,
+        start: e.start_at,
+        end: e.end_at ?? undefined,
+        backgroundColor: color,
+        borderColor: color,
+        textColor: '#F7EFDD',
+        extendedProps: { e },
+      })
     }
     return out
-  }, [events, occurrences, selectedMarkets, selectedSchCats, selectedEvtCats, showMarkets, showEvents])
+  }, [events, selectedMarkets, selectedEvtCats])
 
-  const upcoming: CalItem[] = useMemo(() => {
-    const list: CalItem[] = []
+  const upcoming: MarketEvent[] = useMemo(() => {
     const now = Date.now()
-    if (showMarkets) {
-      for (const o of occurrences) {
-        if (!selectedMarkets.has(o.market_id)) continue
-        if (!selectedSchCats.has(o.category)) continue
-        if (new Date(o.start).getTime() < now) continue
-        list.push({ kind: 'schedule', o })
-      }
-    }
-    if (showEvents) {
-      for (const e of events) {
-        if (!selectedMarkets.has(e.market_id)) continue
-        if (!selectedEvtCats.has(e.category)) continue
-        if (new Date(e.start_at).getTime() < now) continue
-        list.push({ kind: 'event', e })
-      }
-    }
-    list.sort((a, b) => {
-      const ta = a.kind === 'event' ? new Date(a.e.start_at).getTime() : new Date(a.o.start).getTime()
-      const tb = b.kind === 'event' ? new Date(b.e.start_at).getTime() : new Date(b.o.start).getTime()
-      return ta - tb
+    const list = events.filter((e) => {
+      if (!selectedMarkets.has(e.market_id)) return false
+      if (!selectedEvtCats.has(e.category)) return false
+      return new Date(e.start_at).getTime() >= now
     })
+    list.sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())
     return list.slice(0, 8)
-  }, [events, occurrences, selectedMarkets, selectedSchCats, selectedEvtCats, showMarkets, showEvents])
+  }, [events, selectedMarkets, selectedEvtCats])
 
   function toggleMarket(id: string) {
     setSelectedMarkets((prev) => {
       const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n
-    })
-  }
-  function toggleSchCat(c: ScheduleCategory) {
-    setSelectedSchCats((prev) => {
-      const n = new Set(prev); n.has(c) ? n.delete(c) : n.add(c); return n
     })
   }
   function toggleEvtCat(c: string) {
@@ -160,211 +81,208 @@ export default function GlobalCalendarPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 md:px-6 py-10 md:py-14">
-      <div className="mb-8 md:mb-10 border-b-2 border-ink/10 pb-6">
-        <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-2">Liguria · Provincia di Imperia</p>
-        <h1 className="font-display text-3xl md:text-5xl text-ink leading-tight">Calendario</h1>
-        <p className="text-sm text-ink-soft mt-3 max-w-xl">
-          Mercati ricorrenti ed eventi speciali, filtrabili per zona, tipologia e categoria.
-        </p>
-      </div>
+    <div className="min-h-screen bg-carta text-ink">
+      {/* ============ HEADER ============ */}
+      <header className="relative overflow-hidden border-b-2 border-ink/10 bg-notte text-carta">
+        <DriftBackdrop tone="dark" variant="section" />
+        <div
+          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-notte/20 via-transparent to-notte"
+          aria-hidden="true"
+        />
+        <RivieraSun className="pointer-events-none absolute -right-6 -top-6 h-36 w-36 text-sole/80 md:right-10 md:top-6 md:h-40 md:w-40" />
+        <Lemon className="pointer-events-none absolute right-1/3 top-8 hidden h-14 w-14 rotate-12 text-sole/40 lg:block" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3">
-          <div className="bg-white border-2 border-ink/10 rounded-xl p-4">
-            {loading ? (
-              <p className="text-center py-12 text-ink-muted text-sm">Caricamento…</p>
-            ) : (
-              <FullCalendar
-                plugins={[dayGridPlugin, timeGridPlugin, listPlugin]}
-                initialView="dayGridMonth"
-                locale={itLocale}
-                height={680}
-                events={fcEvents}
-                headerToolbar={{
-                  left: 'prev,next today',
-                  center: 'title',
-                  right: 'dayGridMonth,timeGridWeek,listMonth',
-                }}
-                eventClick={(info) => setSelected(info.event.extendedProps as CalItem)}
-              />
-            )}
+        <div className="container relative z-10 mx-auto px-4 py-10 md:px-6 md:py-14">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <Link
+              href="/eventi"
+              className="imk-lift inline-flex items-center gap-1.5 rounded-full bg-carta/10 px-3 py-1 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-carta/90 ring-1 ring-carta/20 transition-colors hover:bg-carta/20"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+              Torna alla bacheca
+            </Link>
+            <Link
+              href="/eventi"
+              className="imk-lift inline-flex items-center gap-2 rounded-full bg-sole px-4 py-2 font-alt text-sm font-semibold text-ink transition-colors hover:bg-sole-600"
+            >
+              <LayoutGrid className="h-4 w-4" aria-hidden="true" />
+              Vista bacheca
+            </Link>
           </div>
+
+          <p className="mt-6 font-alt text-xs font-semibold uppercase tracking-[0.22em] text-sole">
+            Liguria · Provincia di Imperia
+          </p>
+          <h1 className="mt-2 font-display text-3xl leading-[0.95] md:text-5xl">
+            Calendario <span className="imk-mark text-carta">eventi</span>
+          </h1>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-carta/80 md:text-base">
+            Fiere, sagre e appuntamenti speciali della Riviera di Ponente, a colpo d&apos;occhio.
+            Filtrabili per zona e categoria.
+          </p>
         </div>
 
-        <aside className="space-y-4 text-sm">
-          <div className="bg-white border-2 border-ink/10 rounded-xl p-4">
-            <h2 className="font-display text-ink text-base mb-3">Cosa mostrare</h2>
-            <label className="flex items-center gap-2.5 mb-2 cursor-pointer">
-              <input type="checkbox" checked={showMarkets} onChange={(e) => setShowMarkets(e.target.checked)} />
-              <span className="text-ink">Mercati ricorrenti</span>
-            </label>
-            <label className="flex items-center gap-2.5 cursor-pointer">
-              <input type="checkbox" checked={showEvents} onChange={(e) => setShowEvents(e.target.checked)} />
-              <span className="text-ink">Eventi speciali</span>
-            </label>
-          </div>
+        <SeaWaves
+          className="absolute bottom-0 left-0 z-10 h-4 w-[200%] text-mare/60 md:h-5"
+          preserveAspectRatio="none"
+        />
+      </header>
 
-          {showMarkets && (
-            <div className="bg-white border-2 border-ink/10 rounded-xl p-4">
-              <h2 className="font-display text-ink text-base mb-3">Tipologia mercato</h2>
-              <div className="space-y-1.5">
-                {ALL_SCH_CATS.map((c) => {
-                  const active = selectedSchCats.has(c)
-                  return (
-                    <button
-                      key={c}
-                      onClick={() => toggleSchCat(c)}
-                      className="flex items-center gap-2.5 w-full text-left text-sm group"
-                    >
-                      <span
-                        className={`w-3.5 h-3.5 rounded-sm border-2 flex-shrink-0 transition-opacity ${active ? '' : 'opacity-30'}`}
-                        style={{ borderColor: SCH_COLOR[c], backgroundColor: active ? SCH_COLOR[c] + '22' : 'transparent' }}
-                      />
-                      <span className={active ? 'text-ink' : 'text-ink-muted'}>{SCH_LABEL[c]}</span>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-
-          {showEvents && (
-            <div className="bg-white border-2 border-ink/10 rounded-xl p-4">
-              <h2 className="font-display text-ink text-base mb-3">Categorie eventi</h2>
-              <div className="flex flex-wrap gap-1.5">
-                {ALL_EVT_CATS.map((c) => {
-                  const active = selectedEvtCats.has(c)
-                  return (
-                    <button
-                      key={c}
-                      onClick={() => toggleEvtCat(c)}
-                      className={`font-alt font-semibold text-xs px-2.5 py-1 rounded-full border-2 transition-colors ${
-                        active ? 'text-carta' : 'bg-white text-ink-muted border-ink/15 hover:text-ink hover:border-ink/30'
-                      }`}
-                      style={active ? { backgroundColor: EVT_COLOR[c], borderColor: EVT_COLOR[c] } : undefined}
-                    >
-                      {EVT_LABEL[c]}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-
-          <div className="bg-white border-2 border-ink/10 rounded-xl p-4">
-            <h2 className="font-display text-ink text-base mb-3">Zone</h2>
-            <div className="space-y-1 max-h-60 overflow-y-auto pr-1">
-              {markets.map((m) => (
-                <label key={m.id} className="flex items-center gap-2.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={selectedMarkets.has(m.id)}
-                    onChange={() => toggleMarket(m.id)}
+      {/* ============ CONTENUTO ============ */}
+      <main className="relative overflow-hidden bg-carta bg-paper-grain">
+        <DriftBackdrop tone="light" variant="section" />
+        <div className="container relative z-10 mx-auto px-4 py-10 md:px-6 md:py-14">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
+            <div className="lg:col-span-3">
+              <div className="imk-edge border-2 border-ink/10 bg-white p-4">
+                {loading ? (
+                  <p className="py-12 text-center text-sm text-ink-muted">Caricamento…</p>
+                ) : (
+                  <FullCalendar
+                    plugins={[dayGridPlugin, timeGridPlugin, listPlugin]}
+                    initialView="dayGridMonth"
+                    locale={itLocale}
+                    height={680}
+                    events={fcEvents}
+                    headerToolbar={{
+                      left: 'prev,next today',
+                      center: 'title',
+                      right: 'dayGridMonth,timeGridWeek,listMonth',
+                    }}
+                    eventClick={(info) => setSelected(info.event.extendedProps.e as MarketEvent)}
                   />
-                  <span className="text-ink">{m.name}</span>
-                </label>
-              ))}
+                )}
+              </div>
             </div>
-            <div className="flex gap-3 mt-3 pt-3 border-t-2 border-ink/10">
-              <button
-                onClick={() => setSelectedMarkets(new Set(markets.map((m) => m.id)))}
-                className="font-alt text-xs text-mare-600 hover:underline font-semibold"
-              >
-                Tutte
-              </button>
-              <button
-                onClick={() => setSelectedMarkets(new Set())}
-                className="text-xs text-ink-muted hover:text-ink"
-              >
-                Nessuna
-              </button>
-            </div>
-          </div>
 
-          <div className="bg-white border-2 border-ink/10 rounded-xl p-4">
-            <h2 className="font-display text-ink text-base mb-3">Prossimi</h2>
-            {upcoming.length === 0 ? (
-              <p className="text-xs text-ink-muted">Nessun appuntamento coi filtri correnti.</p>
-            ) : (
-              <ul className="space-y-2.5">
-                {upcoming.map((it, i) => {
-                  const label = it.kind === 'event' ? it.e.title : it.o.comune
-                  const sub = it.kind === 'event' ? (it.e.markets?.name ?? '') : it.o.market_name
-                  const d = it.kind === 'event' ? new Date(it.e.start_at) : new Date(it.o.start)
-                  const color = it.kind === 'event' ? (EVT_COLOR[it.e.category] ?? '#4A4F3B') : SCH_COLOR[it.o.category]
-                  return (
-                    <li key={i} className="border-l-2 pl-2.5" style={{ borderColor: color }}>
-                      <button onClick={() => setSelected(it)} className="text-left w-full">
-                        <p className="text-xs text-ink-muted">
-                          {d.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })} · {sub}
-                        </p>
-                        <p className="text-sm text-ink">{label}</p>
+            <aside className="space-y-4 text-sm">
+              <div className="imk-edge border-2 border-ink/10 bg-white p-4">
+                <h2 className="mb-3 font-display text-base text-ink">Categorie eventi</h2>
+                <div className="flex flex-wrap gap-1.5">
+                  {ALL_EVT_CATS.map((c) => {
+                    const active = selectedEvtCats.has(c)
+                    return (
+                      <button
+                        key={c}
+                        onClick={() => toggleEvtCat(c)}
+                        className={`font-alt text-xs font-semibold px-2.5 py-1 rounded-full border-2 transition-colors ${
+                          active ? 'text-carta' : 'bg-white text-ink-muted border-ink/15 hover:text-ink hover:border-ink/30'
+                        }`}
+                        style={active ? { backgroundColor: EVT_COLOR[c], borderColor: EVT_COLOR[c] } : undefined}
+                      >
+                        {EVT_LABEL[c]}
                       </button>
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div className="imk-edge border-2 border-ink/10 bg-white p-4">
+                <h2 className="mb-3 font-display text-base text-ink">Zone</h2>
+                <div className="imk-scroll max-h-60 space-y-1 overflow-y-auto pr-1">
+                  {markets.map((m) => (
+                    <label key={m.id} className="flex cursor-pointer items-center gap-2.5">
+                      <input
+                        type="checkbox"
+                        checked={selectedMarkets.has(m.id)}
+                        onChange={() => toggleMarket(m.id)}
+                      />
+                      <span className="text-ink">{m.name}</span>
+                    </label>
+                  ))}
+                </div>
+                <div className="mt-3 flex gap-3 border-t-2 border-ink/10 pt-3">
+                  <button
+                    onClick={() => setSelectedMarkets(new Set(markets.map((m) => m.id)))}
+                    className="font-alt text-xs font-semibold text-mare-600 hover:underline"
+                  >
+                    Tutte
+                  </button>
+                  <button
+                    onClick={() => setSelectedMarkets(new Set())}
+                    className="text-xs text-ink-muted hover:text-ink"
+                  >
+                    Nessuna
+                  </button>
+                </div>
+              </div>
+
+              <div className="imk-edge border-2 border-ink/10 bg-white p-4">
+                <h2 className="mb-3 font-display text-base text-ink">Prossimi</h2>
+                {upcoming.length === 0 ? (
+                  <p className="text-xs text-ink-muted">Nessun evento coi filtri correnti.</p>
+                ) : (
+                  <ul className="space-y-2.5">
+                    {upcoming.map((e) => {
+                      const d = new Date(e.start_at)
+                      const color = EVT_COLOR[e.category] ?? '#4A4F3B'
+                      return (
+                        <li key={e.id} className="border-l-2 pl-2.5" style={{ borderColor: color }}>
+                          <button onClick={() => setSelected(e)} className="w-full text-left">
+                            <p className="text-xs text-ink-muted">
+                              {d.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })}
+                              {e.markets?.name ? ` · ${e.markets.name}` : ''}
+                            </p>
+                            <p className="text-sm text-ink">{e.title}</p>
+                          </button>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                )}
+              </div>
+            </aside>
           </div>
-        </aside>
-      </div>
+        </div>
+      </main>
 
       {selected && (
-        <div className="fixed inset-0 z-50 bg-notte/55 backdrop-blur-[2px] flex items-center justify-center p-4" onClick={() => setSelected(null)}>
-          <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-xl max-w-lg w-full p-6 border-2 border-ink/10 shadow-2xl">
-            {selected.kind === 'event' ? (
-              <>
-                <div className="flex items-center gap-2 mb-2 flex-wrap text-xs">
-                  <span className="font-alt font-semibold px-2.5 py-0.5 rounded-full text-carta" style={{ backgroundColor: EVT_COLOR[selected.e.category] ?? '#4A4F3B' }}>
-                    {EVT_LABEL[selected.e.category] ?? selected.e.category}
-                  </span>
-                  {selected.e.markets?.slug && (
-                    <Link href={`/${selected.e.markets.slug}`} className="font-alt font-semibold px-2.5 py-0.5 rounded-full bg-carta border-2 border-ink/10 text-ink hover:border-mare">
-                      {selected.e.markets.name}
-                    </Link>
-                  )}
-                  {selected.e.is_recurring && (
-                    <span className="text-ink-muted flex items-center"><Repeat className="w-3 h-3 mr-1" />ricorrente</span>
-                  )}
-                </div>
-                <h3 className="font-display text-xl text-ink mb-1">{selected.e.title}</h3>
-                <p className="text-sm text-ink-soft mb-3">
-                  {new Date(selected.e.start_at).toLocaleString('it-IT')}
-                  {selected.e.end_at ? ` → ${new Date(selected.e.end_at).toLocaleString('it-IT')}` : ''}
-                </p>
-                {selected.e.location && (
-                  <p className="text-sm text-ink flex items-center mb-2"><MapPin className="w-4 h-4 mr-1" />{selected.e.location}</p>
-                )}
-                {selected.e.description && <p className="text-sm text-ink whitespace-pre-wrap">{selected.e.description}</p>}
-              </>
-            ) : (
-              <>
-                <div className="flex items-center gap-2 mb-2 flex-wrap text-xs">
-                  <span
-                    className="font-alt font-semibold px-2.5 py-0.5 rounded-full text-carta"
-                    style={{ backgroundColor: SCH_COLOR[selected.o.category] }}
-                  >
-                    {SCH_LABEL[selected.o.category]}
-                  </span>
-                  <Link href={`/${selected.o.market_slug}`} className="font-alt font-semibold px-2.5 py-0.5 rounded-full bg-carta border-2 border-ink/10 text-ink hover:border-mare">
-                    {selected.o.market_name}
-                  </Link>
-                </div>
-                <h3 className="font-display text-xl text-ink mb-1">{selected.o.comune}</h3>
-                <p className="text-sm text-ink-soft mb-1">
-                  {selected.o.giorno}
-                  {selected.o.orario ? ` · ${selected.o.orario}` : ''}
-                </p>
-                {selected.o.luogo && (
-                  <p className="text-sm text-ink flex items-center mt-2"><MapPin className="w-4 h-4 mr-1" />{selected.o.luogo}</p>
-                )}
-                {selected.o.settori && (
-                  <p className="text-xs text-ink-muted italic mt-2">{selected.o.settori}</p>
-                )}
-              </>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-notte/55 p-4 backdrop-blur-[2px]"
+          onClick={() => setSelected(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="imk-edge w-full max-w-lg border-2 border-ink/10 bg-white p-6 shadow-2xl"
+          >
+            <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
+              <span
+                className="rounded-full px-2.5 py-0.5 font-alt font-semibold text-carta"
+                style={{ backgroundColor: EVT_COLOR[selected.category] ?? '#4A4F3B' }}
+              >
+                {EVT_LABEL[selected.category] ?? selected.category}
+              </span>
+              {selected.markets?.slug && (
+                <Link
+                  href={`/${selected.markets.slug}`}
+                  className="rounded-full border-2 border-ink/10 bg-carta px-2.5 py-0.5 font-alt font-semibold text-ink hover:border-mare"
+                >
+                  {selected.markets.name}
+                </Link>
+              )}
+              {selected.is_recurring && (
+                <span className="flex items-center text-ink-muted">
+                  <Repeat className="mr-1 h-3 w-3" />ricorrente
+                </span>
+              )}
+            </div>
+            <h3 className="mb-1 font-display text-xl text-ink">{selected.title}</h3>
+            <p className="mb-3 text-sm text-ink-soft">
+              {new Date(selected.start_at).toLocaleString('it-IT')}
+              {selected.end_at ? ` → ${new Date(selected.end_at).toLocaleString('it-IT')}` : ''}
+            </p>
+            {selected.location && (
+              <p className="mb-2 flex items-center text-sm text-ink">
+                <MapPin className="mr-1 h-4 w-4" />{selected.location}
+              </p>
             )}
-            <button onClick={() => setSelected(null)} className="mt-6 px-4 py-2.5 bg-carta border-2 border-ink/15 hover:border-ink rounded-full w-full font-alt text-sm font-semibold text-ink transition-colors">
+            {selected.description && (
+              <p className="whitespace-pre-wrap text-sm text-ink">{selected.description}</p>
+            )}
+            <button
+              onClick={() => setSelected(null)}
+              className="mt-6 w-full rounded-full border-2 border-ink/15 bg-carta px-4 py-2.5 font-alt text-sm font-semibold text-ink transition-colors hover:border-ink"
+            >
               Chiudi
             </button>
           </div>

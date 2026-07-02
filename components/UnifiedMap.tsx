@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, GeoJSON, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { CATEGORY_COLOR, CATEGORY_COLOR_DARK, type ScheduleCategory } from '@/lib/schedules/classify'
+import { nearestParkings } from '@/lib/markets/parkings'
 
 export interface UnifiedMapPin {
   id: string
@@ -16,12 +18,22 @@ export interface UnifiedMapPin {
   polygon?: GeoJSON.Feature<GeoJSON.Polygon> | null
   /** Solo per parking: distanza in metri dal mercato (mostrata nel popup) */
   distance?: number
+  /** Tipologia del mercato → colore e glifo dell'icona banco (variante bold) */
+  category?: ScheduleCategory
+}
+
+/** Evidenziazione di una zona (poligono morbido) sulla mappa. */
+export interface MapZone {
+  id: string
+  feature: GeoJSON.Feature<GeoJSON.Polygon>
+  color: string
+  selected?: boolean
 }
 
 interface Props {
   pins: UnifiedMapPin[]
   height?: number | string
-  /** se true e ci sono pin con kind='market', fetch /api/parking per ognuno e li aggiunge come pin kind='parking'. Default false. */
+  /** se true e ci sono pin con kind='market', aggiunge i parcheggi statici OSM (lib/markets/parkings) vicini a ogni mercato come pin kind='parking'. Default false. */
   showParkingNearby?: boolean
   /** maxZoom per fitBounds, default 16 */
   maxZoom?: number
@@ -37,6 +49,10 @@ interface Props {
   bare?: boolean
   /** posizione dell'utente: mostra un pin dedicato e ci si centra */
   userLocation?: { lat: number; lng: number } | null
+  /** poligoni delle zone da evidenziare (sotto i marker) */
+  zones?: MapZone[]
+  /** click su una zona (poligono) */
+  onZoneClick?: (id: string) => void
 }
 
 // ---- Icone divIcon (variante default, comportamento storico) --------------
@@ -70,7 +86,23 @@ function defaultIcon(kind: UnifiedMapPin['kind']): L.DivIcon {
 
 // ---- Icone variante "bold" (Imperia / Riviera) ----------------------------
 
-function boldIcon(kind: UnifiedMapPin['kind'], selected: boolean): L.DivIcon {
+/** SVG di un banco con tendone (awning) colorato per tipologia. */
+function bancoSvg(color: string, dark: string): string {
+  return (
+    `<svg viewBox="0 0 28 32" width="100%" height="100%" style="display:block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))">` +
+    // pole + base point (il punto esatto)
+    `<rect x="13" y="13" width="2" height="13" fill="${dark}"/>` +
+    `<circle cx="14" cy="27" r="3.2" fill="${dark}" stroke="#F7EFDD" stroke-width="1.5"/>` +
+    // canopy (tendone) con bordo carta
+    `<rect x="2.5" y="6" width="23" height="5.2" rx="2.2" fill="${color}" stroke="#F7EFDD" stroke-width="1.2"/>` +
+    // scallops del tendone
+    `<path d="M3 11 q2.875 4.4 5.75 0 q2.875 4.4 5.75 0 q2.875 4.4 5.75 0 q2.875 4.4 5.75 0 L25 11 Z" fill="${color}" stroke="#F7EFDD" stroke-width="0.8"/>` +
+    `</svg>`
+  )
+}
+
+function boldIcon(pin: UnifiedMapPin, selected: boolean): L.DivIcon {
+  const kind = pin.kind
   if (kind === 'parking') {
     const html = `<div style="width:24px;height:24px;border-radius:8px;background:#1A1714;color:#F4B62C;border:2px solid #F7EFDD;display:flex;align-items:center;justify-content:center;font-family:'Archivo Black',sans-serif;font-weight:700;font-size:13px;box-shadow:0 2px 6px rgba(0,0,0,0.35)">P</div>`
     return L.divIcon({ className: '', html, iconSize: [24, 24], iconAnchor: [12, 12] })
@@ -79,19 +111,17 @@ function boldIcon(kind: UnifiedMapPin['kind'], selected: boolean): L.DivIcon {
     const html = `<div style="width:14px;height:14px;border-radius:50%;background:#15607C;border:2px solid #F7EFDD;box-shadow:0 1px 4px rgba(0,0,0,0.35)"></div>`
     return L.divIcon({ className: '', html, iconSize: [14, 14], iconAnchor: [7, 7] })
   }
-  // market
-  const d = selected ? 30 : 20
-  const wrap = selected ? 56 : 30
-  const color = selected ? '#F4B62C' : '#15607C'
-  const ring = selected
-    ? `<span class="imk-pin-ring" style="color:${color}"></span>`
-    : ''
+  // market → icona banco colorata per tipologia
+  const cat = pin.category ?? 'generale'
+  const color = selected ? '#F4B62C' : CATEGORY_COLOR[cat]
+  const dark = selected ? '#B07D08' : CATEGORY_COLOR_DARK[cat]
+  const w = selected ? 44 : 32
+  const h = Math.round((w * 32) / 28)
+  const ring = selected ? `<span class="imk-pin-ring" style="color:${color};position:absolute;left:50%;top:84%;transform:translate(-50%,-50%)"></span>` : ''
   const html =
-    `<div style="position:relative;width:${wrap}px;height:${wrap}px;display:flex;align-items:center;justify-content:center">` +
-    ring +
-    `<div style="width:${d}px;height:${d}px;border-radius:50%;background:${color};border:3px solid #1A1714;box-shadow:0 3px 8px rgba(0,0,0,0.4)"></div>` +
-    `</div>`
-  return L.divIcon({ className: '', html, iconSize: [wrap, wrap], iconAnchor: [wrap / 2, wrap / 2] })
+    `<div style="position:relative;width:${w}px;height:${h}px">${ring}${bancoSvg(color, dark)}</div>`
+  // anchor sul punto base (cerchio in basso ≈ 84% dell'altezza)
+  return L.divIcon({ className: '', html, iconSize: [w, h], iconAnchor: [w / 2, Math.round(h * 0.84)] })
 }
 
 const userIcon = L.divIcon({
@@ -128,8 +158,12 @@ function PanTo({ pin }: { pin: UnifiedMapPin | undefined }) {
   const map = useMap()
   useEffect(() => {
     if (!pin) return
-    const targetZoom = Math.max(map.getZoom(), 14)
-    map.flyTo([pin.lat, pin.lng], targetZoom, { duration: 0.8 })
+    try {
+      const targetZoom = Math.max(map.getZoom(), 14)
+      map.flyTo([pin.lat, pin.lng], targetZoom, { duration: 0.8 })
+    } catch {
+      /* mappa non ancora dimensionata: ignora */
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pin?.id])
   return null
@@ -148,6 +182,8 @@ export default function UnifiedMap({
   panToSelected = false,
   bare = false,
   userLocation = null,
+  zones = [],
+  onZoneClick,
 }: Props) {
   const [parkingPins, setParkingPins] = useState<UnifiedMapPin[]>([])
   const isBold = variant === 'bold'
@@ -172,46 +208,28 @@ export default function UnifiedMap({
       setParkingPins([])
       return
     }
-    let cancelled = false
-    ;(async () => {
-      try {
-        // UNA sola chiamata server-side con tutti i punti → niente race condition
-        // Google Places, niente rate-limit, dedup garantito sul backend.
-        const points = marketPins.map((p) => `${p.lat.toFixed(6)},${p.lng.toFixed(6)}`).join('|')
-        const params = new URLSearchParams()
-        params.set('points', points)
-        params.set('city', marketPins[0]?.title ?? 'Liguria')
-        const r = await fetch(`/api/parking?${params.toString()}`)
-        if (cancelled) return
-        if (!r.ok) {
-          setParkingPins([])
-          return
-        }
-        const j = await r.json()
-        const list: any[] = Array.isArray(j?.data) && j?.success ? j.data : []
-        const merged: UnifiedMapPin[] = []
-        for (const p of list) {
-          const lat = p?.location?.lat
-          const lng = p?.location?.lng
-          if (typeof lat !== 'number' || typeof lng !== 'number') continue
-          merged.push({
-            id: `parking-${p.id ?? `${lat},${lng}`}`,
-            lat,
-            lng,
-            kind: 'parking',
-            title: p.name ?? 'Parcheggio',
-            subtitle: p.address ?? undefined,
-            distance: typeof p.distance === 'number' ? p.distance : undefined,
-          })
-        }
-        setParkingPins(merged)
-      } catch {
-        if (!cancelled) setParkingPins([])
+    // Parcheggi statici OSM (lib/markets/parkings): niente API esterne, niente
+    // Google. Il titolo del pin mercato è il comune → lookup diretto, con dedup
+    // per coordinate quando più mercati condividono lo stesso comune.
+    const merged: UnifiedMapPin[] = []
+    const seen = new Set<string>()
+    for (const mp of marketPins) {
+      for (const p of nearestParkings(mp.lat, mp.lng, mp.title ?? '', 4)) {
+        const key = `${p.lat.toFixed(6)},${p.lng.toFixed(6)}`
+        if (seen.has(key)) continue
+        seen.add(key)
+        merged.push({
+          id: `parking-${key}`,
+          lat: p.lat,
+          lng: p.lng,
+          kind: 'parking',
+          title: p.name || 'Parcheggio',
+          subtitle: p.fee == null ? undefined : p.fee ? 'A pagamento' : 'Gratuito',
+          distance: p.distance,
+        })
       }
-    })()
-    return () => {
-      cancelled = true
     }
+    setParkingPins(merged)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [marketsKey, showParkingNearby])
 
@@ -265,6 +283,25 @@ export default function UnifiedMap({
           <PanTo pin={{ id: '__user', lat: userLocation.lat, lng: userLocation.lng, kind: 'market', title: '' }} />
         )}
 
+        {/* Zone (poligoni morbidi sotto a tutto) */}
+        {zones.map((z) => (
+          <GeoJSON
+            key={`zone-${z.id}-${z.selected ? 'on' : 'off'}`}
+            data={z.feature}
+            style={
+              {
+                color: z.color,
+                fillColor: z.color,
+                fillOpacity: z.selected ? 0.22 : 0.08,
+                weight: z.selected ? 3 : 1.5,
+                opacity: z.selected ? 0.9 : 0.45,
+                dashArray: z.selected ? undefined : '4 5',
+              } as any
+            }
+            eventHandlers={onZoneClick ? { click: () => onZoneClick(z.id) } : undefined}
+          />
+        ))}
+
         {/* Polygons (sotto i marker) */}
         {allPins.map((pin) =>
           pin.polygon ? (
@@ -286,7 +323,7 @@ export default function UnifiedMap({
 
         {/* Markers */}
         {allPins.map((pin) => {
-          const icon = isBold ? boldIcon(pin.kind, pin.id === selectedId) : defaultIcon(pin.kind)
+          const icon = isBold ? boldIcon(pin, pin.id === selectedId) : defaultIcon(pin.kind)
           return (
             <Marker
               key={`pin-${pin.kind}-${pin.id}`}
@@ -300,16 +337,16 @@ export default function UnifiedMap({
               {!onPinClick && (
                 <Popup>
                   <div className="text-sm">
-                    <div className="font-semibold text-gray-900">{pin.title}</div>
-                    {pin.subtitle && <div className="text-xs text-gray-600 mt-0.5">{pin.subtitle}</div>}
+                    <div className="font-semibold text-ink">{pin.title}</div>
+                    {pin.subtitle && <div className="text-xs text-ink-soft mt-0.5">{pin.subtitle}</div>}
                     {pin.kind === 'parking' && typeof pin.distance === 'number' && (
-                      <div className="text-xs text-gray-500 mt-0.5">
+                      <div className="text-xs text-ink-muted mt-0.5">
                         {pin.distance < 1000 ? `${Math.round(pin.distance)}m` : `${(pin.distance / 1000).toFixed(1)}km`}
                       </div>
                     )}
                     <div className="flex flex-col gap-0.5 mt-1.5">
                       {pin.href && (
-                        <a href={pin.href} className="text-xs text-olive-700 underline">
+                        <a href={pin.href} className="text-xs text-mare-700 underline">
                           Apri pagina →
                         </a>
                       )}
@@ -317,7 +354,7 @@ export default function UnifiedMap({
                         href={`https://www.google.com/maps/dir/?api=1&destination=${pin.lat},${pin.lng}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs text-olive-700 underline"
+                        className="text-xs text-mare-700 underline"
                       >
                         Indicazioni
                       </a>

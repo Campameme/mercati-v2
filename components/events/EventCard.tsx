@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { MapPin, Repeat, ArrowUpRight } from 'lucide-react'
 import type { MarketEvent } from '@/types/event'
+import WaterCard from '@/components/motion/WaterCard'
 
 /** Etichette categoria evento (it). */
 export const EVENT_CATEGORY_LABEL: Record<string, string> = {
@@ -14,16 +15,17 @@ export const EVENT_CATEGORY_LABEL: Record<string, string> = {
 }
 
 /**
- * Stile badge per categoria — solo token brand "bold".
- * { bg, fg } = classi Tailwind background + foreground.
+ * Stile badge per categoria — allineato a EVT_COLOR in `lib/events/labels.ts`
+ * (unica semantica colori eventi: mare=mercato · terracotta=fiera · verde
+ * orto=gastronomia · viola=musica · fiore=arte · notte=sport).
  */
 const EVENT_CATEGORY_STYLE: Record<string, { bg: string; fg: string }> = {
-  market: { bg: 'bg-pesto', fg: 'text-white' },
-  fair: { bg: 'bg-riviera', fg: 'text-white' },
-  food: { bg: 'bg-coral', fg: 'text-white' },
-  music: { bg: 'bg-night', fg: 'text-mimosa' },
-  art: { bg: 'bg-mimosa', fg: 'text-ink' },
-  sport: { bg: 'bg-riviera-600', fg: 'text-white' },
+  market: { bg: 'bg-mare', fg: 'text-white' },
+  fair: { bg: 'bg-[#C2502E]', fg: 'text-white' },
+  food: { bg: 'bg-[#4C8B3F]', fg: 'text-white' },
+  music: { bg: 'bg-[#8E5BB5]', fg: 'text-white' },
+  art: { bg: 'bg-fiore', fg: 'text-white' },
+  sport: { bg: 'bg-notte', fg: 'text-sole' },
   other: { bg: 'bg-ink', fg: 'text-paper' },
 }
 
@@ -61,16 +63,18 @@ function rangeLabel(start: string, end: string | null) {
 
 export interface EventCardProps {
   event: MarketEvent
+  /** leggera rotazione imperfetta (alternata dalla griglia) */
+  tilt?: 'l' | 'r'
 }
 
-export default function EventCard({ event }: EventCardProps) {
+export default function EventCard({ event, tilt }: EventCardProps) {
   const dp = dateParts(event.start_at)
   const style = catStyle(event.category)
   const market = event.markets
   const place = event.location ?? market?.city ?? null
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-xl border-2 border-ink/10 bg-white transition-colors hover:border-ink/25">
+    <WaterCard tilt={tilt} className="group relative flex flex-col overflow-hidden rounded-xl">
       {/* Banda colore per categoria in cima */}
       <span className={`block h-1.5 w-full ${style.bg}`} aria-hidden="true" />
 
@@ -80,7 +84,7 @@ export default function EventCard({ event }: EventCardProps) {
           <div className="flex w-[68px] flex-col items-center rounded-xl border-2 border-ink/10 bg-paper px-2 py-2.5 text-center">
             <span className="font-alt text-[10px] uppercase tracking-[0.18em] text-ink-muted">{dp.weekday}</span>
             <span className="font-display text-3xl leading-none text-ink">{dp.day}</span>
-            <span className="font-alt text-[11px] uppercase tracking-[0.14em] text-pesto-600">{dp.month}</span>
+            <span className="font-alt text-[11px] uppercase tracking-[0.14em] text-mare-600">{dp.month}</span>
           </div>
         </div>
 
@@ -128,6 +132,6 @@ export default function EventCard({ event }: EventCardProps) {
           )}
         </div>
       </div>
-    </article>
+    </WaterCard>
   )
 }

@@ -1,4 +1,4 @@
-// Token di motion "Mercati di Ponente" — nomi nostri, valori unici.
+// Token di motion "Mercati della Riviera di Ponente" — nomi nostri, valori unici.
 // Vedi docs/brand-system.md §7.3.
 
 export const DUR = {

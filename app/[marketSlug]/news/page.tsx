@@ -62,7 +62,7 @@ export default async function NewsPage({ params }: { params: { marketSlug: strin
                   <span className="font-alt font-semibold uppercase tracking-[0.08em]">{TYPE_LABEL[n.type]}</span>
                   {n.is_global && (
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-sole/20 text-sole-600 font-alt font-semibold uppercase tracking-[0.08em] text-[10px]">
-                      <Globe2 className="w-3 h-3" /> Mercati di Ponente
+                      <Globe2 className="w-3 h-3" /> Mercati della Riviera di Ponente
                     </span>
                   )}
                   <span>· {new Date(n.publish_from).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })}</span>

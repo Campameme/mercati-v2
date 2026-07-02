@@ -8,7 +8,7 @@ const STORAGE_KEY = 'imercati:cookie-notice-dismissed:v1'
 
 /**
  * Banner informativo, non bloccante.
- * Mercati di Ponente non usa cookie di tracciamento ne richiede consenso
+ * Mercati della Riviera di Ponente non usa cookie di tracciamento ne richiede consenso
  * preventivo, ma e doveroso informare l'utente sulla nostra scelta
  * privacy-friendly e sui cookie tecnici di Supabase per chi accede all'area
  * admin. Quando l'utente clicca "Ho capito", salviamo in localStorage e il
@@ -44,7 +44,7 @@ export default function CookieNotice() {
         <div className="flex-1 text-sm text-ink-soft leading-relaxed">
           <p className="font-display text-base text-ink mb-1">Niente cookie di tracciamento.</p>
           <p>
-            Mercati di Ponente raccoglie solo statistiche aggregate anonime (senza cookie, senza IP).
+            Mercati della Riviera di Ponente raccoglie solo statistiche aggregate anonime (senza cookie, senza IP).
             Maggiori dettagli nella{' '}
             <Link href="/privacy" className="text-mare-700 underline underline-offset-2 hover:text-mare-600">
               Privacy Policy

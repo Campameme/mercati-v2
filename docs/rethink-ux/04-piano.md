@@ -1,3 +1,9 @@
+> ⚠️ **ARCHIVIO STORICO — direzione MAI implementata.** Questo documento descrive
+> la proposta "Slow Compass / magazine editoriale" (Fraunces+Inter, cream/olive,
+> route /agenda /banchi /colophon) generata dal workflow del 2026-05-14 e poi
+> **scartata**. Il sito reale è un'altra cosa: vedi `../brand-system.md` e
+> `../brand-voice.md`. Non usare questi file come riferimento di implementazione.
+
 # 04 · Piano di implementazione
 
 Quattro agenti hanno generato in parallelo: file da cancellare, file da unire, nuova struttura, piano di migrazione in fasi.

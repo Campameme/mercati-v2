@@ -91,7 +91,7 @@ export default function OperatorProductsPage() {
             <p className="text-sm text-ink-muted mt-1">{operatorName}</p>
             <h1 className="font-display text-3xl text-ink">Prodotti</h1>
           </div>
-          <button onClick={addProduct} className="flex items-center gap-2 px-4 py-2.5 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 transition-colors">
+          <button onClick={addProduct} className="flex items-center gap-2 px-4 py-2.5 bg-mare text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-mare-600 transition-colors">
             <Plus className="w-4 h-4" /> <span>Nuovo prodotto</span>
           </button>
         </div>
@@ -99,7 +99,7 @@ export default function OperatorProductsPage() {
         {products.length === 0 ? (
           <div className="bg-white rounded-xl border-2 border-ink/10 p-8 text-center">
             <p className="text-ink-muted mb-4">Nessun prodotto ancora. Crea il primo!</p>
-            <button onClick={addProduct} className="inline-flex items-center gap-2 px-4 py-2 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 transition-colors">
+            <button onClick={addProduct} className="inline-flex items-center gap-2 px-4 py-2 bg-mare text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-mare-600 transition-colors">
               <Plus className="w-4 h-4" /> <span>Crea prodotto</span>
             </button>
           </div>
@@ -117,22 +117,22 @@ export default function OperatorProductsPage() {
                   <div className="flex items-start justify-between">
                     <h3 className="font-alt text-base text-ink">{p.name}</h3>
                     {p.is_available ? (
-                      <span className="text-xs text-pesto-600 flex items-center"><Eye className="w-3 h-3 mr-1" />Visibile</span>
+                      <span className="text-xs text-mare-600 flex items-center"><Eye className="w-3 h-3 mr-1" />Visibile</span>
                     ) : (
                       <span className="text-xs text-ink-muted flex items-center"><EyeOff className="w-3 h-3 mr-1" />Nascosto</span>
                     )}
                   </div>
                   {p.description && <p className="text-sm text-ink-soft mt-1 line-clamp-2 flex-1">{p.description}</p>}
                   {p.price !== null && (
-                    <p className="text-pesto-700 font-display text-lg mt-2">
+                    <p className="text-mare-700 font-display text-lg mt-2">
                       {new Intl.NumberFormat('it-IT', { style: 'currency', currency: p.currency }).format(p.price)}
                     </p>
                   )}
                   <div className="flex items-center gap-2 mt-3">
-                    <button onClick={() => setEditing(p)} className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-paper border-2 border-ink/15 hover:border-pesto text-ink rounded-full text-sm transition-colors">
+                    <button onClick={() => setEditing(p)} className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-paper border-2 border-ink/15 hover:border-mare text-ink rounded-full text-sm transition-colors">
                       <Pencil className="w-4 h-4" /> <span>Modifica</span>
                     </button>
-                    <button onClick={() => deleteProduct(p.id)} className="px-3 py-2 text-coral-600 hover:bg-coral/10 rounded-full transition-colors" title="Elimina">
+                    <button onClick={() => deleteProduct(p.id)} className="px-3 py-2 text-fiore-600 hover:bg-fiore/10 rounded-full transition-colors" title="Elimina">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -153,7 +153,7 @@ export default function OperatorProductsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <label className="block md:col-span-2">
                     <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Nome</span>
-                    <input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+                    <input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
                   </label>
                   <label className="block">
                     <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Prezzo (€)</span>
@@ -161,13 +161,13 @@ export default function OperatorProductsPage() {
                       type="number" step="0.01"
                       value={editing.price ?? ''}
                       onChange={(e) => setEditing({ ...editing, price: e.target.value === '' ? null : parseFloat(e.target.value) })}
-                      className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors"
+                      className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors"
                     />
                   </label>
                 </div>
                 <label className="block">
                   <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Descrizione</span>
-                  <textarea value={editing.description ?? ''} onChange={(e) => setEditing({ ...editing, description: e.target.value })} rows={3} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+                  <textarea value={editing.description ?? ''} onChange={(e) => setEditing({ ...editing, description: e.target.value })} rows={3} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
                 </label>
                 <div>
                   <p className="text-xs font-alt uppercase tracking-wider text-ink-soft mb-2">Foto</p>
@@ -179,13 +179,13 @@ export default function OperatorProductsPage() {
                   />
                 </div>
                 <label className="flex items-center gap-2">
-                  <input type="checkbox" checked={editing.is_available} onChange={(e) => setEditing({ ...editing, is_available: e.target.checked })} className="accent-pesto w-4 h-4" />
+                  <input type="checkbox" checked={editing.is_available} onChange={(e) => setEditing({ ...editing, is_available: e.target.checked })} className="accent-mare w-4 h-4" />
                   <span className="text-sm text-ink">Visibile al pubblico</span>
                 </label>
               </div>
               <div className="flex items-center justify-end gap-2 p-6 border-t-2 border-ink/10 bg-paper rounded-b-xl">
                 <button onClick={() => setEditing(null)} className="px-4 py-2 bg-white border-2 border-ink/15 hover:border-ink/30 text-ink-soft rounded-full transition-colors">Annulla</button>
-                <button onClick={saveProduct} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 disabled:opacity-50 transition-colors">
+                <button onClick={saveProduct} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-mare text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-mare-600 disabled:opacity-50 transition-colors">
                   <Save className="w-4 h-4" /> <span>{saving ? 'Salvataggio…' : 'Salva'}</span>
                 </button>
               </div>

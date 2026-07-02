@@ -7,6 +7,11 @@ export type Lang = 'it' | 'fr' | 'de' | 'en'
 
 export const LANGS: Lang[] = ['it', 'fr', 'de', 'en']
 
+export interface StoryPillar {
+  t: string
+  d: string
+}
+
 export interface HomeDict {
   tagline: string
   hint: string
@@ -43,6 +48,21 @@ export interface HomeDict {
   stall: string
   away: string
   crowd: Record<'empty' | 'low' | 'medium' | 'high' | 'full', string>
+  // --- nuovi (filtri tipologia/zona, lista, ricerca, storia, zone) ---
+  filterType: string
+  filterZone: string
+  allTypes: string
+  sortLabel: string
+  sortAZ: string
+  sortNear: string
+  listEmpty: string
+  exploreCta: string
+  whyShown: string
+  fullCard: string
+  freeParking: string
+  paidParking: string
+  story: { eyebrow: string; title: string; lead: string; pillars: StoryPillar[]; quote: string; quoteSource: string }
+  zones: { eyebrow: string; title: string; lead: string; markets: string }
 }
 
 export const HOME_I18N: Record<Lang, HomeDict> = {
@@ -63,7 +83,7 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
     whatToFind: 'Cosa trovi',
     operators: 'Banchi e operatori',
     parking: 'Parcheggi vicini',
-    searchPlaceholder: 'Cerca un luogo o un ambulante…',
+    searchPlaceholder: 'Cerca: mercato, artigianato, una zona, un ambulante…',
     results: 'Risultati',
     noResults: 'Nessun risultato',
     list: 'Mercati',
@@ -82,6 +102,31 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
     stall: 'Banco',
     away: 'di distanza',
     crowd: { empty: 'libero', low: 'poco pieno', medium: 'medio', high: 'pieno', full: 'pienissimo' },
+    filterType: 'Tipologia',
+    filterZone: 'Zona',
+    allTypes: 'Tutte le tipologie',
+    sortLabel: 'Ordina',
+    sortAZ: 'A → Z',
+    sortNear: 'Più vicini',
+    listEmpty: 'Nessun mercato con questi filtri',
+    exploreCta: 'Esplora la mappa',
+    whyShown: 'Perché compare',
+    fullCard: 'Scheda completa',
+    freeParking: 'gratuito',
+    paidParking: 'a pagamento',
+    story: {
+      eyebrow: 'La storia, quella vera',
+      title: 'Una corda tesa tra il mare e i monti',
+      lead: 'Prima di essere “Riviera dei Fiori”, questa costa era una rete di mulattiere lungo cui il sale del mare risaliva verso il Piemonte e ne tornava carico di grano e formaggi. Ogni mercato di queste valli è un nodo di quella corda antica.',
+      pillars: [
+        { t: 'La Via del Sale', d: 'Dai porti del Ponente al Colle di Nava: per secoli muli carichi di sale, olio e pesce hanno legato il mare all’entroterra. I mercati nascono lì, dove la valle scendeva e la costa saliva.' },
+        { t: 'Il venerdì di Ventimiglia', d: 'Il mercato all’aperto più grande della Liguria, da sempre transfrontaliero: i francesi della Costa Azzurra scendono a fare la spesa e ai banchi si risponde in francese perfetto.' },
+        { t: 'Le città mercatali', d: 'Pieve di Teco non è un borgo con un mercato: è un mercato diventato borgo. Sotto i portici cinquecenteschi, l’ultima domenica del mese, l’antiquariato continua un gesto vecchio di ottocento anni.' },
+      ],
+      quote: '«Aiga ae corde!» — il grido in dialetto che dal 1586 porta in Vaticano le palme bianche di Bordighera.',
+      quoteSource: 'Tradizione del Ponente ligure',
+    },
+    zones: { eyebrow: 'Le zone della provincia', title: 'Otto zone, un Ponente solo', lead: 'Dalla frontiera francese alle valli dell’entroterra: scegli una zona per vedere i suoi borghi e i suoi mercati.', markets: 'mercati' },
   },
   fr: {
     tagline: 'produits authentiques · soin · fiabilité',
@@ -100,7 +145,7 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
     whatToFind: 'Ce qu’on y trouve',
     operators: 'Étals et marchands',
     parking: 'Parkings proches',
-    searchPlaceholder: 'Cherchez un lieu ou un marchand…',
+    searchPlaceholder: 'Cherchez : marché, artisanat, une zone, un marchand…',
     results: 'Résultats',
     noResults: 'Aucun résultat',
     list: 'Marchés',
@@ -119,6 +164,31 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
     stall: 'Étal',
     away: 'de distance',
     crowd: { empty: 'libre', low: 'peu rempli', medium: 'moyen', high: 'rempli', full: 'complet' },
+    filterType: 'Type',
+    filterZone: 'Zone',
+    allTypes: 'Tous les types',
+    sortLabel: 'Trier',
+    sortAZ: 'A → Z',
+    sortNear: 'Les plus proches',
+    listEmpty: 'Aucun marché avec ces filtres',
+    exploreCta: 'Explorer la carte',
+    whyShown: 'Pourquoi ce résultat',
+    fullCard: 'Fiche complète',
+    freeParking: 'gratuit',
+    paidParking: 'payant',
+    story: {
+      eyebrow: 'L’histoire, la vraie',
+      title: 'Une corde tendue entre la mer et les monts',
+      lead: 'Avant d’être la « Riviera des Fleurs », cette côte était un réseau de chemins muletiers : le sel de la mer remontait vers le Piémont et redescendait chargé de blé et de fromages. Chaque marché de ces vallées est un nœud de cette corde ancienne.',
+      pillars: [
+        { t: 'La Route du Sel', d: 'Des ports du Ponant au Col de Nava : pendant des siècles, des mulets chargés de sel, d’huile et de poisson ont relié la mer à l’arrière-pays. Les marchés sont nés là.' },
+        { t: 'Le vendredi de Vintimille', d: 'Le plus grand marché en plein air de Ligurie, transfrontalier depuis toujours : les Français de la Côte d’Azur viennent y faire leurs courses, et l’on répond en français parfait.' },
+        { t: 'Les villes-marchés', d: 'Pieve di Teco n’est pas un bourg avec un marché : c’est un marché devenu bourg. Sous les arcades du XVIᵉ, le dernier dimanche du mois, l’antiquité perpétue un geste vieux de huit siècles.' },
+      ],
+      quote: '« Aiga ae corde ! » — le cri en dialecte qui, depuis 1586, porte au Vatican les palmes blanches de Bordighera.',
+      quoteSource: 'Tradition du Ponant ligure',
+    },
+    zones: { eyebrow: 'Les zones de la province', title: 'Huit zones, un seul Ponant', lead: 'De la frontière française aux vallées de l’arrière-pays : choisissez une zone pour voir ses bourgs et ses marchés.', markets: 'marchés' },
   },
   de: {
     tagline: 'echte Produkte · Sorgfalt · Verlässlichkeit',
@@ -137,7 +207,7 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
     whatToFind: 'Was du findest',
     operators: 'Stände und Händler',
     parking: 'Parkplätze in der Nähe',
-    searchPlaceholder: 'Ort oder Händler suchen…',
+    searchPlaceholder: 'Suche: Markt, Handwerk, eine Zone, einen Händler…',
     results: 'Ergebnisse',
     noResults: 'Keine Ergebnisse',
     list: 'Märkte',
@@ -156,6 +226,31 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
     stall: 'Stand',
     away: 'entfernt',
     crowd: { empty: 'frei', low: 'wenig voll', medium: 'mittel', high: 'voll', full: 'sehr voll' },
+    filterType: 'Art',
+    filterZone: 'Zone',
+    allTypes: 'Alle Arten',
+    sortLabel: 'Sortieren',
+    sortAZ: 'A → Z',
+    sortNear: 'Am nächsten',
+    listEmpty: 'Kein Markt mit diesen Filtern',
+    exploreCta: 'Karte erkunden',
+    whyShown: 'Warum angezeigt',
+    fullCard: 'Vollständige Karte',
+    freeParking: 'kostenlos',
+    paidParking: 'kostenpflichtig',
+    story: {
+      eyebrow: 'Die wahre Geschichte',
+      title: 'Ein Seil zwischen Meer und Bergen',
+      lead: 'Bevor sie „Blumenriviera“ war, war diese Küste ein Netz aus Saumpfaden: Das Salz des Meeres stieg ins Piemont hinauf und kehrte beladen mit Getreide und Käse zurück. Jeder Markt dieser Täler ist ein Knoten in diesem alten Seil.',
+      pillars: [
+        { t: 'Die Salzstraße', d: 'Von den Häfen des Ponente zum Colle di Nava: Jahrhundertelang verbanden mit Salz, Öl und Fisch beladene Maultiere das Meer mit dem Hinterland. Dort entstanden die Märkte.' },
+        { t: 'Der Freitag von Ventimiglia', d: 'Der größte Freiluftmarkt Liguriens, seit jeher grenzüberschreitend: Die Franzosen der Côte d’Azur kommen zum Einkaufen, und an den Ständen antwortet man perfekt auf Französisch.' },
+        { t: 'Die Marktstädte', d: 'Pieve di Teco ist kein Dorf mit Markt: Es ist ein Markt, der zum Dorf wurde. Unter den Arkaden aus dem 16. Jh. führt am letzten Sonntag des Monats der Antiquitätenhandel eine 800 Jahre alte Geste fort.' },
+      ],
+      quote: '„Aiga ae corde!“ — der Ruf im Dialekt, der seit 1586 die weißen Palmen von Bordighera in den Vatikan bringt.',
+      quoteSource: 'Tradition des ligurischen Ponente',
+    },
+    zones: { eyebrow: 'Die Zonen der Provinz', title: 'Acht Zonen, ein Ponente', lead: 'Von der französischen Grenze bis zu den Tälern des Hinterlandes: Wähle eine Zone, um ihre Dörfer und Märkte zu sehen.', markets: 'Märkte' },
   },
   en: {
     tagline: 'authentic produce · care · reliability',
@@ -174,7 +269,7 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
     whatToFind: 'What you find',
     operators: 'Stalls and vendors',
     parking: 'Parking nearby',
-    searchPlaceholder: 'Search a place or a vendor…',
+    searchPlaceholder: 'Search: market, crafts, a zone, a vendor…',
     results: 'Results',
     noResults: 'No results',
     list: 'Markets',
@@ -193,6 +288,31 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
     stall: 'Stall',
     away: 'away',
     crowd: { empty: 'empty', low: 'quiet', medium: 'medium', high: 'busy', full: 'full' },
+    filterType: 'Type',
+    filterZone: 'Zone',
+    allTypes: 'All types',
+    sortLabel: 'Sort',
+    sortAZ: 'A → Z',
+    sortNear: 'Nearest',
+    listEmpty: 'No market with these filters',
+    exploreCta: 'Explore the map',
+    whyShown: 'Why it shows',
+    fullCard: 'Full page',
+    freeParking: 'free',
+    paidParking: 'paid',
+    story: {
+      eyebrow: 'The real story',
+      title: 'A rope strung between the sea and the mountains',
+      lead: 'Before it was the “Riviera of Flowers”, this coast was a web of mule tracks: sea salt climbed toward Piedmont and came back laden with grain and cheese. Every market in these valleys is a knot in that ancient rope.',
+      pillars: [
+        { t: 'The Salt Road', d: 'From the Ponente harbours to the Colle di Nava: for centuries mules loaded with salt, oil and fish tied the sea to the hinterland. The markets were born there.' },
+        { t: 'Ventimiglia’s Friday', d: 'Liguria’s largest open-air market, cross-border since forever: the French from the Côte d’Azur come to shop, and the stalls answer in perfect French.' },
+        { t: 'The market towns', d: 'Pieve di Teco isn’t a town with a market: it’s a market that became a town. Under 16th-century arcades, on the last Sunday of the month, the antiques trade continues a gesture eight centuries old.' },
+      ],
+      quote: '“Aiga ae corde!” — the dialect cry that since 1586 carries Bordighera’s white palms to the Vatican.',
+      quoteSource: 'Western Liguria tradition',
+    },
+    zones: { eyebrow: 'The zones of the province', title: 'Eight zones, one Ponente', lead: 'From the French border to the inland valleys: pick a zone to see its villages and its markets.', markets: 'markets' },
   },
 }
 

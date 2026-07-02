@@ -1,9 +1,10 @@
 /**
- * Wrapper email per Mercati di Ponente. Usa Resend se RESEND_API_KEY e settata,
+ * Wrapper email per Mercati della Riviera di Ponente. Usa Resend se RESEND_API_KEY e settata,
  * altrimenti logga warning e ritorna { ok: false, reason: 'no_key' }.
  * Cosi in dev/staging il form continua a funzionare (salvando su DB)
  * senza richiedere setup esterno.
  */
+import 'server-only'
 import { Resend } from 'resend'
 
 export type SendResult =
@@ -31,7 +32,7 @@ export async function sendEmail({ to, subject, html, replyTo }: SendArgs): Promi
     console.warn('[email] RESEND_API_KEY non impostata, email non inviata')
     return { ok: false, reason: 'no_key' }
   }
-  const from = process.env.RESEND_FROM ?? 'Mercati di Ponente <no-reply@imercati.it>'
+  const from = process.env.RESEND_FROM ?? 'Mercati della Riviera di Ponente <no-reply@imercati.it>'
   try {
     const res = await r.emails.send({ from, to, subject, html, replyTo })
     if (res.error) {

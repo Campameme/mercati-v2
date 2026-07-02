@@ -28,10 +28,10 @@ export default function FavoriteButton({ kind, id, label, size = 'md', className
       aria-label={fav ? `Rimuovi ${label ?? ''} dai preferiti` : `Aggiungi ${label ?? ''} ai preferiti`}
       title={fav ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
       className={`inline-flex items-center justify-center rounded-full p-1.5 transition-colors ${
-        fav ? 'text-amber-500 hover:text-amber-600' : 'text-ink-muted hover:text-amber-500'
+        fav ? 'text-sole hover:text-sole-600' : 'text-ink-muted hover:text-sole'
       } ${className}`}
     >
-      <Star className={`${px} ${fav ? 'fill-amber-500' : ''}`} />
+      <Star className={`${px} ${fav ? 'fill-sole' : ''}`} />
     </button>
   )
 }

@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { buildOperatorsWorkbook, type OperatorRow, type SessionRow } from '@/lib/excel/build-workbook'
+import { requireAdmin } from '@/lib/auth/guard'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
-  const supabase = createClient()
+  // L'export include le email degli operatori: riservato agli admin.
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard.res
+  const supabase = guard.supabase
   const { searchParams } = new URL(request.url)
   const marketSlug = searchParams.get('marketSlug')
   const all = searchParams.get('all') === '1'

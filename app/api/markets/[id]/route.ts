@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/auth/guard'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,7 +16,9 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 }
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createClient()
+  const guard = await requireAdmin({ marketId: params.id })
+  if (!guard.ok) return guard.res
+  const supabase = guard.supabase
   const body = await request.json()
   const allowed = ['slug', 'name', 'city', 'description', 'center_lat', 'center_lng', 'default_zoom', 'default_zoom_operators', 'market_days', 'timezone', 'is_active']
   const update: Record<string, unknown> = {}
@@ -52,7 +55,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createClient()
+  // Eliminare una zona/mercato è un'operazione da super admin.
+  const guard = await requireAdmin({ superOnly: true })
+  if (!guard.ok) return guard.res
+  const supabase = guard.supabase
   const { error } = await supabase.from('markets').delete().eq('id', params.id)
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
   return NextResponse.json({ ok: true })

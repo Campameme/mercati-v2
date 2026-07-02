@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
+import { requireAdmin } from '@/lib/auth/guard'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createClient()
+  // Elenco nomi/ruoli degli admin del mercato: non è roba pubblica.
+  const guard = await requireAdmin({ marketId: params.id })
+  if (!guard.ok) return guard.res
+  const supabase = guard.supabase
   const { data: assignments, error } = await supabase
     .from('market_admins')
     .select('user_id, created_at')
@@ -31,9 +34,10 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 }
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
+  // Assegnare ruoli admin è un'operazione da super admin.
+  const guard = await requireAdmin({ superOnly: true })
+  if (!guard.ok) return guard.res
+  const supabase = guard.supabase
 
   const body = await request.json()
   const { email } = body as { email?: string }
@@ -64,7 +68,9 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createClient()
+  const guard = await requireAdmin({ superOnly: true })
+  if (!guard.ok) return guard.res
+  const supabase = guard.supabase
   const { searchParams } = new URL(request.url)
   const userId = searchParams.get('user_id')
   if (!userId) return NextResponse.json({ error: 'user_id richiesto' }, { status: 400 })

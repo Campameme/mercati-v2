@@ -3,8 +3,8 @@ import { ChevronLeft } from 'lucide-react'
 import { SunRay } from '@/components/decorations'
 
 export const metadata = {
-  title: 'Privacy Policy — Mercati di Ponente',
-  description: 'Come trattiamo i dati personali su Mercati di Ponente.',
+  title: 'Privacy Policy — Mercati della Riviera di Ponente',
+  description: 'Come trattiamo i dati personali su Mercati della Riviera di Ponente.',
 }
 
 const LAST_UPDATE = '14 maggio 2026'
@@ -30,7 +30,7 @@ export default function PrivacyPage() {
         <section>
           <h2 className="font-display text-2xl text-ink mb-3">Chi siamo</h2>
           <p>
-            Mercati di Ponente è un progetto indipendente che raccoglie e racconta i mercati settimanali
+            Mercati della Riviera di Ponente è un progetto indipendente che raccoglie e racconta i mercati settimanali
             della provincia di Imperia. Il titolare del trattamento dei dati è <strong>Emanuele Campanini</strong>,
             contattabile all&apos;indirizzo <a href="mailto:emanueleecampanini@gmail.com" className="text-mare-700 underline underline-offset-2 hover:text-mare-600">emanueleecampanini@gmail.com</a>.
           </p>
@@ -38,7 +38,7 @@ export default function PrivacyPage() {
 
         <section>
           <h2 className="font-display text-2xl text-ink mb-3">Cosa raccogliamo</h2>
-          <p className="mb-3">Mercati di Ponente raccoglie il minimo indispensabile per funzionare. Specificamente:</p>
+          <p className="mb-3">Mercati della Riviera di Ponente raccoglie il minimo indispensabile per funzionare. Specificamente:</p>
           <ul className="list-disc pl-6 space-y-2">
             <li><strong>Statistiche di visita anonime</strong>: ogni pagina pubblica registra una view aggregata
               (tipo evento, pagina, dispositivo generico). Per evitare doppi conteggi, generiamo un
@@ -55,7 +55,7 @@ export default function PrivacyPage() {
         <section>
           <h2 className="font-display text-2xl text-ink mb-3">Cookie e tecnologie simili</h2>
           <p className="mb-3">
-            Mercati di Ponente <strong>non usa cookie di tracciamento, profilazione o pubblicità</strong>.
+            Mercati della Riviera di Ponente <strong>non usa cookie di tracciamento, profilazione o pubblicità</strong>.
             Le statistiche di visita non sono basate su cookie, quindi non hai bisogno di prestare consenso.
           </p>
           <p>

@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/auth/guard'
 
 export const dynamic = 'force-dynamic'
 
 // Endpoint admin: ritorna TUTTE le sessioni (incluse is_active=false), per la
-// dashboard di toggle. Protezione affidata al middleware (/admin/** richiede super_admin).
+// dashboard di toggle. NB: il middleware copre solo le PAGINE → guardia qui.
 export async function GET() {
-  const supabase = createClient()
+  const guard = await requireAdmin({ superOnly: true })
+  if (!guard.ok) return guard.res
+  const supabase = guard.supabase
   const { data, error } = await supabase
     .from('market_schedules')
     .select('id, market_id, comune, giorno, orario, luogo, is_active, markets(slug, name, city)')

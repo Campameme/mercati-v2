@@ -122,7 +122,7 @@ export default function AdminMarketOperatorsPage() {
             <Link href={`/${slug}/admin`} className="text-xs font-alt uppercase tracking-wider text-ink-muted hover:text-ink transition-colors">← Gestione mercato</Link>
             <h1 className="font-display text-3xl text-ink mt-1">Operatori</h1>
           </div>
-          <button onClick={() => setShowCreate((s) => !s)} className="flex items-center gap-2 px-4 py-2.5 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 transition-colors">
+          <button onClick={() => setShowCreate((s) => !s)} className="flex items-center gap-2 px-4 py-2.5 bg-mare text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-mare-600 transition-colors">
             <Plus className="w-4 h-4" /> <span>Nuovo operatore</span>
           </button>
         </div>
@@ -135,17 +135,17 @@ export default function AdminMarketOperatorsPage() {
           <form onSubmit={handleCreate} className="bg-white rounded-xl border-2 border-ink/10 p-6 mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             <label className="block">
               <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Nome</span>
-              <input required value={createForm.name} onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+              <input required value={createForm.name} onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
             </label>
             <label className="block">
               <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Categoria</span>
-              <select value={createForm.category} onChange={(e) => setCreateForm({ ...createForm, category: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors">
+              <select value={createForm.category} onChange={(e) => setCreateForm({ ...createForm, category: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors">
                 {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </label>
             <label className="block">
               <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Banco (opz.)</span>
-              <input value={createForm.stall_number} onChange={(e) => setCreateForm({ ...createForm, stall_number: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" />
+              <input value={createForm.stall_number} onChange={(e) => setCreateForm({ ...createForm, stall_number: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
             </label>
             <label className="block md:col-span-3">
               <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Sessione mercato (opz.)</span>
@@ -162,7 +162,7 @@ export default function AdminMarketOperatorsPage() {
                     location_lng: prev.location_lng ?? s?.lng ?? null,
                   }))
                 }}
-                className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors"
+                className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors"
               >
                 <option value="">— Tutta la zona (non legato a una sessione specifica)</option>
                 {sessions.map((s) => (
@@ -196,10 +196,10 @@ export default function AdminMarketOperatorsPage() {
               </div>
             )}
 
-            {error && <p className="md:col-span-3 text-sm text-coral-600">{error}</p>}
+            {error && <p className="md:col-span-3 text-sm text-fiore-600">{error}</p>}
             <div className="md:col-span-3 flex justify-end gap-2">
               <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 bg-paper border-2 border-ink/15 text-ink-soft rounded-full hover:border-ink/30 transition-colors">Annulla</button>
-              <button type="submit" className="px-4 py-2 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 transition-colors">Crea</button>
+              <button type="submit" className="px-4 py-2 bg-mare text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-mare-600 transition-colors">Crea</button>
             </div>
           </form>
         )}
@@ -214,15 +214,15 @@ export default function AdminMarketOperatorsPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <h2 className="font-alt text-base text-ink">{o.name}</h2>
-                    <span className="text-[10px] font-alt uppercase tracking-wider px-2 py-0.5 bg-pesto/15 text-pesto-700 rounded-full">{o.category}</span>
+                    <span className="text-[10px] font-alt uppercase tracking-wider px-2 py-0.5 bg-mare/15 text-mare-700 rounded-full">{o.category}</span>
                     {o.stall_number && <span className="text-xs text-ink-muted">• {o.stall_number}</span>}
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Link href={`/${slug}/admin/operators/${o.id}`} className="p-2 text-ink-muted hover:text-pesto-600 transition-colors" title="Modifica">
+                  <Link href={`/${slug}/admin/operators/${o.id}`} className="p-2 text-ink-muted hover:text-mare-600 transition-colors" title="Modifica">
                     <Pencil className="w-5 h-5" />
                   </Link>
-                  <button onClick={() => handleDelete(o.id)} className="p-2 text-ink-muted hover:text-coral-600 transition-colors" title="Elimina">
+                  <button onClick={() => handleDelete(o.id)} className="p-2 text-ink-muted hover:text-fiore-600 transition-colors" title="Elimina">
                     <Trash2 className="w-5 h-5" />
                   </button>
                 </div>

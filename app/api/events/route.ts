@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { resolveMarketFromRequest } from '@/lib/markets/resolve'
+import { requireAdmin } from '@/lib/auth/guard'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,12 +31,14 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = createClient()
   const body = await request.json()
   const { market_id, title, start_at } = body
   if (!market_id || !title || !start_at) {
     return NextResponse.json({ error: 'market_id, title, start_at obbligatori' }, { status: 400 })
   }
+  const guard = await requireAdmin({ marketId: market_id })
+  if (!guard.ok) return guard.res
+  const supabase = guard.supabase
   const insert = {
     market_id,
     title,

@@ -1,3 +1,9 @@
+> ⚠️ **ARCHIVIO STORICO — direzione MAI implementata.** Questo documento descrive
+> la proposta "Slow Compass / magazine editoriale" (Fraunces+Inter, cream/olive,
+> route /agenda /banchi /colophon) generata dal workflow del 2026-05-14 e poi
+> **scartata**. Il sito reale è un'altra cosa: vedi `../brand-system.md` e
+> `../brand-voice.md`. Non usare questi file come riferimento di implementazione.
+
 # UX Rethink — IMercati
 
 > Documento generato il **2026-05-14** da workflow multi-agente (28 agenti, 1.2M token, 18 min). > 4 lenti di design valutate, ciascuna verificata adversarialmente su admin/semplicita/brand, poi sintetizzate in una direzione unica.

@@ -15,6 +15,9 @@ function todayString(): string {
 
 function visitorHash(ip: string, ua: string): string {
   const salt = process.env.IP_SALT ?? 'imercati-default-salt'
+  if (!process.env.IP_SALT && process.env.NODE_ENV === 'production') {
+    console.error('[analytics] IP_SALT mancante in produzione: impostala nelle env del deploy')
+  }
   // Rotazione giornaliera: lo stesso utente domani ha un hash diverso.
   // Cosi non possiamo costruire profili cross-day, ma possiamo dedup nello stesso giorno.
   return crypto

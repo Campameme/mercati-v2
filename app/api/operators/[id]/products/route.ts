@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { requireOperatorAccess } from '@/lib/auth/guard'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,7 +17,10 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 }
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createClient()
+  // Ammessi: proprietario della scheda operatore o admin del suo mercato.
+  const guard = await requireOperatorAccess(params.id)
+  if (!guard.ok) return guard.res
+  const supabase = guard.supabase
   const body = await request.json()
   const { name } = body
   if (!name) return NextResponse.json({ error: 'name obbligatorio' }, { status: 400 })

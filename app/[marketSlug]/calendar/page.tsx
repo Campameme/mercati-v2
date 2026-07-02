@@ -16,17 +16,8 @@ import {
   type ScheduleCategory,
 } from '@/lib/schedules/classify'
 import { SunRay } from '@/components/decorations'
-
-const EVT_LABEL: Record<string, string> = {
-  market: 'Mercato', fair: 'Fiera', food: 'Gastronomia', music: 'Musica',
-  art: 'Arte', sport: 'Sport', other: 'Altro',
-}
-const EVT_COLOR: Record<string, string> = {
-  market: '#EC6A5E', fair: '#8B5CF6', food: '#15607C', music: '#2E84A3',
-  art: '#EC4899', sport: '#0E3040', other: '#4A4F3B',
-}
-const ALL_EVT_CATS = Object.keys(EVT_LABEL)
-const ALL_SCH_CATS: ScheduleCategory[] = ['alimentare', 'antiquariato', 'artigianato', 'varie']
+import { EVT_LABEL, EVT_COLOR, ALL_EVT_CATS } from '@/lib/events/labels'
+const ALL_SCH_CATS: ScheduleCategory[] = ['generale', 'alimentare', 'antiquariato', 'artigianato']
 
 interface Occurrence {
   schedule_id: string

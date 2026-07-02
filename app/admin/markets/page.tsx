@@ -64,12 +64,12 @@ export default function AdminMarketsPage() {
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <p className="text-xs font-alt uppercase tracking-[0.18em] text-pesto-600 mb-1">Super-admin</p>
+            <p className="text-xs font-alt uppercase tracking-[0.18em] text-mare-600 mb-1">Super-admin</p>
             <h1 className="font-display text-3xl text-ink">Mercati</h1>
           </div>
           <button
             onClick={() => setShowForm((s) => !s)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 bg-mare text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-mare-600 transition-colors"
           >
             <Plus className="w-4 h-4" /> <span>Nuovo mercato</span>
           </button>
@@ -94,18 +94,18 @@ export default function AdminMarketsPage() {
               <Field label="Zoom parcheggi" value={form.default_zoom} onChange={(v) => setForm({ ...form, default_zoom: v })} placeholder="15" />
               <Field label="Zoom operatori" value={form.default_zoom_operators} onChange={(v) => setForm({ ...form, default_zoom_operators: v })} placeholder="17" />
               <label className="flex items-center gap-2 mt-6">
-                <input type="checkbox" checked={form.is_active} onChange={(e) => setForm({ ...form, is_active: e.target.checked })} className="accent-pesto w-4 h-4" />
+                <input type="checkbox" checked={form.is_active} onChange={(e) => setForm({ ...form, is_active: e.target.checked })} className="accent-mare w-4 h-4" />
                 <span className="text-sm text-ink">Attivo</span>
               </label>
             </div>
             <label className="block">
               <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Descrizione</span>
-              <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors" rows={2} />
+              <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" rows={2} />
             </label>
-            {error && <p className="text-sm text-coral-600">{error}</p>}
+            {error && <p className="text-sm text-fiore-600">{error}</p>}
             <div className="flex justify-end gap-2">
               <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 bg-paper border-2 border-ink/15 text-ink-soft rounded-full hover:border-ink/30 transition-colors">Annulla</button>
-              <button type="submit" className="px-4 py-2 bg-pesto text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-pesto-600 transition-colors">Crea</button>
+              <button type="submit" className="px-4 py-2 bg-mare text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-mare-600 transition-colors">Crea</button>
             </div>
           </form>
         )}
@@ -127,10 +127,10 @@ export default function AdminMarketsPage() {
                   <p className="text-sm text-ink-soft">{m.city} • /{m.slug}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Link href={`/${m.slug}`} className="p-2 text-ink-muted hover:text-pesto-600 transition-colors" title="Visita">
+                  <Link href={`/${m.slug}`} className="p-2 text-ink-muted hover:text-mare-600 transition-colors" title="Visita">
                     <Globe className="w-5 h-5" />
                   </Link>
-                  <Link href={`/admin/markets/${m.id}`} className="p-2 text-ink-muted hover:text-pesto-600 transition-colors" title="Modifica">
+                  <Link href={`/admin/markets/${m.id}`} className="p-2 text-ink-muted hover:text-mare-600 transition-colors" title="Modifica">
                     <Pencil className="w-5 h-5" />
                   </Link>
                 </div>
@@ -155,7 +155,7 @@ function Field({ label, value, onChange, placeholder, required }: {
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         required={required}
-        className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-pesto transition-colors"
+        className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors"
       />
     </label>
   )
