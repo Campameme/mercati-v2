@@ -26,7 +26,7 @@ const figtree = Figtree({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — i mercati della Riviera dei Fiori`,
+    default: `${SITE_NAME} — Riviera dei Fiori, provincia di Imperia`,
     template: `%s — ${SITE_NAME}`,
   },
   description: 'Il mercato che profuma di mare. Tutti i mercati settimanali della Riviera di Ponente — la Riviera dei Fiori, provincia di Imperia: dove e quando, cosa trovi, gli ambulanti e come arrivarci.',

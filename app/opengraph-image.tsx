@@ -48,7 +48,8 @@ export default function OpengraphImage() {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', color: '#F7EFDD', fontSize: 110, lineHeight: 1.05 }}>
+          {/* corpo ridotto: il nome lungo va su due righe dentro i 1032px utili */}
+          <div style={{ display: 'flex', color: '#F7EFDD', fontSize: 88, lineHeight: 1.05, maxWidth: 1032 }}>
             {SITE_NAME}
           </div>
           <div style={{ display: 'flex', color: '#DCEBEC', fontSize: 38, marginTop: 18 }}>
