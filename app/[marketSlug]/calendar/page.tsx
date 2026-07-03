@@ -182,7 +182,7 @@ export default function ZoneCalendarPage() {
 
         <aside className="space-y-4 text-sm">
           <div className="bg-white border-2 border-ink/10 rounded-xl p-4">
-            <h2 className="font-display text-ink text-base mb-3">Cosa mostrare</h2>
+            <h2 className="font-alt font-bold text-ink text-base mb-3">Cosa mostrare</h2>
             <label className="flex items-center gap-2.5 mb-2 cursor-pointer">
               <input type="checkbox" checked={showMarkets} onChange={(e) => setShowMarkets(e.target.checked)} />
               <span className="text-ink">Mercati ricorrenti</span>
@@ -195,7 +195,7 @@ export default function ZoneCalendarPage() {
 
           {showMarkets && (
             <div className="bg-white border-2 border-ink/10 rounded-xl p-4">
-              <h2 className="font-display text-ink text-base mb-3">Tipologia mercato</h2>
+              <h2 className="font-alt font-bold text-ink text-base mb-3">Tipologia mercato</h2>
               <div className="space-y-1.5">
                 {ALL_SCH_CATS.map((c) => {
                   const active = selectedSchCats.has(c)
@@ -219,7 +219,7 @@ export default function ZoneCalendarPage() {
 
           {showEvents && (
             <div className="bg-white border-2 border-ink/10 rounded-xl p-4">
-              <h2 className="font-display text-ink text-base mb-3">Categorie eventi</h2>
+              <h2 className="font-alt font-bold text-ink text-base mb-3">Categorie eventi</h2>
               <div className="flex flex-wrap gap-1.5">
                 {ALL_EVT_CATS.map((c) => {
                   const active = selectedEvtCats.has(c)
@@ -241,7 +241,7 @@ export default function ZoneCalendarPage() {
           )}
 
           <div className="bg-white border-2 border-ink/10 rounded-xl p-4">
-            <h2 className="font-display text-ink text-base mb-3">Prossimi</h2>
+            <h2 className="font-alt font-bold text-ink text-base mb-3">Prossimi</h2>
             {upcoming.length === 0 ? (
               <p className="text-xs text-ink-muted">Nessun appuntamento coi filtri correnti.</p>
             ) : (
@@ -280,7 +280,7 @@ export default function ZoneCalendarPage() {
                     <span className="text-ink-muted flex items-center"><Repeat className="w-3 h-3 mr-1" />ricorrente</span>
                   )}
                 </div>
-                <h3 className="font-display text-xl text-ink mb-1">{selected.e.title}</h3>
+                <h3 className="font-alt font-bold text-xl text-ink mb-1">{selected.e.title}</h3>
                 <p className="text-sm text-ink-soft mb-3">
                   {new Date(selected.e.start_at).toLocaleString('it-IT')}
                   {selected.e.end_at ? ` → ${new Date(selected.e.end_at).toLocaleString('it-IT')}` : ''}
@@ -297,7 +297,7 @@ export default function ZoneCalendarPage() {
                     {SCH_LABEL[selected.o.category]}
                   </span>
                 </div>
-                <h3 className="font-display text-xl text-ink mb-1">{selected.o.comune}</h3>
+                <h3 className="font-alt font-bold text-xl text-ink mb-1">{selected.o.comune}</h3>
                 <p className="text-sm text-ink-soft mb-1">
                   {selected.o.giorno}
                   {selected.o.orario ? ` · ${selected.o.orario}` : ''}

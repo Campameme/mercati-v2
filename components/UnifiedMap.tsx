@@ -258,7 +258,7 @@ export default function UnifiedMap({
 
   const wrapperClass = bare
     ? 'h-full w-full overflow-hidden imk-map'
-    : 'rounded-sm overflow-hidden border border-cream-300 bg-cream-50'
+    : 'rounded-sm overflow-hidden border border-ink/15 bg-white'
 
   return (
     <div className={wrapperClass} style={{ height }}>

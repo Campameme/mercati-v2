@@ -124,7 +124,7 @@ export default function AdminSessionsPage() {
   }, [filteredSessions])
 
   return (
-    <div className="min-h-screen bg-paper">
+    <div className="min-h-screen bg-carta">
       <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl">
         <Link
           href="/admin"
@@ -135,9 +135,9 @@ export default function AdminSessionsPage() {
         <div className="mb-8 border-b-2 border-ink/10 pb-5">
           <div className="flex items-center gap-2 mb-1">
             <Power className="w-5 h-5 text-mare" />
-            <p className="text-xs font-alt uppercase tracking-[0.18em] text-mare-600">Super-admin</p>
+            <p className="text-xs font-alt uppercase tracking-[0.14em] text-mare-600">Super-admin</p>
           </div>
-          <h1 className="font-display text-3xl md:text-4xl text-ink leading-tight">Accendi / Spegni mercati</h1>
+          <h1 className="font-alt font-bold text-3xl md:text-4xl text-ink leading-tight">Accendi / Spegni mercati</h1>
           <p className="text-sm text-ink-soft mt-2 max-w-2xl">
             Toggle rapido per le zone e le singole sessioni di mercato.
             I mercati spenti non appaiono in calendario, mappa pubblica e ricerca.
@@ -168,18 +168,18 @@ export default function AdminSessionsPage() {
                       className={`w-full text-left px-3 py-2.5 rounded-xl border-2 transition-all ${
                         m.is_active
                           ? 'bg-white border-mare/40 hover:border-mare'
-                          : 'bg-paper border-ink/10 opacity-60 hover:opacity-100'
+                          : 'bg-carta border-ink/10 opacity-60 hover:opacity-100'
                       } disabled:opacity-40`}
                     >
                       <div className="flex items-center justify-between gap-2">
                         <span className="font-alt text-sm text-ink truncate">{m.name}</span>
-                        <span className={`text-[10px] font-alt uppercase tracking-wider px-1.5 py-0.5 rounded-full flex-shrink-0 ${
+                        <span className={`text-[11px] font-alt uppercase tracking-wider px-1.5 py-0.5 rounded-full flex-shrink-0 ${
                           m.is_active ? 'bg-mare text-white' : 'bg-ink/10 text-ink-muted'
                         }`}>
                           {m.is_active ? 'ON' : 'OFF'}
                         </span>
                       </div>
-                      <p className="text-[10px] text-ink-muted mt-0.5 tabular-nums">
+                      <p className="text-[11px] text-ink-muted mt-0.5 tabular-nums">
                         {activeSessionsCount}/{sessionsCount} sessioni attive
                       </p>
                     </button>
@@ -232,7 +232,7 @@ export default function AdminSessionsPage() {
                 const m = markets.find((x) => x.id === marketId)
                 return (
                   <div key={marketId}>
-                    <p className="text-[10px] font-alt uppercase tracking-wider text-ink-muted mb-2">{m?.name ?? '—'}</p>
+                    <p className="text-[11px] font-alt uppercase tracking-wider text-ink-muted mb-2">{m?.name ?? '—'}</p>
                     <ul className="bg-white border-2 border-ink/10 rounded-xl divide-y divide-ink/10">
                       {list.map((s) => {
                         const active = s.isActive ?? true
@@ -262,7 +262,7 @@ export default function AdminSessionsPage() {
                                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-alt uppercase tracking-wider transition-colors ${
                                   active
                                     ? 'bg-mare text-white hover:bg-mare-600'
-                                    : 'bg-paper border-2 border-ink/15 text-ink-muted hover:border-ink/30'
+                                    : 'bg-carta border-2 border-ink/15 text-ink-muted hover:border-ink/30'
                                 } disabled:opacity-40`}
                               >
                                 <Power className="w-3 h-3" />

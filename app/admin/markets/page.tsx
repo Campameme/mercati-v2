@@ -60,12 +60,12 @@ export default function AdminMarketsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-paper">
+    <div className="min-h-screen bg-carta">
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <p className="text-xs font-alt uppercase tracking-[0.18em] text-mare-600 mb-1">Super-admin</p>
-            <h1 className="font-display text-3xl text-ink">Mercati</h1>
+            <p className="text-xs font-alt uppercase tracking-[0.14em] text-mare-600 mb-1">Super-admin</p>
+            <h1 className="font-alt font-bold text-3xl text-ink">Mercati</h1>
           </div>
           <button
             onClick={() => setShowForm((s) => !s)}
@@ -100,11 +100,11 @@ export default function AdminMarketsPage() {
             </div>
             <label className="block">
               <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Descrizione</span>
-              <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" rows={2} />
+              <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full mt-1 px-3 py-2 bg-carta border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" rows={2} />
             </label>
             {error && <p className="text-sm text-fiore-600">{error}</p>}
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 bg-paper border-2 border-ink/15 text-ink-soft rounded-full hover:border-ink/30 transition-colors">Annulla</button>
+              <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 bg-carta border-2 border-ink/15 text-ink-soft rounded-full hover:border-ink/30 transition-colors">Annulla</button>
               <button type="submit" className="px-4 py-2 bg-mare text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-mare-600 transition-colors">Crea</button>
             </div>
           </form>
@@ -122,7 +122,7 @@ export default function AdminMarketsPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <h2 className="font-alt text-base text-ink">{m.name}</h2>
-                    {!m.is_active && <span className="text-[10px] font-alt uppercase tracking-wider px-2 py-0.5 bg-paper border-2 border-ink/15 text-ink-muted rounded-full">inattivo</span>}
+                    {!m.is_active && <span className="text-[11px] font-alt uppercase tracking-wider px-2 py-0.5 bg-carta border-2 border-ink/15 text-ink-muted rounded-full">inattivo</span>}
                   </div>
                   <p className="text-sm text-ink-soft">{m.city} • /{m.slug}</p>
                 </div>
@@ -155,7 +155,7 @@ function Field({ label, value, onChange, placeholder, required }: {
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         required={required}
-        className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors"
+        className="w-full mt-1 px-3 py-2 bg-carta border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors"
       />
     </label>
   )

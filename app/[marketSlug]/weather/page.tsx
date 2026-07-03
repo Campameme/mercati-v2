@@ -162,7 +162,7 @@ export default function WeatherPage() {
                 >
                   <AlertTriangle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${alert.severity === 'severe' ? 'text-fiore-600' : 'text-mare'}`} />
                   <div>
-                    <h3 className="font-display text-ink mb-0.5">
+                    <h3 className="font-alt font-bold text-ink mb-0.5">
                       Allerta {alert.type === 'wind' ? 'Vento' : alert.type === 'rain' ? 'Pioggia' : 'Temporale'}
                     </h3>
                     <p className="text-sm text-ink-soft">{alert.message}</p>
@@ -176,7 +176,7 @@ export default function WeatherPage() {
             <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-2">Adesso</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
               <div>
-                <div className="font-display text-5xl text-ink tabular-nums">{weather.current.temperature}°</div>
+                <div className="font-alt font-extrabold text-5xl text-ink tabular-nums">{weather.current.temperature}°</div>
                 <div className="text-sm text-ink-soft mt-1">{weather.current.condition}</div>
               </div>
               <div className="flex flex-wrap gap-4 text-sm text-ink-soft">
@@ -193,8 +193,8 @@ export default function WeatherPage() {
                 {weather.hourly.slice(0, 12).map((h, i) => (
                   <div key={i} className="flex-shrink-0 text-center">
                     <div className="text-xs text-ink-muted mb-1">{format(h.time, 'HH:mm')}</div>
-                    <div className="font-display text-xl text-ink tabular-nums">{Math.round(h.temperature)}°</div>
-                    {h.precipitation > 0 && <div className="text-[10px] text-mare-600 mt-0.5">{h.precipitation.toFixed(1)}mm</div>}
+                    <div className="font-alt font-bold text-xl text-ink tabular-nums">{Math.round(h.temperature)}°</div>
+                    {h.precipitation > 0 && <div className="text-[11px] text-mare-600 mt-0.5">{h.precipitation.toFixed(1)}mm</div>}
                   </div>
                 ))}
               </div>

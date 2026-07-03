@@ -40,7 +40,7 @@ export default function OperatorFilters({
             placeholder="Cerca per nome operatore o prodotto..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-ink/15 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 border border-ink/15 rounded-md focus:ring-2 focus:ring-mare focus:border-transparent"
           />
         </div>
       </div>
@@ -57,7 +57,7 @@ export default function OperatorFilters({
               onClick={() => onCategoryChange(cat.value)}
               className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
                 selectedCategory === cat.value
-                  ? 'bg-primary-600 text-white shadow-md'
+                  ? 'bg-mare-600 text-white shadow-md'
                   : 'bg-marel/40 text-ink-soft hover:bg-ink/10'
               }`}
             >

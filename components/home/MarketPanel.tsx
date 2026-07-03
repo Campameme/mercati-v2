@@ -101,7 +101,7 @@ export default function MarketPanel({ pin, session, status, lang, dict, onClose 
       ref={ref}
       role="dialog"
       aria-label={pin.comune}
-      className="absolute z-[1100] bg-paper bg-paper-grain text-ink flex flex-col shadow-2xl
+      className="absolute z-[1100] bg-carta bg-paper-grain text-ink flex flex-col shadow-2xl
                  left-0 right-0 bottom-0 max-h-[80%] rounded-t-3xl border-t-[3px] border-ink
                  md:left-auto md:top-0 md:right-0 md:bottom-0 md:h-full md:max-h-none md:w-[378px] md:rounded-none md:border-t-0 md:border-l-[3px]"
     >
@@ -111,7 +111,7 @@ export default function MarketPanel({ pin, session, status, lang, dict, onClose 
         <button
           onClick={onClose}
           aria-label="Chiudi"
-          className="absolute right-4 top-4 grid place-items-center w-9 h-9 rounded-full bg-ink text-paper hover:bg-mare transition-colors"
+          className="absolute right-4 top-4 grid place-items-center w-9 h-9 rounded-full bg-ink text-carta hover:bg-mare transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
@@ -124,8 +124,8 @@ export default function MarketPanel({ pin, session, status, lang, dict, onClose 
             {categoryLabelI18n(category, lang)}
           </span>
         </div>
-        <p className="font-alt text-[11px] uppercase tracking-[0.2em] text-ink-muted mt-2">{pin.marketName}</p>
-        <h2 className="font-display text-2xl leading-none mt-1 pr-10"><span className="imk-mark text-ink">{pin.comune}</span></h2>
+        <p className="font-alt text-[11px] uppercase tracking-[0.14em] text-ink-muted mt-2">{pin.marketName}</p>
+        <h2 className="font-alt font-bold text-2xl leading-none mt-1 pr-10"><span className="imk-mark text-ink">{pin.comune}</span></h2>
         {pin.luogo && (
           <p className="mt-1.5 flex items-start gap-1.5 text-sm text-ink-soft">
             <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0 text-ink-muted" aria-hidden="true" />
@@ -272,7 +272,7 @@ export default function MarketPanel({ pin, session, status, lang, dict, onClose 
       <div className="grid grid-cols-2 border-t-2 border-ink/10">
         <Link
           href={fullHref}
-          className="flex items-center justify-center gap-2 bg-paper text-ink font-alt font-semibold py-4 hover:bg-marel transition-colors border-r-2 border-ink/10"
+          className="flex items-center justify-center gap-2 bg-carta text-ink font-alt font-semibold py-4 hover:bg-marel transition-colors border-r-2 border-ink/10"
         >
           {dict.fullCard}
           <ArrowRight className="w-4 h-4" />

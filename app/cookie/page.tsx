@@ -40,7 +40,7 @@ export default function CookiePage() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl text-ink mb-3">Cookie tecnici (strettamente necessari)</h2>
+          <h2 className="font-alt font-bold text-2xl text-ink mb-3">Cookie tecnici (strettamente necessari)</h2>
           <p className="mb-4">Sono gli unici cookie che Mercati della Riviera di Ponente impone, solo quando servono davvero:</p>
 
           <div className="border-2 border-ink/10 rounded-xl overflow-hidden bg-white">
@@ -69,7 +69,7 @@ export default function CookiePage() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl text-ink mb-3">Storage del browser (localStorage)</h2>
+          <h2 className="font-alt font-bold text-2xl text-ink mb-3">Storage del browser (localStorage)</h2>
           <p className="mb-3">Per ricordare le tue preferenze sul tuo dispositivo, usiamo localStorage:</p>
           <div className="border-2 border-ink/10 rounded-xl overflow-hidden bg-white">
             <table className="w-full text-sm">
@@ -96,7 +96,7 @@ export default function CookiePage() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl text-ink mb-3">Come disabilitarli</h2>
+          <h2 className="font-alt font-bold text-2xl text-ink mb-3">Come disabilitarli</h2>
           <p>
             Puoi sempre bloccare o cancellare cookie e localStorage dalle impostazioni del tuo browser.
             Se blocchi i cookie di Supabase, potresti non riuscire ad accedere all&apos;area admin —
@@ -105,7 +105,7 @@ export default function CookiePage() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl text-ink mb-3">Domande?</h2>
+          <h2 className="font-alt font-bold text-2xl text-ink mb-3">Domande?</h2>
           <p>
             Scrivi a <a href="mailto:emanueleecampanini@gmail.com" className="text-mare-700 underline underline-offset-2 hover:text-mare-600">emanueleecampanini@gmail.com</a>.
             Per il quadro completo, vedi la <Link href="/privacy" className="text-mare-700 underline underline-offset-2 hover:text-mare-600">Privacy Policy</Link>.

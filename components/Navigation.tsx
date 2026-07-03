@@ -48,7 +48,7 @@ export default function Navigation() {
   return (
     <>
       <nav
-        className={`bg-paper/90 backdrop-blur-sm border-b-2 border-ink/10 z-50 ${
+        className={`bg-carta/90 backdrop-blur-sm border-b-2 border-ink/10 z-50 ${
           isHome
             ? `fixed inset-x-0 top-0 transition-transform duration-300 ${pastHero ? 'translate-y-0 visible' : '-translate-y-full pointer-events-none invisible'}`
             : 'sticky top-0'
@@ -76,7 +76,7 @@ export default function Navigation() {
               {!role && (
                 <Link
                   href="/login"
-                  className="flex items-center gap-1.5 px-4 py-2 bg-ink text-paper rounded-full font-alt text-sm font-semibold hover:bg-mare transition-colors"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-ink text-carta rounded-full font-alt text-sm font-semibold hover:bg-mare transition-colors"
                 >
                   <LogIn className="w-4 h-4" />
                   <span className="hidden sm:inline">Accedi</span>

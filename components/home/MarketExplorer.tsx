@@ -72,12 +72,12 @@ function FilterDropdown({
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         className={`inline-flex items-center gap-1.5 font-alt text-xs font-semibold px-3 py-1.5 rounded-full border-2 transition-colors ${
-          active ? 'bg-ink text-paper border-ink' : 'bg-white text-ink border-ink/15 hover:border-ink'
+          active ? 'bg-ink text-carta border-ink' : 'bg-white text-ink border-ink/15 hover:border-ink'
         }`}
       >
         {label}
         {active && (
-          <span className="grid place-items-center min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-sole text-ink text-[10px] leading-none">
+          <span className="grid place-items-center min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-sole text-ink text-[11px] leading-none">
             {count}
           </span>
         )}
@@ -105,7 +105,7 @@ function CheckRow({
       className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-marel/50 text-left transition-colors"
     >
       <span className={`grid place-items-center w-4 h-4 rounded border-2 flex-shrink-0 ${checked ? 'bg-ink border-ink' : 'border-ink/25'}`}>
-        {checked && <Check className="w-3 h-3 text-paper" aria-hidden="true" />}
+        {checked && <Check className="w-3 h-3 text-carta" aria-hidden="true" />}
       </span>
       {color && <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: color }} aria-hidden="true" />}
       <span className="font-alt text-sm text-ink">{label}</span>
@@ -290,7 +290,7 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
   return (
     <div className="flex flex-col md:h-[calc(100svh-4rem)]">
       {/* ===== Barra controlli (sopra la mappa, mai sovrapposta) ===== */}
-      <div className="sticky top-16 z-30 bg-paper/95 backdrop-blur-sm border-b-2 border-ink/10 flex-shrink-0">
+      <div className="sticky top-16 z-30 bg-carta/95 backdrop-blur-sm border-b-2 border-ink/10 flex-shrink-0">
         <div className="container mx-auto px-4 md:px-6 pt-3 pb-2 space-y-2.5">
           {/* riga 1: ricerca + posizione + lingua */}
           <div className="flex items-center gap-2.5">
@@ -360,7 +360,7 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
                   key={l}
                   onClick={() => setLang(l)}
                   aria-pressed={lang === l}
-                  className={`text-xs font-bold uppercase px-2 py-1 rounded-md border-2 transition-colors ${lang === l ? 'bg-ink text-paper border-ink' : 'text-ink border-ink/15 hover:border-ink'}`}
+                  className={`text-xs font-bold uppercase px-2 py-1 rounded-md border-2 transition-colors ${lang === l ? 'bg-ink text-carta border-ink' : 'text-ink border-ink/15 hover:border-ink'}`}
                 >
                   {l}
                 </button>
@@ -444,17 +444,17 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
       {/* ===== Lista + Mappa (riempiono l'altezza rimanente, scroll interni) ===== */}
       <div className="flex-1 flex flex-col md:flex-row md:min-h-0">
         <aside
-          className="order-2 md:order-1 w-full md:w-[340px] md:flex-shrink-0 bg-paper/85 border-t-2 md:border-t-0 md:border-r-2 border-ink/10 h-[42svh] md:h-auto md:min-h-0 overflow-y-auto imk-scroll"
+          className="order-2 md:order-1 w-full md:w-[340px] md:flex-shrink-0 bg-carta/85 border-t-2 md:border-t-0 md:border-r-2 border-ink/10 h-[42svh] md:h-auto md:min-h-0 overflow-y-auto imk-scroll"
           data-lenis-prevent
         >
-          <div className="sticky top-0 bg-paper/95 backdrop-blur-sm px-4 py-2.5 border-b border-ink/10 flex items-center justify-between gap-2 z-10">
+          <div className="sticky top-0 bg-carta/95 backdrop-blur-sm px-4 py-2.5 border-b border-ink/10 flex items-center justify-between gap-2 z-10">
             <span className="font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted">
               <span className="imk-mark text-ink">{sortedPins.length}</span> {dict.list}
             </span>
             <button
               onClick={() => setSort('az')}
               aria-pressed={sort === 'az'}
-              className={`text-xs font-semibold px-2 py-1 rounded-md ${sort === 'az' ? 'bg-ink text-paper' : 'text-ink-soft hover:bg-ink/5'}`}
+              className={`text-xs font-semibold px-2 py-1 rounded-md ${sort === 'az' ? 'bg-ink text-carta' : 'text-ink-soft hover:bg-ink/5'}`}
             >
               {dict.sortAZ}
             </button>
@@ -477,7 +477,7 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
                     >
                       <span className="mt-1 w-3 h-3 rounded-full flex-shrink-0" style={{ background: CATEGORY_COLOR[cat] }} aria-hidden="true" />
                       <span className="min-w-0 flex-1">
-                        <span className="font-display text-[15px] text-ink leading-tight block truncate">{p.comune}</span>
+                        <span className="font-alt font-semibold text-[15px] text-ink leading-tight block truncate">{p.comune}</span>
                         {p.luogo && <span className="block text-xs text-ink-muted truncate">{p.luogo}</span>}
                         <span className="mt-1 flex items-center gap-2 flex-wrap">
                           {st && st.state === 'open' && (
@@ -525,7 +525,7 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
 
           {!selected && (
             <div className="absolute left-1/2 bottom-3 -translate-x-1/2 z-[900] pointer-events-none">
-              <span className="font-alt font-semibold text-sm text-paper bg-notte/55 backdrop-blur-sm px-4 py-2 rounded-full">{dict.hint}</span>
+              <span className="font-alt font-semibold text-sm text-carta bg-notte/55 backdrop-blur-sm px-4 py-2 rounded-full">{dict.hint}</span>
             </div>
           )}
 

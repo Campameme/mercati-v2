@@ -89,7 +89,7 @@ export default async function ComunePage({
     <div>
       <PageviewTracker type="view_comune" marketId={market.id} comune={comune} />
       {/* HERO compatto: foto sx, titolo dx. Mappa è sotto in ComuneSessionsExplorer */}
-      <section className="relative overflow-hidden bg-paper bg-paper-grain border-b-2 border-ink/10">
+      <section className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
         <DriftBackdrop tone="light" variant="section" />
         <div className="container mx-auto px-4 md:px-6 py-8 md:py-10 max-w-6xl relative z-10">
           <div className="grid md:grid-cols-[220px_1fr] gap-6 md:gap-10 items-start">
@@ -131,7 +131,7 @@ export default async function ComunePage({
         <section className="mt-12 pt-10 border-t-2 border-ink/10">
           <Reveal className="mb-6">
             <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-fiore-600 mb-1">Sulla Riviera</p>
-            <h2 className="font-display text-2xl text-ink">Attorno a {comune}</h2>
+            <h2 className="font-alt font-bold text-2xl text-ink">Attorno a {comune}</h2>
           </Reveal>
           <Reveal delayMs={60} className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <Cartolina query={`${comune} Liguria`} fallbackQuery={comune} caption={comune} tilt="l" aspect="aspect-[4/3]" />
@@ -150,8 +150,8 @@ export default async function ComunePage({
               >
                 <ChevronLeft className="w-4 h-4 text-mare group-hover:-translate-x-0.5 transition-transform" />
                 <div className="min-w-0">
-                  <p className="font-alt text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Comune precedente</p>
-                  <p className="font-display text-base text-ink truncate">{prevComune}</p>
+                  <p className="font-alt text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Comune precedente</p>
+                  <p className="font-alt font-bold text-base text-ink truncate">{prevComune}</p>
                 </div>
               </Link>
             ) : <div />}
@@ -161,8 +161,8 @@ export default async function ComunePage({
                 className="imk-water imk-edge imk-lift group flex items-center justify-end gap-3 px-4 py-3 bg-white border-2 border-ink/10 hover:border-mare transition-colors text-right"
               >
                 <div className="min-w-0">
-                  <p className="font-alt text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Comune successivo</p>
-                  <p className="font-display text-base text-ink truncate">{nextComune}</p>
+                  <p className="font-alt text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Comune successivo</p>
+                  <p className="font-alt font-bold text-base text-ink truncate">{nextComune}</p>
                 </div>
                 <ChevronRight className="w-4 h-4 text-mare group-hover:translate-x-0.5 transition-transform" />
               </Link>

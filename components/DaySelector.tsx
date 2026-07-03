@@ -31,7 +31,7 @@ export default function DaySelector({ value, onChange }: Props) {
             onClick={() => toggle(d.n)}
             className={`w-12 py-2 rounded-md text-sm font-medium border transition-colors ${
               active
-                ? 'bg-primary-600 text-white border-primary-600'
+                ? 'bg-mare-600 text-white border-mare-600'
                 : 'bg-white text-ink-soft border-ink/15 hover:bg-marel/40'
             }`}
           >

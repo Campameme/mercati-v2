@@ -1,7 +1,7 @@
 // Skeleton degli ambulanti: intestazione + griglia di card.
 export default function Loading() {
   return (
-    <div className="bg-paper">
+    <div className="bg-carta">
       <div className="container mx-auto px-4 md:px-6 py-10 max-w-6xl space-y-6">
         <div className="space-y-3">
           <div className="imk-skel h-3 w-36" />

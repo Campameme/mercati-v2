@@ -98,11 +98,11 @@ export default function AdminPlaceAreaPage() {
     <div className="container mx-auto px-4 md:px-6 py-10 max-w-5xl">
       <Link
         href={`/${slug}/admin`}
-        className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest-plus text-ink-muted hover:text-ink mb-3 transition-colors"
+        className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.14em] text-ink-muted hover:text-ink mb-3 transition-colors"
       >
         <ArrowLeft className="w-3.5 h-3.5" /> Gestione zona
       </Link>
-      <h1 className="font-serif text-3xl md:text-4xl text-ink mb-2">Area del mercato</h1>
+      <h1 className="font-alt font-bold text-3xl md:text-4xl text-ink mb-2">Area del mercato</h1>
       <p className="text-sm text-ink-soft mb-2">
         {place.comune}{place.luogo ? ` · ${place.luogo}` : ''}
       </p>
@@ -121,7 +121,7 @@ export default function AdminPlaceAreaPage() {
         (giorni) di questo luogo.
       </p>
 
-      <div className="bg-cream-50 border border-cream-300 rounded-sm p-1.5 mb-4">
+      <div className="bg-white border border-ink/15 rounded-sm p-1.5 mb-4">
         <MarketAreaDrawer
           center={center}
           zoom={17}
@@ -136,7 +136,7 @@ export default function AdminPlaceAreaPage() {
           <button
             type="button"
             onClick={handleClear}
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-cream-200 hover:bg-cream-300 text-ink rounded-sm text-sm"
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-carta hover:bg-carta text-ink rounded-sm text-sm"
           >
             <Trash2 className="w-3.5 h-3.5" /> Rimuovi area
           </button>
@@ -144,7 +144,7 @@ export default function AdminPlaceAreaPage() {
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-cream-100 rounded-full text-sm hover:bg-ink/90 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-carta rounded-full text-sm hover:bg-ink/90 disabled:opacity-50"
           >
             <Save className="w-4 h-4" /> {saving ? 'Salvataggio…' : 'Salva area'}
           </button>

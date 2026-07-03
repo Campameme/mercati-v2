@@ -1,7 +1,7 @@
 // Skeleton della mappa: barra di ricerca + filtri + riquadro mappa.
 export default function Loading() {
   return (
-    <div className="bg-paper min-h-[calc(100svh-4rem)]">
+    <div className="bg-carta min-h-[calc(100svh-4rem)]">
       <div className="container mx-auto px-4 md:px-6 pt-3 pb-2 space-y-2.5">
         <div className="flex items-center gap-2.5">
           <div className="imk-skel h-12 flex-1" />

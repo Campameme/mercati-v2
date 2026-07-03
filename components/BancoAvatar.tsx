@@ -23,7 +23,7 @@ export default function BancoAvatar({ name, size = 40, className = '' }: BancoAv
   return (
     <span
       aria-hidden="true"
-      className={`inline-flex flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-mare to-sole text-carta font-display leading-none select-none ${className}`}
+      className={`inline-flex flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-mare to-sole text-carta font-alt font-bold leading-none select-none ${className}`}
       style={{ width: size, height: size, fontSize: Math.round(size * 0.42) }}
     >
       {initialOf(name)}
@@ -41,7 +41,7 @@ export function BancoPlaceholder({ name, className = '' }: { name: string; class
       aria-hidden="true"
       className={`relative flex items-center justify-center bg-gradient-to-br from-mare to-sole ${className}`}
     >
-      <span className="font-display text-5xl text-carta/90 leading-none select-none">
+      <span className="font-alt font-bold text-5xl text-carta/90 leading-none select-none">
         {initialOf(name)}
       </span>
     </div>

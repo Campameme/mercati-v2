@@ -28,7 +28,7 @@ export default function PrivacyPage() {
 
       <div className="max-w-none space-y-8 text-ink-soft leading-relaxed">
         <section>
-          <h2 className="font-display text-2xl text-ink mb-3">Chi siamo</h2>
+          <h2 className="font-alt font-bold text-2xl text-ink mb-3">Chi siamo</h2>
           <p>
             Mercati della Riviera di Ponente è un progetto indipendente che raccoglie e racconta i mercati settimanali
             della provincia di Imperia. Il titolare del trattamento dei dati è <strong>Emanuele Campanini</strong>,
@@ -37,7 +37,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl text-ink mb-3">Cosa raccogliamo</h2>
+          <h2 className="font-alt font-bold text-2xl text-ink mb-3">Cosa raccogliamo</h2>
           <p className="mb-3">Mercati della Riviera di Ponente raccoglie il minimo indispensabile per funzionare. Specificamente:</p>
           <ul className="list-disc pl-6 space-y-2">
             <li><strong>Statistiche di visita anonime</strong>: ogni pagina pubblica registra una view aggregata
@@ -53,7 +53,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl text-ink mb-3">Cookie e tecnologie simili</h2>
+          <h2 className="font-alt font-bold text-2xl text-ink mb-3">Cookie e tecnologie simili</h2>
           <p className="mb-3">
             Mercati della Riviera di Ponente <strong>non usa cookie di tracciamento, profilazione o pubblicità</strong>.
             Le statistiche di visita non sono basate su cookie, quindi non hai bisogno di prestare consenso.
@@ -73,7 +73,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl text-ink mb-3">Per quanto tempo conserviamo i dati</h2>
+          <h2 className="font-alt font-bold text-2xl text-ink mb-3">Per quanto tempo conserviamo i dati</h2>
           <ul className="list-disc pl-6 space-y-2">
             <li><strong>Statistiche di visita</strong>: conservate aggregate per 24 mesi, poi cancellate.</li>
             <li><strong>Adesioni operatori</strong>: conservate finché non revochi la richiesta o per massimo 36 mesi
@@ -83,7 +83,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl text-ink mb-3">Su quali basi giuridiche trattiamo i dati</h2>
+          <h2 className="font-alt font-bold text-2xl text-ink mb-3">Su quali basi giuridiche trattiamo i dati</h2>
           <ul className="list-disc pl-6 space-y-2">
             <li><strong>Statistiche anonime</strong>: legittimo interesse (art. 6.1.f GDPR) — capire cosa funziona
               senza profilare i visitatori. Il trattamento è proporzionato perché non identifichiamo nessuno.</li>
@@ -93,7 +93,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl text-ink mb-3">A chi diamo i dati</h2>
+          <h2 className="font-alt font-bold text-2xl text-ink mb-3">A chi diamo i dati</h2>
           <p className="mb-3">I tuoi dati non vengono venduti, ceduti o usati per pubblicità. Sono accessibili a:</p>
           <ul className="list-disc pl-6 space-y-2">
             <li><strong>Il titolare</strong> (Emanuele Campanini), che gestisce il progetto.</li>
@@ -106,7 +106,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl text-ink mb-3">I tuoi diritti</h2>
+          <h2 className="font-alt font-bold text-2xl text-ink mb-3">I tuoi diritti</h2>
           <p className="mb-3">Hai il diritto di:</p>
           <ul className="list-disc pl-6 space-y-2">
             <li>Sapere quali tuoi dati abbiamo (accesso).</li>
@@ -124,7 +124,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl text-ink mb-3">Modifiche a questa policy</h2>
+          <h2 className="font-alt font-bold text-2xl text-ink mb-3">Modifiche a questa policy</h2>
           <p>
             Se modifichiamo questa policy, lo segnaleremo aggiornando la data in cima. Se i cambiamenti
             sono sostanziali, te lo comunicheremo via email (se abbiamo il tuo indirizzo) o con un

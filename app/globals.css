@@ -45,8 +45,8 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
 }
 .fc .fc-toolbar-title {
-  font-family: var(--font-display), 'Archivo Black', system-ui, sans-serif;
-  font-weight: 400;
+  font-family: var(--font-alt), system-ui, sans-serif;
+  font-weight: 700;
   font-size: 1.25rem;
   letter-spacing: -0.01em;
   color: #1A1714;

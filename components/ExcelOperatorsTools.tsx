@@ -83,18 +83,18 @@ export default function ExcelOperatorsTools({ marketSlug, onImported }: Props) {
   }
 
   return (
-    <div className="bg-cream-50 border border-cream-300 rounded-sm p-4 md:p-5">
-      <p className="text-xs uppercase tracking-widest-plus text-ink-muted mb-3">Excel · import / export</p>
+    <div className="bg-white border border-ink/15 rounded-sm p-4 md:p-5">
+      <p className="text-xs uppercase tracking-[0.14em] text-ink-muted mb-3">Excel · import / export</p>
       <div className="flex flex-wrap gap-2">
         <a
           href={exportUrl}
-          className="inline-flex items-center gap-1.5 px-3 py-2 bg-ink text-cream-100 rounded-full text-xs hover:bg-ink/90"
+          className="inline-flex items-center gap-1.5 px-3 py-2 bg-ink text-carta rounded-full text-xs hover:bg-ink/90"
         >
           <Download className="w-3.5 h-3.5" /> Esporta .xlsx
         </a>
         <a
           href={templateUrl}
-          className="inline-flex items-center gap-1.5 px-3 py-2 bg-cream-200 hover:bg-cream-300 text-ink rounded-full text-xs"
+          className="inline-flex items-center gap-1.5 px-3 py-2 bg-carta hover:bg-carta text-ink rounded-full text-xs"
         >
           <FileDown className="w-3.5 h-3.5" /> Template vuoto
         </a>
@@ -102,7 +102,7 @@ export default function ExcelOperatorsTools({ marketSlug, onImported }: Props) {
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={busy === 'import'}
-          className="inline-flex items-center gap-1.5 px-3 py-2 bg-mare-600 hover:bg-mare-700 text-cream-100 rounded-full text-xs disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 px-3 py-2 bg-mare-600 hover:bg-mare-700 text-carta rounded-full text-xs disabled:opacity-50"
         >
           <Upload className="w-3.5 h-3.5" /> {busy === 'import' && !preview ? 'Analisi…' : 'Importa .xlsx'}
         </button>
@@ -122,7 +122,7 @@ export default function ExcelOperatorsTools({ marketSlug, onImported }: Props) {
       )}
 
       {preview && (
-        <div className="mt-4 border-t border-cream-300 pt-4">
+        <div className="mt-4 border-t border-ink/15 pt-4">
           <p className="text-sm font-medium text-ink mb-2">Anteprima import</p>
           <div className="flex flex-wrap gap-4 text-xs text-ink-soft mb-3">
             <span>Nuovi: <strong className="text-ink tabular-nums">{preview.willCreate}</strong></span>
@@ -154,12 +154,12 @@ export default function ExcelOperatorsTools({ marketSlug, onImported }: Props) {
               </summary>
               <ul className="mt-2 max-h-52 overflow-y-auto text-xs space-y-1">
                 {preview.groups.map((g, i) => (
-                  <li key={i} className="flex justify-between items-center gap-2 py-1 border-b border-cream-300 last:border-0">
+                  <li key={i} className="flex justify-between items-center gap-2 py-1 border-b border-ink/15 last:border-0">
                     <span className="truncate">
                       <strong className="text-ink">{g.name}</strong>
                       <span className="text-ink-muted"> · {g.marketSlug} · {g.presencesCount} presenz{g.presencesCount === 1 ? 'a' : 'e'}</span>
                     </span>
-                    <span className={`px-2 py-0.5 rounded-sm text-[10px] uppercase tracking-wider ${g.action === 'create' ? 'bg-marel text-mare-700' : 'bg-marel text-mare-600'}`}>
+                    <span className={`px-2 py-0.5 rounded-sm text-[11px] uppercase tracking-wider ${g.action === 'create' ? 'bg-marel text-mare-700' : 'bg-marel text-mare-600'}`}>
                       {g.action === 'create' ? 'nuovo' : 'aggiorna'}
                     </span>
                   </li>
@@ -172,7 +172,7 @@ export default function ExcelOperatorsTools({ marketSlug, onImported }: Props) {
             <button
               type="button"
               onClick={cancelPreview}
-              className="px-3 py-1.5 text-xs bg-cream-200 hover:bg-cream-300 text-ink rounded-sm"
+              className="px-3 py-1.5 text-xs bg-carta hover:bg-carta text-ink rounded-sm"
             >
               Annulla
             </button>
@@ -180,7 +180,7 @@ export default function ExcelOperatorsTools({ marketSlug, onImported }: Props) {
               type="button"
               onClick={confirmImport}
               disabled={busy === 'import' || preview.errors.length > 0}
-              className="px-3 py-1.5 text-xs bg-ink text-cream-100 rounded-full hover:bg-ink/90 disabled:opacity-50"
+              className="px-3 py-1.5 text-xs bg-ink text-carta rounded-full hover:bg-ink/90 disabled:opacity-50"
             >
               {busy === 'import' ? 'Importazione…' : 'Conferma import'}
             </button>

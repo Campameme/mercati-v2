@@ -31,7 +31,7 @@ export default function AderisciPage() {
   return (
     <div>
       {/* HERO: sfondo carta con silhouette liguri che derivano */}
-      <section className="relative overflow-hidden bg-paper bg-paper-grain border-b-2 border-ink/10">
+      <section className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
         <DriftBackdrop tone="light" variant="hero" />
         <div className="container mx-auto px-4 md:px-6 max-w-5xl py-10 md:py-16 relative z-10">
           <Link
@@ -75,7 +75,7 @@ export default function AderisciPage() {
       <div className="container mx-auto px-4 md:px-6 max-w-3xl py-10 md:py-16">
         <Reveal delayMs={60}>
           <div className="mb-10">
-            <h2 className="font-display text-2xl md:text-3xl text-ink leading-tight mb-2">
+            <h2 className="font-alt font-bold text-2xl md:text-3xl text-ink leading-tight mb-2">
               Cosa cambia per voi,
               <br />
               <span className="imk-mark text-ink">in concreto.</span>
@@ -85,11 +85,11 @@ export default function AderisciPage() {
               {SCHEDA.map((s, i) => (
                 <li key={s.title}>
                   <WaterCard tilt={i % 2 === 0 ? 'l' : 'r'} className="grid grid-cols-[2.5rem_1fr] gap-4 items-start p-5">
-                    <span className="font-display text-2xl text-mare tabular-nums leading-none pt-1">
+                    <span className="font-alt font-bold text-2xl text-mare tabular-nums leading-none pt-1">
                       {String(i + 1).padStart(2, '0')}
                     </span>
                     <div>
-                      <p className="font-display text-xl text-ink mb-1">{s.title}</p>
+                      <p className="font-alt font-bold text-xl text-ink mb-1">{s.title}</p>
                       <p className="text-ink-soft leading-relaxed">{s.body}</p>
                     </div>
                   </WaterCard>
@@ -101,7 +101,7 @@ export default function AderisciPage() {
 
         <Reveal delayMs={120}>
           <div className="border-t-2 border-ink/10 pt-10">
-            <h2 className="font-display text-2xl text-ink mb-1">Raccontateci di voi</h2>
+            <h2 className="font-alt font-bold text-2xl text-ink mb-1">Raccontateci di voi</h2>
             <p className="text-sm text-ink-muted mb-8">
               Cinque minuti. Risposte brevi vanno benissimo — al resto pensiamo insieme.
             </p>

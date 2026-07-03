@@ -1,7 +1,7 @@
 // Skeleton della pagina mercato: hero foto + mappa + card.
 export default function Loading() {
   return (
-    <div className="bg-paper">
+    <div className="bg-carta">
       <div className="container mx-auto px-4 md:px-6 py-8 max-w-6xl space-y-6">
         <div className="imk-skel h-4 w-40" />
         <div className="grid md:grid-cols-2 gap-6">

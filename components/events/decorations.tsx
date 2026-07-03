@@ -49,7 +49,7 @@ export function Lemon(props: SVGProps<SVGSVGElement>) {
     <svg viewBox="0 0 40 40" fill="none" aria-hidden="true" {...props}>
       <ellipse cx="20" cy="22" rx="13" ry="11" transform="rotate(-28 20 22)" fill="currentColor" />
       <path d="M30 12 q 4 -4 7 -3" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
-      <ellipse cx="20" cy="22" rx="6.5" ry="5" transform="rotate(-28 20 22)" fill="var(--paper, #FBF6EA)" opacity="0.35" />
+      <ellipse cx="20" cy="22" rx="6.5" ry="5" transform="rotate(-28 20 22)" fill="var(--carta, #FBF6EA)" opacity="0.35" />
     </svg>
   )
 }

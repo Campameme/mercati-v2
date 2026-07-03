@@ -218,15 +218,15 @@ export default function AdminSessionPage() {
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-5xl">
-      <div className="mb-8 border-b border-cream-300 pb-6">
+      <div className="mb-8 border-b border-ink/15 pb-6">
         <Link
           href={`/${slug}/admin`}
-          className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest-plus text-ink-muted hover:text-ink mb-3 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.14em] text-ink-muted hover:text-ink mb-3 transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" /> Gestione {marketName}
         </Link>
         <div className="flex items-baseline gap-3 flex-wrap mb-1">
-          <h1 className="font-serif text-3xl md:text-4xl text-ink">{session.comune}</h1>
+          <h1 className="font-alt font-bold text-3xl md:text-4xl text-ink">{session.comune}</h1>
           <span className="text-sm text-ink-muted">· {session.giorno}</span>
           {session.orario && <span className="text-sm text-ink-muted tabular-nums">{session.orario}</span>}
           <span
@@ -256,7 +256,7 @@ export default function AdminSessionPage() {
 
       {/* Info area del luogo (place) */}
       {placeInfo && (
-        <div className="mb-6 bg-cream-50 border border-cream-300 rounded-sm p-4 flex items-start gap-3 flex-wrap">
+        <div className="mb-6 bg-white border border-ink/15 rounded-sm p-4 flex items-start gap-3 flex-wrap">
           <MapIcon className="w-4 h-4 text-mare mt-0.5 flex-shrink-0" />
           <div className="min-w-0 flex-1">
             <p className="text-sm text-ink">
@@ -281,7 +281,7 @@ export default function AdminSessionPage() {
           {session.place_id && (
             <Link
               href={`/${slug}/admin/places/${session.place_id}/area`}
-              className="inline-flex items-center gap-1.5 px-3 py-2 bg-cream-200 hover:bg-cream-300 text-ink rounded-sm text-xs flex-shrink-0"
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-carta hover:bg-carta text-ink rounded-sm text-xs flex-shrink-0"
             >
               <MapIcon className="w-3.5 h-3.5" /> Modifica area del luogo
             </Link>
@@ -293,19 +293,19 @@ export default function AdminSessionPage() {
       <section>
         <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
           <div>
-            <p className="text-xs uppercase tracking-widest-plus text-ink-muted">Banchi di questo mercato</p>
-            <h2 className="font-serif text-2xl text-ink">{operators.length} {operators.length === 1 ? 'banco' : 'banchi'}</h2>
+            <p className="text-xs uppercase tracking-[0.14em] text-ink-muted">Banchi di questo mercato</p>
+            <h2 className="font-alt font-bold text-2xl text-ink">{operators.length} {operators.length === 1 ? 'banco' : 'banchi'}</h2>
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => { setShowLink((s) => !s); setShowCreate(false) }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-cream-200 hover:bg-cream-300 text-ink rounded-full text-sm"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-carta hover:bg-carta text-ink rounded-full text-sm"
             >
               <Link2 className="w-4 h-4" /> Aggiungi esistente
             </button>
             <button
               onClick={() => { setShowCreate((s) => !s); setShowLink(false) }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-cream-100 rounded-full text-sm hover:bg-ink/90"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-carta rounded-full text-sm hover:bg-ink/90"
             >
               <Plus className="w-4 h-4" /> Nuovo banco
             </button>
@@ -313,8 +313,8 @@ export default function AdminSessionPage() {
         </div>
 
         {showLink && (
-          <div className="bg-cream-50 border border-cream-300 rounded-sm p-5 mb-6 space-y-3">
-            <p className="text-xs uppercase tracking-widest-plus text-ink-muted">Cerca un operatore già esistente (anche di altri mercati)</p>
+          <div className="bg-white border border-ink/15 rounded-sm p-5 mb-6 space-y-3">
+            <p className="text-xs uppercase tracking-[0.14em] text-ink-muted">Cerca un operatore già esistente (anche di altri mercati)</p>
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted" />
@@ -323,13 +323,13 @@ export default function AdminSessionPage() {
                   onChange={(e) => setSearchQ(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); searchOperators() } }}
                   placeholder="Cerca per nome, codice, descrizione…"
-                  className="w-full pl-9 pr-3 py-2 border border-cream-300 rounded-sm bg-cream-100 text-sm"
+                  className="w-full pl-9 pr-3 py-2 border border-ink/15 rounded-sm bg-carta text-sm"
                 />
               </div>
               <button
                 type="button"
                 onClick={searchOperators}
-                className="px-4 py-2 bg-ink text-cream-100 rounded-full text-sm hover:bg-ink/90"
+                className="px-4 py-2 bg-ink text-carta rounded-full text-sm hover:bg-ink/90"
               >
                 Cerca
               </button>
@@ -338,13 +338,13 @@ export default function AdminSessionPage() {
               <p className="text-xs text-ink-muted italic">Nessun risultato.</p>
             )}
             {searchResults.length > 0 && (
-              <ul className="border-y border-cream-300 divide-y divide-cream-300 max-h-72 overflow-y-auto">
+              <ul className="border-y border-ink/15 divide-y divide-ink/10 max-h-72 overflow-y-auto">
                 {searchResults.map((op) => (
                   <li key={op.id} className="flex items-center justify-between gap-3 py-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline gap-2 flex-wrap">
-                        <span className="font-serif text-base text-ink">{op.name}</span>
-                        {op.code && <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 bg-cream-200 rounded-sm text-ink-muted">{op.code}</span>}
+                        <span className="font-alt font-bold text-base text-ink">{op.name}</span>
+                        {op.code && <span className="text-[11px] uppercase tracking-wider px-1.5 py-0.5 bg-carta rounded-sm text-ink-muted">{op.code}</span>}
                       </div>
                       <p className="text-xs text-ink-muted">
                         {op.category}
@@ -355,7 +355,7 @@ export default function AdminSessionPage() {
                       type="button"
                       onClick={() => linkExistingOperator(op.id)}
                       disabled={linkBusy}
-                      className="px-3 py-1.5 text-xs bg-mare-600 hover:bg-mare-700 text-cream-100 rounded-full disabled:opacity-50"
+                      className="px-3 py-1.5 text-xs bg-mare-600 hover:bg-mare-700 text-carta rounded-full disabled:opacity-50"
                     >
                       Aggiungi qui
                     </button>
@@ -369,9 +369,9 @@ export default function AdminSessionPage() {
         {showCreate && (
           <form
             onSubmit={handleCreate}
-            className="bg-cream-50 border border-cream-300 rounded-sm p-5 md:p-6 mb-6 space-y-4"
+            className="bg-white border border-ink/15 rounded-sm p-5 md:p-6 mb-6 space-y-4"
           >
-            <p className="text-xs uppercase tracking-widest-plus text-ink-muted">
+            <p className="text-xs uppercase tracking-[0.14em] text-ink-muted">
               Nuovo banco per {session.comune} · {session.giorno}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -381,7 +381,7 @@ export default function AdminSessionPage() {
                   required
                   value={createForm.name}
                   onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-cream-300 rounded-sm bg-cream-100"
+                  className="w-full px-3 py-2 border border-ink/15 rounded-sm bg-carta"
                 />
               </label>
               <label className="block">
@@ -389,7 +389,7 @@ export default function AdminSessionPage() {
                 <select
                   value={createForm.category}
                   onChange={(e) => setCreateForm({ ...createForm, category: e.target.value })}
-                  className="w-full px-3 py-2 border border-cream-300 rounded-sm bg-cream-100"
+                  className="w-full px-3 py-2 border border-ink/15 rounded-sm bg-carta"
                 >
                   {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
@@ -399,12 +399,12 @@ export default function AdminSessionPage() {
                 <input
                   value={createForm.stall_number}
                   onChange={(e) => setCreateForm({ ...createForm, stall_number: e.target.value })}
-                  className="w-full px-3 py-2 border border-cream-300 rounded-sm bg-cream-100"
+                  className="w-full px-3 py-2 border border-ink/15 rounded-sm bg-carta"
                 />
               </label>
             </div>
 
-            <div className="border-t border-cream-300 pt-4">
+            <div className="border-t border-ink/15 pt-4">
               <LocationFields
                 center={sessionCenter}
                 zoom={17}
@@ -419,24 +419,24 @@ export default function AdminSessionPage() {
 
             {error && <p className="text-sm text-fiore-600">{error}</p>}
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 bg-cream-200 hover:bg-cream-300 text-ink rounded-sm text-sm">Annulla</button>
-              <button type="submit" className="px-4 py-2 bg-ink text-cream-100 rounded-full text-sm hover:bg-ink/90">Crea</button>
+              <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 bg-carta hover:bg-carta text-ink rounded-sm text-sm">Annulla</button>
+              <button type="submit" className="px-4 py-2 bg-ink text-carta rounded-full text-sm hover:bg-ink/90">Crea</button>
             </div>
           </form>
         )}
 
         {operators.length === 0 ? (
-          <div className="bg-cream-50 border border-cream-300 rounded-sm p-8 text-center text-ink-muted">
+          <div className="bg-white border border-ink/15 rounded-sm p-8 text-center text-ink-muted">
             Nessun banco registrato per questa sessione.
           </div>
         ) : (
-          <ul className="border-y border-cream-300 divide-y divide-cream-300">
+          <ul className="border-y border-ink/15 divide-y divide-ink/10">
             {operators.map((o) => (
               <li key={o.id} className="flex items-center justify-between gap-4 py-4">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="font-serif text-lg text-ink">{o.name}</h3>
-                    <span className="text-xs px-2 py-0.5 bg-cream-200 text-ink rounded-sm">{o.category}</span>
+                    <h3 className="font-alt font-bold text-lg text-ink">{o.name}</h3>
+                    <span className="text-xs px-2 py-0.5 bg-carta text-ink rounded-sm">{o.category}</span>
                     {o.stall_number && <span className="text-xs text-ink-muted">· Banco {o.stall_number}</span>}
                   </div>
                   {o.location_lat != null && o.location_lng != null && (

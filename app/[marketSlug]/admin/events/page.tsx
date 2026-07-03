@@ -79,12 +79,12 @@ export default function AdminEventsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-paper">
+    <div className="min-h-screen bg-carta">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="flex items-center justify-between mb-6">
           <div>
             <Link href={`/${slug}/admin`} className="text-xs font-alt uppercase tracking-wider text-ink-muted hover:text-ink flex items-center transition-colors"><ArrowLeft className="w-4 h-4 mr-1" /> Gestione mercato</Link>
-            <h1 className="font-display text-3xl text-ink mt-1">Eventi</h1>
+            <h1 className="font-alt font-bold text-3xl text-ink mt-1">Eventi</h1>
           </div>
           <button onClick={openNew} className="flex items-center gap-2 px-4 py-2.5 bg-mare text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-mare-600 transition-colors">
             <Plus className="w-4 h-4" /> <span>Nuovo evento</span>
@@ -100,7 +100,7 @@ export default function AdminEventsPage() {
               <div key={e.id} className="p-4 flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <span className="text-[10px] font-alt uppercase tracking-wider px-2 py-0.5 bg-mare/15 text-mare-700 rounded-full">{CAT_LABEL[e.category] ?? e.category}</span>
+                    <span className="text-[11px] font-alt uppercase tracking-wider px-2 py-0.5 bg-mare/15 text-mare-700 rounded-full">{CAT_LABEL[e.category] ?? e.category}</span>
                     {e.is_recurring && <span className="text-xs text-ink-muted flex items-center"><Repeat className="w-3 h-3 mr-1" />ricorrente</span>}
                   </div>
                   <h3 className="font-alt text-base text-ink">{e.title}</h3>
@@ -120,41 +120,41 @@ export default function AdminEventsPage() {
         )}
 
         {editing && (
-          <div className="fixed inset-0 z-50 bg-night/60 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 bg-notte/60 flex items-center justify-center p-4">
             <div className="bg-white rounded-xl border-2 border-ink/10 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between p-6 border-b-2 border-ink/10">
-                <h2 className="font-display text-xl text-ink">{editing.id ? 'Modifica evento' : 'Nuovo evento'}</h2>
+                <h2 className="font-alt font-bold text-xl text-ink">{editing.id ? 'Modifica evento' : 'Nuovo evento'}</h2>
                 <button onClick={() => setEditing(null)} className="text-ink-muted hover:text-ink transition-colors"><X className="w-5 h-5" /></button>
               </div>
               <div className="p-6 space-y-4">
                 <label className="block">
                   <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Titolo</span>
-                  <input value={editing.title ?? ''} onChange={(ev) => setEditing({ ...editing, title: ev.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
+                  <input value={editing.title ?? ''} onChange={(ev) => setEditing({ ...editing, title: ev.target.value })} className="w-full mt-1 px-3 py-2 bg-carta border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
                 </label>
                 <label className="block">
                   <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Descrizione</span>
-                  <textarea value={editing.description ?? ''} onChange={(ev) => setEditing({ ...editing, description: ev.target.value })} rows={3} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
+                  <textarea value={editing.description ?? ''} onChange={(ev) => setEditing({ ...editing, description: ev.target.value })} rows={3} className="w-full mt-1 px-3 py-2 bg-carta border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <label className="block">
                     <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Categoria</span>
-                    <select value={editing.category ?? 'other'} onChange={(ev) => setEditing({ ...editing, category: ev.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors">
+                    <select value={editing.category ?? 'other'} onChange={(ev) => setEditing({ ...editing, category: ev.target.value })} className="w-full mt-1 px-3 py-2 bg-carta border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors">
                       {CATEGORIES.map((c) => <option key={c} value={c}>{CAT_LABEL[c]}</option>)}
                     </select>
                   </label>
                   <label className="block">
                     <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Luogo</span>
-                    <input value={editing.location ?? ''} onChange={(ev) => setEditing({ ...editing, location: ev.target.value })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
+                    <input value={editing.location ?? ''} onChange={(ev) => setEditing({ ...editing, location: ev.target.value })} className="w-full mt-1 px-3 py-2 bg-carta border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
                   </label>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <label className="block">
                     <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Inizio</span>
-                    <input type="datetime-local" value={toLocalInput(editing.start_at)} onChange={(ev) => setEditing({ ...editing, start_at: fromLocalInput(ev.target.value) ?? new Date().toISOString() })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
+                    <input type="datetime-local" value={toLocalInput(editing.start_at)} onChange={(ev) => setEditing({ ...editing, start_at: fromLocalInput(ev.target.value) ?? new Date().toISOString() })} className="w-full mt-1 px-3 py-2 bg-carta border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
                   </label>
                   <label className="block">
                     <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Fine (opz.)</span>
-                    <input type="datetime-local" value={toLocalInput(editing.end_at)} onChange={(ev) => setEditing({ ...editing, end_at: fromLocalInput(ev.target.value) })} className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
+                    <input type="datetime-local" value={toLocalInput(editing.end_at)} onChange={(ev) => setEditing({ ...editing, end_at: fromLocalInput(ev.target.value) })} className="w-full mt-1 px-3 py-2 bg-carta border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
                   </label>
                 </div>
                 <label className="flex items-center gap-2">
@@ -164,11 +164,11 @@ export default function AdminEventsPage() {
                 {editing.is_recurring && (
                   <label className="block">
                     <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Regola ricorrenza (testo libero)</span>
-                    <input value={editing.recurrence_rule ?? ''} onChange={(ev) => setEditing({ ...editing, recurrence_rule: ev.target.value })} placeholder="es. ogni venerdì 8:00-14:00" className="w-full mt-1 px-3 py-2 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
+                    <input value={editing.recurrence_rule ?? ''} onChange={(ev) => setEditing({ ...editing, recurrence_rule: ev.target.value })} placeholder="es. ogni venerdì 8:00-14:00" className="w-full mt-1 px-3 py-2 bg-carta border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors" />
                   </label>
                 )}
               </div>
-              <div className="flex items-center justify-end gap-2 p-6 border-t-2 border-ink/10 bg-paper rounded-b-xl">
+              <div className="flex items-center justify-end gap-2 p-6 border-t-2 border-ink/10 bg-carta rounded-b-xl">
                 <button onClick={() => setEditing(null)} className="px-4 py-2 bg-white border-2 border-ink/15 hover:border-ink/30 text-ink-soft rounded-full transition-colors">Annulla</button>
                 <button onClick={save} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-mare text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-mare-600 disabled:opacity-50 transition-colors">
                   <Save className="w-4 h-4" /> <span>{saving ? 'Salvo…' : 'Salva'}</span>

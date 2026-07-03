@@ -77,12 +77,12 @@ function LoginPageInner() {
   }
 
   return (
-    <div className="min-h-[80vh] bg-paper flex items-center justify-center px-4 py-12">
+    <div className="min-h-[80vh] bg-carta flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-xl border-2 border-ink/10 shadow-sm p-8">
           <div className="flex items-center justify-center gap-2 text-mare-600 mb-1">
             <Logo inline className="text-sm" />
-            <span className="text-xs font-alt uppercase tracking-[0.18em]">· Riviera</span>
+            <span className="text-xs font-alt uppercase tracking-[0.14em]">· Riviera</span>
           </div>
           <h1 className="font-display text-3xl text-ink mb-6 text-center">
             {mode === 'signin' ? 'Accedi' : 'Registrati'}
@@ -98,7 +98,7 @@ function LoginPageInner() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2.5 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors"
+                className="w-full px-3 py-2.5 bg-carta border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors"
               />
             </label>
             <label className="block">
@@ -111,7 +111,7 @@ function LoginPageInner() {
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2.5 bg-paper border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors"
+                className="w-full px-3 py-2.5 bg-carta border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors"
               />
             </label>
 

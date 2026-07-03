@@ -103,7 +103,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
     <div>
       <PageviewTracker type="view_market" marketId={marketFull.id} />
       {/* HERO: foto a sinistra (piccola) + testo + mappa above-the-fold a destra */}
-      <section className="relative overflow-hidden bg-paper bg-paper-grain border-b-2 border-ink/10">
+      <section className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
         <DriftBackdrop tone="light" variant="section" />
         <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl relative z-10">
           <div className="grid md:grid-cols-[280px_1fr] gap-8 md:gap-10 items-start">
@@ -158,7 +158,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
               {mapPins.length > 0 && (
                 <Reveal delayMs={80} className="mt-5">
                   <MarketViewer pins={mapPins} mapHeight="460px" />
-                  <p className="mt-2 text-[11px] text-ink-muted">
+                  <p className="mt-2 text-xs text-ink-soft">
                     {mapPins.length} {mapPins.length === 1 ? 'mercato' : 'mercati'} · parcheggi entro 2 km
                   </p>
                 </Reveal>
@@ -196,7 +196,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
             <Reveal className="flex items-end justify-between mb-8">
               <div>
                 <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-1">I borghi</p>
-                <h2 className="font-display text-2xl md:text-3xl text-ink">I comuni della zona</h2>
+                <h2 className="font-alt font-bold text-2xl md:text-3xl text-ink">I comuni della zona</h2>
               </div>
               <WaveDivider className="w-24 text-mare opacity-60 hidden md:block" aria-hidden="true" />
             </Reveal>
@@ -212,7 +212,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                     >
                       <ZoneImage query={c} aspect="aspect-[3/2]" hoverZoom />
                       <div className="p-4 flex items-baseline justify-between">
-                        <h3 className="font-display text-lg text-ink leading-tight group-hover:text-mare-600 transition-colors">{c}</h3>
+                        <h3 className="font-alt font-bold text-lg text-ink leading-tight group-hover:text-mare-600 transition-colors">{c}</h3>
                         <span className="text-ink-muted group-hover:text-mare-600 group-hover:translate-x-0.5 transition-all">→</span>
                       </div>
                     </Link>
@@ -229,7 +229,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
             <Reveal className="flex items-end justify-between mb-8">
               <div>
                 <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-1">Il calendario locale</p>
-                <h2 className="font-display text-2xl md:text-3xl text-ink"><span className="imk-mark text-ink">Mercati di questa zona</span></h2>
+                <h2 className="font-alt font-bold text-2xl md:text-3xl text-ink"><span className="imk-mark text-ink">Mercati di questa zona</span></h2>
               </div>
               <Link href={`/${marketFull.slug}/calendar`} className="font-alt text-xs font-semibold text-ink-muted hover:text-mare-600 underline underline-offset-2">
                 Calendario completo →
@@ -248,7 +248,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                     >
                       <div className="md:col-span-3 flex items-center gap-2.5">
                         <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: CATEGORY_COLOR[cat] }} />
-                        <h3 className="font-display text-lg md:text-xl text-ink group-hover:text-mare-600 transition-colors">{s.comune}</h3>
+                        <h3 className="font-alt font-bold text-lg md:text-xl text-ink group-hover:text-mare-600 transition-colors">{s.comune}</h3>
                       </div>
                       <div className="md:col-span-4">
                         <p className="text-sm text-ink">{s.giorno}</p>
@@ -269,20 +269,6 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
           </section>
         )}
 
-        {/* Sulla Riviera: cartoline di costa e borghi */}
-        <section className="py-12 md:py-16 border-t-2 border-ink/10">
-          <Reveal className="mb-8">
-            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-fiore-600 mb-1">Sulla Riviera</p>
-            <h2 className="font-display text-2xl md:text-3xl text-ink">Mare, borghi e colori del Ponente</h2>
-          </Reveal>
-          <Reveal delayMs={60} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Cartolina query={heroQuery} fallbackQuery={marketFull.city} caption={`${heroQuery}`} tilt="l" aspect="aspect-[4/5]" />
-            <Cartolina query="Riviera dei Fiori mare" fallbackQuery="Liguria mare" caption="Il mare di Ponente" tilt="r" aspect="aspect-[4/5]" />
-            <Cartolina query="Sanremo Liguria fiori" fallbackQuery="Sanremo Liguria" caption="La città dei fiori" tilt="l" aspect="aspect-[4/5]" />
-            <Cartolina query="Liguria borgo mercato" fallbackQuery="Liguria borgo" caption="Un banco di paese" tilt="r" aspect="aspect-[4/5]" />
-          </Reveal>
-        </section>
-
         {/* Nav prev/next tra zone */}
         <nav className="grid grid-cols-2 gap-3 py-8 border-t-2 border-ink/10 text-sm">
           {prevMarket ? (
@@ -292,8 +278,8 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
             >
               <ChevronLeft className="w-4 h-4 text-mare group-hover:-translate-x-0.5 transition-transform" />
               <div className="min-w-0">
-                <p className="font-alt text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Zona precedente</p>
-                <p className="font-display text-base text-ink truncate">{prevMarket.name}</p>
+                <p className="font-alt text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Zona precedente</p>
+                <p className="font-alt font-bold text-base text-ink truncate">{prevMarket.name}</p>
               </div>
             </Link>
           ) : <div />}
@@ -303,8 +289,8 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
               className="imk-water imk-edge imk-lift group flex items-center justify-end gap-3 px-4 py-3 bg-white border-2 border-ink/10 hover:border-mare transition-colors text-right"
             >
               <div className="min-w-0">
-                <p className="font-alt text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Zona successiva</p>
-                <p className="font-display text-base text-ink truncate">{nextMarket.name}</p>
+                <p className="font-alt text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Zona successiva</p>
+                <p className="font-alt font-bold text-base text-ink truncate">{nextMarket.name}</p>
               </div>
               <ChevronRight className="w-4 h-4 text-mare group-hover:translate-x-0.5 transition-transform" />
             </Link>

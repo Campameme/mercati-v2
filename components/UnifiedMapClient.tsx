@@ -7,7 +7,7 @@ const UnifiedMap = dynamic(() => import('./UnifiedMap'), {
   ssr: false,
   loading: () => (
     <div
-      className="rounded-sm border border-cream-300 bg-cream-50 flex items-center justify-center"
+      className="rounded-sm border border-ink/15 bg-white flex items-center justify-center"
       style={{ height: 380 }}
     >
       <p className="text-xs text-ink-muted">Caricamento mappa…</p>

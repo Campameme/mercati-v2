@@ -3,9 +3,8 @@ import { CalendarDays, ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import type { MarketEvent } from '@/types/event'
 import DriftBackdrop from '@/components/motion/DriftBackdrop'
-import Cartolina from '@/components/Cartolina'
 import EventiBacheca, { BachecaEmpty } from '@/components/events/EventiBacheca'
-import { SeaWaves, RivieraSun, Lemon, ArchRow } from '@/components/events/decorations'
+import { SeaWaves, RivieraSun, Lemon } from '@/components/events/decorations'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,13 +13,6 @@ export const metadata = {
   description:
     'Fiere, sagre, gastronomia, musica e appuntamenti speciali nei mercati della provincia di Imperia. Tutti gli eventi in arrivo, in una bacheca della Riviera.',
 }
-
-/** Cartoline di costa/borghi a corredo della bacheca. */
-const CARTOLINE = [
-  { q: 'Sanremo Liguria', cap: 'Sanremo in festa', tilt: 'l' as const },
-  { q: 'Bordighera Liguria', cap: 'Bordighera, fra le palme', tilt: 'r' as const },
-  { q: 'Cervo Liguria', cap: 'Cervo, musica sul mare', tilt: 'l' as const },
-]
 
 export default async function EventiPage() {
   const supabase = createClient()
@@ -62,7 +54,7 @@ export default async function EventiPage() {
             Torna alla mappa
           </Link>
 
-          <p className="font-alt text-xs font-semibold uppercase tracking-[0.22em] text-sole">
+          <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-sole">
             Liguria · Provincia di Imperia
           </p>
           <h1 className="mt-2 max-w-3xl font-display text-4xl leading-[0.95] md:text-6xl">
@@ -98,39 +90,18 @@ export default async function EventiPage() {
             <EventiBacheca events={events} />
           )}
 
-          {/* Cartoline della Riviera */}
+          {/* Rimando compatto al calendario (l'empty state ha già la sua CTA) */}
           {total > 0 && (
-            <div className="mt-14 grid grid-cols-2 gap-4 md:grid-cols-3">
-              {CARTOLINE.map((c, i) => (
-                <Cartolina
-                  key={c.q}
-                  query={c.q}
-                  caption={c.cap}
-                  tilt={c.tilt}
-                  tape
-                  aspect="aspect-[4/5]"
-                  priority={i === 0}
-                  className={i === 2 ? 'hidden md:block' : ''}
-                />
-              ))}
+            <div className="mt-12 text-center">
+              <Link
+                href="/calendar"
+                className="imk-lift inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 font-alt text-sm font-semibold text-carta transition-colors hover:bg-mare"
+              >
+                <CalendarDays className="h-4 w-4" aria-hidden="true" />
+                Vedi il calendario completo, mese per mese
+              </Link>
             </div>
           )}
-
-          {/* Rimando al calendario eventi */}
-          <div className="mt-14 flex flex-col items-center gap-4 rounded-xl border-2 border-ink/10 bg-white px-6 py-8 text-center imk-edge">
-            <ArchRow className="h-10 w-56 text-mare/30" count={7} />
-            <p className="font-accent text-2xl text-mare-600">Vuoi vedere tutto a colpo d&apos;occhio?</p>
-            <p className="max-w-md text-sm text-ink-soft">
-              Gli eventi della Riviera di Ponente, mese per mese, nel calendario eventi completo.
-            </p>
-            <Link
-              href="/calendar"
-              className="imk-lift inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 font-alt text-sm font-semibold text-carta transition-colors hover:bg-mare"
-            >
-              <CalendarDays className="h-4 w-4" aria-hidden="true" />
-              Apri il calendario eventi
-            </Link>
-          </div>
         </div>
       </main>
     </div>

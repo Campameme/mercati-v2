@@ -211,7 +211,7 @@ export default function NavMenu({ open, onClose }: Props) {
                           className="group flex-1 flex items-center justify-between gap-3 px-3 py-3 hover:bg-white rounded-xl transition-colors"
                         >
                           <div className="min-w-0">
-                            <span className="font-display text-base text-ink leading-tight block group-hover:text-mare-600 transition-colors">
+                            <span className="font-alt font-bold text-base text-ink leading-tight block group-hover:text-mare-600 transition-colors">
                               {m.name}
                             </span>
                             {isAgg ? (

@@ -40,26 +40,26 @@ export default function OperatorHub() {
     router.replace('/')
   }
 
-  if (loading) return <div className="min-h-screen bg-paper"><div className="container mx-auto px-4 py-8 text-ink-soft">Caricamento…</div></div>
+  if (loading) return <div className="min-h-screen bg-carta"><div className="container mx-auto px-4 py-8 text-ink-soft">Caricamento…</div></div>
   if (operators.length === 0) {
     return (
-      <div className="min-h-screen bg-paper">
+      <div className="min-h-screen bg-carta">
         <div className="container mx-auto px-4 py-12 max-w-2xl text-center">
-          <h1 className="font-display text-2xl text-ink mb-4">Nessun banco collegato</h1>
+          <h1 className="font-alt font-bold text-2xl text-ink mb-4">Nessun banco collegato</h1>
           <p className="text-ink-soft mb-6">Non risulta nessuna scheda operatore associata al tuo account. Chiedi all&apos;amministratore del mercato di invitarti.</p>
-          <button onClick={handleLogout} className="px-4 py-2 bg-paper border-2 border-ink/15 hover:border-ink/30 text-ink rounded-full font-alt uppercase tracking-wider text-sm transition-colors">Logout</button>
+          <button onClick={handleLogout} className="px-4 py-2 bg-carta border-2 border-ink/15 hover:border-ink/30 text-ink rounded-full font-alt uppercase tracking-wider text-sm transition-colors">Logout</button>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-paper">
+    <div className="min-h-screen bg-carta">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <p className="text-xs font-alt uppercase tracking-[0.18em] text-mare-600 mb-1">Area operatore</p>
-            <h1 className="font-display text-3xl text-ink">I tuoi banchi</h1>
+            <p className="text-xs font-alt uppercase tracking-[0.14em] text-mare-600 mb-1">Area operatore</p>
+            <h1 className="font-alt font-bold text-3xl text-ink">I tuoi banchi</h1>
           </div>
           <button onClick={handleLogout} className="flex items-center gap-2 px-3 py-2 bg-white border-2 border-ink/15 hover:border-ink/30 text-ink rounded-full text-sm transition-colors">
             <LogOut className="w-4 h-4" /> <span>Esci</span>
@@ -81,7 +81,7 @@ export default function OperatorHub() {
               )}
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-ink-muted flex items-center"><MapPin className="w-3 h-3 mr-1 text-mare" />{op.markets?.name}</p>
-                <h2 className="font-display text-xl text-ink mt-1 truncate">{op.name}</h2>
+                <h2 className="font-alt font-bold text-xl text-ink mt-1 truncate">{op.name}</h2>
                 <div className="flex items-center gap-2 mt-1 text-xs">
                   <span className="px-2 py-0.5 bg-mare/15 text-mare-700 font-alt uppercase tracking-wider rounded-full">{op.category}</span>
                   {op.stall_number && <span className="text-ink-muted">• {op.stall_number}</span>}

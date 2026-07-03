@@ -110,7 +110,7 @@ export default function GlobalCalendarPage() {
             </Link>
           </div>
 
-          <p className="mt-6 font-alt text-xs font-semibold uppercase tracking-[0.22em] text-sole">
+          <p className="mt-6 font-alt text-xs font-semibold uppercase tracking-[0.14em] text-sole">
             Liguria · Provincia di Imperia
           </p>
           <h1 className="mt-2 font-display text-3xl leading-[0.95] md:text-5xl">
@@ -157,7 +157,7 @@ export default function GlobalCalendarPage() {
 
             <aside className="space-y-4 text-sm">
               <div className="imk-edge border-2 border-ink/10 bg-white p-4">
-                <h2 className="mb-3 font-display text-base text-ink">Categorie eventi</h2>
+                <h2 className="mb-3 font-alt font-bold text-base text-ink">Categorie eventi</h2>
                 <div className="flex flex-wrap gap-1.5">
                   {ALL_EVT_CATS.map((c) => {
                     const active = selectedEvtCats.has(c)
@@ -178,7 +178,7 @@ export default function GlobalCalendarPage() {
               </div>
 
               <div className="imk-edge border-2 border-ink/10 bg-white p-4">
-                <h2 className="mb-3 font-display text-base text-ink">Zone</h2>
+                <h2 className="mb-3 font-alt font-bold text-base text-ink">Zone</h2>
                 <div className="imk-scroll max-h-60 space-y-1 overflow-y-auto pr-1">
                   {markets.map((m) => (
                     <label key={m.id} className="flex cursor-pointer items-center gap-2.5">
@@ -208,7 +208,7 @@ export default function GlobalCalendarPage() {
               </div>
 
               <div className="imk-edge border-2 border-ink/10 bg-white p-4">
-                <h2 className="mb-3 font-display text-base text-ink">Prossimi</h2>
+                <h2 className="mb-3 font-alt font-bold text-base text-ink">Prossimi</h2>
                 {upcoming.length === 0 ? (
                   <p className="text-xs text-ink-muted">Nessun evento coi filtri correnti.</p>
                 ) : (
@@ -266,7 +266,7 @@ export default function GlobalCalendarPage() {
                 </span>
               )}
             </div>
-            <h3 className="mb-1 font-display text-xl text-ink">{selected.title}</h3>
+            <h3 className="mb-1 font-alt font-bold text-xl text-ink">{selected.title}</h3>
             <p className="mb-3 text-sm text-ink-soft">
               {new Date(selected.start_at).toLocaleString('it-IT')}
               {selected.end_at ? ` → ${new Date(selected.end_at).toLocaleString('it-IT')}` : ''}

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Italiana, Figtree } from 'next/font/google'
 import './globals.css'
 import Providers from '@/components/Providers'
+import Footer from '@/components/Footer'
 import CookieNotice from '@/components/CookieNotice'
 import SmoothScroll from '@/components/motion/SmoothScroll'
 import { SITE_NAME, SITE_URL } from '@/lib/site'
@@ -55,12 +56,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="it" className={`${italiana.variable} ${figtree.variable}`}>
-      <body className="font-sans bg-paper text-ink antialiased">
+      <body className="font-sans bg-carta text-ink antialiased">
         <SmoothScroll />
         <Providers>
           <main className="min-h-screen">
             {children}
           </main>
+          <Footer />
           <CookieNotice />
         </Providers>
       </body>

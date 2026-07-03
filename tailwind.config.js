@@ -21,18 +21,8 @@ module.exports = {
         sole: { DEFAULT: '#F4B62C', 600: '#D69A12' },
         fiore: { DEFAULT: '#EC6A5E', 100: '#FBE0D9', 600: '#D24B3F' },
 
-        // --- Alias legacy ancora in uso (deprecati: nel codice nuovo usare
-        //     mare/sole/fiore/carta/notte). Gli alias-metafora (pesto, riviera,
-        //     mimosa, coral, olive, sea, terra) sono stati rimappati sui token
-        //     canonici il 2026-07-02 e RIMOSSI da qui. ---
-        paper: '#F7EFDD',
-        night: '#0E3040',
-        cream: { 50: '#FDF8EC', 100: '#F7EFDD', 200: '#EFE3C8', 300: '#E2D6BC' },
-        primary: {
-          50: '#EAF2F5', 100: '#DCEBEC', 200: '#B9D6DE', 300: '#8FBDCB',
-          400: '#2E84A3', 500: '#15607C', 600: '#114F66', 700: '#0E3F52',
-          800: '#0E3040', 900: '#0A2533',
-        },
+        // Gli alias legacy (paper, night, cream, primary) sono stati migrati
+        // ai token canonici e rimossi il 2026-07-03. Usare SOLO i token sopra.
       },
       fontFamily: {
         // Sistema a due caratteri: titolo = Italiana (display/serif, solo 400),

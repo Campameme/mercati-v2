@@ -174,14 +174,14 @@ export default function AdminEditOperatorPage() {
     load()
   }
 
-  if (!operator || !market) return <div className="min-h-screen bg-paper"><div className="container mx-auto px-4 py-8 text-ink-soft">Caricamento…</div></div>
+  if (!operator || !market) return <div className="min-h-screen bg-carta"><div className="container mx-auto px-4 py-8 text-ink-soft">Caricamento…</div></div>
 
   const availableSessions = allSessions.filter(
     (s) => !presences.some((p) => p.scheduleId === s.id),
   )
 
   return (
-    <div className="min-h-screen bg-paper">
+    <div className="min-h-screen bg-carta">
     <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-5xl">
       <Link
         href={`/${slug}/admin/operators`}
@@ -189,7 +189,7 @@ export default function AdminEditOperatorPage() {
       >
         <ArrowLeft className="w-3.5 h-3.5" /> Tutti i banchi
       </Link>
-      <h1 className="font-display text-3xl md:text-4xl text-ink mb-6">{operator.name}</h1>
+      <h1 className="font-alt font-bold text-3xl md:text-4xl text-ink mb-6">{operator.name}</h1>
 
       {/* Profilo */}
       <form onSubmit={handleSave} className="bg-white border-2 border-ink/10 rounded-xl p-5 md:p-6 mb-6 space-y-4">
@@ -201,7 +201,7 @@ export default function AdminEditOperatorPage() {
             <select
               value={operator.category}
               onChange={(e) => setOperator({ ...operator, category: e.target.value })}
-              className="w-full mt-1 px-3 py-2 border-2 border-ink/15 rounded-xl bg-paper text-ink focus:outline-none focus:border-mare transition-colors"
+              className="w-full mt-1 px-3 py-2 border-2 border-ink/15 rounded-xl bg-carta text-ink focus:outline-none focus:border-mare transition-colors"
             >
               {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
@@ -223,7 +223,7 @@ export default function AdminEditOperatorPage() {
             value={operator.description ?? ''}
             onChange={(e) => setOperator({ ...operator, description: e.target.value })}
             rows={3}
-            className="w-full mt-1 px-3 py-2 border-2 border-ink/15 rounded-xl bg-paper text-ink focus:outline-none focus:border-mare transition-colors"
+            className="w-full mt-1 px-3 py-2 border-2 border-ink/15 rounded-xl bg-carta text-ink focus:outline-none focus:border-mare transition-colors"
           />
         </label>
 
@@ -244,7 +244,7 @@ export default function AdminEditOperatorPage() {
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-xs font-alt uppercase tracking-wider text-ink-muted">Presenze nei mercati</p>
-            <h2 className="font-display text-2xl text-ink">
+            <h2 className="font-alt font-bold text-2xl text-ink">
               {presences.length} presenz{presences.length === 1 ? 'a' : 'e'}
             </h2>
           </div>
@@ -273,7 +273,7 @@ export default function AdminEditOperatorPage() {
                     stall: '',
                   })
                 }}
-                className="w-full mt-1 px-3 py-2 border-2 border-ink/15 rounded-xl bg-paper text-ink focus:outline-none focus:border-mare transition-colors"
+                className="w-full mt-1 px-3 py-2 border-2 border-ink/15 rounded-xl bg-carta text-ink focus:outline-none focus:border-mare transition-colors"
               >
                 <option value="">— scegli una sessione —</option>
                 {availableSessions.map((s) => (
@@ -316,7 +316,7 @@ export default function AdminEditOperatorPage() {
               <button
                 type="button"
                 onClick={() => setShowAddPresence(false)}
-                className="px-4 py-2 bg-paper border-2 border-ink/15 hover:border-ink/30 text-ink-soft rounded-full text-sm transition-colors"
+                className="px-4 py-2 bg-carta border-2 border-ink/15 hover:border-ink/30 text-ink-soft rounded-full text-sm transition-colors"
               >
                 Annulla
               </button>
@@ -401,7 +401,7 @@ export default function AdminEditOperatorPage() {
               placeholder="email@operatore.it"
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
-              className="flex-1 px-3 py-2 border-2 border-ink/15 rounded-xl bg-paper text-ink focus:outline-none focus:border-mare transition-colors"
+              className="flex-1 px-3 py-2 border-2 border-ink/15 rounded-xl bg-carta text-ink focus:outline-none focus:border-mare transition-colors"
             />
             <button
               type="submit"
@@ -429,7 +429,7 @@ function F({ label, value, onChange }: { label: string; value: string; onChange:
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full mt-1 px-3 py-2 border-2 border-ink/15 rounded-xl bg-paper text-ink focus:outline-none focus:border-mare transition-colors"
+        className="w-full mt-1 px-3 py-2 border-2 border-ink/15 rounded-xl bg-carta text-ink focus:outline-none focus:border-mare transition-colors"
       />
     </label>
   )

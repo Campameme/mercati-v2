@@ -32,9 +32,6 @@ interface HubOperator {
   market: { slug: string; name: string } | null
 }
 
-// Glifi delle qualità del mercato (stessi valori di copy.qualities, in ordine)
-const QUALITY_GLYPH = ['🤲', '🧭', '🕰', '🌅', '🧺', '🫶']
-
 export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; events?: HomeEvent[] }) {
   const router = useRouter()
   const [lang, setLang] = useState<Lang>('it')
@@ -105,20 +102,20 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
   return (
     <>
       {/* ===== HERO — foto ferma + velo blu + acqua reattiva. UNA sola azione. ===== */}
-      <section ref={heroRef} className="relative min-h-[100svh] flex flex-col overflow-hidden bg-notte text-paper">
+      <section ref={heroRef} className="relative min-h-[100svh] flex flex-col overflow-hidden bg-notte text-carta">
         <div className="absolute inset-0">
           <PhotoFx query="Sanremo" fallbackQuery="Sanremo Liguria" alt="La Riviera di Ponente" fill priority tint="none" />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-mare-700/55 via-mare-700/40 to-notte/88 pointer-events-none" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-b from-mare-700/60 via-notte/45 to-notte/90 pointer-events-none" aria-hidden="true" />
         <canvas ref={aquaRef} className="pointer-events-none absolute inset-0 h-full w-full z-[1]" aria-hidden="true" />
         <div className="absolute inset-0 bg-gradient-to-b from-notte/25 via-transparent to-notte/75 pointer-events-none z-[1]" aria-hidden="true" />
 
         <div className="relative z-10 container mx-auto px-4 md:px-6 pt-7 flex items-start justify-between gap-3">
-          <div data-anim className="text-paper text-base"><Logo inline /></div>
+          <div data-anim className="text-carta text-base"><Logo inline /></div>
           <div data-anim className="flex gap-1">
             {LANGS.map((l) => (
               <button key={l} onClick={() => setLang(l)} aria-pressed={lang === l}
-                className={`text-xs font-bold uppercase px-2.5 py-1 rounded-md border-2 transition-colors ${lang === l ? 'bg-paper text-ink border-paper' : 'text-paper border-paper/30 hover:border-paper'}`}>
+                className={`text-xs font-bold uppercase px-2.5 py-1 rounded-md border-2 transition-colors ${lang === l ? 'bg-carta text-ink border-carta' : 'text-carta border-carta/30 hover:border-carta'}`}>
                 {l}
               </button>
             ))}
@@ -127,24 +124,43 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
 
         <div className="relative z-10 flex-1 flex items-center">
           <div className="container mx-auto px-4 md:px-6 py-10">
-            <h1 className="font-display text-paper text-[14vw] leading-[0.96] tracking-[0.01em] max-w-[14ch] md:text-[8rem]">
+            <h1 className="font-display text-carta text-[14vw] leading-[0.96] tracking-[0.01em] max-w-[14ch] md:text-[8rem] [text-shadow:0_2px_28px_rgba(14,48,64,0.55)]">
               {headlineWords.map((w, i) => (
                 <span key={i} className="inline-block overflow-hidden align-bottom pr-[0.14em]">
                   <span data-word className={`inline-block ${i === headlineWords.length - 1 ? 'italic text-sole' : ''}`}>{w}</span>
                 </span>
               ))}
             </h1>
-            <p data-anim className="mt-6 max-w-xl text-base md:text-lg text-paper/85">{copy.heroSubtitle}</p>
-            <div data-anim className="mt-8">
-              <Link href="/mappa" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-7 py-4 rounded-full hover:bg-sole-600 transition-colors">
-                <MapPin className="w-4 h-4" /> {copy.exploreMapCta} <ArrowRight className="imk-march w-4 h-4" />
-              </Link>
+            <p data-anim className="mt-5 max-w-2xl text-lg md:text-xl text-carta [text-shadow:0_1px_14px_rgba(14,48,64,0.6)]">{copy.heroSubtitle}</p>
+            {/* Ricerca direttamente nell'hero: una sola azione forte, sopra la piega
+                (la vecchia sezione #cerca separata è stata assorbita qui). */}
+            <form data-anim onSubmit={submitSearch} className="mt-8 flex flex-col sm:flex-row gap-2.5 max-w-xl">
+              <div className="imk-edge relative flex-1 min-w-0 bg-white text-ink border-2 border-transparent shadow-lg focus-within:border-sole">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-muted z-10" aria-hidden="true" />
+                <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={typed} aria-label={dict.searchPlaceholder}
+                  className="w-full pl-12 pr-4 py-4 bg-transparent rounded-2xl text-[16px] focus:outline-none" />
+              </div>
+              <button type="submit" className="group imk-lift inline-flex items-center justify-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-6 py-4 imk-edge hover:bg-sole-600 transition-colors flex-shrink-0">
+                {copy.searchCta} <ArrowRight className="imk-march w-4 h-4" />
+              </button>
+            </form>
+            <div data-anim className="mt-4 flex flex-wrap items-center gap-2">
+              {[
+                { t: copy.heroChips.today, href: '/mappa?d=oggi', Icon: Sun },
+                { t: copy.heroChips.near, href: '/mappa?vicino=1', Icon: Crosshair },
+                { t: copy.heroChips.saturday, href: '/mappa?d=sab', Icon: CalendarDays },
+                { t: copy.exploreMapCta, href: '/mappa', Icon: MapPin },
+              ].map(({ t, href, Icon }) => (
+                <Link key={href} href={href} className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.08em] text-carta bg-notte/35 border border-carta/30 rounded-full px-3.5 py-2 hover:border-sole hover:text-sole transition-colors">
+                  <Icon className="w-3.5 h-3.5 text-sole" aria-hidden="true" /> {t}
+                </Link>
+              ))}
             </div>
           </div>
         </div>
 
-        <a href="#borghi" aria-label={copy.heroScrollCue} className="relative z-10 mx-auto mb-5 mt-3 flex flex-col items-center text-paper/70 hover:text-paper">
-          <span className="font-alt text-[10px] uppercase tracking-[0.2em] mb-1">{copy.heroScrollCue}</span>
+        <a href="#borghi" aria-label={copy.heroScrollCue} className="relative z-10 mx-auto mb-5 mt-3 flex flex-col items-center text-carta/70 hover:text-carta">
+          <span className="font-alt text-[11px] font-semibold uppercase tracking-[0.14em] mb-1">{copy.heroScrollCue}</span>
           <span className="flex flex-col -space-y-1.5">
             <ChevronDown className="imk-chev w-4 h-4" /><ChevronDown className="imk-chev w-4 h-4" /><ChevronDown className="imk-chev w-4 h-4" />
           </span>
@@ -159,64 +175,21 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
         cta={{ label: copy.exploreMapCta, href: '/mappa' }}
       />
 
-      {/* ===== VALORE 2 · L'ACCESSO — la ricerca che ti porta al banco ===== */}
-      <section id="cerca" className="relative overflow-hidden bg-notte text-paper scroll-mt-16">
-        <DriftBackdrop tone="dark" variant="section" />
-        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-3xl text-center">
-          <p className="font-alt text-xs font-semibold uppercase tracking-[0.2em] text-sole mb-2">{copy.searchValueEyebrow}</p>
-          <h2 className="font-display text-3xl md:text-5xl leading-[1.05]">{copy.searchValueTitle}</h2>
-          <p className="mt-4 text-base text-paper/80 max-w-2xl mx-auto">{copy.searchValueLead}</p>
-          <form onSubmit={submitSearch} className="mt-8 flex flex-col sm:flex-row gap-2.5 max-w-xl mx-auto">
-            <div className="imk-edge relative flex-1 min-w-0 bg-white text-ink border-2 border-transparent shadow-lg focus-within:border-sole">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-muted z-10" aria-hidden="true" />
-              <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={typed} aria-label={dict.searchPlaceholder}
-                className="w-full pl-12 pr-4 py-4 bg-transparent rounded-2xl text-[16px] focus:outline-none" />
-            </div>
-            <button type="submit" className="group imk-lift inline-flex items-center justify-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-6 py-4 imk-edge hover:bg-sole-600 transition-colors flex-shrink-0">
-              {copy.searchCta} <ArrowRight className="imk-march w-4 h-4" />
-            </button>
-          </form>
-          {/* Scorciatoie pratiche (dall'hero): la risposta "che mercato c'è
-              oggi / vicino a me" — aprono la mappa già filtrata. */}
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-            {[
-              { t: copy.heroChips.today, href: '/mappa?d=oggi', Icon: Sun },
-              { t: copy.heroChips.near, href: '/mappa?vicino=1', Icon: Crosshair },
-              { t: copy.heroChips.saturday, href: '/mappa?d=sab', Icon: CalendarDays },
-            ].map(({ t, href, Icon }) => (
-              <Link key={href} href={href} className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.08em] text-paper/90 bg-white/5 border border-paper/25 rounded-full px-3.5 py-2 hover:border-sole hover:text-sole transition-colors">
-                <Icon className="w-3.5 h-3.5 text-sole" aria-hidden="true" /> {t}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== VALORE 3 · I VALORI DEL MERCATO — le qualità (dagli ambulanti) + le persone ===== */}
-      <section id="valori" className="relative overflow-hidden bg-paper bg-paper-grain border-b-2 border-ink/10">
+      {/* ===== VALORE 2 · LE PERSONE — i valori del mercato e chi li porta al banco ===== */}
+      <section id="valori" className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
         <DriftBackdrop tone="light" variant="section" />
         <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-5xl">
           <div className="max-w-2xl mb-9">
-            <p className="font-alt text-xs font-semibold uppercase tracking-[0.2em] text-fiore-600 mb-2">{copy.valueMarket.k}</p>
-            <h2 className="font-display text-3xl md:text-4xl leading-[1.06] text-ink">{copy.valueMarket.title}</h2>
+            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-fiore-600 mb-2">{copy.valueMarket.k}</p>
+            <h2 className="font-alt font-extrabold tracking-tight text-3xl md:text-4xl leading-[1.06] text-ink">{copy.valueMarket.title}</h2>
             <p className="mt-3 text-base text-ink-soft leading-relaxed">{copy.valueMarket.lead}</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {copy.qualities.map((q, i) => (
-              <WaterCard key={q.t} tilt={i % 2 === 0 ? 'l' : 'r'} className="p-5">
-                <span className="text-3xl" aria-hidden="true">{QUALITY_GLYPH[i % QUALITY_GLYPH.length]}</span>
-                <h3 className="font-display text-lg text-ink leading-tight mt-2">{q.t}</h3>
-                <p className="mt-1.5 text-sm text-ink-soft leading-snug">{q.d}</p>
-              </WaterCard>
-            ))}
-          </div>
-          <p className="mt-4 font-accent text-lg text-mare-600">{copy.qualitiesNote}</p>
-
-          {/* ponte verso le persone: i valori hanno nomi e facce */}
-          <div className="mt-12 pt-9 border-t-2 border-ink/10">
+          {/* le persone: i valori hanno nomi e facce (la griglia di 6 card
+              "qualità" è stata scremata — il lead qui sopra dice già tutto) */}
+          <div className="mt-2">
             <div className="max-w-2xl">
-              <p className="font-alt text-xs font-semibold uppercase tracking-[0.2em] text-mare-600 mb-2">{copy.operatorsEyebrow}</p>
-              <h3 className="font-display text-2xl md:text-4xl leading-[1.04] text-ink"><span className="imk-mark">{copy.operatorsTitle}</span></h3>
+              <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{copy.operatorsEyebrow}</p>
+              <h3 className="font-alt font-bold text-2xl md:text-4xl leading-[1.04] text-ink"><span className="imk-mark">{copy.operatorsTitle}</span></h3>
               <p className="mt-3 text-base text-ink-soft leading-relaxed">{copy.operatorsLead}</p>
             </div>
             {operators.length > 0 && (
@@ -244,8 +217,8 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
         <DriftBackdrop tone="light" variant="section" />
         <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-5xl">
           <div className="max-w-2xl mb-9">
-            <p className="font-alt text-xs font-semibold uppercase tracking-[0.2em] text-mare-600 mb-2">{copy.weekEyebrow}</p>
-            <h2 className="font-display text-3xl md:text-4xl leading-[1.04] text-ink">{copy.weekTitle}</h2>
+            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{copy.weekEyebrow}</p>
+            <h2 className="font-alt font-extrabold tracking-tight text-3xl md:text-4xl leading-[1.04] text-ink">{copy.weekTitle}</h2>
             <p className="mt-2 text-sm text-ink-soft">{copy.weekLead}</p>
           </div>
 
@@ -267,7 +240,7 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
                       <span className="font-alt text-xs font-semibold uppercase tracking-[0.1em] text-mare-600">
                         {fmtDate(n.publish_from)}{n.markets?.name ? ` · ${n.markets.name}` : ''}
                       </span>
-                      <h3 className="font-display text-lg text-ink leading-tight mt-1.5">{n.title}</h3>
+                      <h3 className="font-alt font-bold text-lg text-ink leading-tight mt-1.5">{n.title}</h3>
                       {n.content && <p className="mt-1.5 text-sm text-ink-soft leading-snug line-clamp-2">{n.content}</p>}
                     </WaterCard>
                   ))}
@@ -292,7 +265,7 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
                       <span className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.1em] text-fiore-600">
                         <CalendarDays className="w-3.5 h-3.5" aria-hidden="true" /> {fmtDate(e.startAt)}
                       </span>
-                      <h3 className="font-display text-lg text-ink leading-tight mt-1.5">{e.title}</h3>
+                      <h3 className="font-alt font-bold text-lg text-ink leading-tight mt-1.5">{e.title}</h3>
                       {e.marketName && <p className="mt-1 text-sm text-ink-muted">{e.marketName}</p>}
                     </WaterCard>
                   ))}
@@ -303,7 +276,7 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
 
           {/* pulsanti evidenti verso le sezioni dedicate */}
           <div className="mt-10 flex flex-wrap gap-3">
-            <Link href="/notizie" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-ink text-paper px-6 py-3.5 rounded-full hover:bg-mare transition-colors">
+            <Link href="/notizie" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-ink text-carta px-6 py-3.5 rounded-full hover:bg-mare transition-colors">
               <Newspaper className="w-4 h-4" /> {copy.newsAllCta} <ArrowRight className="imk-march w-4 h-4" />
             </Link>
             <Link href="/eventi" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-6 py-3.5 rounded-full hover:bg-sole-600 transition-colors">

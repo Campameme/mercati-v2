@@ -66,7 +66,7 @@ export default function LocationFields({
           type="button"
           onClick={useCurrentLocation}
           disabled={locating}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-ink text-cream-100 rounded-full text-xs hover:bg-ink/90 disabled:opacity-50 transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-ink text-carta rounded-full text-xs hover:bg-ink/90 disabled:opacity-50 transition-colors"
         >
           <Locate className="w-3.5 h-3.5" />
           {locating ? 'Cerco…' : 'Sono qui'}

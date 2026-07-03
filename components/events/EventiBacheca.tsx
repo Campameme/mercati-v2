@@ -96,7 +96,7 @@ export default function EventiBacheca({ events }: { events: MarketEvent[] }) {
 
         <Link
           href="/calendar"
-          className="imk-lift inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2.5 font-alt text-sm font-semibold text-paper transition-colors hover:bg-mare"
+          className="imk-lift inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2.5 font-alt text-sm font-semibold text-carta transition-colors hover:bg-mare"
         >
           <CalendarDays className="h-4 w-4" aria-hidden="true" />
           Vista calendario
@@ -111,7 +111,7 @@ export default function EventiBacheca({ events }: { events: MarketEvent[] }) {
           {groups.map((g) => (
             <section key={g.key} aria-labelledby={`mese-${g.key}`}>
               <div className="mb-5 flex items-center gap-3">
-                <h2 id={`mese-${g.key}`} className="font-display text-xl capitalize text-ink md:text-2xl">
+                <h2 id={`mese-${g.key}`} className="font-alt font-bold text-xl capitalize text-ink md:text-2xl">
                   {g.label}
                 </h2>
                 <span className="h-[3px] flex-1 rounded-full bg-ink/10" aria-hidden="true" />
@@ -169,7 +169,7 @@ function Bigliettino({ event, idx }: { event: MarketEvent; idx: number }) {
       </p>
       <p className="font-alt text-xs font-semibold text-ink-muted">ore {d.time}</p>
 
-      <h3 className="mt-2 font-display text-lg leading-tight text-ink">{event.title}</h3>
+      <h3 className="mt-2 font-alt font-bold text-lg leading-tight text-ink">{event.title}</h3>
 
       {place && (
         <p className="mt-1.5 flex items-start gap-1.5 text-sm text-ink-soft">
@@ -185,7 +185,7 @@ function Bigliettino({ event, idx }: { event: MarketEvent; idx: number }) {
       {market?.slug && (
         <Link
           href={`/${market.slug}`}
-          className="mt-3 inline-flex items-center gap-1 rounded-full bg-paper px-3 py-1 font-alt text-xs font-semibold text-ink ring-2 ring-ink/10 transition-colors hover:bg-ink hover:text-paper hover:ring-ink"
+          className="mt-3 inline-flex items-center gap-1 rounded-full bg-carta px-3 py-1 font-alt text-xs font-semibold text-ink ring-2 ring-ink/10 transition-colors hover:bg-ink hover:text-carta hover:ring-ink"
         >
           {market.name}
           <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
@@ -203,7 +203,7 @@ export function BachecaEmpty() {
         <RivieraSun className="h-12 w-12 text-sole-600" />
         <Lemon className="absolute -bottom-1 -right-1 h-8 w-8 text-mare" />
       </div>
-      <h2 className="font-display text-2xl text-ink">Bacheca vuota, per ora</h2>
+      <h2 className="font-alt font-bold text-2xl text-ink">Bacheca vuota, per ora</h2>
       <p className="mt-3 text-sm leading-relaxed text-ink-soft">
         Nessun appuntamento appuntato in bacheca. Torna a trovarci: fiere, sagre e mercati
         straordinari della Riviera dei Fiori sono sempre in arrivo.

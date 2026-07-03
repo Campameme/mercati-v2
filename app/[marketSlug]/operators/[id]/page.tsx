@@ -89,7 +89,7 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
                 <div className="flex items-center gap-2 flex-wrap">
                   <h1 className="font-display text-3xl md:text-5xl text-ink leading-tight">{operator.name}</h1>
                   {operator.verified && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-sole text-ink rounded-full font-alt text-[10px] font-semibold uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-sole text-ink rounded-full font-alt text-[11px] font-semibold uppercase tracking-wider">
                       <BadgeCheck className="w-3.5 h-3.5" /> Verificato
                     </span>
                   )}
@@ -98,7 +98,7 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
               <FavoriteButton kind="operator" id={operator.id} label={operator.name} />
             </div>
             <div className="flex items-center gap-2 mt-3 flex-wrap text-sm text-ink-soft">
-              <span className="px-2.5 py-1 bg-sole/30 text-ink rounded-full font-alt text-[10px] font-semibold uppercase tracking-wider">{CAT_LABEL[operator.category] ?? operator.category}</span>
+              <span className="px-2.5 py-1 bg-sole/30 text-ink rounded-full font-alt text-[11px] font-semibold uppercase tracking-wider">{CAT_LABEL[operator.category] ?? operator.category}</span>
               {operator.stall_number && (
                 <span className="flex items-center text-ink-muted"><MapPin className="w-3 h-3 mr-1" />Banco {operator.stall_number}</span>
               )}
@@ -143,7 +143,7 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
       <section className="mb-10">
         <div className="flex items-baseline gap-3 mb-4">
           <p className="text-xs font-alt font-semibold uppercase tracking-[0.14em] text-ink-muted">Dove lo trovi</p>
-          <h2 className="font-display text-2xl text-ink">{sessions.length} presenz{sessions.length === 1 ? 'a' : 'e'}</h2>
+          <h2 className="font-alt font-bold text-2xl text-ink">{sessions.length} presenz{sessions.length === 1 ? 'a' : 'e'}</h2>
         </div>
         {sessions.length === 0 ? (
           <p className="text-sm text-ink-muted italic">Nessuna sessione configurata.</p>
@@ -154,7 +154,7 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
                 <CalendarDays className="w-4 h-4 text-mare flex-shrink-0" />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline gap-2 flex-wrap">
-                    <span className="font-display text-lg text-ink">{s.comune}</span>
+                    <span className="font-alt font-bold text-lg text-ink">{s.comune}</span>
                     <span className="text-sm text-ink-muted">· {s.giorno}</span>
                     {s.orario && <span className="text-xs text-ink-muted tabular-nums">{s.orario}</span>}
                   </div>
@@ -210,7 +210,7 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
         </div>
       )}
 
-      <h2 className="font-display text-2xl text-ink mb-4">Prodotti</h2>
+      <h2 className="font-alt font-bold text-2xl text-ink mb-4">Prodotti</h2>
       {(!products || products.length === 0) ? (
         <p className="bg-white border-2 border-ink/10 rounded-xl p-8 text-center text-ink-muted">
           Nessun prodotto pubblicato.
@@ -224,7 +224,7 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
                 <img src={p.photos[0]} alt={p.name} className="w-full h-40 object-cover" />
               )}
               <div className="p-4 flex-1 flex flex-col">
-                <h3 className="font-display text-lg text-ink">{p.name}</h3>
+                <h3 className="font-alt font-bold text-lg text-ink">{p.name}</h3>
                 {p.description && <p className="text-sm text-ink-soft mt-1 flex-1">{p.description}</p>}
                 {p.price !== null && (
                   <p className="text-mare-700 font-semibold mt-2 tabular-nums">

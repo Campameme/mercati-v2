@@ -42,11 +42,11 @@ export default async function NotiziePage() {
   const news = (data ?? []) as unknown as NewsRow[]
 
   return (
-    <div className="relative overflow-hidden bg-paper bg-paper-grain min-h-[70vh]">
+    <div className="relative overflow-hidden bg-carta bg-paper-grain min-h-[70vh]">
       <DriftBackdrop tone="light" variant="hero" />
-      <div className="relative z-10 container mx-auto px-4 md:px-6 py-14 md:py-20 max-w-5xl">
+      <div className="relative z-10 container mx-auto px-4 md:px-6 py-12 md:py-16 max-w-5xl">
         <div className="max-w-2xl mb-10">
-          <p className="font-alt text-xs font-semibold uppercase tracking-[0.2em] text-mare-600 mb-2">Dai comuni</p>
+          <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">Dai comuni</p>
           <h1 className="font-display text-4xl md:text-5xl leading-[1.04] text-ink">Notizie dalla Riviera</h1>
           <p className="mt-3 text-base text-ink-soft">
             Avvisi, spostamenti e novità dai mercati e dai comuni del Ponente, in ordine di pubblicazione.
@@ -67,7 +67,7 @@ export default async function NotiziePage() {
                   {fmtDate(n.publish_from)}
                   {n.markets?.name ? ` · ${n.markets.name}` : ''}
                 </span>
-                <h2 className="font-display text-xl text-ink leading-tight mt-2">{n.title}</h2>
+                <h2 className="font-alt font-bold text-xl text-ink leading-tight mt-2">{n.title}</h2>
                 {n.content && <p className="mt-2 text-sm text-ink-soft leading-relaxed whitespace-pre-line">{n.content}</p>}
                 {n.markets?.slug && (
                   <Link

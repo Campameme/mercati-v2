@@ -80,11 +80,11 @@ export default async function AdminRoot() {
   const adesioniRows = (recentAdesioni ?? []) as AdesioneRow[]
 
   return (
-    <div className="min-h-screen bg-paper">
+    <div className="min-h-screen bg-carta">
       <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl">
         <div className="mb-8 border-b-2 border-ink/10 pb-5">
-          <p className="text-xs font-alt uppercase tracking-[0.18em] text-mare-600 mb-1">Super-admin</p>
-          <h1 className="font-display text-3xl md:text-4xl text-ink leading-tight flex items-center gap-3">
+          <p className="text-xs font-alt uppercase tracking-[0.14em] text-mare-600 mb-1">Super-admin</p>
+          <h1 className="font-alt font-bold text-3xl md:text-4xl text-ink leading-tight flex items-center gap-3">
             Dashboard <Logo inline />
           </h1>
           <p className="text-sm text-ink-soft mt-2">
@@ -129,7 +129,7 @@ export default async function AdminRoot() {
           <div className="flex items-baseline justify-between mb-4 border-b-2 border-ink/10 pb-2">
             <div className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4 text-mare" />
-              <h2 className="font-display text-lg text-ink">Zone più viste · ultimi 30 giorni</h2>
+              <h2 className="font-alt font-bold text-lg text-ink">Zone più viste · ultimi 30 giorni</h2>
             </div>
             <p className="text-[11px] text-ink-muted italic">Statistiche anonime cookieless</p>
           </div>
@@ -138,7 +138,7 @@ export default async function AdminRoot() {
           ) : (
             <div className="bg-white border-2 border-ink/10 rounded-xl overflow-hidden">
               <table className="w-full text-sm">
-                <thead className="text-[10px] font-alt uppercase tracking-wider text-ink-muted bg-paper">
+                <thead className="text-[11px] font-alt uppercase tracking-wider text-ink-muted bg-carta">
                   <tr className="text-left">
                     <th className="py-2.5 pl-4">Zona</th>
                     <th className="py-2.5 text-right tabular-nums">Views 30g</th>
@@ -149,7 +149,7 @@ export default async function AdminRoot() {
                 </thead>
                 <tbody className="divide-y divide-ink/10">
                   {topMarketsRows.map((m) => (
-                    <tr key={m.market_id} className="hover:bg-paper">
+                    <tr key={m.market_id} className="hover:bg-carta">
                       <td className="py-2.5 pl-4">
                         <Link href={`/${m.market_slug}`} className="font-alt text-ink hover:text-mare-600">
                           {m.market_name}
@@ -172,7 +172,7 @@ export default async function AdminRoot() {
           <div className="flex items-baseline justify-between mb-4 border-b-2 border-ink/10 pb-2">
             <div className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-mare" />
-              <h2 className="font-display text-lg text-ink">Operatori più visti · ultimi 30 giorni</h2>
+              <h2 className="font-alt font-bold text-lg text-ink">Operatori più visti · ultimi 30 giorni</h2>
             </div>
           </div>
           {topOperatorsRows.length === 0 ? (
@@ -180,7 +180,7 @@ export default async function AdminRoot() {
           ) : (
             <div className="bg-white border-2 border-ink/10 rounded-xl overflow-hidden">
               <table className="w-full text-sm">
-                <thead className="text-[10px] font-alt uppercase tracking-wider text-ink-muted bg-paper">
+                <thead className="text-[11px] font-alt uppercase tracking-wider text-ink-muted bg-carta">
                   <tr className="text-left">
                     <th className="py-2.5 pl-4">Operatore</th>
                     <th className="py-2.5 text-right tabular-nums">Views 30g</th>
@@ -191,7 +191,7 @@ export default async function AdminRoot() {
                 </thead>
                 <tbody className="divide-y divide-ink/10">
                   {topOperatorsRows.map((o) => (
-                    <tr key={o.operator_id} className="hover:bg-paper">
+                    <tr key={o.operator_id} className="hover:bg-carta">
                       <td className="py-2.5 pl-4">
                         <span className="text-ink">{o.operator_name}</span>
                       </td>
@@ -212,7 +212,7 @@ export default async function AdminRoot() {
           <div className="flex items-baseline justify-between mb-4 border-b-2 border-ink/10 pb-2">
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-mare" />
-              <h2 className="font-display text-lg text-ink">Ultime adesioni</h2>
+              <h2 className="font-alt font-bold text-lg text-ink">Ultime adesioni</h2>
             </div>
             <Link href="/admin/adesioni" className="text-xs font-alt uppercase tracking-wider text-mare-600 hover:text-mare-700">
               Vedi tutte →
@@ -250,10 +250,10 @@ function Stat({ label, value, sub, icon: Icon, highlight }: {
     }`}>
       <div className="flex items-center gap-2 mb-1">
         <Icon className={`w-3.5 h-3.5 ${highlight ? 'text-fiore-600' : 'text-mare'}`} />
-        <p className="text-[10px] font-alt uppercase tracking-wider text-ink-muted">{label}</p>
+        <p className="text-[11px] font-alt uppercase tracking-wider text-ink-muted">{label}</p>
       </div>
-      <p className="font-display text-2xl text-ink tabular-nums">{value}</p>
-      <p className="text-[10px] text-ink-muted mt-0.5">{sub}</p>
+      <p className="font-alt font-bold text-2xl text-ink tabular-nums">{value}</p>
+      <p className="text-[11px] text-ink-muted mt-0.5">{sub}</p>
     </div>
   )
 }
@@ -268,11 +268,11 @@ function ActionCard({ href, icon: Icon, title, desc, badge }: {
     >
       <Icon className="w-8 h-8 text-mare mb-3" />
       {typeof badge === 'number' && badge > 0 && (
-        <span className="absolute top-3 right-3 bg-fiore text-white text-[10px] font-bold rounded-full px-2 py-0.5">
+        <span className="absolute top-3 right-3 bg-fiore text-white text-[11px] font-bold rounded-full px-2 py-0.5">
           {badge}
         </span>
       )}
-      <h2 className="font-display text-lg text-ink mb-1 group-hover:text-mare-600 transition-colors">
+      <h2 className="font-alt font-bold text-lg text-ink mb-1 group-hover:text-mare-600 transition-colors">
         {title}
       </h2>
       <p className="text-sm text-ink-soft">{desc}</p>
@@ -288,11 +288,11 @@ function StatoBadge({ stato }: { stato: string }) {
     nuovo:        { label: 'Nuovo',         cls: 'bg-mare/15 text-mare-700 border-mare/40' },
     in_contatto:  { label: 'In contatto',   cls: 'bg-sole/20 text-ink-soft border-sole' },
     aderito:      { label: 'Aderito',       cls: 'bg-mare text-white border-mare' },
-    scartato:     { label: 'Scartato',      cls: 'bg-paper text-ink-muted border-ink/15' },
+    scartato:     { label: 'Scartato',      cls: 'bg-carta text-ink-muted border-ink/15' },
   }
   const c = config[stato] ?? config.nuovo
   return (
-    <span className={`flex-shrink-0 text-[10px] font-alt uppercase tracking-wider px-2 py-1 rounded-full border-2 ${c.cls}`}>
+    <span className={`flex-shrink-0 text-[11px] font-alt uppercase tracking-wider px-2 py-1 rounded-full border-2 ${c.cls}`}>
       {c.label}
     </span>
   )

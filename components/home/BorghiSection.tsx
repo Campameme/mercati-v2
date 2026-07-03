@@ -45,8 +45,8 @@ export default function BorghiSection({
   return (
     <section id="borghi" ref={rootRef} className={`relative ${className}`}>
       <div className="container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-5xl">
-        <p className="bsec-reveal font-alt text-xs font-semibold uppercase tracking-[0.2em] text-mare-600 mb-2">{eyebrow}</p>
-        <h2 className="bsec-reveal font-display text-3xl md:text-5xl leading-[1.04] text-ink mb-3">{title}</h2>
+        <p className="bsec-reveal font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{eyebrow}</p>
+        <h2 className="bsec-reveal font-alt font-extrabold tracking-tight text-3xl md:text-5xl leading-[1.04] text-ink mb-3">{title}</h2>
         <p className="bsec-reveal text-ink-soft mb-8 max-w-2xl">{lead}</p>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
@@ -71,7 +71,7 @@ export default function BorghiSection({
                       <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-notte/90 to-transparent" aria-hidden="true" />
                       <span className="absolute top-2 right-2 opacity-90 drop-shadow"><BorgoMark i={i} className="w-9 h-auto" /></span>
                       <span className="absolute left-3 bottom-3 text-left">
-                        <span className="block font-display text-base md:text-lg text-paper leading-tight">{b.n}</span>
+                        <span className="block font-alt font-bold text-base md:text-lg text-carta leading-tight">{b.n}</span>
                         <span className="font-alt text-[11px] text-sole">{b.g}</span>
                       </span>
                     </>
@@ -86,10 +86,10 @@ export default function BorghiSection({
           <div className="mt-5 relative grid md:grid-cols-[1.1fr_1fr] gap-5 rounded-3xl border-2 border-ink/10 bg-white p-4 md:p-5 shadow-sm">
             <PhotoFx key={sel.n} query={sel.wiki ?? sel.n} fallbackQuery={sel.wiki ? sel.n : undefined} alt={sel.n} aspect="aspect-[16/10]" tint="none" priority className="rounded-2xl" />
             <div className="min-w-0 flex flex-col justify-center">
-              <h3 className="font-display text-3xl text-ink leading-tight">{sel.n}</h3>
+              <h3 className="font-alt font-bold text-3xl text-ink leading-tight">{sel.n}</h3>
               <p className="font-alt text-xs font-semibold text-mare-600 mt-1">Mercato: {sel.g}</p>
               <p className="font-accent text-2xl text-mare-700 leading-snug mt-3">{sel.nota}</p>
-              <Link href={`/mappa?q=${encodeURIComponent(sel.n)}`} className="group mt-4 inline-flex w-fit items-center gap-2 font-alt font-semibold text-sm bg-ink text-paper px-4 py-2.5 rounded-full hover:bg-mare transition-colors">
+              <Link href={`/mappa?q=${encodeURIComponent(sel.n)}`} className="group mt-4 inline-flex w-fit items-center gap-2 font-alt font-semibold text-sm bg-ink text-carta px-4 py-2.5 rounded-full hover:bg-mare transition-colors">
                 Vedi sulla mappa <ArrowRight className="imk-march w-4 h-4" />
               </Link>
             </div>

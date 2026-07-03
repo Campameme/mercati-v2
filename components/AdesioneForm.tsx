@@ -46,7 +46,7 @@ export default function AdesioneForm() {
         <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-mare text-white flex items-center justify-center">
           <Check className="w-6 h-6" />
         </div>
-        <h3 className="font-display text-2xl text-ink mb-2">Richiesta ricevuta</h3>
+        <h3 className="font-alt font-bold text-2xl text-ink mb-2">Richiesta ricevuta</h3>
         <p className="text-sm text-ink-soft max-w-md mx-auto">
           Grazie. Vi rispondiamo entro <strong>48 ore</strong> all&apos;email che avete indicato.
           Nel frattempo, esplorate il sito: vi può dare un&apos;idea di cosa costruiremo insieme.
@@ -110,7 +110,7 @@ export default function AdesioneForm() {
         <button
           type="submit"
           disabled={status === 'sending'}
-          className="imk-lift inline-flex items-center gap-2 px-6 py-3 rounded-full bg-ink text-paper font-alt text-sm font-semibold hover:bg-mare transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="imk-lift inline-flex items-center gap-2 px-6 py-3 rounded-full bg-ink text-carta font-alt text-sm font-semibold hover:bg-mare transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {status === 'sending' ? (
             <>

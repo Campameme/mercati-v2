@@ -42,7 +42,7 @@ export default function CookieNotice() {
     >
       <div className="flex items-start gap-3">
         <div className="flex-1 text-sm text-ink-soft leading-relaxed">
-          <p className="font-display text-base text-ink mb-1">Niente cookie di tracciamento.</p>
+          <p className="font-alt font-bold text-base text-ink mb-1">Niente cookie di tracciamento.</p>
           <p>
             Mercati della Riviera di Ponente raccoglie solo statistiche aggregate anonime (senza cookie, senza IP).
             Maggiori dettagli nella{' '}

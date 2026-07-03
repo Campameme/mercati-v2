@@ -134,7 +134,7 @@ export default function ComuneSessionsExplorer({
                   aria-pressed={isActive}
                   className={`group flex items-center gap-2 pl-3 pr-4 py-2.5 rounded-full border-2 text-left transition-colors ${
                     isActive
-                      ? 'bg-ink text-paper border-ink'
+                      ? 'bg-ink text-carta border-ink'
                       : 'bg-white text-ink border-ink/15 hover:border-mare'
                   }`}
                 >
@@ -142,7 +142,7 @@ export default function ComuneSessionsExplorer({
                   <span className="flex flex-col">
                     <span className="font-alt font-semibold text-sm leading-tight">{shortLabel(s.giorno)}</span>
                     {s.luogo && (
-                      <span className={`text-xs leading-tight ${isActive ? 'text-paper/70' : 'text-ink-muted'}`}>
+                      <span className={`text-xs leading-tight ${isActive ? 'text-carta/70' : 'text-ink-muted'}`}>
                         {s.luogo.length > 38 ? s.luogo.slice(0, 36) + '…' : s.luogo}
                       </span>
                     )}
@@ -160,7 +160,7 @@ export default function ComuneSessionsExplorer({
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div className="min-w-0 flex-1">
               <div className="flex items-baseline flex-wrap gap-x-3 mb-1">
-                <h2 className="font-display text-2xl text-ink">{active.giorno}</h2>
+                <h2 className="font-alt font-bold text-2xl text-ink">{active.giorno}</h2>
                 {active.orario && <span className="text-sm text-ink-muted tabular-nums">{active.orario}</span>}
                 <span
                   className="font-alt text-[11px] font-semibold uppercase tracking-wider"
@@ -181,7 +181,7 @@ export default function ComuneSessionsExplorer({
                 href={`https://www.google.com/maps/dir/?api=1&destination=${active.lat},${active.lng}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="imk-lift inline-flex items-center gap-1.5 px-4 py-2.5 bg-ink text-paper rounded-full font-alt text-sm font-semibold hover:bg-mare transition-colors flex-shrink-0"
+                className="imk-lift inline-flex items-center gap-1.5 px-4 py-2.5 bg-ink text-carta rounded-full font-alt text-sm font-semibold hover:bg-mare transition-colors flex-shrink-0"
               >
                 <Navigation2 className="w-4 h-4" /> Indicazioni
               </a>
@@ -218,7 +218,7 @@ export default function ComuneSessionsExplorer({
                   className="group flex items-baseline justify-between gap-4 py-3.5 hover:bg-white -mx-3 px-3 transition-colors"
                 >
                   <div className="min-w-0 flex-1">
-                    <h4 className="font-display text-base text-ink leading-tight">{op.name}</h4>
+                    <h4 className="font-alt font-bold text-base text-ink leading-tight">{op.name}</h4>
                     {op.description && <p className="text-sm text-ink-soft line-clamp-1 mt-0.5">{op.description}</p>}
                     <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-ink-muted mt-1">
                       <span className="font-alt font-semibold uppercase tracking-wider">{CAT_LABEL[op.category] ?? op.category}</span>

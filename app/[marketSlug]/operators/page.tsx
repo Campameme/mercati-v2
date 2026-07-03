@@ -209,7 +209,7 @@ export default function OperatorsPage() {
             </div>
           ) : (
             <>
-              <h2 className="font-display text-2xl text-ink mb-4">
+              <h2 className="font-alt font-bold text-2xl text-ink mb-4">
                 Carte del banco <span className="text-ink-muted font-sans text-base font-normal">({filteredOperators.length})</span>
               </h2>
               <ul className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -232,7 +232,7 @@ export default function OperatorsPage() {
                           className="min-w-0 flex-1 group"
                         >
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="font-display text-base text-ink leading-tight group-hover:text-mare-600 transition-colors">
+                            <span className="font-alt font-bold text-base text-ink leading-tight group-hover:text-mare-600 transition-colors">
                               {op.name}
                             </span>
                             {verified && (

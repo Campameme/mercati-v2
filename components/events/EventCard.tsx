@@ -26,7 +26,7 @@ const EVENT_CATEGORY_STYLE: Record<string, { bg: string; fg: string }> = {
   music: { bg: 'bg-[#8E5BB5]', fg: 'text-white' },
   art: { bg: 'bg-fiore', fg: 'text-white' },
   sport: { bg: 'bg-notte', fg: 'text-sole' },
-  other: { bg: 'bg-ink', fg: 'text-paper' },
+  other: { bg: 'bg-ink', fg: 'text-carta' },
 }
 
 function catStyle(cat: string) {
@@ -81,9 +81,9 @@ export default function EventCard({ event, tilt }: EventCardProps) {
       <div className="flex gap-4 p-5">
         {/* Blocco data grande */}
         <div className="flex-shrink-0">
-          <div className="flex w-[68px] flex-col items-center rounded-xl border-2 border-ink/10 bg-paper px-2 py-2.5 text-center">
-            <span className="font-alt text-[10px] uppercase tracking-[0.18em] text-ink-muted">{dp.weekday}</span>
-            <span className="font-display text-3xl leading-none text-ink">{dp.day}</span>
+          <div className="flex w-[68px] flex-col items-center rounded-xl border-2 border-ink/10 bg-carta px-2 py-2.5 text-center">
+            <span className="font-alt text-[11px] uppercase tracking-[0.14em] text-ink-muted">{dp.weekday}</span>
+            <span className="font-alt font-extrabold text-3xl leading-none text-ink">{dp.day}</span>
             <span className="font-alt text-[11px] uppercase tracking-[0.14em] text-mare-600">{dp.month}</span>
           </div>
         </div>
@@ -104,7 +104,7 @@ export default function EventCard({ event, tilt }: EventCardProps) {
             )}
           </div>
 
-          <h3 className="font-display text-lg leading-tight text-ink">{event.title}</h3>
+          <h3 className="font-alt font-bold text-lg leading-tight text-ink">{event.title}</h3>
 
           <p className="mt-1 font-alt text-sm font-medium text-ink-soft">
             {rangeLabel(event.start_at, event.end_at)}
@@ -124,7 +124,7 @@ export default function EventCard({ event, tilt }: EventCardProps) {
           {market?.slug && (
             <Link
               href={`/${market.slug}`}
-              className="mt-3 inline-flex items-center gap-1 rounded-full bg-paper px-3 py-1 font-alt text-xs font-semibold text-ink ring-2 ring-ink/10 transition-colors hover:bg-ink hover:text-paper hover:ring-ink"
+              className="mt-3 inline-flex items-center gap-1 rounded-full bg-carta px-3 py-1 font-alt text-xs font-semibold text-ink ring-2 ring-ink/10 transition-colors hover:bg-ink hover:text-carta hover:ring-ink"
             >
               {market.name}
               <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />

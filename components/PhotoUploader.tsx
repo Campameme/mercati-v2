@@ -67,7 +67,7 @@ export default function PhotoUploader({ bucket, folder, value, onChange, max = 8
           </div>
         ))}
         {value.length < max && (
-          <label className="w-24 h-24 border-2 border-dashed border-ink/15 rounded-md flex flex-col items-center justify-center cursor-pointer hover:border-primary-500 text-ink-muted hover:text-primary-600 transition-colors">
+          <label className="w-24 h-24 border-2 border-dashed border-ink/15 rounded-md flex flex-col items-center justify-center cursor-pointer hover:border-mare text-ink-muted hover:text-mare-600 transition-colors">
             <Upload className="w-6 h-6" />
             <span className="text-xs mt-1">{uploading ? '…' : 'Carica'}</span>
             <input type="file" accept="image/*" multiple hidden onChange={(e) => handleFiles(e.target.files)} disabled={uploading} />

@@ -63,13 +63,13 @@ export default async function MarketAdminHome({ params }: { params: { marketSlug
   const placeRows: PlaceRow[] = (places ?? []) as any
 
   return (
-    <div className="min-h-screen bg-paper">
+    <div className="min-h-screen bg-carta">
       <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-5xl">
         <div className="mb-8 border-b-2 border-ink/10 pb-6">
           <Link href={`/${market.slug}`} className="text-xs font-alt uppercase tracking-wider text-ink-muted hover:text-ink transition-colors">
             ← {market.name}
           </Link>
-          <h1 className="font-display text-3xl md:text-5xl text-ink mt-2">Gestione {market.name}</h1>
+          <h1 className="font-alt font-bold text-3xl md:text-5xl text-ink mt-2">Gestione {market.name}</h1>
           <p className="text-ink-soft mt-2">{market.city}</p>
         </div>
 
@@ -86,7 +86,7 @@ export default async function MarketAdminHome({ params }: { params: { marketSlug
                   className="group bg-white border-2 border-ink/10 rounded-xl p-5 hover:border-mare hover:-translate-y-0.5 transition-all"
                 >
                   <Icon className="w-8 h-8 text-mare mb-3" />
-                  <h2 className="font-display text-lg text-ink mb-1 group-hover:text-mare-600 transition-colors">{c.title}</h2>
+                  <h2 className="font-alt font-bold text-lg text-ink mb-1 group-hover:text-mare-600 transition-colors">{c.title}</h2>
                   <p className="text-sm text-ink-soft">{c.desc}</p>
                 </Link>
               )
@@ -99,7 +99,7 @@ export default async function MarketAdminHome({ params }: { params: { marketSlug
           <div className="flex items-end justify-between mb-4">
             <div>
               <p className="text-xs font-alt uppercase tracking-wider text-ink-muted mb-1">Gestione per luogo</p>
-              <h2 className="font-display text-2xl text-ink">Stesso luogo, sessioni diverse</h2>
+              <h2 className="font-alt font-bold text-2xl text-ink">Stesso luogo, sessioni diverse</h2>
             </div>
             <p className="text-xs text-ink-muted hidden sm:block">
               Area condivisa, banchi specifici per ogni giorno
@@ -124,7 +124,7 @@ export default async function MarketAdminHome({ params }: { params: { marketSlug
                   <div key={place.id} className="border-2 border-ink/10 rounded-xl bg-white overflow-hidden">
                     <div className="flex items-center justify-between gap-3 px-4 md:px-5 py-4 border-b-2 border-ink/10 flex-wrap">
                       <div className="min-w-0">
-                        <h3 className="font-display text-xl text-ink flex items-center gap-2 min-w-0">
+                        <h3 className="font-alt font-bold text-xl text-ink flex items-center gap-2 min-w-0">
                           <MapPin className="w-4 h-4 text-mare flex-shrink-0" />
                           <span className="truncate">{place.comune}</span>
                           <span className="text-ink-muted">·</span>
@@ -136,7 +136,7 @@ export default async function MarketAdminHome({ params }: { params: { marketSlug
                       </div>
                       <Link
                         href={`/${market.slug}/admin/places/${place.id}/area`}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 bg-paper border-2 border-ink/15 hover:border-mare text-ink rounded-full text-xs font-alt uppercase tracking-wider transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3 py-2 bg-carta border-2 border-ink/15 hover:border-mare text-ink rounded-full text-xs font-alt uppercase tracking-wider transition-colors"
                       >
                         <MapPinIcon className="w-3.5 h-3.5" /> Disegna area
                       </Link>
@@ -155,7 +155,7 @@ export default async function MarketAdminHome({ params }: { params: { marketSlug
                             <li key={s.id}>
                               <Link
                                 href={`/${market.slug}/admin/s/${s.id}`}
-                                className="group grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-5 items-center py-3 md:py-4 px-4 md:px-5 hover:bg-paper transition-colors"
+                                className="group grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-5 items-center py-3 md:py-4 px-4 md:px-5 hover:bg-carta transition-colors"
                               >
                                 <div className="md:col-span-4 flex items-center gap-2.5 min-w-0">
                                   <span

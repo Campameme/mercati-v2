@@ -61,13 +61,13 @@ export default async function NewsPage({ params }: { params: { marketSlug: strin
                   <Icon className="w-4 h-4 text-mare" aria-hidden="true" />
                   <span className="font-alt font-semibold uppercase tracking-[0.08em]">{TYPE_LABEL[n.type]}</span>
                   {n.is_global && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-sole/20 text-sole-600 font-alt font-semibold uppercase tracking-[0.08em] text-[10px]">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-sole/20 text-sole-600 font-alt font-semibold uppercase tracking-[0.08em] text-[11px]">
                       <Globe2 className="w-3 h-3" /> Mercati della Riviera di Ponente
                     </span>
                   )}
                   <span>· {new Date(n.publish_from).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                 </div>
-                <h2 className="font-display text-xl text-ink mb-1">{n.title}</h2>
+                <h2 className="font-alt font-bold text-xl text-ink mb-1">{n.title}</h2>
                 <p className="text-ink-soft whitespace-pre-wrap leading-relaxed">{n.content}</p>
               </div>
             )

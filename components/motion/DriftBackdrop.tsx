@@ -18,7 +18,7 @@ export default function DriftBackdrop({
   className?: string
 }) {
   // colore base delle ombre
-  const col = tone === 'dark' ? 'text-paper' : 'text-mare'
+  const col = tone === 'dark' ? 'text-carta' : 'text-mare'
   const op = tone === 'dark' ? 'opacity-[0.10]' : 'opacity-[0.07]'
 
   return (

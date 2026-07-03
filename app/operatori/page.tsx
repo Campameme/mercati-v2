@@ -6,7 +6,6 @@ import { Search, CalendarDays, BadgeCheck, MessageCircle } from 'lucide-react'
 import { WaveTaglia } from '@/components/decorations'
 import { BancoPlaceholder } from '@/components/BancoAvatar'
 import DriftBackdrop from '@/components/motion/DriftBackdrop'
-import Cartolina from '@/components/Cartolina'
 
 interface HubOperator {
   id: string
@@ -103,35 +102,27 @@ export default function OperatoriHubPage() {
   return (
     <div>
       {/* Header di sezione: sfondo carta con silhouette che derivano + cartoline */}
-      <section className="relative overflow-hidden bg-paper bg-paper-grain border-b-2 border-ink/10">
+      <section className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
         <DriftBackdrop tone="light" variant="section" />
         <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 relative z-10">
-          <div className="grid lg:grid-cols-[1fr_auto] gap-8 lg:gap-10 items-end">
-            <div>
-              <div className="flex items-center gap-3 mb-2 text-ink-soft">
-                <WaveTaglia className="w-8 h-2.5 text-mare" aria-hidden="true" />
-                <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">Riviera di Ponente · la carta del banco</p>
-              </div>
-              <div className="flex items-baseline justify-between gap-4 flex-wrap">
-                <h1 className="font-display text-3xl md:text-5xl text-ink leading-tight imk-tilt-l">
-                  I banchi <span className="imk-mark text-ink">della provincia</span>
-                </h1>
-                <p className="text-xs text-ink-muted tabular-nums">
-                  {operators.length} operator{operators.length === 1 ? 'e' : 'i'}
-                </p>
-              </div>
-              <p className="text-sm text-ink-soft mt-3 max-w-xl">
-                Ogni venditore della Riviera con la sua figurina e i mercati che frequenta ogni settimana.
-                Filtra per zona, comune o categoria per trovare subito quello che cerchi.
-              </p>
-            </div>
-
-            {/* Cartoline: i mercati della Riviera */}
-            <div className="hidden lg:flex gap-3 flex-shrink-0 w-[300px]">
-              <Cartolina query="Sanremo mercato" fallbackQuery="Sanremo Liguria" caption="I banchi di Sanremo" tilt="r" aspect="aspect-[3/4]" className="w-1/2" />
-              <Cartolina query="Bordighera Liguria" caption="Lungomare di Bordighera" tilt="l" aspect="aspect-[3/4]" className="w-1/2 mt-6" />
-            </div>
+          <div className="flex items-center gap-3 mb-2 text-ink-soft">
+            <WaveTaglia className="w-8 h-2.5 text-mare" aria-hidden="true" />
+            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">Riviera di Ponente · la carta del banco</p>
           </div>
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <h1 className="font-display text-3xl md:text-5xl text-ink leading-tight">
+              I banchi <span className="imk-mark text-ink">della provincia</span>
+            </h1>
+            {!loading && operators.length > 0 && (
+              <p className="font-alt text-xs font-semibold text-ink-soft bg-white border-2 border-ink/10 rounded-full px-3.5 py-1.5 tabular-nums">
+                {operators.length} operator{operators.length === 1 ? 'e' : 'i'}
+              </p>
+            )}
+          </div>
+          <p className="text-sm text-ink-soft mt-3 max-w-xl">
+            Ogni venditore della Riviera con la sua figurina e i mercati che frequenta ogni settimana.
+            Filtra per zona, comune o categoria per trovare subito quello che cerchi.
+          </p>
         </div>
       </section>
 
@@ -210,15 +201,15 @@ export default function OperatoriHubPage() {
                     <BancoPlaceholder name={op.name} className="w-full h-40 border-b-2 border-ink/10" />
                   )}
                   {op.verified && (
-                    <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 bg-sole text-ink rounded-full font-alt text-[10px] font-semibold uppercase tracking-wider shadow-sm">
+                    <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 bg-sole text-ink rounded-full font-alt text-[11px] font-semibold uppercase tracking-wider shadow-sm">
                       <BadgeCheck className="w-3.5 h-3.5" /> Verificato
                     </span>
                   )}
                 </div>
                 <div className="p-5 flex-1 flex flex-col">
                   <div className="flex items-start justify-between gap-2 mb-1">
-                    <h3 className="font-display text-lg text-ink leading-tight group-hover:text-mare-600 transition-colors">{op.name}</h3>
-                    <span className="flex-shrink-0 font-alt text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 bg-sole/30 text-ink rounded-full">
+                    <h3 className="font-alt font-bold text-lg text-ink leading-tight group-hover:text-mare-600 transition-colors">{op.name}</h3>
+                    <span className="flex-shrink-0 font-alt text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 bg-sole/30 text-ink rounded-full">
                       {CAT_LABEL[op.category] ?? op.category}
                     </span>
                   </div>
