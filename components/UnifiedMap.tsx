@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, GeoJSON, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { CATEGORY_COLOR, CATEGORY_COLOR_DARK, type ScheduleCategory } from '@/lib/schedules/classify'
@@ -15,19 +15,12 @@ export interface UnifiedMapPin {
   title: string
   subtitle?: string
   href?: string
+  /** Accettato per compatibilità ma NON disegnato: le aree/zone evidenziate sono state rimosse dal linguaggio del sito. */
   polygon?: GeoJSON.Feature<GeoJSON.Polygon> | null
   /** Solo per parking: distanza in metri dal mercato (mostrata nel popup) */
   distance?: number
-  /** Tipologia del mercato → colore e glifo dell'icona banco (variante bold) */
+  /** Tipologia del mercato → colore dell'icona banco */
   category?: ScheduleCategory
-}
-
-/** Evidenziazione di una zona (poligono morbido) sulla mappa. */
-export interface MapZone {
-  id: string
-  feature: GeoJSON.Feature<GeoJSON.Polygon>
-  color: string
-  selected?: boolean
 }
 
 interface Props {
@@ -37,11 +30,9 @@ interface Props {
   showParkingNearby?: boolean
   /** maxZoom per fitBounds, default 16 */
   maxZoom?: number
-  /** 'default' (cream/olive, comportamento storico) | 'bold' (home mappa-centrica) */
-  variant?: 'default' | 'bold'
   /** se fornita, il click sul pin invoca questa callback invece di aprire il Popup */
   onPinClick?: (pin: UnifiedMapPin) => void
-  /** id del pin attualmente selezionato (evidenziato nella variante bold) */
+  /** id del pin attualmente selezionato (ingrandito e in evidenza) */
   selectedId?: string | null
   /** se true, la mappa si centra/zooma sul pin selezionato */
   panToSelected?: boolean
@@ -49,42 +40,12 @@ interface Props {
   bare?: boolean
   /** posizione dell'utente: mostra un pin dedicato e ci si centra */
   userLocation?: { lat: number; lng: number } | null
-  /** poligoni delle zone da evidenziare (sotto i marker) */
-  zones?: MapZone[]
-  /** click su una zona (poligono) */
-  onZoneClick?: (id: string) => void
 }
 
-// ---- Icone divIcon (variante default, comportamento storico) --------------
-
-const marketIcon = L.divIcon({
-  className: '',
-  html: `<div style="background:#15607C;color:#fff;width:40px;height:40px;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-weight:700;font-size:16px;box-shadow:0 1px 4px rgba(0,0,0,0.3)">M</div>`,
-  iconSize: [40, 40],
-  iconAnchor: [20, 20],
-})
-
-const parkingIcon = L.divIcon({
-  className: '',
-  html: `<div style="background:#0E3040;color:#fff;width:26px;height:26px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;font-weight:700;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,0.3)">P</div>`,
-  iconSize: [26, 26],
-  iconAnchor: [13, 13],
-})
-
-const operatorIcon = L.divIcon({
-  className: '',
-  html: `<div style="background:#15607C;width:18px;height:18px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>`,
-  iconSize: [18, 18],
-  iconAnchor: [9, 9],
-})
-
-function defaultIcon(kind: UnifiedMapPin['kind']): L.DivIcon {
-  if (kind === 'market') return marketIcon
-  if (kind === 'parking') return parkingIcon
-  return operatorIcon
-}
-
-// ---- Icone variante "bold" (Imperia / Riviera) ----------------------------
+// ---- Icona unica del brand: il banco col tendone ---------------------------
+// Un solo linguaggio su TUTTE le mappe (home, /mappa, pagine zona): banco con
+// tendone colorato per tipologia, P scura per i parcheggi, punto mare per gli
+// operatori. Niente varianti per pagina.
 
 /** SVG di un banco con tendone (awning) colorato per tipologia. */
 function bancoSvg(color: string, dark: string): string {
@@ -101,7 +62,7 @@ function bancoSvg(color: string, dark: string): string {
   )
 }
 
-function boldIcon(pin: UnifiedMapPin, selected: boolean): L.DivIcon {
+function pinIcon(pin: UnifiedMapPin, selected: boolean): L.DivIcon {
   const kind = pin.kind
   if (kind === 'parking') {
     const html = `<div style="width:24px;height:24px;border-radius:8px;background:#1A1714;color:#F4B62C;border:2px solid #F7EFDD;display:flex;align-items:center;justify-content:center;font-family:'Archivo Black',sans-serif;font-weight:700;font-size:13px;box-shadow:0 2px 6px rgba(0,0,0,0.35)">P</div>`
@@ -176,17 +137,13 @@ export default function UnifiedMap({
   height = 460,
   showParkingNearby = false,
   maxZoom = 16,
-  variant = 'default',
   onPinClick,
   selectedId = null,
   panToSelected = false,
   bare = false,
   userLocation = null,
-  zones = [],
-  onZoneClick,
 }: Props) {
   const [parkingPins, setParkingPins] = useState<UnifiedMapPin[]>([])
-  const isBold = variant === 'bold'
 
   // chiave stabile sui market pin per dipendenza dell'effetto fetch
   const marketsKey = useMemo(
@@ -283,47 +240,9 @@ export default function UnifiedMap({
           <PanTo pin={{ id: '__user', lat: userLocation.lat, lng: userLocation.lng, kind: 'market', title: '' }} />
         )}
 
-        {/* Zone (poligoni morbidi sotto a tutto) */}
-        {zones.map((z) => (
-          <GeoJSON
-            key={`zone-${z.id}-${z.selected ? 'on' : 'off'}`}
-            data={z.feature}
-            style={
-              {
-                color: z.color,
-                fillColor: z.color,
-                fillOpacity: z.selected ? 0.22 : 0.08,
-                weight: z.selected ? 3 : 1.5,
-                opacity: z.selected ? 0.9 : 0.45,
-                dashArray: z.selected ? undefined : '4 5',
-              } as any
-            }
-            eventHandlers={onZoneClick ? { click: () => onZoneClick(z.id) } : undefined}
-          />
-        ))}
-
-        {/* Polygons (sotto i marker) */}
-        {allPins.map((pin) =>
-          pin.polygon ? (
-            <GeoJSON
-              key={`poly-${pin.id}-${JSON.stringify(pin.polygon)}`}
-              data={pin.polygon}
-              style={
-                {
-                  color: isBold ? '#1A1714' : '#0E3040',
-                  fillColor: isBold ? '#15607C' : '#15607C',
-                  fillOpacity: 0.3,
-                  weight: 3,
-                  opacity: 0.95,
-                } as any
-              }
-            />
-          ) : null,
-        )}
-
-        {/* Markers */}
+        {/* Markers — icona banco unica, niente aree/zone evidenziate */}
         {allPins.map((pin) => {
-          const icon = isBold ? boldIcon(pin, pin.id === selectedId) : defaultIcon(pin.kind)
+          const icon = pinIcon(pin, pin.id === selectedId)
           return (
             <Marker
               key={`pin-${pin.kind}-${pin.id}`}

@@ -1,7 +1,11 @@
-// Recupero foto comune con DEDUP + limite di CONCORRENZA: richieste identiche
-// condividono una sola promessa (la galleria riusa le query dei borghi) e al
-// massimo MAX richieste partono insieme (niente "thundering herd" su Wikipedia,
-// che altrimenti rallenta/scarta). I MISS non vengono memorizzati → retry futuro.
+// Recupero foto comune: PRIMA la selezione curata locale (public/zone — foto
+// scelte una per una perché rappresentino davvero quel borgo/costa), poi il
+// fallback via /api/comune-image (Wikipedia) per i luoghi non coperti.
+// DEDUP + limite di CONCORRENZA: richieste identiche condividono una sola
+// promessa e al massimo MAX richieste partono insieme (niente "thundering
+// herd" su Wikipedia). I MISS non vengono memorizzati → retry futuro.
+import { curatedPhoto } from '@/lib/zonePhotos'
+
 const cache = new Map<string, Promise<string | null>>()
 
 const MAX = 4
@@ -18,6 +22,9 @@ function release() {
 }
 
 export function getComuneImage(query: string, fallback?: string): Promise<string | null> {
+  const curated = curatedPhoto(query) ?? (fallback ? curatedPhoto(fallback) : null)
+  if (curated) return Promise.resolve(curated.src)
+
   const key = `${query}|${fallback ?? ''}`
   const hit = cache.get(key)
   if (hit) return hit

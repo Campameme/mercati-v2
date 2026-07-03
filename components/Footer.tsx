@@ -17,6 +17,7 @@ export default function Footer() {
         <Link href="/aderisci" className="hover:text-ink">Aderisci</Link>
         <Link href="/privacy" className="hover:text-ink">Privacy</Link>
         <Link href="/cookie" className="hover:text-ink">Cookie</Link>
+        <Link href="/crediti" className="hover:text-ink">Crediti foto</Link>
         <a href="mailto:emanueleecampanini@gmail.com" className="hover:text-ink">Contatti</a>
       </div>
     </footer>

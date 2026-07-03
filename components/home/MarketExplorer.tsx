@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Search, Crosshair, Navigation as NavIcon, ChevronDown, Check } from 'lucide-react'
 import UnifiedMapClient from '@/components/UnifiedMapClient'
-import type { UnifiedMapPin, MapZone } from '@/components/UnifiedMap'
+import type { UnifiedMapPin } from '@/components/UnifiedMap'
 import MarketPanel from './MarketPanel'
 import type { MarketPin, MarketSession } from './types'
 import { HOME_I18N, LANGS, type Lang } from '@/lib/i18n/home'
@@ -12,7 +12,7 @@ import {
   classifyMany, CATEGORY_ORDER, CATEGORY_COLOR, CATEGORY_GLYPH, categoryLabelI18n, type ScheduleCategory,
 } from '@/lib/schedules/classify'
 import { ZONES, ZONE_BY_SLUG } from '@/lib/markets/zones'
-import { zonePolygon, haversineMeters } from '@/lib/markets/geo'
+import { haversineMeters } from '@/lib/markets/geo'
 import { HOME_COPY } from '@/lib/i18n/homeCopy'
 import { useTypewriter } from '@/lib/useTypewriter'
 import { searchMarkets, type SearchOperatorLite } from '@/lib/markets/search'
@@ -245,22 +245,6 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
     [filteredPins, meta],
   )
 
-  const mapZones = useMemo<MapZone[]>(() => {
-    const bySlug = new Map<string, MarketPin[]>()
-    for (const p of filteredPins) {
-      const arr = bySlug.get(p.marketSlug) ?? []
-      arr.push(p)
-      bySlug.set(p.marketSlug, arr)
-    }
-    const out: MapZone[] = []
-    for (const [slug, ps] of bySlug) {
-      const feature = zonePolygon(ps.map((p) => ({ lat: p.lat, lng: p.lng })))
-      if (!feature) continue
-      out.push({ id: slug, feature, color: ZONE_BY_SLUG[slug]?.accent ?? '#15607C', selected: zone === slug })
-    }
-    return out
-  }, [filteredPins, zone])
-
   const selected = useMemo(() => pins.find((p) => p.id === selectedId) ?? null, [pins, selectedId])
   const selectedSession = selected ? pickSession(selected, now) : null
   const selectedStatus = selected ? statuses.get(selected.id) : undefined
@@ -279,7 +263,6 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
   }
 
   function selectMarket(id: string) { setSelectedId(id); setOpen(false); setQuery('') }
-  function chooseZone(slug: string) { setZone((z) => (z === slug ? 'all' : slug)) }
   function toggleType(c: ScheduleCategory) {
     setTypes((t) => (t.includes(c) ? t.filter((x) => x !== c) : [...t, c]))
   }
@@ -511,14 +494,11 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
             <UnifiedMapClient
               pins={mapPins}
               height="100%"
-              variant="bold"
               bare
               onPinClick={(p) => selectMarket(p.id)}
               selectedId={selectedId}
               panToSelected
               userLocation={userLoc}
-              zones={mapZones}
-              onZoneClick={chooseZone}
               maxZoom={14}
             />
           </div>

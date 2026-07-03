@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { curatedPhoto } from '@/lib/zonePhotos'
 
 interface Props {
   query: string
@@ -34,6 +35,12 @@ export default function ZoneImage({
     let cancelled = false
     setLoaded(false)
     setFailed(false)
+    // Selezione curata locale: foto scelta a mano per quel borgo/costa.
+    const curated = curatedPhoto(query) ?? (fallbackQuery ? curatedPhoto(fallbackQuery) : null)
+    if (curated) {
+      setSrc(curated.src)
+      return () => { cancelled = true }
+    }
     ;(async () => {
       async function tryQuery(q: string): Promise<string | null> {
         try {

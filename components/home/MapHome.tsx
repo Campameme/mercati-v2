@@ -167,7 +167,7 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
         </a>
       </section>
 
-      {/* ===== VALORE 1 · IL PROGETTO — tutta la Riviera in un posto solo (borghi) ===== */}
+      {/* ===== LE ZONE — otto zone, otto racconti: la porta d'ingresso del sito ===== */}
       <BorghiSection
         eyebrow={copy.valueProject.k}
         title={copy.valueProject.title}
@@ -175,45 +175,8 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
         cta={{ label: copy.exploreMapCta, href: '/mappa' }}
       />
 
-      {/* ===== VALORE 2 · LE PERSONE — i valori del mercato e chi li porta al banco ===== */}
-      <section id="valori" className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
-        <DriftBackdrop tone="light" variant="section" />
-        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-5xl">
-          <div className="max-w-2xl mb-9">
-            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-fiore-600 mb-2">{copy.valueMarket.k}</p>
-            <h2 className="font-alt font-extrabold tracking-tight text-3xl md:text-4xl leading-[1.06] text-ink">{copy.valueMarket.title}</h2>
-            <p className="mt-3 text-base text-ink-soft leading-relaxed">{copy.valueMarket.lead}</p>
-          </div>
-          {/* le persone: i valori hanno nomi e facce (la griglia di 6 card
-              "qualità" è stata scremata — il lead qui sopra dice già tutto) */}
-          <div className="mt-2">
-            <div className="max-w-2xl">
-              <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{copy.operatorsEyebrow}</p>
-              <h3 className="font-alt font-bold text-2xl md:text-4xl leading-[1.04] text-ink"><span className="imk-mark">{copy.operatorsTitle}</span></h3>
-              <p className="mt-3 text-base text-ink-soft leading-relaxed">{copy.operatorsLead}</p>
-            </div>
-            {operators.length > 0 && (
-              <div className="mt-6 flex flex-wrap gap-3">
-                {operators.slice(0, 10).map((op) => (
-                  <Link key={op.id} href={op.market ? `/${op.market.slug}/operators/${op.id}` : '/operatori'} className="imk-lift" aria-label={`Scopri ${op.name}`}>
-                    <WaterCard className="flex items-center gap-2.5 pl-1.5 pr-3.5 py-1.5 rounded-full hover:border-mare/50">
-                      <BancoAvatar name={op.name} size={32} />
-                      <span className="font-alt text-sm font-semibold text-ink">{op.name}</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-mare-600 flex-shrink-0" aria-hidden="true" />
-                    </WaterCard>
-                  </Link>
-                ))}
-              </div>
-            )}
-            <Link href="/operatori" className="group imk-lift mt-7 inline-flex items-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-6 py-3.5 rounded-full hover:bg-sole-600 transition-colors">
-              <Store className="w-4 h-4" /> {copy.operatorsCta} <ArrowRight className="imk-march w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* ===== LA SETTIMANA — notizie ed eventi, fianco a fianco ===== */}
-      <section id="settimana" className="relative overflow-hidden bg-marel/40 border-b-2 border-ink/10">
+      <section id="settimana" className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
         <DriftBackdrop tone="light" variant="section" />
         <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-5xl">
           <div className="max-w-2xl mb-9">
@@ -250,7 +213,7 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
 
             {/* colonna eventi */}
             <div>
-              <p className="inline-flex items-center gap-2 font-alt text-xs font-semibold uppercase tracking-[0.14em] text-fiore-600 mb-4">
+              <p className="inline-flex items-center gap-2 font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-4">
                 <CalendarDays className="w-4 h-4" aria-hidden="true" /> {copy.eventsColTitle}
               </p>
               {events.length === 0 ? (
@@ -262,7 +225,7 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
                 <div className="space-y-4">
                   {events.slice(0, 3).map((e, i) => (
                     <WaterCard key={e.id} tilt={i % 2 === 0 ? 'r' : 'l'} className="imk-tape p-5 pt-6">
-                      <span className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.1em] text-fiore-600">
+                      <span className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.1em] text-mare-600">
                         <CalendarDays className="w-3.5 h-3.5" aria-hidden="true" /> {fmtDate(e.startAt)}
                       </span>
                       <h3 className="font-alt font-bold text-lg text-ink leading-tight mt-1.5">{e.title}</h3>
@@ -279,8 +242,45 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
             <Link href="/notizie" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-ink text-carta px-6 py-3.5 rounded-full hover:bg-mare transition-colors">
               <Newspaper className="w-4 h-4" /> {copy.newsAllCta} <ArrowRight className="imk-march w-4 h-4" />
             </Link>
-            <Link href="/eventi" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-6 py-3.5 rounded-full hover:bg-sole-600 transition-colors">
+            <Link href="/eventi" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-ink text-carta px-6 py-3.5 rounded-full hover:bg-mare transition-colors">
               <CalendarDays className="w-4 h-4" /> {copy.eventsAllCta} <ArrowRight className="imk-march w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== LE PERSONE — i valori del mercato e chi li porta al banco ===== */}
+      <section id="valori" className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
+        <DriftBackdrop tone="light" variant="section" />
+        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-5xl">
+          <div className="max-w-2xl mb-9">
+            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{copy.valueMarket.k}</p>
+            <h2 className="font-alt font-extrabold tracking-tight text-3xl md:text-4xl leading-[1.06] text-ink">{copy.valueMarket.title}</h2>
+            <p className="mt-3 text-base text-ink-soft leading-relaxed">{copy.valueMarket.lead}</p>
+          </div>
+          {/* le persone: i valori hanno nomi e facce (la griglia di 6 card
+              "qualità" è stata scremata — il lead qui sopra dice già tutto) */}
+          <div className="mt-2">
+            <div className="max-w-2xl">
+              <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{copy.operatorsEyebrow}</p>
+              <h3 className="font-alt font-bold text-2xl md:text-4xl leading-[1.04] text-ink"><span className="imk-mark">{copy.operatorsTitle}</span></h3>
+              <p className="mt-3 text-base text-ink-soft leading-relaxed">{copy.operatorsLead}</p>
+            </div>
+            {operators.length > 0 && (
+              <div className="mt-6 flex flex-wrap gap-3">
+                {operators.slice(0, 10).map((op) => (
+                  <Link key={op.id} href={op.market ? `/${op.market.slug}/operators/${op.id}` : '/operatori'} className="imk-lift" aria-label={`Scopri ${op.name}`}>
+                    <WaterCard className="flex items-center gap-2.5 pl-1.5 pr-3.5 py-1.5 rounded-full hover:border-mare/50">
+                      <BancoAvatar name={op.name} size={32} />
+                      <span className="font-alt text-sm font-semibold text-ink">{op.name}</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-mare-600 flex-shrink-0" aria-hidden="true" />
+                    </WaterCard>
+                  </Link>
+                ))}
+              </div>
+            )}
+            <Link href="/operatori" className="group imk-lift mt-7 inline-flex items-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-6 py-3.5 rounded-full hover:bg-sole-600 transition-colors">
+              <Store className="w-4 h-4" /> {copy.operatorsCta} <ArrowRight className="imk-march w-4 h-4" />
             </Link>
           </div>
         </div>

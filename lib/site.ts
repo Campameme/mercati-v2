@@ -3,4 +3,6 @@
 // es. https://mercatidiponente.netlify.app); in locale cade su localhost.
 export const SITE_NAME = 'Mercati della Riviera di Ponente'
 export const SITE_TAGLINE = 'I mercati settimanali della Riviera dei Fiori, in provincia di Imperia'
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/$/, '')
+// Fallback: su Netlify la variabile URL è impostata automaticamente al dominio
+// del sito, così sitemap/metadata non puntano mai a localhost in produzione.
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? process.env.URL ?? 'http://localhost:3000').replace(/\/$/, '')

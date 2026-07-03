@@ -7,6 +7,7 @@ import { formatMarketDays } from '@/lib/markets/days'
 import { SunRay, WaveDivider } from '@/components/decorations'
 import { slugifyName } from '@/lib/markets/slug'
 import { classifySchedule, CATEGORY_COLOR } from '@/lib/schedules/classify'
+import { ZONE_BY_SLUG } from '@/lib/markets/zones'
 import ZoneImage from '@/components/ZoneImage'
 import Reveal from '@/components/Reveal'
 import MarketViewer from '@/components/MarketViewer'
@@ -37,11 +38,13 @@ export async function generateMetadata({ params }: { params: { marketSlug: strin
   }
 }
 
+// Comune della foto-hero di ogni zona (le foto sono la selezione curata in
+// public/zone — vedi lib/zonePhotos): il soggetto più riconoscibile della zona.
 const ZONE_HERO_COMUNE: Record<string, string> = {
-  'val-nervia':             'Camporosso',
+  'val-nervia':             'Perinaldo',
   'bordighera-ospedaletti': 'Bordighera',
-  'taggia-e-costa':         'Taggia',
-  'golfo-dianese':          'Diano Marina',
+  'taggia-e-costa':         'Arma di Taggia',
+  'golfo-dianese':          'Cervo',
   'entroterra':             'Pieve di Teco',
 }
 
@@ -73,24 +76,25 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
   ])
   if (!marketFull) notFound()
 
+  // Niente poligoni/aree evidenziate: sulla mappa parlano solo i pin-banco.
   const mapPins = (schedules ?? [])
     .filter((s) => s.lat != null && s.lng != null)
-    .map((s: any) => {
-      const placePolygon = s.market_places?.polygon_geojson ?? null
-      return {
-        id: s.id as string,
-        lat: s.lat as number,
-        lng: s.lng as number,
-        kind: 'market' as const,
-        title: `${s.comune} · ${s.giorno}`,
-        subtitle: s.luogo ?? s.settori ?? undefined,
-        polygon: (placePolygon ?? s.polygon_geojson ?? null) as any,
-        href: `/${marketFull.slug}/c/${slugifyName(s.comune)}`,
-      }
-    })
+    .map((s: any) => ({
+      id: s.id as string,
+      lat: s.lat as number,
+      lng: s.lng as number,
+      kind: 'market' as const,
+      title: `${s.comune} · ${s.giorno}`,
+      subtitle: s.luogo ?? s.settori ?? undefined,
+      href: `/${marketFull.slug}/c/${slugifyName(s.comune)}`,
+      category: classifySchedule(s.settori),
+    }))
 
   const comuni = Array.from(new Set((schedules ?? []).map((s) => s.comune)))
   const heroQuery = ZONE_HERO_COMUNE[marketFull.slug] ?? marketFull.city ?? comuni[0]
+  // Il racconto della zona: curato in lib/markets/zones (specifico, verificato);
+  // la description dal DB resta come ripiego per zone non mappate.
+  const zoneStory = ZONE_BY_SLUG[marketFull.slug]?.story ?? marketFull.description
 
   const features = [
     { href: `/${marketFull.slug}/operators`, label: 'Banchi',     icon: Store },
@@ -119,7 +123,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                 query={heroQuery}
                 fallbackQuery={comuni[0] ?? marketFull.city}
                 alt={marketFull.name}
-                caption={`${heroQuery} · via Wikipedia`}
+                caption={heroQuery}
                 aspect="aspect-[4/5]"
                 tilt="l"
                 tape
@@ -142,9 +146,9 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                   </h1>
                   <FavoriteButton kind="market" id={marketFull.slug} label={marketFull.name} />
                 </div>
-                {marketFull.description && (
+                {zoneStory && (
                   <p className="mt-4 text-sm md:text-base text-ink-soft max-w-2xl leading-relaxed">
-                    {marketFull.description}
+                    {zoneStory}
                   </p>
                 )}
                 {marketFull.market_days && marketFull.market_days.length > 0 && (

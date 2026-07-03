@@ -1,11 +1,11 @@
 import type { Lang } from './home'
 
 // Copy della home editoriale. Tenuto separato da HomeDict. Voce: prima persona
-// plurale, calda, ligure-pop, sensoriale; gli ambulanti = il prodotto.
-// Le "qualities" vengono dai colloqui veri con gli ambulanti (docs/operatori_schede_PED):
-// gesti reali — il banco che cambia ogni settimana, cinque generazioni di baccalà,
-// la sveglia alle 4, il pensierino nel sacchetto — raccontati senza nomi.
-// Vedi docs/brand-voice.md.
+// plurale, concreta, ligure; niente slogan da agenzia — si raccontano giorni,
+// piazze e gesti veri. Le "qualities" vengono dai colloqui veri con gli
+// ambulanti (docs/operatori_schede_PED): il banco che cambia ogni settimana,
+// cinque generazioni di baccalà, la sveglia alle 4, il pensierino nel
+// sacchetto — raccontati senza nomi. Vedi docs/brand-voice.md.
 
 export interface HomeQuality {
   t: string
@@ -52,24 +52,24 @@ export interface HomeCopy {
 
 export const HOME_COPY: Record<Lang, HomeCopy> = {
   it: {
-    heroHeadline: 'Il mercato che profuma di mare.',
-    heroSubtitle: 'Da oltre 100 anni, la Liguria al mercato. I mercati della Riviera di Ponente.',
-    heroScrollCue: 'Scopri',
+    heroHeadline: 'Ogni piazza ha il suo giorno.',
+    heroSubtitle: 'I mercati settimanali della Riviera di Ponente: banchi, piazze e voci da Ventimiglia a Cervo, dal mare alla Via del Sale.',
+    heroScrollCue: 'Le zone',
     heroChips: { today: 'Oggi al mercato', near: 'Vicino a me', saturday: 'Sabato' },
     searchExamples: ['Cerca un prodotto…', 'Cerca un ambulante…', 'Cerca una zona…', 'Cerca un mercato di oggi…', 'Cerca l’artigianato…'],
     exploreMapCta: 'Apri la mappa',
     valueProject: {
       k: 'Il progetto',
-      title: 'Tutta la Riviera, in un posto solo.',
-      lead: 'I mercati settimanali del Ponente — dalla costa ai borghi dell’entroterra — raccolti in un’unica mappa: dove sono, quando aprono, cosa ci trovi.',
+      title: 'Otto zone, un solo Ponente.',
+      lead: 'Da Ventimiglia alla Valle Arroscia, ogni zona ha i suoi giorni, le sue piazze e il suo racconto: qui trovi dove sono i mercati, quando aprono e cosa aspettarti.',
     },
     searchValueEyebrow: 'L’accesso ai mercati',
-    searchValueTitle: 'Dimmi cosa cerchi, ti porto al banco giusto',
-    searchValueLead: 'Un prodotto, un ambulante, una zona o semplicemente “oggi”: scrivi e ti apriamo la mappa con i mercati che fanno per te — giorni, orari, cosa trovi e come arrivarci.',
+    searchValueTitle: 'Cerca un prodotto, un banco, un paese',
+    searchValueLead: 'Scrivi cosa ti serve — o semplicemente “oggi” — e la mappa ti mostra i mercati giusti: giorni, orari e come arrivarci.',
     searchCta: 'Cerca sulla mappa',
     valueMarket: {
       k: 'I valori del mercato',
-      title: 'Il meglio del Ponente non è la merce: è come te la danno.',
+      title: 'Il mestiere del banco',
       lead: 'Qualità vera, cortesia, mestiere tramandato. Li abbiamo raccolti parlando con chi il banco lo monta all’alba, ogni settimana.',
     },
     qualities: [
@@ -82,8 +82,8 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     ],
     qualitiesNote: 'Raccolti parlando con gli ambulanti del Ponente, banco per banco.',
     operatorsEyebrow: 'Le persone del mercato',
-    operatorsTitle: 'Gli ambulanti sono il prodotto',
-    operatorsLead: 'Dietro ogni banco c’è una storia: chi coltiva, chi sceglie, chi ti conosce per nome. Scopri chi c’è e cosa porta.',
+    operatorsTitle: 'Chi c’è dietro i banchi',
+    operatorsLead: 'Chi coltiva, chi sceglie all’alba, chi ti conosce per nome: qui trovi le persone dei mercati, banco per banco, e cosa portano.',
     operatorsCta: 'Conosci gli ambulanti',
     weekEyebrow: 'La settimana',
     weekTitle: 'Notizie ed eventi dalla Riviera',
@@ -98,24 +98,24 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     eventsAllCta: 'Tutti gli eventi',
   },
   fr: {
-    heroHeadline: 'Le marché qui sent la mer.',
-    heroSubtitle: 'Depuis plus de 100 ans, la Ligurie au marché. Les marchés de la Riviera di Ponente.',
-    heroScrollCue: 'Découvre',
+    heroHeadline: 'Chaque place a son jour.',
+    heroSubtitle: 'Les marchés hebdomadaires de la Riviera di Ponente : étals, places et voix de Vintimille à Cervo, de la mer à la Route du Sel.',
+    heroScrollCue: 'Les zones',
     heroChips: { today: 'Aujourd’hui au marché', near: 'Près de moi', saturday: 'Samedi' },
     searchExamples: ['Cherche un produit…', 'Cherche un marchand…', 'Cherche une zone…', 'Cherche un marché d’aujourd’hui…', 'Cherche l’artisanat…'],
     exploreMapCta: 'Ouvrir la carte',
     valueProject: {
       k: 'Le projet',
-      title: 'Toute la Riviera, au même endroit.',
-      lead: 'Les marchés hebdomadaires du Ponant — de la côte aux villages de l’arrière-pays — réunis sur une seule carte : où ils sont, quand ils ouvrent, ce qu’on y trouve.',
+      title: 'Huit zones, un seul Ponant.',
+      lead: 'De Vintimille à la vallée de l’Arroscia, chaque zone a ses jours, ses places et son histoire : ici tu trouves où sont les marchés, quand ils ouvrent et à quoi t’attendre.',
     },
     searchValueEyebrow: 'L’accès aux marchés',
-    searchValueTitle: 'Dis-moi ce que tu cherches, je t’amène au bon étal',
-    searchValueLead: 'Un produit, un marchand, une zone ou simplement « aujourd’hui » : écris et on t’ouvre la carte avec les marchés qu’il te faut — jours, horaires, ce qu’on y trouve et comment y arriver.',
+    searchValueTitle: 'Cherche un produit, un étal, un village',
+    searchValueLead: 'Écris ce qu’il te faut — ou simplement « aujourd’hui » — et la carte te montre les bons marchés : jours, horaires et comment y arriver.',
     searchCta: 'Chercher sur la carte',
     valueMarket: {
       k: 'Les valeurs du marché',
-      title: 'Le meilleur du Ponant, ce n’est pas la marchandise : c’est la façon de la donner.',
+      title: 'Le métier de l’étal',
       lead: 'Qualité vraie, courtoisie, métier transmis. Recueillis en parlant avec ceux qui montent l’étal à l’aube, chaque semaine.',
     },
     qualities: [
@@ -128,8 +128,8 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     ],
     qualitiesNote: 'Recueillis auprès des marchands du Ponant, étal par étal.',
     operatorsEyebrow: 'Les gens du marché',
-    operatorsTitle: 'Les marchands sont le produit',
-    operatorsLead: 'Derrière chaque étal, une histoire : qui cultive, qui choisit, qui te connaît par ton nom. Découvre qui est là et ce qu’il apporte.',
+    operatorsTitle: 'Qui est derrière les étals',
+    operatorsLead: 'Qui cultive, qui choisit à l’aube, qui te connaît par ton nom : ici tu trouves les gens des marchés, étal par étal, et ce qu’ils apportent.',
     operatorsCta: 'Rencontrer les marchands',
     weekEyebrow: 'La semaine',
     weekTitle: 'Nouvelles et événements de la Riviera',
@@ -144,24 +144,24 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     eventsAllCta: 'Tous les événements',
   },
   de: {
-    heroHeadline: 'Der Markt, der nach Meer duftet.',
-    heroSubtitle: 'Seit über 100 Jahren: Ligurien auf dem Markt. Die Märkte der Riviera di Ponente.',
-    heroScrollCue: 'Entdecke',
+    heroHeadline: 'Jeder Platz hat seinen Tag.',
+    heroSubtitle: 'Die Wochenmärkte der Riviera di Ponente: Stände, Plätze und Stimmen von Ventimiglia bis Cervo, vom Meer bis zur Salzstraße.',
+    heroScrollCue: 'Die Zonen',
     heroChips: { today: 'Heute am Markt', near: 'In meiner Nähe', saturday: 'Samstag' },
     searchExamples: ['Suche ein Produkt…', 'Suche einen Händler…', 'Suche eine Zone…', 'Suche einen Markt heute…', 'Suche Handwerk…'],
     exploreMapCta: 'Karte öffnen',
     valueProject: {
       k: 'Das Projekt',
-      title: 'Die ganze Riviera, an einem Ort.',
-      lead: 'Die Wochenmärkte des Ponente — von der Küste bis zu den Dörfern des Hinterlands — auf einer einzigen Karte: wo sie sind, wann sie öffnen, was es gibt.',
+      title: 'Acht Zonen, ein Ponente.',
+      lead: 'Von Ventimiglia bis ins Arroscia-Tal: jede Zone hat ihre Tage, ihre Plätze und ihre Geschichte. Hier findest du, wo die Märkte sind, wann sie öffnen und was dich erwartet.',
     },
     searchValueEyebrow: 'Der Zugang zu den Märkten',
-    searchValueTitle: 'Sag, was du suchst — ich bring dich zum richtigen Stand',
-    searchValueLead: 'Ein Produkt, ein Händler, eine Zone oder einfach „heute“: schreib es, und wir öffnen die Karte mit den passenden Märkten — Tage, Zeiten, was es gibt und wie man hinkommt.',
+    searchValueTitle: 'Such ein Produkt, einen Stand, ein Dorf',
+    searchValueLead: 'Schreib, was du brauchst — oder einfach „heute“ — und die Karte zeigt dir die richtigen Märkte: Tage, Zeiten und den Weg dorthin.',
     searchCta: 'Auf der Karte suchen',
     valueMarket: {
       k: 'Die Werte des Marktes',
-      title: 'Das Beste des Ponente ist nicht die Ware: es ist, wie man sie dir gibt.',
+      title: 'Das Handwerk am Stand',
       lead: 'Echte Qualität, Freundlichkeit, überliefertes Handwerk. Gesammelt im Gespräch mit denen, die den Stand jede Woche im Morgengrauen aufbauen.',
     },
     qualities: [
@@ -174,8 +174,8 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     ],
     qualitiesNote: 'Gesammelt im Gespräch mit den Händlern des Ponente, Stand für Stand.',
     operatorsEyebrow: 'Die Menschen des Marktes',
-    operatorsTitle: 'Die Händler sind das Produkt',
-    operatorsLead: 'Hinter jedem Stand eine Geschichte: wer anbaut, wer auswählt, wer dich beim Namen kennt. Entdecke, wer da ist und was er mitbringt.',
+    operatorsTitle: 'Wer hinter den Ständen steht',
+    operatorsLead: 'Wer anbaut, wer im Morgengrauen auswählt, wer dich beim Namen kennt: hier findest du die Menschen der Märkte, Stand für Stand, und was sie mitbringen.',
     operatorsCta: 'Die Händler kennenlernen',
     weekEyebrow: 'Die Woche',
     weekTitle: 'Nachrichten & Termine von der Riviera',
@@ -190,24 +190,24 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     eventsAllCta: 'Alle Termine',
   },
   en: {
-    heroHeadline: 'The market with the scent of the sea.',
-    heroSubtitle: 'For over 100 years, Liguria at the market. The markets of the Riviera di Ponente.',
-    heroScrollCue: 'Discover',
+    heroHeadline: 'Every square has its day.',
+    heroSubtitle: 'The weekly markets of the Riviera di Ponente: stalls, squares and voices from Ventimiglia to Cervo, from the sea to the old Salt Road.',
+    heroScrollCue: 'The areas',
     heroChips: { today: 'Today at the market', near: 'Near me', saturday: 'Saturday' },
     searchExamples: ['Search a product…', 'Search a vendor…', 'Search an area…', 'Search a market today…', 'Search the crafts…'],
     exploreMapCta: 'Open the map',
     valueProject: {
       k: 'The project',
-      title: 'The whole Riviera, in one place.',
-      lead: 'The weekly markets of the Ponente — from the coast to the inland villages — gathered on a single map: where they are, when they open, what you’ll find.',
+      title: 'Eight areas, one Ponente.',
+      lead: 'From Ventimiglia to the Arroscia valley, every area has its days, its squares and its story: here you’ll find where the markets are, when they open and what to expect.',
     },
     searchValueEyebrow: 'Getting to the markets',
-    searchValueTitle: 'Tell me what you want, I’ll take you to the right stall',
-    searchValueLead: 'A product, a vendor, an area or just “today”: type it and we open the map with the markets for you — days, hours, what you’ll find and how to get there.',
+    searchValueTitle: 'Search a product, a stall, a village',
+    searchValueLead: 'Type what you need — or simply “today” — and the map shows you the right markets: days, hours and how to get there.',
     searchCta: 'Search on the map',
     valueMarket: {
       k: 'The market’s values',
-      title: 'The best of the Ponente isn’t the goods: it’s how they hand them to you.',
+      title: 'The craft of the stall',
       lead: 'Real quality, courtesy, a craft passed down. Collected by talking with the people who set up their stalls at dawn, every week.',
     },
     qualities: [
@@ -220,8 +220,8 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     ],
     qualitiesNote: 'Collected by talking with the vendors of the Ponente, stall by stall.',
     operatorsEyebrow: 'The people of the market',
-    operatorsTitle: 'The vendors are the product',
-    operatorsLead: 'Behind every stall a story: who grows, who picks, who knows you by name. Discover who’s there and what they bring.',
+    operatorsTitle: 'Who’s behind the stalls',
+    operatorsLead: 'Who grows, who picks at dawn, who knows you by name: here you’ll find the people of the markets, stall by stall, and what they bring.',
     operatorsCta: 'Meet the vendors',
     weekEyebrow: 'The week',
     weekTitle: 'News & events from the Riviera',
