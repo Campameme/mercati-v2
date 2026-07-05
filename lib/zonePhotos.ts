@@ -306,6 +306,38 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     license: 'CC BY-SA 4.0',
     url: 'https://commons.wikimedia.org/wiki/File:Sassello_1273.jpg',
   },
+  'vita-mercato-ventimiglia': {
+    src: '/zone/vita-mercato-ventimiglia.jpg',
+    alt: 'Il mercato del venerdì a Ventimiglia, con la città alta alle spalle',
+    file: 'Market of Vintimiglia.jpg',
+    artist: 'Tangopaso',
+    license: 'Public domain',
+    url: 'https://commons.wikimedia.org/wiki/File:Market_of_Vintimiglia.jpg',
+  },
+  'vita-banco-verdure': {
+    src: '/zone/vita-banco-verdure.jpg',
+    alt: 'Un banco di verdure al mercato, tra venditore e clienti',
+    file: '--quanti skei?-- (41167411811).jpg',
+    artist: 'istolethetv',
+    license: 'CC BY 2.0',
+    url: 'https://commons.wikimedia.org/wiki/File:--quanti_skei%3F--_(41167411811).jpg',
+  },
+  'vita-fiori-sanremo-1962': {
+    src: '/zone/vita-fiori-sanremo-1962.jpg',
+    alt: 'Il mercato dei fiori di Sanremo nel 1962',
+    file: 'Photo Flower market in Sanremo 1962 - Touring Club Italiano 1.3390.jpg',
+    artist: 'Autore sconosciuto (Touring Club Italiano)',
+    license: 'CC BY-SA 4.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Photo_Flower_market_in_Sanremo_1962_-_Touring_Club_Italiano_1.3390.jpg',
+  },
+  'vita-sapori': {
+    src: '/zone/vita-sapori.jpg',
+    alt: 'Cestini di sapori su un banco di mercato',
+    file: 'Fruit at Mercato Centrale.jpg',
+    artist: 'Brian & Jaclyn Drum',
+    license: 'CC BY 2.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Fruit_at_Mercato_Centrale.jpg',
+  },
 }
 
 // Alias: nomi alternativi con cui i luoghi arrivano dalle query (comuni dal

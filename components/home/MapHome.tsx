@@ -228,14 +228,44 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
       <section id="valori" className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
         <DriftBackdrop tone="light" variant="section" />
         <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-6xl">
-          <div className="max-w-2xl">
-            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{copy.valueProject.k}</p>
-            <h2 className="font-display text-4xl md:text-6xl leading-[1.02] text-ink">
-              {copy.operatorsTitle.split(' ').map((w, i, arr) => (
-                <span key={i} className={i === arr.length - 1 ? 'italic text-fiore' : ''}>{w} </span>
-              ))}
-            </h2>
-            <p className="mt-4 text-base md:text-lg text-ink-soft leading-relaxed">{copy.operatorsLead}</p>
+          <div className="grid lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-16 items-center">
+            <div>
+              <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{copy.valueProject.k}</p>
+              <h2 className="font-display text-4xl md:text-6xl leading-[1.02] text-ink">
+                {copy.operatorsTitle.split(' ').map((w, i, arr) => (
+                  <span key={i} className={i === arr.length - 1 ? 'italic text-fiore' : ''}>{w} </span>
+                ))}
+              </h2>
+              <p className="mt-4 text-base md:text-lg text-ink-soft leading-relaxed">{copy.operatorsLead}</p>
+            </div>
+
+            {/* Collage di vita di mercato: il calore, non i concetti */}
+            <div className="relative pt-4 pb-10 pr-4 hidden sm:block">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/zone/vita-mercato-ventimiglia.jpg"
+                alt="Il mercato del venerdì a Ventimiglia, con la città alta alle spalle"
+                loading="lazy"
+                className="imk-edge imk-tilt-r w-full aspect-[4/3] object-cover border-2 border-ink/10 shadow-md"
+              />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/zone/vita-banco-verdure.jpg"
+                alt="Un banco di verdure al mercato, tra venditore e clienti"
+                loading="lazy"
+                className="imk-edge imk-tilt-l absolute -bottom-2 -left-3 w-1/2 aspect-[4/3] object-cover border-[3px] border-carta shadow-xl"
+              />
+              <figure className="imk-tape absolute -top-3 -right-1 w-[38%] rotate-2 bg-white border-2 border-ink/10 imk-edge p-1.5 pb-2 shadow-lg">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/zone/vita-fiori-sanremo-1962.jpg"
+                  alt="Il mercato dei fiori di Sanremo nel 1962"
+                  loading="lazy"
+                  className="w-full aspect-[4/3] object-cover"
+                />
+                <figcaption className="mt-1 px-1 font-accent text-sm text-ink-soft leading-tight">Sanremo, 1962</figcaption>
+              </figure>
+            </div>
           </div>
 
           {/* I valori raccolti ai banchi: tre cartoline con nastro, la voce vera */}
@@ -284,28 +314,29 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
         </div>
       </section>
 
-      {/* ===== LE ZONE — quindici zone, quindici racconti ===== */}
+      {/* ===== LE ZONE — quindici zone, quindici racconti (aria di marel) ===== */}
       <BorghiSection
+        className="bg-marel/40 border-b-2 border-ink/10"
         eyebrow={dict.zones.eyebrow}
         title={copy.valueProject.title}
         lead={copy.valueProject.lead}
         cta={{ label: copy.exploreMapCta, href: '/mappa' }}
       />
 
-      {/* ===== LA SETTIMANA — notizie ed eventi, fianco a fianco ===== */}
-      <section id="settimana" className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
-        <DriftBackdrop tone="light" variant="section" />
+      {/* ===== LA SETTIMANA — notizie ed eventi, di sera: sezione notturna ===== */}
+      <section id="settimana" className="relative overflow-hidden bg-notte text-carta border-b-2 border-notte">
+        <DriftBackdrop tone="dark" variant="section" />
         <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-5xl">
           <div className="max-w-2xl mb-9">
-            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{copy.weekEyebrow}</p>
-            <h2 className="font-alt font-extrabold tracking-tight text-3xl md:text-4xl leading-[1.04] text-ink">{copy.weekTitle}</h2>
-            <p className="mt-2 text-sm text-ink-soft">{copy.weekLead}</p>
+            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-sole mb-2">{copy.weekEyebrow}</p>
+            <h2 className="font-alt font-extrabold tracking-tight text-3xl md:text-4xl leading-[1.04] text-carta">{copy.weekTitle}</h2>
+            <p className="mt-2 text-sm text-carta/70">{copy.weekLead}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
             {/* colonna notizie */}
             <div>
-              <p className="inline-flex items-center gap-2 font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-4">
+              <p className="inline-flex items-center gap-2 font-alt text-xs font-semibold uppercase tracking-[0.14em] text-marel mb-4">
                 <Newspaper className="w-4 h-4" aria-hidden="true" /> {copy.newsColTitle}
               </p>
               {news.length === 0 ? (
@@ -330,7 +361,7 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
 
             {/* colonna eventi */}
             <div>
-              <p className="inline-flex items-center gap-2 font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-4">
+              <p className="inline-flex items-center gap-2 font-alt text-xs font-semibold uppercase tracking-[0.14em] text-sole mb-4">
                 <CalendarDays className="w-4 h-4" aria-hidden="true" /> {copy.eventsColTitle}
               </p>
               {events.length === 0 ? (
@@ -356,7 +387,7 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
 
           {/* pulsanti evidenti verso le sezioni dedicate */}
           <div className="mt-10 flex flex-wrap gap-3">
-            <Link href="/notizie" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-ink text-carta px-6 py-3.5 rounded-full hover:bg-mare transition-colors">
+            <Link href="/notizie" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-carta text-ink px-6 py-3.5 rounded-full hover:bg-sole transition-colors">
               <Newspaper className="w-4 h-4" /> {copy.newsAllCta} <ArrowRight className="imk-march w-4 h-4" />
             </Link>
             <Link href="/eventi" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-ink text-carta px-6 py-3.5 rounded-full hover:bg-mare transition-colors">
