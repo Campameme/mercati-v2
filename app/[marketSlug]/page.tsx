@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { MapPin, Store, Newspaper, Calendar, Cloud, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Store, Newspaper, Calendar, Cloud, ArrowRight, ChevronLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { formatMarketDays } from '@/lib/markets/days'
 import { SunRay, WaveDivider } from '@/components/decorations'
@@ -61,8 +61,6 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
   const idx = (allMarkets ?? []).findIndex((m) => m.slug === params.marketSlug)
   const market = idx >= 0 ? (allMarkets ?? [])[idx] : null
   if (!market) notFound()
-  const prevMarket = idx > 0 ? (allMarkets ?? [])[idx - 1] : null
-  const nextMarket = idx < (allMarkets?.length ?? 0) - 1 ? (allMarkets ?? [])[idx + 1] : null
 
   // Full market info + sessions (con coord e poligoni per la mappa)
   const [{ data: marketFull }, { data: schedules }] = await Promise.all([
@@ -273,33 +271,6 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
           </section>
         )}
 
-        {/* Nav prev/next tra zone */}
-        <nav className="grid grid-cols-2 gap-3 py-8 border-t-2 border-ink/10 text-sm">
-          {prevMarket ? (
-            <Link
-              href={`/${prevMarket.slug}`}
-              className="imk-water imk-edge imk-lift group flex items-center gap-3 px-4 py-3 bg-white border-2 border-ink/10 hover:border-mare transition-colors"
-            >
-              <ChevronLeft className="w-4 h-4 text-mare group-hover:-translate-x-0.5 transition-transform" />
-              <div className="min-w-0">
-                <p className="font-alt text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Zona precedente</p>
-                <p className="font-alt font-bold text-base text-ink truncate">{prevMarket.name}</p>
-              </div>
-            </Link>
-          ) : <div />}
-          {nextMarket ? (
-            <Link
-              href={`/${nextMarket.slug}`}
-              className="imk-water imk-edge imk-lift group flex items-center justify-end gap-3 px-4 py-3 bg-white border-2 border-ink/10 hover:border-mare transition-colors text-right"
-            >
-              <div className="min-w-0">
-                <p className="font-alt text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Zona successiva</p>
-                <p className="font-alt font-bold text-base text-ink truncate">{nextMarket.name}</p>
-              </div>
-              <ChevronRight className="w-4 h-4 text-mare group-hover:translate-x-0.5 transition-transform" />
-            </Link>
-          ) : <div />}
-        </nav>
       </div>
     </div>
   )

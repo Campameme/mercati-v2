@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { slugifyName } from '@/lib/markets/slug'
 import { SunRay } from '@/components/decorations'
@@ -9,8 +9,14 @@ import ComuneSessionsExplorer from '@/components/ComuneSessionsExplorer'
 import PageviewTracker from '@/components/analytics/PageviewTracker'
 import DriftBackdrop from '@/components/motion/DriftBackdrop'
 import Cartolina from '@/components/Cartolina'
+import ZoneImage from '@/components/ZoneImage'
+import { comuneDescription } from '@/lib/markets/comuni'
+import { weekdaysOf } from '@/lib/markets/hours'
+import { haversineMeters } from '@/lib/markets/geo'
 
 export const dynamic = 'force-dynamic'
+
+const WD_SHORT = ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab']
 
 export default async function ComunePage({
   params,
@@ -27,7 +33,7 @@ export default async function ComunePage({
 
   const { data: schedules } = await supabase
     .from('market_schedules')
-    .select('id, comune, giorno, orario, luogo, settori, lat, lng, polygon_geojson, place_id, market_places(polygon_geojson)')
+    .select('id, comune, giorno, orario, luogo, settori, lat, lng')
     .eq('market_id', market.id)
     .eq('is_active', true)
     .order('comune', { ascending: true })
@@ -43,18 +49,39 @@ export default async function ComunePage({
     settori: s.settori,
     lat: s.lat,
     lng: s.lng,
-    polygon_geojson: s.polygon_geojson ?? null,
-    placePolygon: s.market_places?.polygon_geojson ?? null,
   }))
 
   const comune = forComune[0].comune
+  const descrizione = comuneDescription(comune)
 
-  // Lista comuni della zona ordinati — per prev/next
-  const comuniOrdinati = Array.from(new Set((schedules ?? []).map((s) => s.comune)))
-    .sort((a, b) => a.localeCompare(b, 'it'))
-  const curIdx = comuniOrdinati.indexOf(comune)
-  const prevComune = curIdx > 0 ? comuniOrdinati[curIdx - 1] : null
-  const nextComune = curIdx < comuniOrdinati.length - 1 ? comuniOrdinati[curIdx + 1] : null
+  // Comuni limitrofi (anche di ALTRE zone): centroide per comune su tutta la
+  // Riviera, poi i 3 più vicini — ognuno apre la SUA pagina comune.
+  const { data: allSchedules } = await supabase
+    .from('market_schedules')
+    .select('comune, giorno, lat, lng, markets!inner(slug, is_active)')
+    .eq('is_active', true)
+    .eq('markets.is_active', true)
+
+  interface Vicino { comune: string; slug: string; marketSlug: string; lat: number; lng: number; giorni: Set<number>; n: number }
+  const byComune = new Map<string, Vicino>()
+  for (const s of (allSchedules ?? []) as any[]) {
+    if (s.lat == null || s.lng == null) continue
+    const key = slugifyName(s.comune)
+    const cur = byComune.get(key) ?? {
+      comune: s.comune, slug: key, marketSlug: s.markets.slug, lat: 0, lng: 0, giorni: new Set<number>(), n: 0,
+    }
+    cur.lat += s.lat; cur.lng += s.lng; cur.n += 1
+    for (const d of weekdaysOf(s.giorno)) cur.giorni.add(d)
+    byComune.set(key, cur)
+  }
+  const here = byComune.get(params.comuneSlug)
+  const vicini = here
+    ? Array.from(byComune.values())
+        .filter((v) => v.slug !== params.comuneSlug)
+        .map((v) => ({ ...v, lat: v.lat / v.n, lng: v.lng / v.n, km: haversineMeters({ lat: here.lat / here.n, lng: here.lng / here.n }, { lat: v.lat / v.n, lng: v.lng / v.n }) / 1000 }))
+        .sort((a, b) => a.km - b.km)
+        .slice(0, 3)
+    : []
 
   // Operatori del comune: modello M:N (operator_schedules) + fallback legacy.
   // Così un ambulante presente in più mercati compare in ognuno di essi.
@@ -88,7 +115,7 @@ export default async function ComunePage({
   return (
     <div>
       <PageviewTracker type="view_comune" marketId={market.id} comune={comune} />
-      {/* HERO compatto: foto sx, titolo dx. Mappa è sotto in ComuneSessionsExplorer */}
+      {/* HERO compatto: foto sx, titolo + descrizione del paese a dx */}
       <section className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
         <DriftBackdrop tone="light" variant="section" />
         <div className="container mx-auto px-4 md:px-6 py-8 md:py-10 max-w-6xl relative z-10">
@@ -100,7 +127,7 @@ export default async function ComunePage({
               >
                 <ChevronLeft className="w-3.5 h-3.5" /> {market.name}
               </Link>
-              <Cartolina query={comune} alt={comune} caption={`${comune} · via Wikipedia`} aspect="aspect-[4/5]" tilt="l" tape priority />
+              <Cartolina query={comune} alt={comune} caption={comune} aspect="aspect-[4/5]" tilt="l" tape priority />
             </Reveal>
 
             <Reveal>
@@ -109,6 +136,9 @@ export default async function ComunePage({
                 <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">Comune</p>
               </div>
               <h1 className="font-display text-3xl md:text-5xl text-ink leading-[1.06]"><span className="imk-mark text-ink">{comune}</span></h1>
+              {descrizione && (
+                <p className="mt-4 text-sm md:text-base text-ink-soft max-w-2xl leading-relaxed">{descrizione}</p>
+              )}
               <p className="mt-3 text-sm text-ink-soft">
                 {forComune.length} {forComune.length === 1 ? 'mercato' : 'mercati'} · {market.name}
               </p>
@@ -127,47 +157,38 @@ export default async function ComunePage({
           operators={operators}
         />
 
-        {/* Sulla Riviera: cartoline di costa e borgo */}
-        <section className="mt-12 pt-10 border-t-2 border-ink/10">
-          <Reveal className="mb-6">
-            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-fiore-600 mb-1">Sulla Riviera</p>
-            <h2 className="font-alt font-bold text-2xl text-ink">Attorno a {comune}</h2>
-          </Reveal>
-          <Reveal delayMs={60} className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <Cartolina query={`${comune} Liguria`} fallbackQuery={comune} caption={comune} tilt="l" aspect="aspect-[4/3]" />
-            <Cartolina query={`${market.city} Liguria`} fallbackQuery="Riviera dei Fiori" caption={market.city} tilt="r" aspect="aspect-[4/3]" />
-            <Cartolina query="Riviera dei Fiori mare" fallbackQuery="Liguria mare" caption="Il mare di Ponente" tilt="l" aspect="aspect-[4/3]" />
-          </Reveal>
-        </section>
-
-        {/* Nav prev/next tra comuni della stessa zona */}
-        {(prevComune || nextComune) && (
-          <nav className="grid grid-cols-2 gap-3 mt-12 pt-8 border-t-2 border-ink/10 text-sm">
-            {prevComune ? (
-              <Link
-                href={`/${market.slug}/c/${slugifyName(prevComune)}`}
-                className="imk-water imk-edge imk-lift group flex items-center gap-3 px-4 py-3 bg-white border-2 border-ink/10 hover:border-mare transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4 text-mare group-hover:-translate-x-0.5 transition-transform" />
-                <div className="min-w-0">
-                  <p className="font-alt text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Comune precedente</p>
-                  <p className="font-alt font-bold text-base text-ink truncate">{prevComune}</p>
-                </div>
-              </Link>
-            ) : <div />}
-            {nextComune ? (
-              <Link
-                href={`/${market.slug}/c/${slugifyName(nextComune)}`}
-                className="imk-water imk-edge imk-lift group flex items-center justify-end gap-3 px-4 py-3 bg-white border-2 border-ink/10 hover:border-mare transition-colors text-right"
-              >
-                <div className="min-w-0">
-                  <p className="font-alt text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Comune successivo</p>
-                  <p className="font-alt font-bold text-base text-ink truncate">{nextComune}</p>
-                </div>
-                <ChevronRight className="w-4 h-4 text-mare group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-            ) : <div />}
-          </nav>
+        {/* Sulla Riviera: i comuni limitrofi coi loro mercati (link alla pagina comune) */}
+        {vicini.length > 0 && (
+          <section className="mt-12 pt-10 border-t-2 border-ink/10">
+            <Reveal className="mb-6">
+              <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-1">Sulla Riviera</p>
+              <h2 className="font-alt font-bold text-2xl text-ink">Attorno a {comune}</h2>
+              <p className="mt-1 text-sm text-ink-soft">I mercati dei paesi vicini, a pochi minuti di strada.</p>
+            </Reveal>
+            <Reveal delayMs={60} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {vicini.map((v) => (
+                <Link
+                  key={v.slug}
+                  href={`/${v.marketSlug}/c/${v.slug}`}
+                  className="imk-lift group flex flex-col bg-white border-2 border-ink/10 imk-edge overflow-hidden hover:border-mare transition-colors"
+                >
+                  <div className="relative">
+                    <ZoneImage query={v.comune} alt={v.comune} aspect="aspect-[4/3]" hoverZoom />
+                    <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-notte/80 to-transparent pointer-events-none" aria-hidden="true" />
+                    <span className="absolute left-3 bottom-2.5 right-3 font-alt font-bold text-lg text-carta leading-tight [text-shadow:0_1px_8px_rgba(14,48,64,0.5)]">
+                      {v.comune}
+                    </span>
+                  </div>
+                  <div className="p-3.5 flex items-baseline justify-between gap-2 text-xs">
+                    <span className="font-alt font-semibold text-ink">
+                      {Array.from(v.giorni).sort().map((d) => WD_SHORT[d]).join(' · ') || 'date variabili'}
+                    </span>
+                    <span className="text-ink-muted whitespace-nowrap">{v.km < 1 ? 'accanto' : `${Math.round(v.km)} km`}</span>
+                  </div>
+                </Link>
+              ))}
+            </Reveal>
+          </section>
         )}
       </div>
     </div>

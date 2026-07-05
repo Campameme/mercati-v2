@@ -10,6 +10,7 @@ export default function Footer() {
         <span className="text-ink-muted/70">Guida ai mercati della Riviera di Ponente.</span>
         <span className="flex-1" />
         <Link href="/mappa" className="hover:text-ink">Mappa</Link>
+        <Link href="/tipici" className="hover:text-ink">Mercati tipici</Link>
         <Link href="/operatori" className="hover:text-ink">Ambulanti</Link>
         <Link href="/eventi" className="hover:text-ink">Eventi</Link>
         <Link href="/notizie" className="hover:text-ink">Notizie</Link>

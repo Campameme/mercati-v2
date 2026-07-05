@@ -1,8 +1,9 @@
-// Selezione fotografica curata delle zone e dei borghi del Ponente.
-// Ogni foto è stata scelta (e verificata una per una) perché rappresenti
-// DAVVERO quel borgo o quel tratto di costa — niente immagini a caso da API.
-// File locali in public/zone/, provenienza Wikimedia Commons con licenze
-// libere: i crediti completi sono in PHOTO_CREDITS (pagina /crediti).
+// Selezione fotografica curata delle zone e dei borghi del Ponente
+// (province di Imperia e Savona). Ogni foto è stata scelta e verificata
+// una per una perché rappresenti DAVVERO quel borgo o quel tratto di
+// costa — niente immagini a caso da API. File locali in public/zone/,
+// provenienza Wikimedia Commons con licenze libere: i crediti completi
+// sono in PHOTO_CREDITS (pagina /crediti).
 
 export interface CuratedPhoto {
   /** percorso locale (public/) */
@@ -185,6 +186,126 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     license: 'CC BY-SA 4.0',
     url: 'https://commons.wikimedia.org/wiki/File:Pornassio_-_Forte_Centrale.jpeg',
   },
+  'andora': {
+    src: '/zone/andora.jpg',
+    alt: 'La baia di Andora verso Capo Mele',
+    file: 'Andora-panorama (2).JPG',
+    artist: 'Riky_Volpe',
+    license: 'Public domain',
+    url: 'https://commons.wikimedia.org/wiki/File:Andora-panorama_(2).JPG',
+  },
+  'laigueglia': {
+    src: '/zone/laigueglia.jpg',
+    alt: 'La baia di Laigueglia con le case colorate sul mare',
+    file: 'Laigueglia view.jpg',
+    artist: 'Amstead23',
+    license: 'CC BY-SA 4.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Laigueglia_view.jpg',
+  },
+  'alassio': {
+    src: '/zone/alassio.jpg',
+    alt: 'La spiaggia di Alassio con l’isola Gallinara sullo sfondo',
+    file: 'Alassio spiaggia 2013.jpg',
+    artist: 'Incola',
+    license: 'CC BY-SA 3.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Alassio_spiaggia_2013.jpg',
+  },
+  'albenga': {
+    src: '/zone/albenga.jpg',
+    alt: 'La cattedrale di San Michele e le torri medievali di Albenga',
+    file: 'Albenga - Kathedrale San Michele Arcangelo - Domplatz 1, August 2019.jpg',
+    artist: 'Mediatus',
+    license: 'CC BY-SA 3.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Albenga_-_Kathedrale_San_Michele_Arcangelo_-_Domplatz_1,_August_2019.jpg',
+  },
+  'loano': {
+    src: '/zone/loano.jpg',
+    alt: 'La passeggiata a mare di Loano',
+    file: 'Loano verso Pietra Ligure.jpg',
+    artist: 'Al*from*Lig',
+    license: 'CC BY-SA 4.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Loano_verso_Pietra_Ligure.jpg',
+  },
+  'pietra-ligure': {
+    src: '/zone/pietra-ligure.jpg',
+    alt: 'Pietra Ligure e il promontorio della Caprazoppa',
+    file: 'Pietra Ligure SV (panorama) - panoramio.jpg',
+    artist: 'Stefano Mazzone',
+    license: 'CC BY-SA 3.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Pietra_Ligure_SV_(panorama)_-_panoramio.jpg',
+  },
+  'finale-ligure': {
+    src: '/zone/finale-ligure.jpg',
+    alt: 'Finalborgo visto dal castello, con il mare in fondo alla valle',
+    file: 'Finalborgo dal castello.jpg',
+    artist: 'Davide Mauro',
+    license: 'CC BY-SA 4.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Finalborgo_dal_castello.jpg',
+  },
+  'noli': {
+    src: '/zone/noli.jpg',
+    alt: 'La baia di Noli con il castello di Monte Ursino',
+    file: 'Panorama di Noli.JPG',
+    artist: 'Giorgiosantin',
+    license: 'Public domain',
+    url: 'https://commons.wikimedia.org/wiki/File:Panorama_di_Noli.JPG',
+  },
+  'savona': {
+    src: '/zone/savona.jpg',
+    alt: 'La torre Leon Pancaldo sulla vecchia darsena di Savona',
+    file: 'Savona - Torre Leon Pancaldo (1).jpg',
+    artist: 'raffaele sergi',
+    license: 'CC BY 2.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Savona_-_Torre_Leon_Pancaldo_(1).jpg',
+  },
+  'albissola-marina': {
+    src: '/zone/albissola-marina.jpg',
+    alt: 'Il mosaico del Lungomare degli Artisti ad Albissola Marina',
+    file: 'Albissola Marina-IMG 1507.JPG',
+    artist: 'Davide Papalini',
+    license: 'CC BY-SA 2.5',
+    url: 'https://commons.wikimedia.org/wiki/File:Albissola_Marina-IMG_1507.JPG',
+  },
+  'celle-ligure': {
+    src: '/zone/celle-ligure.jpg',
+    alt: 'Le facciate colorate sulla passeggiata di Celle Ligure',
+    file: 'Celle Ligure-IMG 1449.JPG',
+    artist: 'Davide Papalini',
+    license: 'CC BY-SA 2.5',
+    url: 'https://commons.wikimedia.org/wiki/File:Celle_Ligure-IMG_1449.JPG',
+  },
+  'varazze': {
+    src: '/zone/varazze.jpg',
+    alt: 'Il porto turistico di Varazze',
+    file: 'Varazze vista con porto.jpg',
+    artist: 'Al*from*Lig',
+    license: 'CC BY-SA 4.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Varazze_vista_con_porto.jpg',
+  },
+  'cairo-montenotte': {
+    src: '/zone/cairo-montenotte.jpg',
+    alt: 'Cairo Montenotte lungo la Bormida',
+    file: 'Cairo montenotte bormida di spigno.jpg',
+    artist: 'F Ceragioli',
+    license: 'CC BY-SA 3.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Cairo_montenotte_bormida_di_spigno.jpg',
+  },
+  'millesimo': {
+    src: '/zone/millesimo.jpg',
+    alt: 'Il ponte-torre della Gaietta a Millesimo',
+    file: 'Millesimo-IMG 0905.JPG',
+    artist: 'Davide Papalini',
+    license: 'CC BY 2.5',
+    url: 'https://commons.wikimedia.org/wiki/File:Millesimo-IMG_0905.JPG',
+  },
+  'sassello': {
+    src: '/zone/sassello.jpg',
+    alt: 'Sassello tra i prati e i boschi del Beigua',
+    file: 'Sassello 1273.jpg',
+    artist: 'Phyrexian',
+    license: 'CC BY-SA 4.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Sassello_1273.jpg',
+  },
 }
 
 // Alias: nomi alternativi con cui i luoghi arrivano dalle query (comuni dal
@@ -193,6 +314,8 @@ const ALIASES: Record<string, string> = {
   'pornassio': 'colle-di-nava',
   'colle-di-nava-pornassio': 'colle-di-nava',
   'sanremo-centro': 'sanremo',
+  'finalborgo': 'finale-ligure',
+  'albisola-superiore': 'albissola-marina',
 }
 
 /** Foto-hero di ogni zona (slug zona → chiave foto). */
@@ -205,6 +328,13 @@ const ZONE_HERO: Record<string, string> = {
   'golfo-dianese': 'cervo',
   'val-nervia': 'perinaldo',
   'entroterra': 'pieve-di-teco',
+  'baia-del-sole': 'alassio',
+  'albenganese': 'albenga',
+  'loano-pietra': 'pietra-ligure',
+  'finalese': 'finale-ligure',
+  'savonese': 'savona',
+  'val-bormida': 'millesimo',
+  'beigua': 'sassello',
 }
 
 function normalize(q: string): string {

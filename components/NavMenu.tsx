@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   X, Map as MapIcon, Store, Calendar, Newspaper, Cloud, MapPin, ChevronDown,
-  Search, Shield, LogIn,
+  Search, Shield, LogIn, ShoppingBasket,
 } from 'lucide-react'
 import Logo from '@/components/Logo'
 import { slugifyName } from '@/lib/markets/slug'
@@ -99,6 +99,7 @@ export default function NavMenu({ open, onClose }: Props) {
 
   const globalLinks = [
     { href: '/mappa',      label: 'Mappa dei mercati',     icon: MapIcon },
+    { href: '/tipici',     label: 'Mercati tipici',        icon: ShoppingBasket },
     { href: '/operatori',  label: 'Gli ambulanti',         icon: Store },
     { href: '/calendar',   label: 'Calendario eventi',     icon: Calendar },
   ]

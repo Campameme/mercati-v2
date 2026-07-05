@@ -31,8 +31,9 @@ if (!GKEY) {
   process.exit(1)
 }
 
-// Bounding box generoso della provincia di Imperia: scarta risultati fuori zona.
-const BOUNDS = { latMin: 43.7, latMax: 44.25, lngMin: 7.45, lngMax: 8.25 }
+// Bounding box generoso del Ponente ligure (province di Imperia e Savona,
+// costa ed entroterra fino al Beigua): scarta risultati fuori zona.
+const BOUNDS = { latMin: 43.7, latMax: 44.60, lngMin: 7.45, lngMax: 8.70 }
 const ACCEPT = new Set(['ROOFTOP', 'RANGE_INTERPOLATED', 'GEOMETRIC_CENTER'])
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
@@ -83,7 +84,7 @@ console.log(`${groups.size} luoghi distinti · ${DRY ? 'DRY-RUN (nessuna scrittu
 
 let updated = 0, skipped = 0
 for (const g of groups.values()) {
-  const query = [g.luogo, g.comune, 'Provincia di Imperia', 'Liguria', 'Italia'].filter(Boolean).join(', ')
+  const query = [g.luogo, g.comune, 'Liguria', 'Italia'].filter(Boolean).join(', ')
   let res = null
   try {
     res = await geocode(query)

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { MapPin, Store, Navigation2 } from 'lucide-react'
+import { MapPin, Store, Navigation2, ChevronDown } from 'lucide-react'
 import MarketViewer from '@/components/MarketViewer'
 import { classifySchedule, CATEGORY_COLOR, CATEGORY_LABEL } from '@/lib/schedules/classify'
 
@@ -16,9 +16,6 @@ interface SessionLite {
   settori: string | null
   lat: number | null
   lng: number | null
-  polygon_geojson?: GeoJSON.Feature<GeoJSON.Polygon> | null
-  /** Polygon ereditato dal place (preferito). Fallback su polygon_geojson legacy. */
-  placePolygon?: GeoJSON.Feature<GeoJSON.Polygon> | null
 }
 
 interface OperatorLite {
@@ -110,7 +107,7 @@ export default function ComuneSessionsExplorer({
       kind: 'market' as const,
       title: `${active.comune} · ${active.giorno}`,
       subtitle: active.luogo ?? active.settori ?? undefined,
-      polygon: (active.placePolygon ?? active.polygon_geojson ?? null) as any,
+      category: classifySchedule(active.settori),
     }]
   }, [active])
 
@@ -118,38 +115,33 @@ export default function ComuneSessionsExplorer({
 
   return (
     <>
-      {/* Tab sessione (solo se più di una) */}
+      {/* Scegli un giorno: menu a tendina con i SOLI giorni in cui questo
+          comune ha davvero un mercato (una voce per sessione). */}
       {sessions.length > 1 && (
         <section className="mb-6">
-          <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-3">Scegli l&apos;appuntamento</p>
-          <div className="flex flex-wrap gap-2">
-            {sessions.map((s) => {
-              const isActive = s.id === active.id
-              const sCat = classifySchedule(s.settori)
-              const color = CATEGORY_COLOR[sCat]
-              return (
-                <button
-                  key={s.id}
-                  onClick={() => setActiveId(s.id)}
-                  aria-pressed={isActive}
-                  className={`group flex items-center gap-2 pl-3 pr-4 py-2.5 rounded-full border-2 text-left transition-colors ${
-                    isActive
-                      ? 'bg-ink text-carta border-ink'
-                      : 'bg-white text-ink border-ink/15 hover:border-mare'
-                  }`}
-                >
-                  <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: isActive ? '#FBF6EA' : color }} />
-                  <span className="flex flex-col">
-                    <span className="font-alt font-semibold text-sm leading-tight">{shortLabel(s.giorno)}</span>
-                    {s.luogo && (
-                      <span className={`text-xs leading-tight ${isActive ? 'text-carta/70' : 'text-ink-muted'}`}>
-                        {s.luogo.length > 38 ? s.luogo.slice(0, 36) + '…' : s.luogo}
-                      </span>
-                    )}
-                  </span>
-                </button>
-              )
-            })}
+          <label htmlFor="comune-giorno" className="block font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-3">
+            Scegli un giorno
+          </label>
+          <div className="relative inline-block w-full max-w-md">
+            <span
+              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full"
+              style={{ backgroundColor: CATEGORY_COLOR[cat] }}
+              aria-hidden="true"
+            />
+            <select
+              id="comune-giorno"
+              value={active.id}
+              onChange={(e) => setActiveId(e.target.value)}
+              className="w-full appearance-none font-alt font-semibold text-sm text-ink bg-white border-2 border-ink/15 rounded-full pl-9 pr-10 py-3 focus:outline-none focus:border-mare cursor-pointer"
+            >
+              {sessions.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {shortLabel(s.giorno)}
+                  {s.luogo ? ` — ${s.luogo.length > 40 ? s.luogo.slice(0, 38) + '…' : s.luogo}` : ''}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted" aria-hidden="true" />
           </div>
         </section>
       )}

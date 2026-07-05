@@ -1,4 +1,7 @@
-# Setup Mercati-v2 (Fase 1)
+# Setup Mercati della Riviera di Ponente
+
+Guida ai mercati da **Ventimiglia a Varazze** (province di Imperia e Savona): 15 zone,
+pagine comune con descrizioni curate, mercati tipici con ricorrenze, mappa unificata.
 
 ## 1. Installazione
 ```
@@ -13,11 +16,16 @@ npm install
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY` (sezione *API → service_role*)
+   - `SUPABASE_DB_URL` (*Project Settings → Database → Connection string → URI*)
 3. Copia `.env.local.example` → `.env.local` e riempi i valori.
-4. Applica le migrazioni: nel SQL Editor di Supabase esegui in ordine
-   - `supabase/migrations/0001_init.sql`
-   - `supabase/migrations/0002_rls.sql`
-   - `supabase/seed.sql`
+4. Applica le migrazioni: `npm run migrate` (idempotente: applica in ordine
+   `supabase/migrations/0001…0019` e poi `supabase/seed.sql`).
+   - `0007` seeda le 8 zone della provincia di Imperia (41 sessioni).
+   - `0019` seeda le 7 zone della provincia di Savona (83 sessioni, generate da
+     `mercatini_della_provincia_di_savona.xls`).
+5. (Opzionale) Affina le coordinate dei luoghi: `node scripts/geocode-schedules.mjs --dry`
+   e poi senza `--dry`. Richiede una chiave Google con **Geocoding API** abilitata
+   (`GOOGLE_PLACES_API_KEY` o `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`).
 
 ## 3. Primo super-admin
 1. Avvia `npm run dev` → apri `http://localhost:3000/login`, crea un account (Registrati).
@@ -31,17 +39,18 @@ npm install
 4. Rientra da `/login` → verrai reindirizzato a `/admin/markets`.
 
 ## 4. Deploy su Netlify
-- Aggiungi le stesse env vars nel dashboard Netlify (*Site settings → Environment variables*).
+- Aggiungi le stesse env vars nel dashboard Netlify (*Site settings → Environment variables*),
+  anche per il contesto **branch deploy** se usi i branch.
 - Push su `main`: il plugin `@netlify/plugin-nextjs` costruisce automaticamente.
 
-## 5. Cosa c'è in Fase 1
-- Auth reale via Supabase (no più password hard-coded).
-- Multi-mercato: super-admin crea mercati da `/admin/markets` e assegna admin.
-- Market-admin disegna l'area mercato in `/{slug}/admin/area` (Leaflet + Geoman).
-- Parcheggi, meteo e operatori scoped al mercato corrente.
-- Area disegnata visualizzata automaticamente sulla mappa pubblica dei parcheggi.
+## 5. Contenuti curati (dove si modificano)
+- **Zone** (nome, borghi, carattere, racconto): `lib/markets/zones.ts`
+- **Comuni** (descrizione con le peculiarità): `lib/markets/comuni.ts`
+- **Copy della home** (claim, sezioni, 4 lingue): `lib/i18n/homeCopy.ts`
+- **Fotografie dei borghi** (selezione curata + crediti): `lib/zonePhotos.ts` + `public/zone/`
+- **Tono di voce e stato del brand**: `docs/brand-voice.md`
 
-## 6. Roadmap Fase 2/3
-- CMS news/eventi con tabelle DB e UI admin.
-- Dashboard operatore con prodotti e Storage Supabase per immagini.
-- AI Vision (Gemini Flash) per classificare pieno/vuoto dei parcheggi da webcam pubbliche.
+## 6. Sezioni del sito
+- `/` home · `/mappa` esplora · `/tipici` mercati tipici (≠ merci varie, con ricorrenze)
+- `/{zona}` pagina zona · `/{zona}/c/{comune}` pagina comune ("Scegli un giorno" + vicini)
+- `/calendar` calendario · `/eventi` · `/notizie` · `/operatori` · `/crediti` crediti foto

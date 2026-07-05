@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { Sun, Cloud, CloudRain, X } from 'lucide-react'
 import { format } from 'date-fns'
 import { it } from 'date-fns/locale/it'
@@ -176,9 +177,11 @@ export default function WeatherWidget() {
         </button>
       </div>
 
-      {/* Modal Dettagli Meteo */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+      {/* Modal Dettagli Meteo — via PORTAL su document.body: dentro la nav il
+          backdrop-blur crea un containing block e il fixed verrebbe ritagliato
+          all'altezza della barra (il "popup tagliato"). */}
+      {showModal && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-black bg-opacity-50">
           <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto overscroll-contain imk-scroll" data-lenis-prevent>
             {/* Header */}
             <div className="bg-gradient-to-r from-mare to-mare-600 text-white p-6 rounded-t-xl">
@@ -304,7 +307,8 @@ export default function WeatherWidget() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   )

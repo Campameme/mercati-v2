@@ -18,8 +18,8 @@ import ZoneImage from '@/components/ZoneImage'
 export default function BorghiSection({
   className = 'bg-carta bg-paper-grain border-b-2 border-ink/10',
   eyebrow = 'Le zone',
-  title = 'Otto zone, un solo Ponente.',
-  lead = 'Da Ventimiglia alla Valle Arroscia: ogni zona ha i suoi giorni, le sue piazze e il suo racconto.',
+  title = 'Da Ventimiglia a Varazze, un solo Ponente.',
+  lead = 'Quindici zone tra mare e entroterra: ognuna con i suoi giorni, le sue piazze e il suo racconto.',
   cta,
 }: {
   className?: string

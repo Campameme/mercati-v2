@@ -2,12 +2,16 @@
 
 > Per **grafica e motion** vedi [`brand-system.md`](./brand-system.md).
 
-## ⭑ Stato attuale (aggiornato 2026-07-02 — supera i dettagli più sotto dove divergono)
-- **Nome ufficiale: "Mercati della Riviera di Ponente"** (deciso 2026-07-02, coerente col logo). Sostituisce "Mercato Riviera dei Fiori". *"Riviera dei Fiori"* resta come **descrittore geografico/heritage** (metadati SEO, sezione storia, pun dei fiori) — mai come nome del progetto.
-- **Voce** (modello mercatosantambrogio.it): **prima persona plurale**, calda, ligure-pop, sensoriale (mare/sole/fiori/profumi), spiritosa con misura; **gli ambulanti sono il prodotto**; autenticità = persone + prodotto + filiera corta; **niente anglicismi**, niente foglie d'ulivo. 4 lingue IT/FR/DE/EN (`lib/i18n/homeCopy.ts` + `home.ts`).
-- **Hero (definitivo):** headline *"Il mercato che profuma di mare."* + sottotitolo *"Da oltre 100 anni, la Liguria al mercato. I mercati della Riviera di Ponente."* + **chip pratici** *Oggi al mercato · Vicino a me · Sabato* (→ `/mappa` prefiltrata; target 55+/turisti: la risposta pratica senza scrollare).
-- **Struttura HOME attuale** (vedi `brand-system.md §6`): Hero foto+acqua reattiva → **"Il progetto, in tre righe"** (storytelling, ogni riga con CTA verso un'attività: mappa / ricerca `#cerca` / ambulanti) → Borghi (8 tessere foto) → Il meglio del Ponente + **operatori con chip cliccabili** → Recap + ricerca typewriter → Notizie dai comuni → Eventi. La **mappa è la destinazione** (pagina `/mappa` + menu).
-- **Heritage verificato:** Sanremo, **1882** primo mercato dei fiori; Ventimiglia tra i **più grandi mercati all'aperto d'Italia**; Bordighera palme al Vaticano dal **1586**; Pieve di Teco città mercatale (1233).
+## ⭑ Stato attuale (aggiornato 2026-07-05 — supera i dettagli più sotto dove divergono)
+- **Nome ufficiale: "Mercati della Riviera di Ponente"** (deciso 2026-07-02, coerente col logo). *"Riviera dei Fiori"* resta come **descrittore geografico/heritage** — mai come nome del progetto.
+- **Perimetro: da Ventimiglia a Varazze** (province di Imperia **e Savona**, costa ed entroterra fino a Val Bormida e Beigua): **15 zone**, ognuna con `carattere` + `story` curati in `lib/markets/zones.ts`. Dati Savona da `mercatini_della_provincia_di_savona.xls` (migration `0019`).
+- **Voce**: prima persona plurale, concreta, ligure; **si raccontano giorni, piazze e gesti veri — MAI slogan da agenzia** (bandite frasi tipo *"gli ambulanti sono il prodotto"*: le persone dei mercati si raccontano coi fatti). Niente anglicismi. 4 lingue IT/FR/DE/EN (`lib/i18n/homeCopy.ts` + `home.ts`).
+- **Hero (definitivo):** claim *"I mercati che profumano di mare."* + sottotitolo *"I mercati della Riviera di Ponente: banchi, piazze e voci da Ventimiglia a Varazze, dal mare alla Via del Sale."* + **chip pratici** *Oggi al mercato · Vicino a me · Sabato*.
+- **Struttura HOME attuale:** Hero foto+acqua reattiva → **Le zone** (15 card con foto curata + carattere → pagina zona) → **La settimana** (notizie+eventi) → **Le persone** (operatori). Sfondi omologati (carta+grain+DriftBackdrop), eyebrow `mare-600`.
+- **Pagine territorio:** ogni **zona** ha il suo racconto (`story`) nell'hero; ogni **comune** ha la sua descrizione curata (`lib/markets/comuni.ts`), il selettore **"Scegli un giorno"** (a tendina, solo i giorni con mercato reale) e i **comuni limitrofi** in "Attorno a …". Niente nav precedente/successivo.
+- **Mercati tipici** (`/tipici`): tutti i mercati ≠ merci varie (antiquariato/alimentare/artigianato) con le loro ricorrenze — calendario dei prossimi 60 giorni + elenco filtrabile (chip a vista, non dropdown).
+- **Fotografie:** selezione curata e verificata una-per-una in `public/zone` (`lib/zonePhotos.ts`), Wikimedia Commons con crediti in `/crediti`. **Icona mercato unica** (banco col tendone) su tutte le mappe; niente zone/poligoni evidenziati.
+- **Heritage verificato:** Sanremo, **1882** primo mercato dei fiori; Ventimiglia tra i **più grandi mercati all'aperto d'Italia**; Bordighera palme al Vaticano dal **1586**; Pieve di Teco città mercatale (**1233**); Albenga città delle **cento torri**; Noli **repubblica marinara** per cinque secoli; le Albisole capitali della **ceramica**.
 - **Posizionamento:** esperienza di **qualità e autoctona** ad **accesso aperto** (no "élite", no claim "banchi selezionati" finché non c'è selezione reale).
 - I testi delle sezioni sono in `lib/i18n/homeCopy.ts` (4 lingue).
 

@@ -111,6 +111,19 @@ export function occursOn(giorno: string | null | undefined, date: Date): boolean
   return ords.some((o) => (o === 'last' ? isLast : o === occurrence))
 }
 
+/**
+ * True se la cadenza NON è la semplice settimana piena: ordinali del mese
+ * ("1° sabato", "ultima domenica"), stagionalità o date esplicite. Usato per
+ * distinguere i mercati "ricorrenti speciali" (antiquariato mensile, mercatini
+ * estivi) da quelli settimanali.
+ */
+export function isNonWeekly(giorno?: string | null): boolean {
+  if (!giorno) return false
+  if (ordinalsOf(giorno).length > 0) return true
+  if (hasSeasonConstraint(giorno)) return true
+  return weekdaysOf(giorno).length === 0
+}
+
 export interface HourRange {
   start: number // ore decimali (es. 8.5 = 08:30)
   end: number
