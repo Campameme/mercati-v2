@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { gsap } from '@/lib/motion/gsap'
-import { Search, Store, MapPin, ArrowRight, CalendarDays, ChevronDown, Sun, Crosshair, Newspaper } from 'lucide-react'
+import { Search, Store, ArrowRight, CalendarDays, ChevronDown, Sun, Newspaper } from 'lucide-react'
 import Logo from '@/components/Logo'
 import DriftBackdrop from '@/components/motion/DriftBackdrop'
 import WaterCard from '@/components/motion/WaterCard'
@@ -167,38 +167,29 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
                 {copy.searchCta} <ArrowRight className="imk-march w-4 h-4" />
               </button>
             </form>
-            <div data-anim className="mt-4 flex flex-wrap items-center gap-2">
-              {[
-                { t: copy.heroChips.today, href: '/mappa?d=oggi', Icon: Sun },
-                { t: copy.heroChips.near, href: '/mappa?vicino=1', Icon: Crosshair },
-                { t: copy.heroChips.saturday, href: '/mappa?d=sab', Icon: CalendarDays },
-                { t: copy.exploreMapCta, href: '/mappa', Icon: MapPin },
-              ].map(({ t, href, Icon }) => (
-                <Link key={href} href={href} className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.08em] text-carta bg-notte/35 border border-carta/30 rounded-full px-3.5 py-2 hover:border-sole hover:text-sole transition-colors">
-                  <Icon className="w-3.5 h-3.5 text-sole" aria-hidden="true" /> {t}
-                </Link>
-              ))}
-            </div>
-
-            {/* Ticker vivo: dove c'è mercato OGGI — il brand che respira coi dati veri */}
+            {/* Ticker vivo: dove c'è mercato OGGI — unica scorciatoia sotto la
+                ricerca. min-w-0 sul nastro: senza, il testo sborda sopra
+                l'etichetta; il fade a sinistra fa sparire i nomi con grazia. */}
             {todayComuni.length > 0 && (
               <Link
                 data-anim
                 href="/mappa?d=oggi"
-                className="group mt-6 flex items-center max-w-xl overflow-hidden rounded-full border border-carta/25 bg-notte/40 backdrop-blur-[2px] hover:border-sole/70 transition-colors"
+                className="group mt-6 flex items-center max-w-xl rounded-full border border-carta/25 bg-notte/60 backdrop-blur-[2px] hover:border-sole/70 transition-colors"
                 aria-label={copy.heroChips.today}
               >
-                <span className="flex items-center gap-1.5 flex-shrink-0 font-alt text-[11px] font-bold uppercase tracking-[0.12em] text-ink bg-sole rounded-full m-1 px-3 py-1.5">
+                <span className="relative z-10 flex items-center gap-1.5 flex-shrink-0 font-alt text-[11px] font-bold uppercase tracking-[0.12em] text-ink bg-sole rounded-full m-1 px-3 py-1.5">
                   <Sun className="w-3.5 h-3.5" aria-hidden="true" /> {copy.heroChips.today}
                 </span>
-                <span className="imk-marquee relative flex-1 overflow-hidden whitespace-nowrap py-2" aria-hidden="true">
-                  <span className="imk-marquee-track inline-block font-alt text-sm text-carta/90">
+                <span className="imk-marquee relative flex-1 min-w-0 overflow-hidden whitespace-nowrap py-2 rounded-r-full" aria-hidden="true">
+                  <span className="imk-marquee-track inline-block font-alt text-sm text-carta/90 pl-3">
                     {[...todayComuni, ...todayComuni].map((c, i) => (
                       <span key={i} className="mx-3">
                         {c} <span className="text-sole mx-1">·</span>
                       </span>
                     ))}
                   </span>
+                  <span className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-notte/70 to-transparent" />
+                  <span className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-notte/70 to-transparent" />
                 </span>
               </Link>
             )}
