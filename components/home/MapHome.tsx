@@ -10,10 +10,8 @@ import DriftBackdrop from '@/components/motion/DriftBackdrop'
 import WaterCard from '@/components/motion/WaterCard'
 import BancoAvatar from '@/components/BancoAvatar'
 import PhotoFx from './PhotoFx'
-import UnifiedMapClient from '@/components/UnifiedMapClient'
-import { WaveDivider } from '@/components/decorations'
-import { classifyMany } from '@/lib/schedules/classify'
-import { slugifyName } from '@/lib/markets/slug'
+import { occursOn } from '@/lib/markets/hours'
+import { categoryLabel } from '@/lib/i18n/home'
 import { mountAqua } from '@/lib/home/aqua'
 import BorghiSection from './BorghiSection'
 import type { MarketPin } from './types'
@@ -51,22 +49,13 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
   const copy = HOME_COPY[lang]
   const typed = useTypewriter(copy.searchExamples)
 
-  // La mappa è il fulcro: tutti i mercati come pin-banco, click → popup con
-  // link alla pagina comune.
-  const mapPins = useMemo(
-    () =>
-      pins.map((p) => ({
-        id: p.id,
-        lat: p.lat,
-        lng: p.lng,
-        kind: 'market' as const,
-        title: p.comune,
-        subtitle: p.luogo ?? p.marketName,
-        category: classifyMany(p.sessions.map((s) => s.settori)),
-        href: `/${p.marketSlug}/c/${slugifyName(p.comune)}`,
-      })),
-    [pins],
-  )
+  // Ticker vivo dell'hero: i comuni dove OGGI c'è davvero mercato.
+  const todayComuni = useMemo(() => {
+    const now = new Date()
+    const set = new Set<string>()
+    for (const p of pins) if (p.sessions.some((s) => occursOn(s.giorno, now))) set.add(p.comune)
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'it'))
+  }, [pins])
 
   useEffect(() => {
     fetch('/api/operators?all=1').then((r) => r.json()).then((j) => setOperators(Array.isArray(j?.data) ? j.data : [])).catch(() => {})
@@ -161,7 +150,7 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
             <h1 className="font-display text-carta text-[14vw] leading-[0.96] tracking-[0.01em] max-w-[14ch] md:text-[8rem] [text-shadow:0_2px_28px_rgba(14,48,64,0.55)]">
               {headlineWords.map((w, i) => (
                 <span key={i} className="inline-block overflow-hidden align-bottom pr-[0.14em]">
-                  <span data-word className={`inline-block ${i === headlineWords.length - 1 ? 'italic text-sole' : ''}`}>{w}</span>
+                  <span data-word className={`imk-word inline-block ${i === headlineWords.length - 1 ? 'italic text-sole' : ''}`}>{w}</span>
                 </span>
               ))}
             </h1>
@@ -190,71 +179,106 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
                 </Link>
               ))}
             </div>
+
+            {/* Ticker vivo: dove c'è mercato OGGI — il brand che respira coi dati veri */}
+            {todayComuni.length > 0 && (
+              <Link
+                data-anim
+                href="/mappa?d=oggi"
+                className="group mt-6 flex items-center max-w-xl overflow-hidden rounded-full border border-carta/25 bg-notte/40 backdrop-blur-[2px] hover:border-sole/70 transition-colors"
+                aria-label={copy.heroChips.today}
+              >
+                <span className="flex items-center gap-1.5 flex-shrink-0 font-alt text-[11px] font-bold uppercase tracking-[0.12em] text-ink bg-sole rounded-full m-1 px-3 py-1.5">
+                  <Sun className="w-3.5 h-3.5" aria-hidden="true" /> {copy.heroChips.today}
+                </span>
+                <span className="imk-marquee relative flex-1 overflow-hidden whitespace-nowrap py-2" aria-hidden="true">
+                  <span className="imk-marquee-track inline-block font-alt text-sm text-carta/90">
+                    {[...todayComuni, ...todayComuni].map((c, i) => (
+                      <span key={i} className="mx-3">
+                        {c} <span className="text-sole mx-1">·</span>
+                      </span>
+                    ))}
+                  </span>
+                </span>
+              </Link>
+            )}
           </div>
         </div>
 
-        <a href="#mappa" aria-label={copy.heroScrollCue} className="relative z-10 mx-auto mb-5 mt-3 flex flex-col items-center text-carta/70 hover:text-carta">
+        <a href="#valori" aria-label={copy.heroScrollCue} className="relative z-10 mx-auto mb-8 mt-3 flex flex-col items-center text-carta/70 hover:text-carta">
           <span className="font-alt text-[11px] font-semibold uppercase tracking-[0.14em] mb-1">{copy.heroScrollCue}</span>
           <span className="flex flex-col -space-y-1.5">
             <ChevronDown className="imk-chev w-4 h-4" /><ChevronDown className="imk-chev w-4 h-4" /><ChevronDown className="imk-chev w-4 h-4" />
           </span>
         </a>
+
+        {/* Bordo a onda: l'hero "sfocia" nella carta della pagina */}
+        <svg
+          className="pointer-events-none absolute bottom-0 inset-x-0 w-full h-7 md:h-10 text-carta z-[2]"
+          viewBox="0 0 1440 48"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <path d="M0 28 C 90 46 180 10 288 26 C 396 42 486 8 576 24 C 666 40 756 10 864 26 C 972 42 1062 8 1152 24 C 1242 40 1350 12 1440 28 L1440 48 L0 48 Z" fill="currentColor" />
+        </svg>
       </section>
 
-      {/* ===== LA MAPPA — il fulcro: tutti i mercati, subito ===== */}
-      <section id="mappa" className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
-        <DriftBackdrop tone="light" variant="section" />
-        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-6xl">
-          <div className="flex items-end justify-between gap-6 mb-8">
-            <div className="max-w-2xl">
-              <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{dict.list}</p>
-              <h2 className="font-alt font-extrabold tracking-tight text-3xl md:text-4xl leading-[1.06] text-ink">{dict.introTitle}</h2>
-              <p className="mt-3 text-base text-ink-soft leading-relaxed">{dict.introText}</p>
-            </div>
-            <WaveDivider className="w-24 text-mare opacity-60 hidden md:block flex-shrink-0" aria-hidden="true" />
-          </div>
-          <div className="imk-edge overflow-hidden border-2 border-ink/10 bg-white shadow-sm">
-            <UnifiedMapClient pins={mapPins} height={480} maxZoom={11} bare />
-          </div>
-          <div className="mt-5 flex flex-wrap items-center gap-3">
-            <Link href="/mappa" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-6 py-3.5 rounded-full hover:bg-sole-600 transition-colors">
-              <MapPin className="w-4 h-4" /> {copy.exploreMapCta} <ArrowRight className="imk-march w-4 h-4" />
-            </Link>
-            <span className="font-alt text-xs text-ink-muted">{dict.hint}</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== LE PERSONE — il cuore del progetto: chi sta dietro i banchi ===== */}
+      {/* ===== LE PERSONE — il manifesto del progetto: mettere in contatto
+           chi cerca con chi tiene banco. Prima sezione, la più ricca. ===== */}
       <section id="valori" className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
         <DriftBackdrop tone="light" variant="section" />
-        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-5xl">
-          <div className="max-w-2xl mb-9">
-            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{copy.valueMarket.k}</p>
-            <h2 className="font-alt font-extrabold tracking-tight text-3xl md:text-4xl leading-[1.06] text-ink">{copy.valueMarket.title}</h2>
-            <p className="mt-3 text-base text-ink-soft leading-relaxed">{copy.valueMarket.lead}</p>
+        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-6xl">
+          <div className="max-w-2xl">
+            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{copy.valueProject.k}</p>
+            <h2 className="font-display text-4xl md:text-6xl leading-[1.02] text-ink">
+              {copy.operatorsTitle.split(' ').map((w, i, arr) => (
+                <span key={i} className={i === arr.length - 1 ? 'italic text-fiore' : ''}>{w} </span>
+              ))}
+            </h2>
+            <p className="mt-4 text-base md:text-lg text-ink-soft leading-relaxed">{copy.operatorsLead}</p>
           </div>
-          <div className="mt-2">
-            <div className="max-w-2xl">
-              <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{copy.operatorsEyebrow}</p>
-              <h3 className="font-alt font-bold text-2xl md:text-4xl leading-[1.04] text-ink"><span className="imk-mark">{copy.operatorsTitle}</span></h3>
-              <p className="mt-3 text-base text-ink-soft leading-relaxed">{copy.operatorsLead}</p>
+
+          {/* I valori raccolti ai banchi: tre cartoline con nastro, la voce vera */}
+          <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-5">
+            {copy.qualities.slice(0, 3).map((q, i) => (
+              <WaterCard key={q.t} tilt={i % 2 === 0 ? 'l' : 'r'} className="imk-tape p-5 pt-7 bg-white">
+                <p className="font-accent text-xl text-mare-700 leading-snug">{q.t}</p>
+                <p className="mt-2 text-[13px] leading-snug text-ink-soft">{q.d}</p>
+              </WaterCard>
+            ))}
+          </div>
+          <p className="mt-3 font-alt text-xs text-ink-muted">{copy.qualitiesNote}</p>
+
+          {/* Gli ambulanti, in evidenza: card grandi, non chip */}
+          {operators.length > 0 && (
+            <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {operators.slice(0, 8).map((op, i) => (
+                <Link
+                  key={op.id}
+                  href={op.market ? `/${op.market.slug}/operators/${op.id}` : '/operatori'}
+                  aria-label={`Scopri ${op.name}`}
+                  className={`imk-lift group flex items-start gap-3.5 bg-white border-2 border-ink/10 imk-edge p-4 hover:border-mare transition-colors ${
+                    i % 4 === 1 ? 'imk-tilt-l' : i % 4 === 2 ? 'imk-tilt-r' : ''
+                  }`}
+                >
+                  <BancoAvatar name={op.name} size={52} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-alt font-bold text-base text-ink leading-tight group-hover:text-mare-600 transition-colors">{op.name}</span>
+                    <span className="block font-alt text-[11px] font-semibold uppercase tracking-wider text-fiore-600 mt-1">{categoryLabel(op.category, lang)}</span>
+                    {op.market && <span className="block text-xs text-ink-muted mt-0.5 truncate">{op.market.name}</span>}
+                  </span>
+                  <ArrowRight className="w-4 h-4 text-ink-muted group-hover:text-mare-600 group-hover:translate-x-0.5 transition-all flex-shrink-0 mt-1" aria-hidden="true" />
+                </Link>
+              ))}
             </div>
-            {operators.length > 0 && (
-              <div className="mt-6 flex flex-wrap gap-3">
-                {operators.slice(0, 10).map((op) => (
-                  <Link key={op.id} href={op.market ? `/${op.market.slug}/operators/${op.id}` : '/operatori'} className="imk-lift" aria-label={`Scopri ${op.name}`}>
-                    <WaterCard className="flex items-center gap-2.5 pl-1.5 pr-3.5 py-1.5 rounded-full hover:border-mare/50">
-                      <BancoAvatar name={op.name} size={32} />
-                      <span className="font-alt text-sm font-semibold text-ink">{op.name}</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-mare-600 flex-shrink-0" aria-hidden="true" />
-                    </WaterCard>
-                  </Link>
-                ))}
-              </div>
-            )}
-            <Link href="/operatori" className="group imk-lift mt-7 inline-flex items-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-6 py-3.5 rounded-full hover:bg-sole-600 transition-colors">
+          )}
+
+          <div className="mt-9 flex flex-wrap gap-3">
+            <Link href="/operatori" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-6 py-3.5 rounded-full hover:bg-sole-600 transition-colors">
               <Store className="w-4 h-4" /> {copy.operatorsCta} <ArrowRight className="imk-march w-4 h-4" />
+            </Link>
+            <Link href="/aderisci" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-ink text-carta px-6 py-3.5 rounded-full hover:bg-mare transition-colors">
+              {copy.operatorsJoinCta} <ArrowRight className="imk-march w-4 h-4" />
             </Link>
           </div>
         </div>
@@ -262,7 +286,7 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
 
       {/* ===== LE ZONE — quindici zone, quindici racconti ===== */}
       <BorghiSection
-        eyebrow={copy.valueProject.k}
+        eyebrow={dict.zones.eyebrow}
         title={copy.valueProject.title}
         lead={copy.valueProject.lead}
         cta={{ label: copy.exploreMapCta, href: '/mappa' }}

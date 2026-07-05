@@ -37,6 +37,7 @@ export interface HomeCopy {
   operatorsTitle: string
   operatorsLead: string
   operatorsCta: string
+  operatorsJoinCta: string
   weekEyebrow: string
   weekTitle: string
   weekLead: string
@@ -82,9 +83,10 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     ],
     qualitiesNote: 'Raccolti parlando con gli ambulanti del Ponente, banco per banco.',
     operatorsEyebrow: 'Le persone del mercato',
-    operatorsTitle: 'Chi c’è dietro i banchi',
-    operatorsLead: 'Chi coltiva, chi sceglie all’alba, chi ti conosce per nome: qui trovi le persone dei mercati, banco per banco, e cosa portano.',
+    operatorsTitle: 'Prima le persone, poi le piazze.',
+    operatorsLead: 'Il progetto è tutto qui: metterti in contatto con chi tiene banco — chi coltiva, chi pesca, chi cuce, chi ti chiama per nome. I mercati sono le persone che ci lavorano, e da qui le raggiungi una per una.',
     operatorsCta: 'Conosci gli ambulanti',
+    operatorsJoinCta: 'Hai un banco? Unisciti',
     weekEyebrow: 'La settimana',
     weekTitle: 'Notizie ed eventi dalla Riviera',
     weekLead: 'Gli avvisi dei comuni e gli appuntamenti da segnare, uno accanto all’altro.',
@@ -128,9 +130,10 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     ],
     qualitiesNote: 'Recueillis auprès des marchands du Ponant, étal par étal.',
     operatorsEyebrow: 'Les gens du marché',
-    operatorsTitle: 'Qui est derrière les étals',
-    operatorsLead: 'Qui cultive, qui choisit à l’aube, qui te connaît par ton nom : ici tu trouves les gens des marchés, étal par étal, et ce qu’ils apportent.',
+    operatorsTitle: 'D’abord les gens, ensuite les places.',
+    operatorsLead: 'Le projet tient en une phrase : te mettre en contact avec ceux qui tiennent l’étal — qui cultive, qui pêche, qui coud, qui t’appelle par ton prénom. Les marchés, ce sont les gens qui y travaillent, et ici tu les rejoins un par un.',
     operatorsCta: 'Rencontrer les marchands',
+    operatorsJoinCta: 'Tu as un étal ? Rejoins-nous',
     weekEyebrow: 'La semaine',
     weekTitle: 'Nouvelles et événements de la Riviera',
     weekLead: 'Les avis des communes et les rendez-vous à noter, côte à côte.',
@@ -174,9 +177,10 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     ],
     qualitiesNote: 'Gesammelt im Gespräch mit den Händlern des Ponente, Stand für Stand.',
     operatorsEyebrow: 'Die Menschen des Marktes',
-    operatorsTitle: 'Wer hinter den Ständen steht',
-    operatorsLead: 'Wer anbaut, wer im Morgengrauen auswählt, wer dich beim Namen kennt: hier findest du die Menschen der Märkte, Stand für Stand, und was sie mitbringen.',
+    operatorsTitle: 'Zuerst die Menschen, dann die Plätze.',
+    operatorsLead: 'Darum geht es hier: dich mit denen zu verbinden, die den Stand halten — wer anbaut, wer fischt, wer näht, wer dich beim Namen ruft. Die Märkte sind die Menschen, die dort arbeiten, und hier erreichst du sie einzeln.',
     operatorsCta: 'Die Händler kennenlernen',
+    operatorsJoinCta: 'Hast du einen Stand? Mach mit',
     weekEyebrow: 'Die Woche',
     weekTitle: 'Nachrichten & Termine von der Riviera',
     weekLead: 'Die Hinweise der Gemeinden und die Termine zum Vormerken, nebeneinander.',
@@ -220,9 +224,10 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     ],
     qualitiesNote: 'Collected by talking with the vendors of the Ponente, stall by stall.',
     operatorsEyebrow: 'The people of the market',
-    operatorsTitle: 'Who’s behind the stalls',
-    operatorsLead: 'Who grows, who picks at dawn, who knows you by name: here you’ll find the people of the markets, stall by stall, and what they bring.',
+    operatorsTitle: 'People first, then the squares.',
+    operatorsLead: 'This whole project does one thing: it connects you with the people behind the stalls — who grow, who fish, who sew, who call you by name. Markets are the people who work them, and here you can reach them one by one.',
     operatorsCta: 'Meet the vendors',
+    operatorsJoinCta: 'Got a stall? Join us',
     weekEyebrow: 'The week',
     weekTitle: 'News & events from the Riviera',
     weekLead: 'Town notices and dates to save, side by side.',

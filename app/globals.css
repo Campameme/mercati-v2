@@ -456,3 +456,28 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .imk-skel::after { animation: none; }
 }
+
+/* ===== Hero v3: ticker "oggi al mercato" + parole vive ===== */
+/* Marquee continuo (contenuto duplicato → loop senza scatti) */
+.imk-marquee-track {
+  animation: imk-marquee 28s linear infinite;
+}
+.imk-marquee:hover .imk-marquee-track {
+  animation-play-state: paused;
+}
+@keyframes imk-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+/* Parole dell'headline: reagiscono al passaggio, una per una */
+.imk-word {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.35s ease;
+}
+.imk-word:hover {
+  transform: translateY(-0.06em) rotate(-1.6deg);
+  color: #F4B62C;
+}
+@media (prefers-reduced-motion: reduce) {
+  .imk-marquee-track { animation: none; }
+  .imk-word, .imk-word:hover { transition: none; transform: none; }
+}

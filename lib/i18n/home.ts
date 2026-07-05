@@ -126,7 +126,7 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
       quote: '«Aiga ae corde!» — il grido in dialetto che dal 1586 porta in Vaticano le palme bianche di Bordighera.',
       quoteSource: 'Tradizione del Ponente ligure',
     },
-    zones: { eyebrow: 'Le zone della provincia', title: 'Otto zone, un Ponente solo', lead: 'Dalla frontiera francese alle valli dell’entroterra: scegli una zona per vedere i suoi borghi e i suoi mercati.', markets: 'mercati' },
+    zones: { eyebrow: 'Le zone', title: 'Otto zone, un Ponente solo', lead: 'Dalla frontiera francese alle valli dell’entroterra: scegli una zona per vedere i suoi borghi e i suoi mercati.', markets: 'mercati' },
   },
   fr: {
     tagline: 'produits authentiques · soin · fiabilité',
@@ -188,7 +188,7 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
       quote: '« Aiga ae corde ! » — le cri en dialecte qui, depuis 1586, porte au Vatican les palmes blanches de Bordighera.',
       quoteSource: 'Tradition du Ponant ligure',
     },
-    zones: { eyebrow: 'Les zones de la province', title: 'Huit zones, un seul Ponant', lead: 'De la frontière française aux vallées de l’arrière-pays : choisissez une zone pour voir ses bourgs et ses marchés.', markets: 'marchés' },
+    zones: { eyebrow: 'Les zones', title: 'Huit zones, un seul Ponant', lead: 'De la frontière française aux vallées de l’arrière-pays : choisissez une zone pour voir ses bourgs et ses marchés.', markets: 'marchés' },
   },
   de: {
     tagline: 'echte Produkte · Sorgfalt · Verlässlichkeit',
@@ -250,7 +250,7 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
       quote: '„Aiga ae corde!“ — der Ruf im Dialekt, der seit 1586 die weißen Palmen von Bordighera in den Vatikan bringt.',
       quoteSource: 'Tradition des ligurischen Ponente',
     },
-    zones: { eyebrow: 'Die Zonen der Provinz', title: 'Acht Zonen, ein Ponente', lead: 'Von der französischen Grenze bis zu den Tälern des Hinterlandes: Wähle eine Zone, um ihre Dörfer und Märkte zu sehen.', markets: 'Märkte' },
+    zones: { eyebrow: 'Die Zonen', title: 'Acht Zonen, ein Ponente', lead: 'Von der französischen Grenze bis zu den Tälern des Hinterlandes: Wähle eine Zone, um ihre Dörfer und Märkte zu sehen.', markets: 'Märkte' },
   },
   en: {
     tagline: 'authentic produce · care · reliability',
@@ -312,7 +312,7 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
       quote: '“Aiga ae corde!” — the dialect cry that since 1586 carries Bordighera’s white palms to the Vatican.',
       quoteSource: 'Western Liguria tradition',
     },
-    zones: { eyebrow: 'The zones of the province', title: 'Eight zones, one Ponente', lead: 'From the French border to the inland valleys: pick a zone to see its villages and its markets.', markets: 'markets' },
+    zones: { eyebrow: 'The areas', title: 'Eight zones, one Ponente', lead: 'From the French border to the inland valleys: pick a zone to see its villages and its markets.', markets: 'markets' },
   },
 }
 
