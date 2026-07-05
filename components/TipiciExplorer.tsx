@@ -4,6 +4,8 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { CalendarDays, LayoutList, MapPin, Check } from 'lucide-react'
 import { slugifyName } from '@/lib/markets/slug'
+import { useLang } from '@/lib/i18n/useLang'
+import { UI_I18N } from '@/lib/i18n/ui'
 import { occursOn, isNonWeekly } from '@/lib/markets/hours'
 import {
   CATEGORY_COLOR, CATEGORY_LABEL, CATEGORY_GLYPH, type ScheduleCategory,
@@ -22,8 +24,6 @@ export interface TipicoItem {
 }
 
 const TIPICO_CATS: ScheduleCategory[] = ['antiquariato', 'alimentare', 'artigianato']
-const WD_LONG = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
-const MONTH_LONG = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre']
 
 /** Prossimi N giorni con almeno un mercato (per la vista calendario). */
 function agenda(items: TipicoItem[], days: number) {
@@ -38,6 +38,10 @@ function agenda(items: TipicoItem[], days: number) {
 }
 
 export default function TipiciExplorer({ items }: { items: TipicoItem[] }) {
+  const [lang] = useLang()
+  const ui = UI_I18N[lang]
+  const WD_LONG = ui.weekdaysLong
+  const MONTH_LONG = ui.monthsLong
   const [view, setView] = useState<'calendario' | 'elenco'>('calendario')
   const [cats, setCats] = useState<ScheduleCategory[]>([])
   const [zona, setZona] = useState<string>('all')
@@ -112,10 +116,10 @@ export default function TipiciExplorer({ items }: { items: TipicoItem[] }) {
         <select
           value={zona}
           onChange={(e) => setZona(e.target.value)}
-          aria-label="Filtra per zona"
+          aria-label={ui.tipiciAllZones}
           className="font-alt text-sm font-semibold px-4 py-2.5 rounded-full border-2 border-ink/15 bg-white text-ink focus:outline-none focus:border-mare"
         >
-          <option value="all">Tutte le zone</option>
+          <option value="all">{ui.tipiciAllZones}</option>
           {zone.map(([slug, name]) => (
             <option key={slug} value={slug}>{name}</option>
           ))}
@@ -124,7 +128,7 @@ export default function TipiciExplorer({ items }: { items: TipicoItem[] }) {
 
       {/* Vista: calendario / elenco */}
       <div className="flex items-center gap-1.5 mb-8 border-b-2 border-ink/10">
-        {([['calendario', 'Calendario', CalendarDays], ['elenco', 'Tutti i mercati', LayoutList]] as const).map(([key, label, Icon]) => (
+        {([['calendario', ui.tipiciCalendarTab, CalendarDays], ['elenco', ui.tipiciListTab, LayoutList]] as const).map(([key, label, Icon]) => (
           <button
             key={key}
             onClick={() => setView(key)}
@@ -140,9 +144,7 @@ export default function TipiciExplorer({ items }: { items: TipicoItem[] }) {
 
       {view === 'calendario' ? (
         days.length === 0 ? (
-          <p className="text-sm text-ink-muted py-8">
-            Nessuna ricorrenza speciale nei prossimi 60 giorni con questi filtri.
-          </p>
+          <p className="text-sm text-ink-muted py-8">{ui.tipiciEmptyCalendar}</p>
         ) : (
           <ol className="space-y-8">
             {days.map(({ date, events }) => (
@@ -194,11 +196,11 @@ export default function TipiciExplorer({ items }: { items: TipicoItem[] }) {
             >
               <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${soloSpeciali ? 'left-[22px]' : 'left-0.5'}`} />
             </button>
-            <span className="font-alt text-sm font-semibold text-ink">Solo ricorrenze speciali (mensili e stagionali)</span>
+            <span className="font-alt text-sm font-semibold text-ink">{ui.tipiciOnlySpecial}</span>
           </label>
 
           {listItems.length === 0 ? (
-            <p className="text-sm text-ink-muted py-8">Nessun mercato con questi filtri.</p>
+            <p className="text-sm text-ink-muted py-8">{ui.tipiciEmptyList}</p>
           ) : (
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {listItems.map((it) => (

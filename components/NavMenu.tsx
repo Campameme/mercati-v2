@@ -10,6 +10,8 @@ import {
 import Logo from '@/components/Logo'
 import { slugifyName } from '@/lib/markets/slug'
 import { createClient } from '@/lib/supabase/client'
+import { useLang } from '@/lib/i18n/useLang'
+import { UI_I18N } from '@/lib/i18n/ui'
 import type { UserRole } from '@/types/market'
 
 interface MarketLite {
@@ -97,11 +99,13 @@ export default function NavMenu({ open, onClose }: Props) {
     }
   }, [open, onClose])
 
+  const [lang] = useLang()
+  const ui = UI_I18N[lang]
   const globalLinks = [
-    { href: '/mappa',      label: 'Mappa dei mercati',     icon: MapIcon },
-    { href: '/tipici',     label: 'Mercati tipici',        icon: ShoppingBasket },
-    { href: '/operatori',  label: 'Gli ambulanti',         icon: Store },
-    { href: '/calendar',   label: 'Calendario eventi',     icon: Calendar },
+    { href: '/mappa',      label: ui.navMap,       icon: MapIcon },
+    { href: '/tipici',     label: ui.navTipici,    icon: ShoppingBasket },
+    { href: '/operatori',  label: ui.navOperators, icon: Store },
+    { href: '/calendar',   label: ui.navCalendar,  icon: Calendar },
   ]
 
   // Filtro testuale su zone + comuni

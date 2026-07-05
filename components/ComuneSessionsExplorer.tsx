@@ -6,6 +6,8 @@ import { useSearchParams } from 'next/navigation'
 import { MapPin, Store, Navigation2, ChevronDown } from 'lucide-react'
 import MarketViewer from '@/components/MarketViewer'
 import { classifySchedule, CATEGORY_COLOR, CATEGORY_LABEL } from '@/lib/schedules/classify'
+import { useLang } from '@/lib/i18n/useLang'
+import { UI_I18N } from '@/lib/i18n/ui'
 
 interface SessionLite {
   id: string
@@ -68,6 +70,8 @@ export default function ComuneSessionsExplorer({
   sessions,
   operators,
 }: Props) {
+  const [lang] = useLang()
+  const ui = UI_I18N[lang]
   const searchParams = useSearchParams()
   const initialId = (() => {
     const q = searchParams?.get('s')
@@ -120,7 +124,7 @@ export default function ComuneSessionsExplorer({
       {sessions.length > 1 && (
         <section className="mb-6">
           <label htmlFor="comune-giorno" className="block font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-3">
-            Scegli un giorno
+            {ui.comuneChooseDay}
           </label>
           <div className="relative inline-block w-full max-w-md">
             <span
@@ -175,7 +179,7 @@ export default function ComuneSessionsExplorer({
                 rel="noopener noreferrer"
                 className="imk-lift inline-flex items-center gap-1.5 px-4 py-2.5 bg-ink text-carta rounded-full font-alt text-sm font-semibold hover:bg-mare transition-colors flex-shrink-0"
               >
-                <Navigation2 className="w-4 h-4" /> Indicazioni
+                <Navigation2 className="w-4 h-4" /> {ui.comuneDirections}
               </a>
             )}
           </div>
@@ -194,12 +198,12 @@ export default function ComuneSessionsExplorer({
         <div className="flex items-center gap-2 mb-4 text-ink-muted">
           <Store className="w-4 h-4" aria-hidden="true" />
           <h3 className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">
-            Banchi · {comuneOperators.length}
+            {ui.comuneBanchi} · {comuneOperators.length}
           </h3>
         </div>
         {comuneOperators.length === 0 ? (
           <div className="bg-white border-2 border-ink/10 rounded-xl p-6 text-sm text-ink-muted">
-            Nessun operatore ancora registrato per questo mercato.
+            {ui.comuneNoOperators}
           </div>
         ) : (
           <ul className="divide-y-2 divide-ink/10 border-y-2 border-ink/10">

@@ -7,6 +7,7 @@ import { Menu, Shield, LogIn } from 'lucide-react'
 import WeatherWidget from './WeatherWidget'
 import Logo from './Logo'
 import NavMenu from './NavMenu'
+import LangSwitcher from './LangSwitcher'
 import { useMarketSlug } from '@/lib/markets/useMarketSlug'
 import { createClient } from '@/lib/supabase/client'
 import type { UserRole } from '@/types/market'
@@ -61,9 +62,10 @@ export default function Navigation() {
               <Logo inline />
             </Link>
 
-            {/* Right: weather + quick admin + auth + menu (icona, ultima a destra) */}
+            {/* Right: lingua + weather + quick admin + auth + menu (icona, ultima a destra) */}
             <div className="flex items-center gap-2">
-              <WeatherWidget />
+              <LangSwitcher />
+              <div className="hidden sm:block"><WeatherWidget /></div>
               {(role === 'super_admin' || role === 'market_admin') && marketSlug && (
                 <Link
                   href={`/${marketSlug}/admin`}

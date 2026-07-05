@@ -69,8 +69,8 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
   it: {
     tagline: 'prodotti autentici · cura · affidabilità',
     hint: 'Tocca un mercato sulla mappa',
-    introTitle: 'I mercati della provincia di Imperia, su una mappa.',
-    introText: 'Dove e quando si tengono, chi c’è al banco, dove parcheggiare. Scegli una zona o tocca un mercato.',
+    introTitle: 'Tutti i mercati del Ponente, su una mappa.',
+    introText: 'Da Ventimiglia a Varazze: dove e quando si tengono, chi c’è al banco, dove parcheggiare. Tocca un mercato per aprirlo.',
     zonesLabel: 'Cerca per zona',
     allZones: 'Tutta la provincia',
     operatorsLink: 'Gli ambulanti',
@@ -131,8 +131,8 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
   fr: {
     tagline: 'produits authentiques · soin · fiabilité',
     hint: 'Touchez un marché sur la carte',
-    introTitle: 'Les marchés de la province d’Imperia, sur une carte.',
-    introText: 'Où et quand, qui tient l’étal, où se garer. Choisissez une zone ou touchez un marché.',
+    introTitle: 'Tous les marchés du Ponant, sur une carte.',
+    introText: 'De Vintimille à Varazze : où et quand, qui tient l’étal, où se garer. Touchez un marché pour l’ouvrir.',
     zonesLabel: 'Rechercher par zone',
     allZones: 'Toute la province',
     operatorsLink: 'Les marchands',
@@ -193,8 +193,8 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
   de: {
     tagline: 'echte Produkte · Sorgfalt · Verlässlichkeit',
     hint: 'Tippe auf einen Markt auf der Karte',
-    introTitle: 'Die Märkte der Provinz Imperia, auf einer Karte.',
-    introText: 'Wo und wann, wer am Stand steht, wo man parkt. Wähle eine Zone oder tippe auf einen Markt.',
+    introTitle: 'Alle Märkte des Ponente, auf einer Karte.',
+    introText: 'Von Ventimiglia bis Varazze: wo und wann, wer am Stand steht, wo man parkt. Tippe auf einen Markt, um ihn zu öffnen.',
     zonesLabel: 'Nach Zone suchen',
     allZones: 'Ganze Provinz',
     operatorsLink: 'Die Händler',
@@ -255,8 +255,8 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
   en: {
     tagline: 'authentic produce · care · reliability',
     hint: 'Tap a market on the map',
-    introTitle: 'The markets of the Imperia province, on a map.',
-    introText: 'Where and when, who’s at the stall, where to park. Pick a zone or tap a market.',
+    introTitle: 'All the Ponente markets, on one map.',
+    introText: 'From Ventimiglia to Varazze: where and when, who’s at the stall, where to park. Tap a market to open it.',
     zonesLabel: 'Search by zone',
     allZones: 'Whole province',
     operatorsLink: 'The vendors',

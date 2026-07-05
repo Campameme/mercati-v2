@@ -1,12 +1,13 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { Search, Crosshair, Navigation as NavIcon, ChevronDown, Check } from 'lucide-react'
+import { Search, Crosshair, Navigation as NavIcon, ChevronDown, Check, History, X } from 'lucide-react'
 import UnifiedMapClient from '@/components/UnifiedMapClient'
 import type { UnifiedMapPin } from '@/components/UnifiedMap'
 import MarketPanel from './MarketPanel'
 import type { MarketPin, MarketSession } from './types'
 import { HOME_I18N, LANGS, type Lang } from '@/lib/i18n/home'
+import { useLang } from '@/lib/i18n/useLang'
 import { marketStatus, weekdaysOf, occursOn, fmtHour, type MarketStatus } from '@/lib/markets/hours'
 import {
   classifyMany, CATEGORY_ORDER, CATEGORY_COLOR, CATEGORY_GLYPH, categoryLabelI18n, type ScheduleCategory,
@@ -126,9 +127,11 @@ interface Props {
 }
 
 export default function MarketExplorer({ pins, initialQuery = '', initialZone = 'all', initialToday = false, initialDays = [], initialNear = false }: Props) {
-  const [lang, setLang] = useState<Lang>('it')
+  const [lang, setLang] = useLang()
   const [days, setDays] = useState<number[]>(initialDays)
   const [today, setToday] = useState(initialToday)
+  const [openNow, setOpenNow] = useState(false)
+  const [recents, setRecents] = useState<string[]>([])
   const [zone, setZone] = useState<string>(initialZone && ZONE_BY_SLUG[initialZone] ? initialZone : 'all')
   const [types, setTypes] = useState<ScheduleCategory[]>([])
   const [sort, setSort] = useState<'az' | 'near'>('az')
@@ -145,8 +148,8 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
   const typedPlaceholder = useTypewriter(HOME_COPY[lang].searchExamples)
 
   useEffect(() => {
-    const saved = (typeof localStorage !== 'undefined' && localStorage.getItem('imk:lang')) as Lang | null
-    if (saved && LANGS.includes(saved)) setLang(saved)
+    // ricerche recenti: memorizzate in locale per ri-proporle al focus
+    try { setRecents(JSON.parse(localStorage.getItem('imk:recentSearches') ?? '[]')) } catch { /* ignore */ }
     setNow(new Date())
     const t = setInterval(() => setNow(new Date()), 60_000)
     fetch('/api/operators?all=1')
@@ -155,11 +158,6 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
       .catch(() => {})
     return () => clearInterval(t)
   }, [])
-
-  useEffect(() => {
-    if (typeof document !== 'undefined') document.documentElement.lang = lang
-    if (typeof localStorage !== 'undefined') localStorage.setItem('imk:lang', lang)
-  }, [lang])
 
   // Chip "Vicino a me" dalla home: chiede subito la posizione e ordina per distanza.
   useEffect(() => {
@@ -186,6 +184,7 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
     return pins.filter((p) => {
       if (zone !== 'all' && p.marketSlug !== zone) return false
       if (types.length > 0 && !types.includes(meta.get(p.id)?.category ?? 'generale')) return false
+      if (openNow && statuses.get(p.id)?.state !== 'open') return false
       if (today || days.length > 0) {
         const okToday = today && now ? p.sessions.some((s) => occursOn(s.giorno, now)) : false
         const okWeekday = days.length > 0 ? days.some((d) => pinWeekdays(p).has(d)) : false
@@ -193,7 +192,7 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
       }
       return true
     })
-  }, [pins, zone, types, days, today, now, meta])
+  }, [pins, zone, types, days, today, now, meta, openNow, statuses])
 
   const sortedPins = useMemo(() => {
     const arr = [...filteredPins]
@@ -229,12 +228,18 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
     }
   }, [initialQuery, searchResults])
 
+  // Conteggio "aperti adesso" sul set filtrato SENZA il filtro openNow stesso
+  // (così il numero sul chip resta stabile quando lo attivi/disattivi).
   const openCount = useMemo(() => {
     if (!now) return 0
     let n = 0
-    for (const p of filteredPins) if (statuses.get(p.id)?.state === 'open') n++
+    for (const p of pins) {
+      if (zone !== 'all' && p.marketSlug !== zone) continue
+      if (types.length > 0 && !types.includes(meta.get(p.id)?.category ?? 'generale')) continue
+      if (statuses.get(p.id)?.state === 'open') n++
+    }
     return n
-  }, [filteredPins, statuses, now])
+  }, [pins, zone, types, meta, statuses, now])
 
   const mapPins = useMemo<UnifiedMapPin[]>(
     () =>
@@ -262,7 +267,24 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
     )
   }
 
-  function selectMarket(id: string) { setSelectedId(id); setOpen(false); setQuery('') }
+  function saveRecent(q: string) {
+    const t = q.trim()
+    if (t.length < 2) return
+    setRecents((prev) => {
+      const next = [t, ...prev.filter((x) => x.toLowerCase() !== t.toLowerCase())].slice(0, 8)
+      try { localStorage.setItem('imk:recentSearches', JSON.stringify(next)) } catch { /* ignore */ }
+      return next
+    })
+  }
+  function selectMarket(id: string, searched?: string) {
+    if (searched) saveRecent(searched)
+    setSelectedId(id); setOpen(false); setQuery('')
+  }
+  /** Invio nella ricerca: seleziona il miglior risultato. */
+  function submitSearch(e: { preventDefault(): void }) {
+    e.preventDefault()
+    if (searchResults.length > 0) selectMarket(searchResults[0].pin.id, query)
+  }
   function toggleType(c: ScheduleCategory) {
     setTypes((t) => (t.includes(c) ? t.filter((x) => x !== c) : [...t, c]))
   }
@@ -277,7 +299,7 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
         <div className="container mx-auto px-4 md:px-6 pt-3 pb-2 space-y-2.5">
           {/* riga 1: ricerca + posizione + lingua */}
           <div className="flex items-center gap-2.5">
-            <div className="imk-edge relative flex-1 min-w-0 bg-white border-2 border-ink/15 shadow-sm focus-within:border-mare">
+            <form onSubmit={submitSearch} role="search" className="imk-edge relative flex-1 min-w-0 bg-white border-2 border-ink/15 shadow-sm focus-within:border-mare">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-muted z-10" aria-hidden="true" />
               <input
                 value={query}
@@ -286,8 +308,45 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
                 onBlur={() => setTimeout(() => setOpen(false), 180)}
                 placeholder={typedPlaceholder}
                 aria-label={dict.searchPlaceholder}
-                className="relative w-full pl-11 pr-3 py-3 bg-transparent rounded-2xl text-[15px] focus:outline-none"
+                enterKeyHint="search"
+                className="relative w-full pl-11 pr-12 py-3 bg-transparent rounded-2xl text-[15px] focus:outline-none"
               />
+              {/* Invio esplicito: seleziona il miglior risultato */}
+              <button
+                type="submit"
+                aria-label={dict.searchPlaceholder}
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 grid place-items-center w-9 h-9 rounded-full bg-ink text-carta hover:bg-mare transition-colors z-10"
+              >
+                <Search className="w-4 h-4" aria-hidden="true" />
+              </button>
+              {/* Ricerche recenti (a focus, prima di digitare) */}
+              {open && query.trim().length < 2 && recents.length > 0 && (
+                <div
+                  className="absolute left-0 right-0 top-full mt-1.5 bg-white border-2 border-ink/15 imk-edge shadow-xl z-40 overflow-hidden"
+                  data-lenis-prevent
+                >
+                  {recents.map((r) => (
+                    <button
+                      key={r}
+                      onMouseDown={(e) => { e.preventDefault(); setQuery(r); setOpen(true) }}
+                      className="w-full text-left flex items-center gap-2.5 px-3 py-2.5 hover:bg-marel/50 border-b border-ink/5 last:border-0"
+                    >
+                      <History className="w-4 h-4 text-ink-muted flex-shrink-0" aria-hidden="true" />
+                      <span className="font-alt text-sm text-ink truncate">{r}</span>
+                    </button>
+                  ))}
+                  <button
+                    onMouseDown={(e) => {
+                      e.preventDefault()
+                      setRecents([])
+                      try { localStorage.removeItem('imk:recentSearches') } catch { /* ignore */ }
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-left font-alt text-xs font-semibold text-ink-muted hover:text-ink"
+                  >
+                    <X className="w-3.5 h-3.5" aria-hidden="true" /> {RESET_LABEL[lang]}
+                  </button>
+                </div>
+              )}
               {open && query.trim().length >= 2 && (
                 <div
                   className="absolute left-0 right-0 top-full mt-1.5 bg-white border-2 border-ink/15 imk-edge shadow-xl z-40 max-h-[60vh] overflow-y-auto imk-scroll"
@@ -304,7 +363,7 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
                       return (
                         <button
                           key={r.pin.id}
-                          onMouseDown={(e) => { e.preventDefault(); selectMarket(r.pin.id) }}
+                          onMouseDown={(e) => { e.preventDefault(); selectMarket(r.pin.id, query) }}
                           className="w-full text-left flex items-start gap-2.5 px-3 py-2.5 hover:bg-marel/50 border-b border-ink/5 last:border-0"
                         >
                           <span className="mt-0.5 w-3 h-3 rounded-full flex-shrink-0" style={{ background: CATEGORY_COLOR[cat] }} aria-hidden="true" />
@@ -325,7 +384,7 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
                   )}
                 </div>
               )}
-            </div>
+            </form>
             <button
               onClick={locateNearest}
               disabled={locating}
@@ -393,33 +452,29 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
               )}
             </FilterDropdown>
 
-            {(zone !== 'all' || types.length > 0 || dayCount > 0) && (
+            {/* "Sono le HH:MM · N aperti adesso": è un FILTRO cliccabile */}
+            {now && (
               <button
-                onClick={() => { setZone('all'); setTypes([]); setDays([]); setToday(false) }}
+                onClick={() => setOpenNow((v) => !v)}
+                aria-pressed={openNow}
+                className={`inline-flex items-center gap-1.5 font-alt text-xs font-semibold px-3 py-1.5 rounded-full border-2 transition-colors ${
+                  openNow ? 'bg-mare text-white border-mare' : 'bg-white text-ink-soft border-ink/15 hover:border-mare'
+                }`}
+              >
+                <span className={`w-2 h-2 rounded-full ${openNow ? 'bg-white' : 'bg-sole'}`} aria-hidden="true" />
+                {nowText} · <b className={openNow ? 'text-white' : 'text-mare-600'}>{openCount}</b>{' '}
+                {openCount > 0 ? dict.openSuffix : dict.noneOpen}
+              </button>
+            )}
+
+            {(zone !== 'all' || types.length > 0 || dayCount > 0 || openNow) && (
+              <button
+                onClick={() => { setZone('all'); setTypes([]); setDays([]); setToday(false); setOpenNow(false) }}
                 className="font-alt text-xs font-semibold text-ink-muted hover:text-ink underline underline-offset-2"
               >
                 {RESET_LABEL[lang]}
               </button>
             )}
-          </div>
-
-          {/* riga 3: stato (ora + aperti) + legenda tipologie — in linea, niente overlay */}
-          <div className="flex items-center gap-x-4 gap-y-1 flex-wrap pb-0.5 text-[11px]">
-            <span className="inline-flex items-center gap-1.5 font-alt font-semibold text-ink-soft">
-              <span className="w-2 h-2 rounded-full bg-sole" aria-hidden="true" />
-              {nowText}
-              {now && (
-                <>· <b className="text-mare-600">{openCount}</b> {openCount > 0 ? dict.openSuffix : dict.noneOpen}</>
-              )}
-            </span>
-            <span className="hidden sm:flex items-center gap-x-3 gap-y-1 flex-wrap text-ink-muted">
-              {CATEGORY_ORDER.map((c) => (
-                <span key={c} className="inline-flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full" style={{ background: CATEGORY_COLOR[c] }} aria-hidden="true" />
-                  {categoryLabelI18n(c, lang)}
-                </span>
-              ))}
-            </span>
           </div>
         </div>
       </div>
@@ -489,7 +544,9 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
           )}
         </aside>
 
-        <div className="order-1 md:order-2 relative flex-1 h-[55svh] md:h-auto min-h-[420px] overflow-hidden bg-notte">
+        {/* z-0: crea uno stacking context così mappa E card mercato restano
+            SOTTO la barra filtri sticky (z-30), senza clippare i suoi menu. */}
+        <div className="order-1 md:order-2 relative z-0 flex-1 h-[55svh] md:h-auto min-h-[420px] overflow-hidden bg-notte">
           <div className="absolute inset-0">
             <UnifiedMapClient
               pins={mapPins}

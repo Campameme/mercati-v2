@@ -11,18 +11,22 @@ import DriftBackdrop from '@/components/motion/DriftBackdrop'
 import Cartolina from '@/components/Cartolina'
 import ZoneImage from '@/components/ZoneImage'
 import { comuneDescription } from '@/lib/markets/comuni'
+import { getLang } from '@/lib/i18n/getLang'
+import { UI_I18N } from '@/lib/i18n/ui'
 import { weekdaysOf } from '@/lib/markets/hours'
 import { haversineMeters } from '@/lib/markets/geo'
 
 export const dynamic = 'force-dynamic'
 
-const WD_SHORT = ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab']
 
 export default async function ComunePage({
   params,
 }: {
   params: { marketSlug: string; comuneSlug: string }
 }) {
+  const lang = getLang()
+  const ui = UI_I18N[lang]
+  const WD_SHORT = ui.weekdaysShort
   const supabase = createClient()
   const { data: market } = await supabase
     .from('markets')
@@ -52,7 +56,7 @@ export default async function ComunePage({
   }))
 
   const comune = forComune[0].comune
-  const descrizione = comuneDescription(comune)
+  const descrizione = comuneDescription(comune, lang)
 
   // Comuni limitrofi (anche di ALTRE zone): centroide per comune su tutta la
   // Riviera, poi i 3 più vicini — ognuno apre la SUA pagina comune.
@@ -133,14 +137,14 @@ export default async function ComunePage({
             <Reveal>
               <div className="flex items-center gap-3 mb-3 text-ink-soft">
                 <SunRay className="w-5 h-5 text-sole" aria-hidden="true" />
-                <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">Comune</p>
+                <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">{ui.comuneLabel}</p>
               </div>
               <h1 className="font-display text-3xl md:text-5xl text-ink leading-[1.06]"><span className="imk-mark text-ink">{comune}</span></h1>
               {descrizione && (
                 <p className="mt-4 text-sm md:text-base text-ink-soft max-w-2xl leading-relaxed">{descrizione}</p>
               )}
               <p className="mt-3 text-sm text-ink-soft">
-                {forComune.length} {forComune.length === 1 ? 'mercato' : 'mercati'} · {market.name}
+                {forComune.length} {forComune.length === 1 ? ui.zoneMarketsCount.one : ui.zoneMarketsCount.many} · {market.name}
               </p>
             </Reveal>
           </div>
@@ -161,9 +165,9 @@ export default async function ComunePage({
         {vicini.length > 0 && (
           <section className="mt-12 pt-10 border-t-2 border-ink/10">
             <Reveal className="mb-6">
-              <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-1">Sulla Riviera</p>
-              <h2 className="font-alt font-bold text-2xl text-ink">Attorno a {comune}</h2>
-              <p className="mt-1 text-sm text-ink-soft">I mercati dei paesi vicini, a pochi minuti di strada.</p>
+              <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-1">{ui.comuneRiviera}</p>
+              <h2 className="font-alt font-bold text-2xl text-ink">{ui.comuneAround} {comune}</h2>
+              <p className="mt-1 text-sm text-ink-soft">{ui.comuneAroundLead}</p>
             </Reveal>
             <Reveal delayMs={60} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {vicini.map((v) => (
@@ -181,9 +185,9 @@ export default async function ComunePage({
                   </div>
                   <div className="p-3.5 flex items-baseline justify-between gap-2 text-xs">
                     <span className="font-alt font-semibold text-ink">
-                      {Array.from(v.giorni).sort().map((d) => WD_SHORT[d]).join(' · ') || 'date variabili'}
+                      {Array.from(v.giorni).sort().map((d) => WD_SHORT[d]).join(' · ') || ui.comuneVariableDates}
                     </span>
-                    <span className="text-ink-muted whitespace-nowrap">{v.km < 1 ? 'accanto' : `${Math.round(v.km)} km`}</span>
+                    <span className="text-ink-muted whitespace-nowrap">{v.km < 1 ? ui.comuneNextDoor : `${Math.round(v.km)} km`}</span>
                   </div>
                 </Link>
               ))}

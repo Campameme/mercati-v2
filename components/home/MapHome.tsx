@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { gsap } from '@/lib/motion/gsap'
@@ -10,12 +10,17 @@ import DriftBackdrop from '@/components/motion/DriftBackdrop'
 import WaterCard from '@/components/motion/WaterCard'
 import BancoAvatar from '@/components/BancoAvatar'
 import PhotoFx from './PhotoFx'
+import UnifiedMapClient from '@/components/UnifiedMapClient'
+import { WaveDivider } from '@/components/decorations'
+import { classifyMany } from '@/lib/schedules/classify'
+import { slugifyName } from '@/lib/markets/slug'
 import { mountAqua } from '@/lib/home/aqua'
 import BorghiSection from './BorghiSection'
 import type { MarketPin } from './types'
 import type { NewsItem } from '@/types/news'
 import { HOME_I18N, LANGS, type Lang } from '@/lib/i18n/home'
 import { HOME_COPY } from '@/lib/i18n/homeCopy'
+import { useLang } from '@/lib/i18n/useLang'
 import { useTypewriter } from '@/lib/useTypewriter'
 
 export interface HomeEvent {
@@ -34,28 +39,39 @@ interface HubOperator {
 
 export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; events?: HomeEvent[] }) {
   const router = useRouter()
-  const [lang, setLang] = useState<Lang>('it')
+  const [lang, setLang] = useLang()
   const [query, setQuery] = useState('')
   const [operators, setOperators] = useState<HubOperator[]>([])
   const [news, setNews] = useState<NewsItem[]>([])
   const heroRef = useRef<HTMLDivElement>(null)
   const aquaRef = useRef<HTMLCanvasElement>(null)
+  const heroPhotoRef = useRef<HTMLDivElement>(null)
 
   const dict = HOME_I18N[lang]
   const copy = HOME_COPY[lang]
   const typed = useTypewriter(copy.searchExamples)
 
+  // La mappa è il fulcro: tutti i mercati come pin-banco, click → popup con
+  // link alla pagina comune.
+  const mapPins = useMemo(
+    () =>
+      pins.map((p) => ({
+        id: p.id,
+        lat: p.lat,
+        lng: p.lng,
+        kind: 'market' as const,
+        title: p.comune,
+        subtitle: p.luogo ?? p.marketName,
+        category: classifyMany(p.sessions.map((s) => s.settori)),
+        href: `/${p.marketSlug}/c/${slugifyName(p.comune)}`,
+      })),
+    [pins],
+  )
+
   useEffect(() => {
-    const saved = (typeof localStorage !== 'undefined' && localStorage.getItem('imk:lang')) as Lang | null
-    if (saved && LANGS.includes(saved)) setLang(saved)
     fetch('/api/operators?all=1').then((r) => r.json()).then((j) => setOperators(Array.isArray(j?.data) ? j.data : [])).catch(() => {})
     fetch('/api/news?all=1').then((r) => r.json()).then((j) => setNews(Array.isArray(j?.data) ? j.data : [])).catch(() => {})
   }, [])
-
-  useEffect(() => {
-    if (typeof document !== 'undefined') document.documentElement.lang = lang
-    if (typeof localStorage !== 'undefined') localStorage.setItem('imk:lang', lang)
-  }, [lang])
 
   // Hero: ingresso cinetico (transform-only → sempre leggibile)
   useEffect(() => {
@@ -75,6 +91,24 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
     const c = aquaRef.current, host = heroRef.current
     if (!c || !host) return
     return mountAqua(c, host, { bubbles: 32 })
+  }, [])
+
+  // Parallasse leggera della foto hero al movimento del mouse (solo desktop,
+  // reduced-motion safe): la scena "respira" dietro il titolo.
+  useEffect(() => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+    const host = heroRef.current, photo = heroPhotoRef.current
+    if (!host || !photo) return
+    const onMove = (e: MouseEvent) => {
+      const r = host.getBoundingClientRect()
+      const dx = (e.clientX - r.left) / r.width - 0.5
+      const dy = (e.clientY - r.top) / r.height - 0.5
+      gsap.to(photo, { x: dx * -14, y: dy * -10, scale: 1.04, duration: 0.9, ease: 'power2.out' })
+    }
+    const onLeave = () => gsap.to(photo, { x: 0, y: 0, scale: 1.02, duration: 1.1, ease: 'power2.out' })
+    host.addEventListener('mousemove', onMove)
+    host.addEventListener('mouseleave', onLeave)
+    return () => { host.removeEventListener('mousemove', onMove); host.removeEventListener('mouseleave', onLeave) }
   }, [])
 
   // Reveal d'ingresso delle sezioni (solo transform → mai testo invisibile)
@@ -103,7 +137,7 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
     <>
       {/* ===== HERO — foto ferma + velo blu + acqua reattiva. UNA sola azione. ===== */}
       <section ref={heroRef} className="relative min-h-[100svh] flex flex-col overflow-hidden bg-notte text-carta">
-        <div className="absolute inset-0">
+        <div ref={heroPhotoRef} className="absolute -inset-4 scale-[1.02] will-change-transform">
           <PhotoFx query="Sanremo" fallbackQuery="Sanremo Liguria" alt="La Riviera di Ponente" fill priority tint="none" />
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-mare-700/60 via-notte/45 to-notte/90 pointer-events-none" aria-hidden="true" />
@@ -159,7 +193,7 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
           </div>
         </div>
 
-        <a href="#borghi" aria-label={copy.heroScrollCue} className="relative z-10 mx-auto mb-5 mt-3 flex flex-col items-center text-carta/70 hover:text-carta">
+        <a href="#mappa" aria-label={copy.heroScrollCue} className="relative z-10 mx-auto mb-5 mt-3 flex flex-col items-center text-carta/70 hover:text-carta">
           <span className="font-alt text-[11px] font-semibold uppercase tracking-[0.14em] mb-1">{copy.heroScrollCue}</span>
           <span className="flex flex-col -space-y-1.5">
             <ChevronDown className="imk-chev w-4 h-4" /><ChevronDown className="imk-chev w-4 h-4" /><ChevronDown className="imk-chev w-4 h-4" />
@@ -167,7 +201,66 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
         </a>
       </section>
 
-      {/* ===== LE ZONE — otto zone, otto racconti: la porta d'ingresso del sito ===== */}
+      {/* ===== LA MAPPA — il fulcro: tutti i mercati, subito ===== */}
+      <section id="mappa" className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
+        <DriftBackdrop tone="light" variant="section" />
+        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-6xl">
+          <div className="flex items-end justify-between gap-6 mb-8">
+            <div className="max-w-2xl">
+              <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{dict.list}</p>
+              <h2 className="font-alt font-extrabold tracking-tight text-3xl md:text-4xl leading-[1.06] text-ink">{dict.introTitle}</h2>
+              <p className="mt-3 text-base text-ink-soft leading-relaxed">{dict.introText}</p>
+            </div>
+            <WaveDivider className="w-24 text-mare opacity-60 hidden md:block flex-shrink-0" aria-hidden="true" />
+          </div>
+          <div className="imk-edge overflow-hidden border-2 border-ink/10 bg-white shadow-sm">
+            <UnifiedMapClient pins={mapPins} height={480} maxZoom={11} bare />
+          </div>
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <Link href="/mappa" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-6 py-3.5 rounded-full hover:bg-sole-600 transition-colors">
+              <MapPin className="w-4 h-4" /> {copy.exploreMapCta} <ArrowRight className="imk-march w-4 h-4" />
+            </Link>
+            <span className="font-alt text-xs text-ink-muted">{dict.hint}</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== LE PERSONE — il cuore del progetto: chi sta dietro i banchi ===== */}
+      <section id="valori" className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
+        <DriftBackdrop tone="light" variant="section" />
+        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-5xl">
+          <div className="max-w-2xl mb-9">
+            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{copy.valueMarket.k}</p>
+            <h2 className="font-alt font-extrabold tracking-tight text-3xl md:text-4xl leading-[1.06] text-ink">{copy.valueMarket.title}</h2>
+            <p className="mt-3 text-base text-ink-soft leading-relaxed">{copy.valueMarket.lead}</p>
+          </div>
+          <div className="mt-2">
+            <div className="max-w-2xl">
+              <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{copy.operatorsEyebrow}</p>
+              <h3 className="font-alt font-bold text-2xl md:text-4xl leading-[1.04] text-ink"><span className="imk-mark">{copy.operatorsTitle}</span></h3>
+              <p className="mt-3 text-base text-ink-soft leading-relaxed">{copy.operatorsLead}</p>
+            </div>
+            {operators.length > 0 && (
+              <div className="mt-6 flex flex-wrap gap-3">
+                {operators.slice(0, 10).map((op) => (
+                  <Link key={op.id} href={op.market ? `/${op.market.slug}/operators/${op.id}` : '/operatori'} className="imk-lift" aria-label={`Scopri ${op.name}`}>
+                    <WaterCard className="flex items-center gap-2.5 pl-1.5 pr-3.5 py-1.5 rounded-full hover:border-mare/50">
+                      <BancoAvatar name={op.name} size={32} />
+                      <span className="font-alt text-sm font-semibold text-ink">{op.name}</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-mare-600 flex-shrink-0" aria-hidden="true" />
+                    </WaterCard>
+                  </Link>
+                ))}
+              </div>
+            )}
+            <Link href="/operatori" className="group imk-lift mt-7 inline-flex items-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-6 py-3.5 rounded-full hover:bg-sole-600 transition-colors">
+              <Store className="w-4 h-4" /> {copy.operatorsCta} <ArrowRight className="imk-march w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== LE ZONE — quindici zone, quindici racconti ===== */}
       <BorghiSection
         eyebrow={copy.valueProject.k}
         title={copy.valueProject.title}
@@ -249,42 +342,6 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
         </div>
       </section>
 
-      {/* ===== LE PERSONE — i valori del mercato e chi li porta al banco ===== */}
-      <section id="valori" className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
-        <DriftBackdrop tone="light" variant="section" />
-        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-5xl">
-          <div className="max-w-2xl mb-9">
-            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{copy.valueMarket.k}</p>
-            <h2 className="font-alt font-extrabold tracking-tight text-3xl md:text-4xl leading-[1.06] text-ink">{copy.valueMarket.title}</h2>
-            <p className="mt-3 text-base text-ink-soft leading-relaxed">{copy.valueMarket.lead}</p>
-          </div>
-          {/* le persone: i valori hanno nomi e facce (la griglia di 6 card
-              "qualità" è stata scremata — il lead qui sopra dice già tutto) */}
-          <div className="mt-2">
-            <div className="max-w-2xl">
-              <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{copy.operatorsEyebrow}</p>
-              <h3 className="font-alt font-bold text-2xl md:text-4xl leading-[1.04] text-ink"><span className="imk-mark">{copy.operatorsTitle}</span></h3>
-              <p className="mt-3 text-base text-ink-soft leading-relaxed">{copy.operatorsLead}</p>
-            </div>
-            {operators.length > 0 && (
-              <div className="mt-6 flex flex-wrap gap-3">
-                {operators.slice(0, 10).map((op) => (
-                  <Link key={op.id} href={op.market ? `/${op.market.slug}/operators/${op.id}` : '/operatori'} className="imk-lift" aria-label={`Scopri ${op.name}`}>
-                    <WaterCard className="flex items-center gap-2.5 pl-1.5 pr-3.5 py-1.5 rounded-full hover:border-mare/50">
-                      <BancoAvatar name={op.name} size={32} />
-                      <span className="font-alt text-sm font-semibold text-ink">{op.name}</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-mare-600 flex-shrink-0" aria-hidden="true" />
-                    </WaterCard>
-                  </Link>
-                ))}
-              </div>
-            )}
-            <Link href="/operatori" className="group imk-lift mt-7 inline-flex items-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-6 py-3.5 rounded-full hover:bg-sole-600 transition-colors">
-              <Store className="w-4 h-4" /> {copy.operatorsCta} <ArrowRight className="imk-march w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
     </>
   )
 }

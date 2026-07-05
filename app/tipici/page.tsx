@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { classifySchedule } from '@/lib/schedules/classify'
 import TipiciExplorer, { type TipicoItem } from '@/components/TipiciExplorer'
 import DriftBackdrop from '@/components/motion/DriftBackdrop'
+import { getLang } from '@/lib/i18n/getLang'
+import { UI_I18N } from '@/lib/i18n/ui'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,6 +18,7 @@ export const metadata: Metadata = {
 // antiquariato e collezionismo, produttori/alimentare, artigianato — con le
 // loro ricorrenze (spesso mensili o stagionali, non settimanali).
 export default async function TipiciPage() {
+  const ui = UI_I18N[getLang()]
   const supabase = createClient()
   const { data } = await supabase
     .from('market_schedules')
@@ -42,12 +45,9 @@ export default async function TipiciPage() {
     <div className="relative overflow-hidden bg-carta bg-paper-grain min-h-screen">
       <DriftBackdrop tone="light" variant="section" />
       <div className="relative z-10 container mx-auto px-4 md:px-6 py-12 md:py-16 max-w-5xl">
-        <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">Oltre le merci varie</p>
-        <h1 className="font-alt font-extrabold tracking-tight text-3xl md:text-5xl leading-[1.04] text-ink mb-3">Mercati tipici</h1>
-        <p className="text-ink-soft max-w-2xl mb-10">
-          Antiquariato e collezionismo, produttori e sapori, artigianato: i mercati speciali del Ponente,
-          con le loro ricorrenze — la prima domenica, il terzo sabato, le sere d’estate. Da Ventimiglia a Varazze.
-        </p>
+        <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{ui.tipiciEyebrow}</p>
+        <h1 className="font-alt font-extrabold tracking-tight text-3xl md:text-5xl leading-[1.04] text-ink mb-3">{ui.tipiciTitle}</h1>
+        <p className="text-ink-soft max-w-2xl mb-10">{ui.tipiciLead}</p>
         <TipiciExplorer items={items} />
       </div>
     </div>

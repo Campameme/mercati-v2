@@ -1,25 +1,28 @@
 import Link from 'next/link'
 import Logo from '@/components/Logo'
+import { getLang } from '@/lib/i18n/getLang'
+import { UI_I18N } from '@/lib/i18n/ui'
 
-// Footer condiviso: identico su tutte le pagine (prima esisteva solo in home).
+// Footer condiviso: identico su tutte le pagine, nella lingua scelta (cookie).
 export default function Footer() {
+  const ui = UI_I18N[getLang()]
   return (
     <footer className="bg-carta border-t-2 border-ink/10 py-8">
       <div className="container mx-auto px-4 md:px-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-ink-muted">
         <Logo inline className="text-ink text-xs" />
-        <span className="text-ink-muted/70">Guida ai mercati della Riviera di Ponente.</span>
+        <span className="text-ink-muted/70">{ui.footerTagline}</span>
         <span className="flex-1" />
-        <Link href="/mappa" className="hover:text-ink">Mappa</Link>
-        <Link href="/tipici" className="hover:text-ink">Mercati tipici</Link>
-        <Link href="/operatori" className="hover:text-ink">Ambulanti</Link>
-        <Link href="/eventi" className="hover:text-ink">Eventi</Link>
-        <Link href="/notizie" className="hover:text-ink">Notizie</Link>
-        <Link href="/calendar" className="hover:text-ink">Calendario</Link>
-        <Link href="/aderisci" className="hover:text-ink">Aderisci</Link>
+        <Link href="/mappa" className="hover:text-ink">{ui.navMap}</Link>
+        <Link href="/tipici" className="hover:text-ink">{ui.navTipici}</Link>
+        <Link href="/operatori" className="hover:text-ink">{ui.navOperators}</Link>
+        <Link href="/eventi" className="hover:text-ink">{ui.footerEvents}</Link>
+        <Link href="/notizie" className="hover:text-ink">{ui.footerNews}</Link>
+        <Link href="/calendar" className="hover:text-ink">{ui.navCalendar}</Link>
+        <Link href="/aderisci" className="hover:text-ink">{ui.footerJoin}</Link>
         <Link href="/privacy" className="hover:text-ink">Privacy</Link>
         <Link href="/cookie" className="hover:text-ink">Cookie</Link>
-        <Link href="/crediti" className="hover:text-ink">Crediti foto</Link>
-        <a href="mailto:emanueleecampanini@gmail.com" className="hover:text-ink">Contatti</a>
+        <Link href="/crediti" className="hover:text-ink">{ui.footerCredits}</Link>
+        <a href="mailto:emanueleecampanini@gmail.com" className="hover:text-ink">{ui.footerContacts}</a>
       </div>
     </footer>
   )

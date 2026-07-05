@@ -1,3 +1,5 @@
+import { COMUNI_I18N } from './comuni.i18n'
+
 // Descrizioni curate dei comuni del Ponente (Imperia + Savona): una-due frasi
 // concrete sulle peculiarità di ogni paese, mostrate nella pagina comune.
 // Stesso registro delle story di zona (lib/markets/zones): fatti, non slogan.
@@ -233,11 +235,21 @@ function normalize(s: string): string {
     .trim()
 }
 
-const BY_KEY: Record<string, ComuneMeta> = Object.fromEntries(
-  Object.entries(COMUNI).map(([name, meta]) => [normalize(name), meta]),
+const BY_KEY: Record<string, { name: string; meta: ComuneMeta }> = Object.fromEntries(
+  Object.entries(COMUNI).map(([name, meta]) => [normalize(name), { name, meta }]),
 )
 
-/** Descrizione curata del comune, se disponibile (match tollerante). */
-export function comuneDescription(comune: string): string | null {
-  return BY_KEY[normalize(comune)]?.descrizione ?? null
+/**
+ * Descrizione curata del comune nella lingua richiesta (match tollerante).
+ * Le traduzioni FR/DE/EN vivono in comuni.i18n.ts; l'italiano è la sorgente
+ * (e il ripiego se una traduzione manca).
+ */
+export function comuneDescription(comune: string, lang: 'it' | 'fr' | 'de' | 'en' = 'it'): string | null {
+  const hit = BY_KEY[normalize(comune)]
+  if (!hit) return null
+  if (lang !== 'it') {
+    const tr = COMUNI_I18N[hit.name]?.[lang]
+    if (tr) return tr
+  }
+  return hit.meta.descrizione
 }

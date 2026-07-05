@@ -6,7 +6,48 @@ import type { MarketPin } from '@/components/home/types'
 import { classifyMany, CATEGORY_I18N, type ScheduleCategory } from '@/lib/schedules/classify'
 import { ZONE_BY_SLUG } from '@/lib/markets/zones'
 import { haversineMeters } from '@/lib/markets/geo'
+import { occursOn } from '@/lib/markets/hours'
 import type { Lang } from '@/lib/i18n/home'
+
+// ---- Intenzioni: giorni e sinonimi di tipologia (4 lingue) -----------------
+
+/** parola → giorno della settimana (0=dom … 6=sab), nelle 4 lingue */
+const DAY_WORDS: Array<[RegExp, number]> = [
+  [/\b(domenica|dimanche|sonntag|sunday)\b/, 0],
+  [/\b(luned[iì]|lundi|montag|monday)\b/, 1],
+  [/\b(marted[iì]|mardi|dienstag|tuesday)\b/, 2],
+  [/\b(mercoled[iì]|mercredi|mittwoch|wednesday)\b/, 3],
+  [/\b(gioved[iì]|jeudi|donnerstag|thursday)\b/, 4],
+  [/\b(venerd[iì]|vendredi|freitag|friday)\b/, 5],
+  [/\b(sabato|samedi|samstag|saturday)\b/, 6],
+]
+const TODAY_RE = /\b(oggi|aujourd|heute|today)\b/
+const TOMORROW_RE = /\b(domani|demain|morgen|tomorrow)\b/
+
+/** sinonimi/parole-chiave → macro-tipologia (ricerca "pesce", "brocante"…) */
+const CATEGORY_SYNONYMS: Record<ScheduleCategory, RegExp> = {
+  alimentare: /\b(pesce|poisson|fisch|fish|frutta|verdura|legumes?|gemuse|vegetables?|formagg|fromage|kase|cheese|km\s*0|bio|contadin|producteur|erzeuger|farmer|sapori|gastronom)\w*/,
+  antiquariato: /\b(brocante|vintage|usato|antiquit|antiques?|collezion|collection|sammler|modernariato|rigattier|flohmarkt)\w*/,
+  artigianato: /\b(artigian|artisan|handwerk|crafts?|ceramic|keramik|creativ|opere|handmade)\w*/,
+  generale: /\b(abbigliament|vetements?|kleidung|clothing|scarpe|chaussures|schuhe|shoes|casaling)\w*/,
+}
+
+/** Il giorno richiesto dalla query, se c'è (data concreta per l'occorrenza). */
+function dayIntent(q: string, now: Date): { date: Date; label: string } | null {
+  if (TODAY_RE.test(q)) return { date: now, label: 'oggi' }
+  if (TOMORROW_RE.test(q)) {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
+    return { date: d, label: 'domani' }
+  }
+  for (const [re, wd] of DAY_WORDS) {
+    if (re.test(q)) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      while (d.getDay() !== wd) d.setDate(d.getDate() + 1)
+      return { date: d, label: q.match(re)![0] }
+    }
+  }
+  return null
+}
 
 export interface SearchOperatorLite {
   id: string
@@ -72,6 +113,8 @@ export function searchMarkets(
     const h = norm(hay)
     return tokens.every((t) => h.includes(t)) || h.includes(q)
   }
+  const wantedDay = dayIntent(q, new Date())
+  const wantedCats = (Object.keys(CATEGORY_SYNONYMS) as ScheduleCategory[]).filter((c) => CATEGORY_SYNONYMS[c].test(q))
 
   const acc = new Map<string, SearchResult>()
   const add = (pin: MarketPin, score: number, reason: SearchReason) => {
@@ -93,6 +136,12 @@ export function searchMarkets(
     if (zone && hit(zone.name)) add(pin, 5, { kind: 'zona', field: FIELD_LABEL.zona, value: zone.name })
     if (catLabels.some((l) => hit(l)))
       add(pin, 4, { kind: 'tipologia', field: FIELD_LABEL.tipologia, value: CATEGORY_I18N[cat][lang] })
+    // Intenzioni: "pesce" → alimentare, "brocante" → antiquariato…
+    if (wantedCats.includes(cat))
+      add(pin, 4, { kind: 'tipologia', field: FIELD_LABEL.tipologia, value: CATEGORY_I18N[cat][lang] })
+    // …e "venerdì"/"oggi"/"domani" → mercati che si tengono davvero quel giorno
+    if (wantedDay && pin.sessions.some((s) => occursOn(s.giorno, wantedDay.date)))
+      add(pin, 5, { kind: 'giorno', field: FIELD_LABEL.giorno, value: wantedDay.label })
     if (pin.luogo && hit(pin.luogo)) add(pin, 3, { kind: 'luogo', field: FIELD_LABEL.luogo, value: pin.luogo })
     for (const s of pin.sessions) {
       if (s.giorno && hit(s.giorno)) add(pin, 2, { kind: 'giorno', field: FIELD_LABEL.giorno, value: s.giorno })

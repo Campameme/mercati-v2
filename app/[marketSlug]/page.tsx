@@ -8,6 +8,9 @@ import { SunRay, WaveDivider } from '@/components/decorations'
 import { slugifyName } from '@/lib/markets/slug'
 import { classifySchedule, CATEGORY_COLOR } from '@/lib/schedules/classify'
 import { ZONE_BY_SLUG } from '@/lib/markets/zones'
+import { ZONES_I18N } from '@/lib/markets/zones.i18n'
+import { getLang } from '@/lib/i18n/getLang'
+import { UI_I18N } from '@/lib/i18n/ui'
 import ZoneImage from '@/components/ZoneImage'
 import Reveal from '@/components/Reveal'
 import MarketViewer from '@/components/MarketViewer'
@@ -49,6 +52,8 @@ const ZONE_HERO_COMUNE: Record<string, string> = {
 }
 
 export default async function MarketHomePage({ params }: { params: { marketSlug: string } }) {
+  const lang = getLang()
+  const ui = UI_I18N[lang]
   const supabase = createClient()
 
   // Carica tutte le zone attive ordinate (serve per prev/next)
@@ -90,15 +95,18 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
 
   const comuni = Array.from(new Set((schedules ?? []).map((s) => s.comune)))
   const heroQuery = ZONE_HERO_COMUNE[marketFull.slug] ?? marketFull.city ?? comuni[0]
-  // Il racconto della zona: curato in lib/markets/zones (specifico, verificato);
-  // la description dal DB resta come ripiego per zone non mappate.
-  const zoneStory = ZONE_BY_SLUG[marketFull.slug]?.story ?? marketFull.description
+  // Il racconto della zona: curato in lib/markets/zones, tradotto in
+  // zones.i18n; la description dal DB resta come ripiego per zone non mappate.
+  const zoneStory =
+    (lang !== 'it' ? ZONES_I18N[marketFull.slug]?.[lang]?.story : null) ??
+    ZONE_BY_SLUG[marketFull.slug]?.story ??
+    marketFull.description
 
   const features = [
-    { href: `/${marketFull.slug}/operators`, label: 'Banchi',     icon: Store },
-    { href: `/${marketFull.slug}/calendar`,  label: 'Calendario', icon: Calendar },
-    { href: `/${marketFull.slug}/news`,      label: 'Notizie',    icon: Newspaper },
-    { href: `/${marketFull.slug}/weather`,   label: 'Meteo',      icon: Cloud },
+    { href: `/${marketFull.slug}/operators`, label: ui.featBanchi,   icon: Store },
+    { href: `/${marketFull.slug}/calendar`,  label: ui.featCalendar, icon: Calendar },
+    { href: `/${marketFull.slug}/news`,      label: ui.featNews,     icon: Newspaper },
+    { href: `/${marketFull.slug}/weather`,   label: ui.featWeather,  icon: Cloud },
   ]
 
   return (
@@ -115,7 +123,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                 href="/"
                 className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-mare-600 mb-4 transition-colors"
               >
-                <ChevronLeft className="w-3.5 h-3.5" /> Provincia
+                <ChevronLeft className="w-3.5 h-3.5" /> {ui.zoneBack}
               </Link>
               <Cartolina
                 query={heroQuery}
@@ -135,7 +143,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                 <div className="flex items-center gap-3 mb-4 text-ink-soft">
                   <SunRay className="w-5 h-5 text-sole" aria-hidden="true" />
                   <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">
-                    {comuni.length > 1 ? `${comuni.length} comuni` : marketFull.city}
+                    {comuni.length > 1 ? `${comuni.length} ${ui.comuniWord}` : marketFull.city}
                   </p>
                 </div>
                 <div className="flex items-start gap-2">
@@ -151,7 +159,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                 )}
                 {marketFull.market_days && marketFull.market_days.length > 0 && (
                   <p className="mt-3 text-sm text-ink-soft">
-                    <span className="font-alt font-semibold uppercase tracking-[0.12em] text-xs text-ink-muted mr-2">Giorni</span>
+                    <span className="font-alt font-semibold uppercase tracking-[0.12em] text-xs text-ink-muted mr-2">{ui.zoneDays}</span>
                     <span className="text-ink">{formatMarketDays(marketFull.market_days)}</span>
                   </p>
                 )}
@@ -161,7 +169,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                 <Reveal delayMs={80} className="mt-5">
                   <MarketViewer pins={mapPins} mapHeight="460px" />
                   <p className="mt-2 text-xs text-ink-soft">
-                    {mapPins.length} {mapPins.length === 1 ? 'mercato' : 'mercati'} · parcheggi entro 2 km
+                    {mapPins.length} {mapPins.length === 1 ? ui.zoneMarketsCount.one : ui.zoneMarketsCount.many} · {ui.zoneParkingNote}
                   </p>
                 </Reveal>
               )}
@@ -197,8 +205,8 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
           <section className="py-12 md:py-16">
             <Reveal className="flex items-end justify-between mb-8">
               <div>
-                <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-1">I borghi</p>
-                <h2 className="font-alt font-bold text-2xl md:text-3xl text-ink">I comuni della zona</h2>
+                <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-1">{ui.zoneComuni}</p>
+                <h2 className="font-alt font-bold text-2xl md:text-3xl text-ink">{ui.zoneComuniTitle}</h2>
               </div>
               <WaveDivider className="w-24 text-mare opacity-60 hidden md:block" aria-hidden="true" />
             </Reveal>
@@ -230,11 +238,11 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
           <section className="py-12 md:py-16">
             <Reveal className="flex items-end justify-between mb-8">
               <div>
-                <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-1">Il calendario locale</p>
-                <h2 className="font-alt font-bold text-2xl md:text-3xl text-ink"><span className="imk-mark text-ink">Mercati di questa zona</span></h2>
+                <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-1">{ui.zoneLocalCalendar}</p>
+                <h2 className="font-alt font-bold text-2xl md:text-3xl text-ink"><span className="imk-mark text-ink">{ui.zoneMarketsTitle}</span></h2>
               </div>
               <Link href={`/${marketFull.slug}/calendar`} className="font-alt text-xs font-semibold text-ink-muted hover:text-mare-600 underline underline-offset-2">
-                Calendario completo →
+                {ui.zoneFullCalendar}
               </Link>
             </Reveal>
 

@@ -6,6 +6,8 @@ import { ArrowRight } from 'lucide-react'
 import { gsap } from '@/lib/motion/gsap'
 import { prefersReduced } from '@/lib/motion/tokens'
 import { ZONES } from '@/lib/markets/zones'
+import { ZONES_I18N } from '@/lib/markets/zones.i18n'
+import { useLang } from '@/lib/i18n/useLang'
 import { zoneHeroKey } from '@/lib/zonePhotos'
 import DriftBackdrop from '@/components/motion/DriftBackdrop'
 import ZoneImage from '@/components/ZoneImage'
@@ -29,6 +31,8 @@ export default function BorghiSection({
   cta?: { label: string; href: string }
 }) {
   const rootRef = useRef<HTMLDivElement>(null)
+  const [lang] = useLang()
+  const ZONE_LINK: Record<string, string> = { it: 'La zona', fr: 'La zone', de: 'Die Zone', en: 'The area' }
 
   useEffect(() => {
     if (prefersReduced()) return
@@ -52,11 +56,13 @@ export default function BorghiSection({
         <p className="bsec-reveal text-ink-soft mb-8 max-w-2xl">{lead}</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-          {ZONES.map((z) => (
+          {ZONES.map((z, i) => (
             <Link
               key={z.slug}
               href={`/${z.slug}`}
-              className="bsec-reveal imk-lift group flex flex-col bg-white border-2 border-ink/10 imk-edge overflow-hidden hover:border-mare transition-colors"
+              className={`bsec-reveal imk-lift group flex flex-col bg-white border-2 border-ink/10 imk-edge overflow-hidden hover:border-mare transition-colors ${
+                i % 4 === 0 ? 'imk-tilt-l' : i % 4 === 3 ? 'imk-tilt-r' : ''
+              }`}
             >
               <div className="relative">
                 <ZoneImage query={zoneHeroKey(z.slug)} alt={z.name} aspect="aspect-[4/3]" hoverZoom />
@@ -66,10 +72,10 @@ export default function BorghiSection({
                 </span>
               </div>
               <p className="flex-1 p-3.5 text-[13px] leading-snug text-ink-soft">
-                {z.carattere}
+                {(lang !== 'it' ? ZONES_I18N[z.slug]?.[lang]?.carattere : null) ?? z.carattere}
               </p>
               <span className="px-3.5 pb-3 inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.08em] text-mare-600">
-                La zona <ArrowRight className="imk-march w-3.5 h-3.5" aria-hidden="true" />
+                {ZONE_LINK[lang]} <ArrowRight className="imk-march w-3.5 h-3.5" aria-hidden="true" />
               </span>
             </Link>
           ))}
