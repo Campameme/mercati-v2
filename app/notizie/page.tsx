@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, Newspaper } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { fetchLiveNews, generalNewsQuery } from '@/lib/news/live'
 import WaterCard from '@/components/motion/WaterCard'
 import DriftBackdrop from '@/components/motion/DriftBackdrop'
 
@@ -40,6 +41,7 @@ export default async function NotiziePage() {
     .order('publish_from', { ascending: false })
     .limit(60)
   const news = (data ?? []) as unknown as NewsRow[]
+  const live = await fetchLiveNews(generalNewsQuery(), 8)
 
   return (
     <div className="relative overflow-hidden bg-carta bg-paper-grain min-h-[70vh]">
@@ -49,9 +51,34 @@ export default async function NotiziePage() {
           <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">Dai comuni</p>
           <h1 className="font-display text-4xl md:text-5xl leading-[1.04] text-ink">Notizie dalla Riviera</h1>
           <p className="mt-3 text-base text-ink-soft">
-            Avvisi, spostamenti e novità dai mercati e dai comuni del Ponente, in ordine di pubblicazione.
+            La bacheca della Riviera: le ultime dalla stampa e dai comuni, più gli avvisi ufficiali dei mercati.
           </p>
         </div>
+
+        {/* Bacheca generale: notizie vive dalla stampa e dai siti dei comuni */}
+        {live.length > 0 && (
+          <section className="mb-12">
+            <h2 className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-4">La bacheca della Riviera</h2>
+            <ul className="divide-y divide-ink/10 border-y-2 border-ink/10 bg-white/60">
+              {live.map((n) => (
+                <li key={n.link}>
+                  <a href={n.link} target="_blank" rel="noopener noreferrer" className="group flex items-baseline justify-between gap-4 py-3.5 px-3 hover:bg-white transition-colors">
+                    <span className="min-w-0">
+                      <span className="block font-alt font-semibold text-[15px] text-ink leading-snug group-hover:text-mare-600 transition-colors">{n.title}</span>
+                      <span className="block text-xs text-ink-muted mt-1">
+                        {n.source ?? ''}
+                        {n.publishedAt ? ` · ${fmtDate(n.publishedAt)}` : ''}
+                      </span>
+                    </span>
+                    <span className="text-ink-muted group-hover:text-mare-600 flex-shrink-0">↗</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        <h2 className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-4">Avvisi ufficiali dei mercati</h2>
 
         {news.length === 0 ? (
           <WaterCard className="px-6 py-12 text-center max-w-lg">

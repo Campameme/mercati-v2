@@ -18,6 +18,14 @@ export interface HomeValueHead {
   lead: string
 }
 
+export interface LiguriaBeat {
+  /** parola/numero grande (es. '1ª', 'SV', '7/7') */
+  stat: string
+  statLabel: string
+  t: string
+  d: string
+}
+
 export interface HomeCopy {
   heroHeadline: string
   heroSubtitle: string
@@ -26,6 +34,7 @@ export interface HomeCopy {
   searchExamples: string[]
   exploreMapCta: string
   valueProject: HomeValueHead
+  liguria: { eyebrow: string; title: string; beats: LiguriaBeat[] }
   searchValueEyebrow: string
   searchValueTitle: string
   searchValueLead: string
@@ -59,6 +68,15 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     heroChips: { today: 'Oggi al mercato', near: 'Vicino a me', saturday: 'Sabato' },
     searchExamples: ['Cerca un prodotto…', 'Cerca un ambulante…', 'Cerca una zona…', 'Cerca un mercato di oggi…', 'Cerca l’artigianato…'],
     exploreMapCta: 'Apri la mappa',
+    liguria: {
+      eyebrow: 'La Liguria vera',
+      title: 'Qui l’autentico è quotidiano.',
+      beats: [
+        { stat: '1ª', statLabel: 'regione d’Italia per Bandiere Blu 2026', t: 'Il mare più premiato d’Italia', d: 'Il mare che profuma i banchi è lo stesso che colleziona primati: nel 2026 la Liguria è ancora prima per Bandiere Blu. Chi viene per la spiaggia trova il mercato a due passi dall’ombrellone.' },
+        { stat: 'SV', statLabel: 'la provincia con più borghi', t: 'La terra dei borghi', d: 'Savona è la provincia italiana con più borghi: Finalborgo dentro le mura, Noli che fu repubblica, Millesimo col suo ponte-torre. E in ogni borgo, da secoli, il giorno di mercato è il giorno in cui la piazza si accende.' },
+        { stat: '7/7', statLabel: 'giorni: c’è sempre un mercato aperto', t: 'Un mercato, ogni giorno', d: 'Sette giorni su sette c’è un banco montato da qualche parte tra Ventimiglia e Varazze. Non eventi: la spesa vera di tutti i giorni, il consiglio, il mestiere tramandato.' },
+      ],
+    },
     valueProject: {
       k: 'Il progetto',
       title: 'Da Ventimiglia a Varazze, un solo Ponente.',
@@ -85,11 +103,11 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     operatorsEyebrow: 'Le persone del mercato',
     operatorsTitle: 'Ti aspettano al banco.',
     operatorsLead: 'La sveglia alle quattro per scegliere la cassetta migliore. Cinque generazioni dietro lo stesso baccalà. Il pensierino nel sacchetto e due parole in francese per chi scende dal confine. I mercati del Ponente sono le loro persone: questo posto serve a fartele incontrare.',
-    operatorsCta: 'Conosci gli ambulanti',
+    operatorsCta: 'Conosci i Maestri del Banco',
     operatorsJoinCta: 'Hai un banco? Unisciti',
     weekEyebrow: 'La settimana',
-    weekTitle: 'Notizie ed eventi dalla Riviera',
-    weekLead: 'Gli avvisi dei comuni e gli appuntamenti da segnare, uno accanto all’altro.',
+    weekTitle: 'La settimana della Riviera',
+    weekLead: 'Gli avvisi dei comuni e i prossimi mercati tipici, uno accanto all’altro.',
     newsColTitle: 'Dai comuni',
     newsEmpty: 'Presto nuove notizie',
     newsEmptyLead: 'Gli avvisi dei comuni e dei mercati compariranno qui.',
@@ -106,6 +124,15 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     heroChips: { today: 'Aujourd’hui au marché', near: 'Près de moi', saturday: 'Samedi' },
     searchExamples: ['Cherche un produit…', 'Cherche un marchand…', 'Cherche une zone…', 'Cherche un marché d’aujourd’hui…', 'Cherche l’artisanat…'],
     exploreMapCta: 'Ouvrir la carte',
+    liguria: {
+      eyebrow: 'La vraie Ligurie',
+      title: 'Ici, l’authentique est quotidien.',
+      beats: [
+        { stat: '1ère', statLabel: 'région d’Italie pour les Pavillons Bleus 2026', t: 'La mer la plus primée d’Italie', d: 'La mer qui parfume les étals est la même qui collectionne les records : en 2026, la Ligurie est encore première pour les Pavillons Bleus. Qui vient pour la plage trouve le marché à deux pas du parasol.' },
+        { stat: 'SV', statLabel: 'la province aux plus nombreux bourgs', t: 'La terre des bourgs', d: 'Savone est la province italienne qui compte le plus de bourgs : Finalborgo dans ses murailles, Noli l’ancienne république, Millesimo et son pont-tour. Et dans chaque bourg, depuis des siècles, le jour de marché est celui où la place s’anime.' },
+        { stat: '7/7', statLabel: 'jours : il y a toujours un marché ouvert', t: 'Un marché, chaque jour', d: 'Sept jours sur sept, un étal est monté quelque part entre Vintimille et Varazze. Pas des événements : les courses vraies de tous les jours, le conseil, le métier transmis.' },
+      ],
+    },
     valueProject: {
       k: 'Le projet',
       title: 'De Vintimille à Varazze, un seul Ponant.',
@@ -132,11 +159,11 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     operatorsEyebrow: 'Les gens du marché',
     operatorsTitle: 'Ils t’attendent à l’étal.',
     operatorsLead: 'Debout à quatre heures pour choisir la meilleure cagette. Cinq générations derrière la même morue. Le petit cadeau dans le sachet et deux mots de français pour qui descend de la frontière. Les marchés du Ponant, ce sont leurs gens : ce site sert à te les faire rencontrer.',
-    operatorsCta: 'Rencontrer les marchands',
+    operatorsCta: 'Rencontrer les Maîtres de l’étal',
     operatorsJoinCta: 'Tu as un étal ? Rejoins-nous',
     weekEyebrow: 'La semaine',
-    weekTitle: 'Nouvelles et événements de la Riviera',
-    weekLead: 'Les avis des communes et les rendez-vous à noter, côte à côte.',
+    weekTitle: 'La semaine de la Riviera',
+    weekLead: 'Les avis des communes et les prochains marchés typiques, côte à côte.',
     newsColTitle: 'Des communes',
     newsEmpty: 'Bientôt de nouvelles infos',
     newsEmptyLead: 'Les avis des communes et des marchés apparaîtront ici.',
@@ -153,6 +180,15 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     heroChips: { today: 'Heute am Markt', near: 'In meiner Nähe', saturday: 'Samstag' },
     searchExamples: ['Suche ein Produkt…', 'Suche einen Händler…', 'Suche eine Zone…', 'Suche einen Markt heute…', 'Suche Handwerk…'],
     exploreMapCta: 'Karte öffnen',
+    liguria: {
+      eyebrow: 'Das echte Ligurien',
+      title: 'Hier ist das Echte Alltag.',
+      beats: [
+        { stat: '1.', statLabel: 'Region Italiens bei den Blauen Flaggen 2026', t: 'Das meistausgezeichnete Meer Italiens', d: 'Das Meer, das die Stände duften lässt, sammelt auch Rekorde: 2026 ist Ligurien wieder die Nummer eins bei den Blauen Flaggen. Wer für den Strand kommt, findet den Markt zwei Schritte vom Sonnenschirm.' },
+        { stat: 'SV', statLabel: 'die Provinz mit den meisten Borghi', t: 'Das Land der Borghi', d: 'Savona ist die italienische Provinz mit den meisten Borghi: Finalborgo hinter Mauern, Noli, die Republik war, Millesimo mit seiner Brückenturm. Und in jedem Borgo ist der Markttag seit Jahrhunderten der Tag, an dem der Platz lebendig wird.' },
+        { stat: '7/7', statLabel: 'Tage: irgendwo ist immer Markt', t: 'Ein Markt, jeden Tag', d: 'Sieben Tage die Woche steht irgendwo zwischen Ventimiglia und Varazze ein Stand. Keine Events: der echte Alltagseinkauf, der Rat, das überlieferte Handwerk.' },
+      ],
+    },
     valueProject: {
       k: 'Das Projekt',
       title: 'Von Ventimiglia bis Varazze: ein Ponente.',
@@ -179,11 +215,11 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     operatorsEyebrow: 'Die Menschen des Marktes',
     operatorsTitle: 'Sie warten am Stand auf dich.',
     operatorsLead: 'Um vier Uhr auf, um die beste Kiste auszusuchen. Fünf Generationen hinter demselben Stockfisch. Die kleine Aufmerksamkeit im Beutel und ein paar Worte Französisch für Gäste von der Grenze. Die Märkte des Ponente sind ihre Menschen: diese Seite bringt euch zusammen.',
-    operatorsCta: 'Die Händler kennenlernen',
+    operatorsCta: 'Die Meister des Standes kennenlernen',
     operatorsJoinCta: 'Hast du einen Stand? Mach mit',
     weekEyebrow: 'Die Woche',
-    weekTitle: 'Nachrichten & Termine von der Riviera',
-    weekLead: 'Die Hinweise der Gemeinden und die Termine zum Vormerken, nebeneinander.',
+    weekTitle: 'Die Woche der Riviera',
+    weekLead: 'Die Hinweise der Gemeinden und die nächsten typischen Märkte, nebeneinander.',
     newsColTitle: 'Aus den Gemeinden',
     newsEmpty: 'Bald neue Nachrichten',
     newsEmptyLead: 'Die Hinweise der Gemeinden und Märkte erscheinen hier.',
@@ -200,6 +236,15 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     heroChips: { today: 'Today at the market', near: 'Near me', saturday: 'Saturday' },
     searchExamples: ['Search a product…', 'Search a vendor…', 'Search an area…', 'Search a market today…', 'Search the crafts…'],
     exploreMapCta: 'Open the map',
+    liguria: {
+      eyebrow: 'The real Liguria',
+      title: 'Here, authentic is everyday.',
+      beats: [
+        { stat: '1st', statLabel: 'region in Italy for Blue Flags 2026', t: 'Italy’s most awarded sea', d: 'The sea that scents the stalls is the same one that collects records: in 2026 Liguria is once again first for Blue Flag beaches. Come for the beach — the market is two steps from your umbrella.' },
+        { stat: 'SV', statLabel: 'the province with the most villages', t: 'The land of borghi', d: 'Savona is the Italian province with the most historic villages: walled Finalborgo, Noli the former republic, Millesimo with its bridge-tower. And in every village, for centuries, market day is the day the square comes alive.' },
+        { stat: '7/7', statLabel: 'days: somewhere a market is always on', t: 'A market, every day', d: 'Seven days a week there’s a stall set up somewhere between Ventimiglia and Varazze. Not events: real everyday shopping, honest advice, a craft handed down.' },
+      ],
+    },
     valueProject: {
       k: 'The project',
       title: 'From Ventimiglia to Varazze, one Ponente.',
@@ -226,11 +271,11 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     operatorsEyebrow: 'The people of the market',
     operatorsTitle: 'They’re waiting at the stall.',
     operatorsLead: 'Up at four to pick the best crate. Five generations behind the same salt cod. A little extra in the bag and a few words of French for those coming down from the border. The Ponente markets are their people: this place exists to introduce you.',
-    operatorsCta: 'Meet the vendors',
+    operatorsCta: 'Meet the Stall Masters',
     operatorsJoinCta: 'Got a stall? Join us',
     weekEyebrow: 'The week',
-    weekTitle: 'News & events from the Riviera',
-    weekLead: 'Town notices and dates to save, side by side.',
+    weekTitle: 'The Riviera’s week',
+    weekLead: 'Town notices and the next typical markets, side by side.',
     newsColTitle: 'From the towns',
     newsEmpty: 'New notices soon',
     newsEmptyLead: 'Notices from towns and markets will appear here.',

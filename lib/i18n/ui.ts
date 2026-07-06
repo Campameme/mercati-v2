@@ -62,7 +62,7 @@ export const UI_I18N: Record<Lang, UiDict> = {
   it: {
     navMap: 'Mappa dei mercati',
     navTipici: 'Mercati tipici',
-    navOperators: 'Gli ambulanti',
+    navOperators: 'I Maestri del Banco',
     navCalendar: 'Calendario eventi',
     footerTagline: 'Guida ai mercati della Riviera di Ponente.',
     footerNews: 'Notizie',
@@ -112,7 +112,7 @@ export const UI_I18N: Record<Lang, UiDict> = {
   fr: {
     navMap: 'Carte des marchés',
     navTipici: 'Marchés typiques',
-    navOperators: 'Les marchands',
+    navOperators: 'Les Maîtres de l’étal',
     navCalendar: 'Calendrier des événements',
     footerTagline: 'Guide des marchés de la Riviera di Ponente.',
     footerNews: 'Actualités',
@@ -162,7 +162,7 @@ export const UI_I18N: Record<Lang, UiDict> = {
   de: {
     navMap: 'Karte der Märkte',
     navTipici: 'Typische Märkte',
-    navOperators: 'Die Händler',
+    navOperators: 'Die Meister des Standes',
     navCalendar: 'Veranstaltungskalender',
     footerTagline: 'Führer zu den Märkten der Riviera di Ponente.',
     footerNews: 'Nachrichten',
@@ -212,7 +212,7 @@ export const UI_I18N: Record<Lang, UiDict> = {
   en: {
     navMap: 'Market map',
     navTipici: 'Typical markets',
-    navOperators: 'The vendors',
+    navOperators: 'The Stall Masters',
     navCalendar: 'Events calendar',
     footerTagline: 'Guide to the markets of the Riviera di Ponente.',
     footerNews: 'News',

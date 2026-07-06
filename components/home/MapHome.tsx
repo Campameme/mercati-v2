@@ -11,23 +11,19 @@ import WaterCard from '@/components/motion/WaterCard'
 import BancoAvatar from '@/components/BancoAvatar'
 import PhotoFx from './PhotoFx'
 import { StringLights } from '@/components/decorations'
-import { occursOn } from '@/lib/markets/hours'
+import { occursOn, isNonWeekly } from '@/lib/markets/hours'
 import { categoryLabel } from '@/lib/i18n/home'
+import { UI_I18N } from '@/lib/i18n/ui'
+import { classifySchedule, CATEGORY_COLOR, categoryLabelI18n } from '@/lib/schedules/classify'
 import { mountAqua } from '@/lib/home/aqua'
 import BorghiSection from './BorghiSection'
 import type { MarketPin } from './types'
 import type { NewsItem } from '@/types/news'
+import type { LiveNewsItem } from '@/lib/news/live'
 import { HOME_I18N, LANGS, type Lang } from '@/lib/i18n/home'
 import { HOME_COPY } from '@/lib/i18n/homeCopy'
 import { useLang } from '@/lib/i18n/useLang'
 import { useTypewriter } from '@/lib/useTypewriter'
-
-export interface HomeEvent {
-  id: string
-  title: string
-  startAt: string
-  marketName: string | null
-}
 
 interface HubOperator {
   id: string
@@ -36,19 +32,53 @@ interface HubOperator {
   market: { slug: string; name: string } | null
 }
 
-export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; events?: HomeEvent[] }) {
+// Immagini e accenti dei tre beat de "La Liguria vera"
+const BEAT_IMG = [
+  { src: '/zone/alassio.jpg', alt: 'La spiaggia di Alassio con l’isola Gallinara' },
+  { src: '/zone/finale-ligure.jpg', alt: 'Finalborgo visto dal castello' },
+  { src: '/zone/vita-mercato-ventimiglia.jpg', alt: 'Il mercato del venerdì a Ventimiglia' },
+]
+const BEAT_ACCENT = ['#15607C', '#C2502E', '#F4B62C']
+
+export default function MapHome({ pins }: { pins: MarketPin[] }) {
   const router = useRouter()
   const [lang, setLang] = useLang()
   const [query, setQuery] = useState('')
   const [operators, setOperators] = useState<HubOperator[]>([])
   const [news, setNews] = useState<NewsItem[]>([])
+  const [liveNews, setLiveNews] = useState<LiveNewsItem[]>([])
   const heroRef = useRef<HTMLDivElement>(null)
   const aquaRef = useRef<HTMLCanvasElement>(null)
   const heroPhotoRef = useRef<HTMLDivElement>(null)
 
   const dict = HOME_I18N[lang]
+  const ui = UI_I18N[lang]
   const copy = HOME_COPY[lang]
   const typed = useTypewriter(copy.searchExamples)
+
+  // I prossimi Mercati tipici (ricorrenze speciali ≠ merci varie): hanno
+  // preso il posto degli eventi — sono gli appuntamenti veri del territorio.
+  const prossimiTipici = useMemo(() => {
+    const out: Array<{ id: string; date: Date; comune: string; giorno: string; cat: ReturnType<typeof classifySchedule>; slug: string }> = []
+    const start = new Date()
+    for (const p of pins) {
+      for (const sSess of p.sessions) {
+        const g = sSess.giorno
+        const cat = classifySchedule(sSess.settori)
+        if (!g || cat === 'generale' || !isNonWeekly(g)) continue
+        for (let i = 0; i < 45; i++) {
+          const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i)
+          if (occursOn(g, d)) {
+            out.push({ id: `${p.id}-${sSess.scheduleId}`, date: d, comune: p.comune, giorno: g, cat, slug: p.marketSlug })
+            break
+          }
+        }
+      }
+    }
+    out.sort((a, b) => a.date.getTime() - b.date.getTime())
+    const seen = new Set<string>()
+    return out.filter((t) => (seen.has(t.id) ? false : (seen.add(t.id), true))).slice(0, 3)
+  }, [pins])
 
   // Ticker vivo dell'hero: i comuni dove OGGI c'è davvero mercato.
   const todayComuni = useMemo(() => {
@@ -61,6 +91,7 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
   useEffect(() => {
     fetch('/api/operators?all=1').then((r) => r.json()).then((j) => setOperators(Array.isArray(j?.data) ? j.data : [])).catch(() => {})
     fetch('/api/news?all=1').then((r) => r.json()).then((j) => setNews(Array.isArray(j?.data) ? j.data : [])).catch(() => {})
+    fetch('/api/news/live').then((r) => r.json()).then((j) => setLiveNews(Array.isArray(j?.data) ? j.data : [])).catch(() => {})
   }, [])
 
   // Hero: ingresso cinetico (transform-only → sempre leggibile)
@@ -107,6 +138,14 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
     const ctx = gsap.context(() => {
       gsap.utils.toArray<HTMLElement>('.home-reveal').forEach((el) => {
         gsap.from(el, { y: 30, duration: 0.7, ease: 'power3.out', clearProps: 'transform', scrollTrigger: { trigger: el, start: 'top 88%', once: true } })
+      })
+      // parallasse leggera sulle immagini del racconto (scrub)
+      gsap.utils.toArray<HTMLElement>('[data-plx]').forEach((img) => {
+        gsap.fromTo(
+          img,
+          { yPercent: -8 },
+          { yPercent: 8, ease: 'none', scrollTrigger: { trigger: img.parentElement, start: 'top bottom', end: 'bottom top', scrub: true } },
+        )
       })
     })
     return () => ctx.revert()
@@ -188,21 +227,27 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
                 {todayComuni.length} <ArrowRight className="inline w-3 h-3 -mt-px" aria-hidden="true" />
               </span>
             </span>
-            <span className="imk-marquee relative block min-w-0 overflow-hidden whitespace-nowrap pb-2.5 pt-1.5" aria-hidden="true">
-              <span className="imk-marquee-track inline-block font-alt text-sm text-carta/90 pl-3.5">
-                {[...todayComuni, ...todayComuni].map((c, i) => (
-                  <span key={i} className="mx-3">
-                    {c} <span className="text-sole mx-1">·</span>
+            {/* Nastro: contenitore con clipping proprio (contain:paint) così il
+                testo NON può uscire dal box; due metà identiche per il loop. */}
+            <span className="imk-marquee relative block w-full overflow-hidden pb-2.5 pt-1.5 [contain:paint]" aria-hidden="true">
+              <span className="imk-marquee-track flex w-max whitespace-nowrap will-change-transform font-alt text-sm text-carta/90">
+                {[0, 1].map((half) => (
+                  <span key={half} className="flex whitespace-nowrap pl-3.5">
+                    {todayComuni.map((c, i) => (
+                      <span key={`${half}-${i}`} className="mx-3 flex-shrink-0">
+                        {c} <span className="text-sole mx-1">·</span>
+                      </span>
+                    ))}
                   </span>
                 ))}
               </span>
-              <span className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-notte/70 to-transparent" />
-              <span className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-notte/70 to-transparent" />
+              <span className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-notte to-transparent opacity-80" />
+              <span className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-notte to-transparent opacity-80" />
             </span>
           </Link>
         )}
 
-        <a href="#valori" aria-label={copy.heroScrollCue} className="relative z-10 mx-auto mb-8 mt-3 flex flex-col items-center text-carta/70 hover:text-carta">
+        <a href="#liguria" aria-label={copy.heroScrollCue} className="relative z-10 mx-auto mb-8 mt-3 flex flex-col items-center text-carta/70 hover:text-carta">
           <span className="font-alt text-[11px] font-semibold uppercase tracking-[0.14em] mb-1">{copy.heroScrollCue}</span>
           <span className="flex flex-col -space-y-1.5">
             <ChevronDown className="imk-chev w-4 h-4" /><ChevronDown className="imk-chev w-4 h-4" /><ChevronDown className="imk-chev w-4 h-4" />
@@ -218,6 +263,38 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
         >
           <path d="M0 28 C 90 46 180 10 288 26 C 396 42 486 8 576 24 C 666 40 756 10 864 26 C 972 42 1062 8 1152 24 C 1242 40 1350 12 1440 28 L1440 48 L0 48 Z" fill="currentColor" />
         </svg>
+      </section>
+
+      {/* ===== LA LIGURIA VERA — mare da primato, borghi, mercati quotidiani ===== */}
+      <section id="liguria" className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
+        <div className="relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-6xl">
+          <div className="home-reveal max-w-2xl mb-12 md:mb-16">
+            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{copy.liguria.eyebrow}</p>
+            <h2 className="font-display text-4xl md:text-6xl leading-[1.02] text-ink">{copy.liguria.title}</h2>
+          </div>
+          <div className="space-y-14 md:space-y-24">
+            {copy.liguria.beats.map((b, i) => (
+              <div key={b.t} className="home-reveal grid md:grid-cols-2 gap-8 md:gap-14 items-center">
+                <div className={`relative overflow-hidden imk-edge border-2 border-ink/10 shadow-md aspect-[4/3] ${i % 2 === 1 ? 'md:order-2' : ''}`}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    data-plx
+                    src={BEAT_IMG[i].src}
+                    alt={BEAT_IMG[i].alt}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover scale-110 will-change-transform"
+                  />
+                </div>
+                <div>
+                  <p className="font-display italic text-6xl md:text-8xl leading-none" style={{ color: BEAT_ACCENT[i] }}>{b.stat}</p>
+                  <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mt-2">{b.statLabel}</p>
+                  <h3 className="font-alt font-extrabold text-2xl md:text-3xl text-ink mt-5">{b.t}</h3>
+                  <p className="mt-3 text-base text-ink-soft leading-relaxed max-w-md">{b.d}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* ===== LE PERSONE — il manifesto del progetto: mettere in contatto
@@ -259,7 +336,7 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
                 loading="lazy"
                 className="imk-edge imk-tilt-l absolute -bottom-2 -left-3 w-1/2 aspect-[4/3] object-cover border-[3px] border-carta shadow-xl"
               />
-              <figure className="imk-tape absolute -top-3 -right-1 w-[38%] rotate-2 bg-white border-2 border-ink/10 imk-edge p-1.5 pb-2 shadow-lg">
+              <figure className="absolute -top-3 -right-1 w-[38%] rotate-2 bg-white border-2 border-ink/10 imk-edge p-1.5 pb-2 shadow-lg">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/zone/vita-fiori-sanremo-1962.jpg"
@@ -272,16 +349,6 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
             </div>
           </div>
 
-          {/* I valori raccolti ai banchi: tre cartoline con nastro, la voce vera */}
-          <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-5">
-            {copy.qualities.slice(0, 3).map((q, i) => (
-              <WaterCard key={q.t} tilt={i % 2 === 0 ? 'l' : 'r'} className="imk-tape p-5 pt-7 bg-white">
-                <p className="font-accent text-xl text-mare-700 leading-snug">{q.t}</p>
-                <p className="mt-2 text-[13px] leading-snug text-ink-soft">{q.d}</p>
-              </WaterCard>
-            ))}
-          </div>
-          <p className="mt-3 font-alt text-xs text-ink-muted">{copy.qualitiesNote}</p>
 
           {/* Gli ambulanti, in evidenza: card grandi, non chip */}
           {operators.length > 0 && (
@@ -343,7 +410,7 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
               <p className="inline-flex items-center gap-2 font-alt text-xs font-semibold uppercase tracking-[0.14em] text-marel mb-4">
                 <Newspaper className="w-4 h-4" aria-hidden="true" /> {copy.newsColTitle}
               </p>
-              {news.length === 0 ? (
+              {news.length === 0 && liveNews.length === 0 ? (
                 <WaterCard className="px-6 py-9 text-center">
                   <p className="font-accent text-2xl text-mare-600">{copy.newsEmpty}</p>
                   <p className="mt-2 text-sm text-ink-soft">{copy.newsEmptyLead}</p>
@@ -359,30 +426,41 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
                       {n.content && <p className="mt-1.5 text-sm text-ink-soft leading-snug line-clamp-2">{n.content}</p>}
                     </WaterCard>
                   ))}
+                  {liveNews.slice(0, Math.max(0, 3 - news.length)).map((n, i) => (
+                    <a key={n.link} href={n.link} target="_blank" rel="noopener noreferrer" className="block">
+                      <WaterCard tilt={i % 2 === 0 ? 'r' : 'l'} className="p-5 hover:border-mare/60 transition-colors">
+                        <span className="font-alt text-xs font-semibold uppercase tracking-[0.1em] text-mare-600">
+                          {n.publishedAt ? fmtDate(n.publishedAt) : ''}{n.source ? ` · ${n.source}` : ''} ↗
+                        </span>
+                        <h3 className="font-alt font-bold text-lg text-ink leading-tight mt-1.5 line-clamp-2">{n.title}</h3>
+                      </WaterCard>
+                    </a>
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* colonna eventi */}
+            {/* colonna Mercati tipici: i prossimi appuntamenti speciali */}
             <div>
               <p className="inline-flex items-center gap-2 font-alt text-xs font-semibold uppercase tracking-[0.14em] text-sole mb-4">
-                <CalendarDays className="w-4 h-4" aria-hidden="true" /> {copy.eventsColTitle}
+                <CalendarDays className="w-4 h-4" aria-hidden="true" /> {ui.navTipici}
               </p>
-              {events.length === 0 ? (
+              {prossimiTipici.length === 0 ? (
                 <WaterCard className="px-6 py-9 text-center">
-                  <p className="font-accent text-2xl text-mare-600">{copy.eventsEmpty}</p>
-                  <p className="mt-2 text-sm text-ink-soft">{copy.eventsEmptyLead}</p>
+                  <p className="font-accent text-2xl text-mare-600">{ui.tipiciEmptyCalendar}</p>
                 </WaterCard>
               ) : (
                 <div className="space-y-4">
-                  {events.slice(0, 3).map((e, i) => (
-                    <WaterCard key={e.id} tilt={i % 2 === 0 ? 'r' : 'l'} className="imk-tape p-5 pt-6">
-                      <span className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.1em] text-mare-600">
-                        <CalendarDays className="w-3.5 h-3.5" aria-hidden="true" /> {fmtDate(e.startAt)}
-                      </span>
-                      <h3 className="font-alt font-bold text-lg text-ink leading-tight mt-1.5">{e.title}</h3>
-                      {e.marketName && <p className="mt-1 text-sm text-ink-muted">{e.marketName}</p>}
-                    </WaterCard>
+                  {prossimiTipici.map((t, i) => (
+                    <Link key={t.id} href="/tipici" className="block">
+                      <WaterCard tilt={i % 2 === 0 ? 'r' : 'l'} className="p-5 hover:border-mare/60 transition-colors">
+                        <span className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.1em]" style={{ color: CATEGORY_COLOR[t.cat] }}>
+                          <CalendarDays className="w-3.5 h-3.5" aria-hidden="true" /> {fmtDate(t.date.toISOString())} · {categoryLabelI18n(t.cat, lang)}
+                        </span>
+                        <h3 className="font-alt font-bold text-lg text-ink leading-tight mt-1.5">{t.comune}</h3>
+                        <p className="mt-1 text-sm text-ink-muted">{t.giorno}</p>
+                      </WaterCard>
+                    </Link>
                   ))}
                 </div>
               )}
@@ -394,8 +472,8 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
             <Link href="/notizie" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-carta text-ink px-6 py-3.5 rounded-full hover:bg-sole transition-colors">
               <Newspaper className="w-4 h-4" /> {copy.newsAllCta} <ArrowRight className="imk-march w-4 h-4" />
             </Link>
-            <Link href="/eventi" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-ink text-carta px-6 py-3.5 rounded-full hover:bg-mare transition-colors">
-              <CalendarDays className="w-4 h-4" /> {copy.eventsAllCta} <ArrowRight className="imk-march w-4 h-4" />
+            <Link href="/tipici" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-ink text-carta px-6 py-3.5 rounded-full hover:bg-mare transition-colors">
+              <CalendarDays className="w-4 h-4" /> {ui.navTipici} <ArrowRight className="imk-march w-4 h-4" />
             </Link>
           </div>
         </div>

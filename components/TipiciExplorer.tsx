@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { CalendarDays, LayoutList, MapPin, Check } from 'lucide-react'
+import { CalendarDays, LayoutList, MapPin, Check, Map as MapIcon } from 'lucide-react'
+import UnifiedMapClient from '@/components/UnifiedMapClient'
 import { slugifyName } from '@/lib/markets/slug'
 import { useLang } from '@/lib/i18n/useLang'
 import { UI_I18N } from '@/lib/i18n/ui'
@@ -18,6 +19,8 @@ export interface TipicoItem {
   orario: string | null
   luogo: string | null
   settori: string | null
+  lat: number | null
+  lng: number | null
   marketSlug: string
   marketName: string
   category: ScheduleCategory
@@ -42,7 +45,8 @@ export default function TipiciExplorer({ items }: { items: TipicoItem[] }) {
   const ui = UI_I18N[lang]
   const WD_LONG = ui.weekdaysLong
   const MONTH_LONG = ui.monthsLong
-  const [view, setView] = useState<'calendario' | 'elenco'>('calendario')
+  const MAP_TAB: Record<string, string> = { it: 'Mappa', fr: 'Carte', de: 'Karte', en: 'Map' }
+  const [view, setView] = useState<'calendario' | 'elenco' | 'mappa'>('calendario')
   const [cats, setCats] = useState<ScheduleCategory[]>([])
   const [zona, setZona] = useState<string>('all')
   const [soloSpeciali, setSoloSpeciali] = useState(true)
@@ -83,6 +87,24 @@ export default function TipiciExplorer({ items }: { items: TipicoItem[] }) {
   }
 
   const href = (it: TipicoItem) => `/${it.marketSlug}/c/${slugifyName(it.comune)}?s=${it.id}`
+
+  // La mappa SOLO dei tipici: pin-banco colorati per tipologia
+  const mapPins = useMemo(
+    () =>
+      filtered
+        .filter((it) => it.lat != null && it.lng != null)
+        .map((it) => ({
+          id: it.id,
+          lat: it.lat as number,
+          lng: it.lng as number,
+          kind: 'market' as const,
+          title: `${it.comune} · ${it.giorno}`,
+          subtitle: it.luogo ?? undefined,
+          category: it.category,
+          href: href(it),
+        })),
+    [filtered],
+  )
 
   return (
     <div>
@@ -128,7 +150,7 @@ export default function TipiciExplorer({ items }: { items: TipicoItem[] }) {
 
       {/* Vista: calendario / elenco */}
       <div className="flex items-center gap-1.5 mb-8 border-b-2 border-ink/10">
-        {([['calendario', ui.tipiciCalendarTab, CalendarDays], ['elenco', ui.tipiciListTab, LayoutList]] as const).map(([key, label, Icon]) => (
+        {([['calendario', ui.tipiciCalendarTab, CalendarDays], ['elenco', ui.tipiciListTab, LayoutList], ['mappa', MAP_TAB[lang], MapIcon]] as const).map(([key, label, Icon]) => (
           <button
             key={key}
             onClick={() => setView(key)}
@@ -142,7 +164,11 @@ export default function TipiciExplorer({ items }: { items: TipicoItem[] }) {
         ))}
       </div>
 
-      {view === 'calendario' ? (
+      {view === 'mappa' ? (
+        <div className="imk-edge overflow-hidden border-2 border-ink/10 bg-white shadow-sm">
+          <UnifiedMapClient pins={mapPins} height={520} maxZoom={12} bare />
+        </div>
+      ) : view === 'calendario' ? (
         days.length === 0 ? (
           <p className="text-sm text-ink-muted py-8">{ui.tipiciEmptyCalendar}</p>
         ) : (

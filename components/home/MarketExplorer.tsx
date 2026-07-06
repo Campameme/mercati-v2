@@ -9,9 +9,7 @@ import type { MarketPin, MarketSession } from './types'
 import { HOME_I18N, LANGS, type Lang } from '@/lib/i18n/home'
 import { useLang } from '@/lib/i18n/useLang'
 import { marketStatus, weekdaysOf, occursOn, fmtHour, type MarketStatus } from '@/lib/markets/hours'
-import {
-  classifyMany, CATEGORY_ORDER, CATEGORY_COLOR, CATEGORY_GLYPH, categoryLabelI18n, type ScheduleCategory,
-} from '@/lib/schedules/classify'
+import { classifyMany, CATEGORY_COLOR, type ScheduleCategory } from '@/lib/schedules/classify'
 import { ZONES, ZONE_BY_SLUG } from '@/lib/markets/zones'
 import { haversineMeters } from '@/lib/markets/geo'
 import { HOME_COPY } from '@/lib/i18n/homeCopy'
@@ -126,14 +124,13 @@ interface Props {
   initialNear?: boolean
 }
 
-export default function MarketExplorer({ pins, initialQuery = '', initialZone = 'all', initialToday = false, initialDays = [], initialNear = false }: Props) {
+export default function MarketExplorer({ pins: allPins, initialQuery = '', initialZone = 'all', initialToday = false, initialDays = [], initialNear = false }: Props) {
   const [lang, setLang] = useLang()
   const [days, setDays] = useState<number[]>(initialDays)
   const [today, setToday] = useState(initialToday)
   const [openNow, setOpenNow] = useState(false)
   const [recents, setRecents] = useState<string[]>([])
   const [zone, setZone] = useState<string>(initialZone && ZONE_BY_SLUG[initialZone] ? initialZone : 'all')
-  const [types, setTypes] = useState<ScheduleCategory[]>([])
   const [sort, setSort] = useState<'az' | 'near'>('az')
   const [query, setQuery] = useState(initialQuery)
   const [open, setOpen] = useState(false)
@@ -167,9 +164,16 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
 
   const meta = useMemo(() => {
     const m = new Map<string, { category: ScheduleCategory }>()
-    for (const p of pins) m.set(p.id, { category: classifyMany(p.sessions.map((s) => s.settori)) })
+    for (const p of allPins) m.set(p.id, { category: classifyMany(p.sessions.map((s) => s.settori)) })
     return m
-  }, [pins])
+  }, [allPins])
+
+  // La mappa generale mostra SOLO i mercati settimanali (merci varie):
+  // antiquariato/produttori/artigianato vivono sulla mappa dei Mercati tipici.
+  const pins = useMemo(
+    () => allPins.filter((p) => meta.get(p.id)?.category === 'generale'),
+    [allPins, meta],
+  )
 
   const statuses = useMemo(() => {
     const map = new Map<string, MarketStatus>()
@@ -183,7 +187,6 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
   const filteredPins = useMemo(() => {
     return pins.filter((p) => {
       if (zone !== 'all' && p.marketSlug !== zone) return false
-      if (types.length > 0 && !types.includes(meta.get(p.id)?.category ?? 'generale')) return false
       if (openNow && statuses.get(p.id)?.state !== 'open') return false
       if (today || days.length > 0) {
         const okToday = today && now ? p.sessions.some((s) => occursOn(s.giorno, now)) : false
@@ -192,7 +195,7 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
       }
       return true
     })
-  }, [pins, zone, types, days, today, now, meta, openNow, statuses])
+  }, [pins, zone, days, today, now, meta, openNow, statuses])
 
   const sortedPins = useMemo(() => {
     const arr = [...filteredPins]
@@ -235,11 +238,10 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
     let n = 0
     for (const p of pins) {
       if (zone !== 'all' && p.marketSlug !== zone) continue
-      if (types.length > 0 && !types.includes(meta.get(p.id)?.category ?? 'generale')) continue
       if (statuses.get(p.id)?.state === 'open') n++
     }
     return n
-  }, [pins, zone, types, meta, statuses, now])
+  }, [pins, zone, meta, statuses, now])
 
   const mapPins = useMemo<UnifiedMapPin[]>(
     () =>
@@ -284,9 +286,6 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
   function submitSearch(e: { preventDefault(): void }) {
     e.preventDefault()
     if (searchResults.length > 0) selectMarket(searchResults[0].pin.id, query)
-  }
-  function toggleType(c: ScheduleCategory) {
-    setTypes((t) => (t.includes(c) ? t.filter((x) => x !== c) : [...t, c]))
   }
   function toggleDay(d: number) {
     setDays((s) => (s.includes(d) ? s.filter((x) => x !== d) : [...s, d]))
@@ -425,22 +424,6 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
               {ZONES.map((z) => <option key={z.slug} value={z.slug}>{z.name}</option>)}
             </select>
 
-            <FilterDropdown label={dict.filterType} count={types.length}>
-              {CATEGORY_ORDER.map((c) => (
-                <CheckRow
-                  key={c}
-                  checked={types.includes(c)}
-                  onClick={() => toggleType(c)}
-                  color={CATEGORY_COLOR[c]}
-                  label={`${CATEGORY_GLYPH[c]} ${categoryLabelI18n(c, lang)}`}
-                />
-              ))}
-              {types.length > 0 && (
-                <button onClick={() => setTypes([])} className="w-full mt-1 px-2.5 py-1.5 text-left font-alt text-xs font-semibold text-ink-muted hover:text-ink">
-                  ✕ {RESET_LABEL[lang]}
-                </button>
-              )}
-            </FilterDropdown>
 
             <FilterDropdown label={DAYS_LABEL[lang]} count={dayCount}>
               <CheckRow checked={today} onClick={() => setToday((t) => !t)} label={dict.filters.today} />
@@ -470,9 +453,9 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
               </button>
             )}
 
-            {(zone !== 'all' || types.length > 0 || dayCount > 0 || openNow) && (
+            {(zone !== 'all' || dayCount > 0 || openNow) && (
               <button
-                onClick={() => { setZone('all'); setTypes([]); setDays([]); setToday(false); setOpenNow(false) }}
+                onClick={() => { setZone('all'); setDays([]); setToday(false); setOpenNow(false) }}
                 className="font-alt text-xs font-semibold text-ink-muted hover:text-ink underline underline-offset-2"
               >
                 {RESET_LABEL[lang]}

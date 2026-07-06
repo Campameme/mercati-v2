@@ -79,9 +79,10 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
   ])
   if (!marketFull) notFound()
 
-  // Niente poligoni/aree evidenziate: sulla mappa parlano solo i pin-banco.
+  // Sulla mappa di zona solo i mercati settimanali (i tipici hanno la loro
+  // mappa su /tipici); l'elenco sotto resta completo.
   const mapPins = (schedules ?? [])
-    .filter((s) => s.lat != null && s.lng != null)
+    .filter((s) => s.lat != null && s.lng != null && classifySchedule(s.settori) === 'generale')
     .map((s: any) => ({
       id: s.id as string,
       lat: s.lat as number,

@@ -22,7 +22,7 @@ export default async function TipiciPage() {
   const supabase = createClient()
   const { data } = await supabase
     .from('market_schedules')
-    .select('id, comune, giorno, orario, luogo, settori, markets!inner(slug, name, is_active)')
+    .select('id, comune, giorno, orario, luogo, settori, lat, lng, markets!inner(slug, name, is_active)')
     .eq('is_active', true)
     .eq('markets.is_active', true)
     .order('comune', { ascending: true })
@@ -35,6 +35,8 @@ export default async function TipiciPage() {
       orario: (s.orario ?? null) as string | null,
       luogo: (s.luogo ?? null) as string | null,
       settori: (s.settori ?? null) as string | null,
+      lat: (s.lat ?? null) as number | null,
+      lng: (s.lng ?? null) as number | null,
       marketSlug: s.markets.slug as string,
       marketName: s.markets.name as string,
       category: classifySchedule(s.settori),

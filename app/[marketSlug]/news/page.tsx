@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation'
 import { AlertTriangle, Calendar, Megaphone, Clock, Globe2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { fetchLiveNews, zoneNewsQuery } from '@/lib/news/live'
+import { ZONE_BY_SLUG } from '@/lib/markets/zones'
 import { SunRay } from '@/components/decorations'
 import type { NewsItem, NewsType, NewsPriority } from '@/types/news'
 
@@ -38,6 +40,10 @@ export default async function NewsPage({ params }: { params: { marketSlug: strin
 
   const items: NewsItem[] = (data ?? []) as NewsItem[]
 
+  // Notizie vive dalla stampa locale e dai comuni della zona
+  const zoneMeta = ZONE_BY_SLUG[params.marketSlug]
+  const live = zoneMeta ? await fetchLiveNews(zoneNewsQuery(zoneMeta.borghi), 6) : []
+
   return (
     <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-3xl">
       <div className="flex items-center gap-3 mb-3 text-ink-soft">
@@ -73,6 +79,32 @@ export default async function NewsPage({ params }: { params: { marketSlug: strin
             )
           })}
         </div>
+      )}
+
+      {/* Dalla stampa e dai siti dei comuni (aggiornate automaticamente) */}
+      {live.length > 0 && (
+        <section className="mt-12">
+          <div className="flex items-center gap-2 mb-4 text-ink-muted">
+            <Globe2 className="w-4 h-4" aria-hidden="true" />
+            <h2 className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">Dalla stampa e dai comuni</h2>
+          </div>
+          <ul className="divide-y divide-ink/10 border-y-2 border-ink/10">
+            {live.map((n) => (
+              <li key={n.link}>
+                <a href={n.link} target="_blank" rel="noopener noreferrer" className="group flex items-baseline justify-between gap-4 py-3.5 hover:bg-white -mx-2 px-2 transition-colors">
+                  <span className="min-w-0">
+                    <span className="block font-alt font-semibold text-[15px] text-ink leading-snug group-hover:text-mare-600 transition-colors">{n.title}</span>
+                    <span className="block text-xs text-ink-muted mt-1">
+                      {n.source ?? ''}
+                      {n.publishedAt ? ` · ${new Date(n.publishedAt).toLocaleDateString('it-IT', { day: '2-digit', month: 'short' })}` : ''}
+                    </span>
+                  </span>
+                  <span className="text-ink-muted group-hover:text-mare-600 flex-shrink-0">↗</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
     </div>
   )

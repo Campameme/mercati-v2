@@ -105,7 +105,6 @@ export default function NavMenu({ open, onClose }: Props) {
     { href: '/mappa',      label: ui.navMap,       icon: MapIcon },
     { href: '/tipici',     label: ui.navTipici,    icon: ShoppingBasket },
     { href: '/operatori',  label: ui.navOperators, icon: Store },
-    { href: '/calendar',   label: ui.navCalendar,  icon: Calendar },
   ]
 
   // Filtro testuale su zone + comuni

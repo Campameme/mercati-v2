@@ -15,9 +15,7 @@ export default function Footer() {
         <Link href="/mappa" className="hover:text-ink">{ui.navMap}</Link>
         <Link href="/tipici" className="hover:text-ink">{ui.navTipici}</Link>
         <Link href="/operatori" className="hover:text-ink">{ui.navOperators}</Link>
-        <Link href="/eventi" className="hover:text-ink">{ui.footerEvents}</Link>
         <Link href="/notizie" className="hover:text-ink">{ui.footerNews}</Link>
-        <Link href="/calendar" className="hover:text-ink">{ui.navCalendar}</Link>
         <Link href="/aderisci" className="hover:text-ink">{ui.footerJoin}</Link>
         <Link href="/privacy" className="hover:text-ink">Privacy</Link>
         <Link href="/cookie" className="hover:text-ink">Cookie</Link>
