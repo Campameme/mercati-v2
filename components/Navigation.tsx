@@ -20,6 +20,19 @@ export default function Navigation() {
   const isHome = pathname === '/'
   const [pastHero, setPastHero] = useState(false)
 
+  // I link di recupero password di Supabase atterrano sulla Site URL (root):
+  // da qualunque pagina, portiamo l'utente al form "nuova password".
+  useEffect(() => {
+    const supabase = createClient()
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY' && !pathname.startsWith('/login')) {
+        window.location.assign('/login?recovery=1')
+      }
+    })
+    return () => sub.subscription.unsubscribe()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   useEffect(() => {
     const supabase = createClient()
     let active = true
