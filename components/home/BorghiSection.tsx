@@ -18,7 +18,7 @@ import ZoneImage from '@/components/ZoneImage'
 // Testata e CTA configurabili così la home può usarla come sezione-valore
 // ("Il progetto") in 4 lingue.
 export default function BorghiSection({
-  className = 'bg-carta bg-paper-grain border-b-2 border-ink/10',
+  className = 'bg-carta border-b-2 border-ink/10',
   eyebrow = 'Le zone',
   title = 'Da Ventimiglia a Varazze, un solo Ponente.',
   lead = 'Quindici zone tra mare e entroterra: ognuna con i suoi giorni, le sue piazze e il suo racconto.',
@@ -49,11 +49,11 @@ export default function BorghiSection({
 
   return (
     <section id="borghi" ref={rootRef} className={`relative overflow-hidden ${className}`}>
-      {/* Il tendone copre la sezione dall'alto; il mare la riempie dal basso */}
-      <CanopyEdge color="#F4B62C" className="absolute top-0 inset-x-0" />
-      <BigWaves className="absolute bottom-0 inset-x-0 h-40 md:h-64 pointer-events-none" />
+      {/* Il tendone copre la sezione dall'alto; la schiuma la chiude dal basso */}
+      <CanopyEdge color="#15607C" className="absolute top-0 inset-x-0" />
+      <BigWaves color="#F7EFDD" className="absolute bottom-0 inset-x-0 h-40 md:h-64 pointer-events-none" />
       <div className="relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-5xl">
-        <p className="bsec-reveal font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{eyebrow}</p>
+        <p className="bsec-reveal font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-700 mb-2">{eyebrow}</p>
         <h2 className="bsec-reveal font-alt font-extrabold tracking-tight text-3xl md:text-5xl leading-[1.04] text-ink mb-3">{title}</h2>
         <p className="bsec-reveal text-ink-soft mb-8 max-w-2xl">{lead}</p>
 
@@ -85,7 +85,7 @@ export default function BorghiSection({
 
         {cta && (
           <div className="bsec-reveal mt-9">
-            <Link href={cta.href} className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-6 py-3.5 rounded-full hover:bg-sole-600 transition-colors">
+            <Link href={cta.href} className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-notte text-carta px-6 py-3.5 rounded-full hover:bg-mare transition-colors">
               {cta.label} <ArrowRight className="imk-march w-4 h-4" />
             </Link>
           </div>

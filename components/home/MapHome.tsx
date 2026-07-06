@@ -10,7 +10,7 @@ import DriftBackdrop from '@/components/motion/DriftBackdrop'
 import WaterCard from '@/components/motion/WaterCard'
 import BancoAvatar from '@/components/BancoAvatar'
 import PhotoFx from './PhotoFx'
-import { StringLights } from '@/components/decorations'
+import { BigWaves, CanopyEdge, StringLights } from '@/components/decorations'
 import { occursOn, isNonWeekly } from '@/lib/markets/hours'
 import { categoryLabel } from '@/lib/i18n/home'
 import { UI_I18N } from '@/lib/i18n/ui'
@@ -38,7 +38,8 @@ const BEAT_IMG = [
   { src: '/zone/finale-ligure.jpg', alt: 'Finalborgo visto dal castello' },
   { src: '/zone/vita-mercato-ventimiglia.jpg', alt: 'Il mercato del venerdì a Ventimiglia' },
 ]
-const BEAT_ACCENT = ['#15607C', '#D24B3F', '#D69A12']
+// Accenti dei beat SUL MARE (sezione bg-mare): sole, fiore chiaro, marel
+const BEAT_ACCENT = ['#F4B62C', '#FBE0D9', '#DCEBEC']
 
 export default function MapHome({ pins }: { pins: MarketPin[] }) {
   const router = useRouter()
@@ -256,7 +257,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
 
         {/* Bordo a onda: l'hero "sfocia" nella carta della pagina */}
         <svg
-          className="pointer-events-none absolute bottom-0 inset-x-0 w-full h-7 md:h-10 text-carta z-[2]"
+          className="pointer-events-none absolute bottom-0 inset-x-0 w-full h-7 md:h-10 text-mare z-[2]"
           viewBox="0 0 1440 48"
           preserveAspectRatio="none"
           aria-hidden="true"
@@ -265,17 +266,19 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
         </svg>
       </section>
 
-      {/* ===== LA LIGURIA VERA — mare da primato, borghi, mercati quotidiani ===== */}
-      <section id="liguria" className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
+      {/* ===== LA LIGURIA VERA — dentro il mare: sezione color-block #15607C,
+           l'hero ci "sfocia" con l'onda, la schiuma chiara chiude in basso ===== */}
+      <section id="liguria" className="relative overflow-hidden bg-mare">
+        <BigWaves color="#F7EFDD" className="absolute bottom-0 inset-x-0 h-40 md:h-64 pointer-events-none" />
         <div className="relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-6xl">
           <div className="home-reveal max-w-2xl mb-12 md:mb-16">
-            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{copy.liguria.eyebrow}</p>
-            <h2 className="font-display text-4xl md:text-6xl leading-[1.02] text-ink">{copy.liguria.title}</h2>
+            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-sole mb-2">{copy.liguria.eyebrow}</p>
+            <h2 className="font-display text-4xl md:text-6xl leading-[1.02] text-carta">{copy.liguria.title}</h2>
           </div>
           <div className="space-y-14 md:space-y-24">
             {copy.liguria.beats.map((b, i) => (
               <div key={b.t} className="home-reveal grid md:grid-cols-2 gap-8 md:gap-14 items-center">
-                <div className={`relative overflow-hidden imk-edge border-2 border-ink/10 shadow-md aspect-[4/3] ${i % 2 === 1 ? 'md:order-2' : ''}`}>
+                <div className={`relative overflow-hidden imk-edge border-2 border-carta/25 shadow-lg aspect-[4/3] ${i % 2 === 1 ? 'md:order-2' : ''}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     data-plx
@@ -288,9 +291,9 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
                 <div>
                   {/* La cifra "scritta a mano" col pennarello del banco (Caveat) */}
                   <p className="font-hand font-bold text-7xl md:text-9xl leading-none -rotate-2 origin-left w-fit" style={{ color: BEAT_ACCENT[i] }}>{b.stat}</p>
-                  <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mt-2">{b.statLabel}</p>
-                  <h3 className="font-alt font-extrabold text-2xl md:text-3xl text-ink mt-5">{b.t}</h3>
-                  <p className="mt-3 text-base text-ink-soft leading-relaxed max-w-md">{b.d}</p>
+                  <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-marel/80 mt-2">{b.statLabel}</p>
+                  <h3 className="font-alt font-extrabold text-2xl md:text-3xl text-carta mt-5">{b.t}</h3>
+                  <p className="mt-3 text-base text-carta/85 leading-relaxed max-w-md">{b.d}</p>
                 </div>
               </div>
             ))}
@@ -300,7 +303,9 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
 
       {/* ===== LE PERSONE — il manifesto del progetto: mettere in contatto
            chi cerca con chi tiene banco. Prima sezione, la più ricca. ===== */}
-      <section id="valori" className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
+      <section id="valori" className="relative overflow-hidden bg-carta">
+        {/* Il tendone del mare qui sopra si chiude sulla carta */}
+        <CanopyEdge color="#15607C" className="absolute top-0 inset-x-0" />
         <DriftBackdrop tone="light" variant="section" />
         {/* Lettera fantasma: il Ponente in Italiana, come filigrana di carta */}
         <span
@@ -390,7 +395,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
 
       {/* ===== LE ZONE — quindici zone, quindici racconti (aria di marel) ===== */}
       <BorghiSection
-        className="bg-marel/40 border-b-2 border-ink/10"
+        className="bg-sole"
         eyebrow={dict.zones.eyebrow}
         title={copy.valueProject.title}
         lead={copy.valueProject.lead}

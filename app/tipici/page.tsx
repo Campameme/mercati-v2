@@ -44,7 +44,7 @@ export default async function TipiciPage() {
     .filter((s) => s.category !== 'generale')
 
   return (
-    <div className="relative overflow-hidden bg-carta bg-paper-grain min-h-screen">
+    <div className="relative overflow-hidden bg-carta min-h-screen">
       {/* banda-tendone: filo di brand in cima */}
       <div className="imk-awning h-2" aria-hidden="true" />
       <DriftBackdrop tone="light" variant="section" />

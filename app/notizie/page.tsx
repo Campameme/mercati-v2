@@ -44,7 +44,7 @@ export default async function NotiziePage() {
   const live = await fetchLiveNews(generalNewsQuery(), 8)
 
   return (
-    <div className="relative overflow-hidden bg-carta bg-paper-grain min-h-[70vh]">
+    <div className="relative overflow-hidden bg-carta min-h-[70vh]">
       <DriftBackdrop tone="light" variant="hero" />
       <div className="relative z-10 container mx-auto px-4 md:px-6 py-12 md:py-16 max-w-5xl">
         <div className="max-w-2xl mb-10">

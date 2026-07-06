@@ -123,7 +123,7 @@ export default async function ComunePage({
     <div>
       <PageviewTracker type="view_comune" marketId={market.id} comune={comune} />
       {/* HERO compatto: foto sx, titolo + descrizione del paese a dx */}
-      <section className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
+      <section className="relative overflow-hidden bg-carta border-b-2 border-ink/10">
         <DriftBackdrop tone="light" variant="section" />
         {/* banda-tendone: filo di brand in cima */}
         <div className="imk-awning h-2" aria-hidden="true" />

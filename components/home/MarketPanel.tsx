@@ -102,7 +102,7 @@ export default function MarketPanel({ pin, session, status, lang, dict, onClose 
       ref={ref}
       role="dialog"
       aria-label={pin.comune}
-      className="absolute z-[1100] bg-carta bg-paper-grain text-ink flex flex-col shadow-2xl
+      className="absolute z-[1100] bg-carta text-ink flex flex-col shadow-2xl
                  left-0 right-0 bottom-0 max-h-[80%] rounded-t-3xl border-t-[3px] border-ink
                  md:left-auto md:top-0 md:right-0 md:bottom-0 md:h-full md:max-h-none md:w-[378px] md:rounded-none md:border-t-0 md:border-l-[3px]"
     >

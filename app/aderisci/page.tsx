@@ -31,7 +31,7 @@ export default function AderisciPage() {
   return (
     <div>
       {/* HERO: sfondo carta con silhouette liguri che derivano */}
-      <section className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
+      <section className="relative overflow-hidden bg-carta border-b-2 border-ink/10">
         <DriftBackdrop tone="light" variant="hero" />
         <div className="container mx-auto px-4 md:px-6 max-w-5xl py-10 md:py-16 relative z-10">
           <Link

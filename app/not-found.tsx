@@ -3,7 +3,7 @@ import Link from 'next/link'
 // 404 brandizzata: tono del sito, rimanda ai due ingressi principali.
 export default function NotFound() {
   return (
-    <div className="min-h-[70vh] bg-carta bg-paper-grain flex items-center justify-center px-4">
+    <div className="min-h-[70vh] bg-carta flex items-center justify-center px-4">
       <div className="max-w-lg text-center py-20">
         <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-sole-600">
           Errore 404

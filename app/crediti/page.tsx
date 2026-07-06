@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 // licenze Creative Commons e ringraziamento dovuto a chi le ha scattate.
 export default function CreditiPage() {
   return (
-    <div className="bg-carta bg-paper-grain min-h-screen">
+    <div className="bg-carta min-h-screen">
       <div className="container mx-auto px-4 md:px-6 py-14 md:py-20 max-w-3xl">
         <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">Il sito</p>
         <h1 className="font-alt font-extrabold tracking-tight text-3xl md:text-4xl text-ink mb-3">Crediti fotografici</h1>

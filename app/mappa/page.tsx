@@ -29,7 +29,7 @@ export default async function MappaPage({
       <PageviewTracker type="view_homepage" />
       {/* Cornice carta: silhouette liguri in ombra dietro a barra/lista, senza
           disturbare la mappa Leaflet (che vive in un layer opaco). */}
-      <div className="relative overflow-hidden bg-carta bg-paper-grain">
+      <div className="relative overflow-hidden bg-carta">
         <DriftBackdrop tone="light" variant="section" />
         <div className="relative z-10">
           <MarketExplorer

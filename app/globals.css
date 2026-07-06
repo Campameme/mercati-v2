@@ -166,15 +166,8 @@ body {
    Pensati per restare leggibili anche per chi ha piu' di 55 anni.
    ============================================================ */
 
-/* --- Texture "carta" leggera, opzionale (.bg-paper-grain) --- */
-.bg-paper-grain {
-  background-color: #F7EFDD;
-  background-image:
-    radial-gradient(rgba(22, 19, 13, 0.035) 1px, transparent 1px),
-    radial-gradient(rgba(22, 19, 13, 0.025) 1px, transparent 1px);
-  background-size: 22px 22px, 22px 22px;
-  background-position: 0 0, 11px 11px;
-}
+/* (La texture .bg-paper-grain è stata ritirata con gli sfondi v3: superfici
+   PIATTE in color-block di brand — mare, carta, sole, notte — come sui social.) */
 
 /* --- Hover "magnetico" / lift: leggera elevazione su card e bottoni --- */
 .imk-lift {

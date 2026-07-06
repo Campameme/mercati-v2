@@ -115,12 +115,12 @@ export function StringLights({ className = '' }: { className?: string }) {
  * BigWaves — onde larghe di fondo (il mare della Riviera), per riempire
  * il piede di una sezione chiara senza rubare la scena.
  */
-export function BigWaves({ className = '' }: { className?: string }) {
+export function BigWaves({ className = '', color = '#15607C' }: { className?: string; color?: string }) {
   return (
     <svg viewBox="0 0 1440 300" preserveAspectRatio="none" aria-hidden="true" className={`block w-full ${className}`}>
-      <path d="M0 140 C 180 100 300 180 480 150 S 840 90 1020 140 S 1320 200 1440 150 V300 H0 Z" fill="#15607C" opacity="0.05" />
-      <path d="M0 200 C 200 160 340 240 520 210 S 880 150 1060 200 S 1340 260 1440 210 V300 H0 Z" fill="#15607C" opacity="0.07" />
-      <path d="M0 258 C 220 226 380 292 560 268 S 920 216 1100 258 S 1360 300 1440 268 V300 H0 Z" fill="#15607C" opacity="0.1" />
+      <path d="M0 140 C 180 100 300 180 480 150 S 840 90 1020 140 S 1320 200 1440 150 V300 H0 Z" fill={color} opacity="0.05" />
+      <path d="M0 200 C 200 160 340 240 520 210 S 880 150 1060 200 S 1340 260 1440 210 V300 H0 Z" fill={color} opacity="0.07" />
+      <path d="M0 258 C 220 226 380 292 560 268 S 920 216 1100 258 S 1360 300 1440 268 V300 H0 Z" fill={color} opacity="0.1" />
     </svg>
   )
 }

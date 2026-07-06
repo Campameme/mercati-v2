@@ -114,7 +114,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
     <div>
       <PageviewTracker type="view_market" marketId={marketFull.id} />
       {/* HERO: foto a sinistra (piccola) + testo + mappa above-the-fold a destra */}
-      <section className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
+      <section className="relative overflow-hidden bg-carta border-b-2 border-ink/10">
         <DriftBackdrop tone="light" variant="section" />
         {/* banda-tendone: filo di brand in cima */}
         <div className="imk-awning h-2" aria-hidden="true" />

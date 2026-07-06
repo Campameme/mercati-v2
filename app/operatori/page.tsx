@@ -101,20 +101,20 @@ export default function OperatoriHubPage() {
 
   return (
     <div>
-      {/* Il tendone all'ingresso: banda a righe + smerlo, come sui social */}
+      {/* Il tendone all'ingresso: banda a righe + smerlo di tela sul mare */}
       <div aria-hidden="true" className="imk-awning h-2.5" />
-      <CanopyEdge color="#15607C" className="h-3 md:h-3.5 -mt-px" />
-      {/* Header di sezione: sfondo carta con silhouette che derivano + cartoline */}
-      <section className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
-        <DriftBackdrop tone="light" variant="section" />
-        <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 relative z-10">
-          <div className="flex items-center gap-3 mb-2 text-ink-soft">
-            <WaveTaglia className="w-8 h-2.5 text-mare" aria-hidden="true" />
+      {/* Header di sezione: color-block MARE, come i ritratti dei Maestri */}
+      <section className="relative overflow-hidden bg-mare">
+        <CanopyEdge color="#F7EFDD" className="absolute top-0 inset-x-0" />
+        <DriftBackdrop tone="dark" variant="section" />
+        <div className="container mx-auto px-4 md:px-6 pt-12 pb-10 md:pt-16 md:pb-14 relative z-10">
+          <div className="flex items-center gap-3 mb-2 text-marel">
+            <WaveTaglia className="w-8 h-2.5 text-sole" aria-hidden="true" />
             <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">Riviera di Ponente · la carta del banco</p>
           </div>
           <div className="flex items-center justify-between gap-4 flex-wrap">
-            <h1 className="font-display text-3xl md:text-5xl text-ink leading-tight">
-              I banchi <span className="imk-mark text-ink">della provincia</span>
+            <h1 className="font-display text-3xl md:text-5xl text-carta leading-tight">
+              I banchi della provincia
             </h1>
             {!loading && operators.length > 0 && (
               <p className="imk-cartellino imk-cartellino--r px-3.5 py-1 font-hand font-bold text-xl leading-none">
@@ -122,7 +122,7 @@ export default function OperatoriHubPage() {
               </p>
             )}
           </div>
-          <p className="text-sm text-ink-soft mt-3 max-w-xl">
+          <p className="text-sm text-marel/90 mt-3 max-w-xl">
             Ogni venditore della Riviera con la sua figurina e i mercati che frequenta ogni settimana.
             Filtra per zona, comune o categoria per trovare subito quello che cerchi.
           </p>
