@@ -14,7 +14,7 @@ import { StringLights } from '@/components/decorations'
 import { occursOn, isNonWeekly } from '@/lib/markets/hours'
 import { categoryLabel } from '@/lib/i18n/home'
 import { UI_I18N } from '@/lib/i18n/ui'
-import { classifySchedule, CATEGORY_COLOR, categoryLabelI18n } from '@/lib/schedules/classify'
+import { classifySchedule, categoryLabelI18n } from '@/lib/schedules/classify'
 import { mountAqua } from '@/lib/home/aqua'
 import BorghiSection from './BorghiSection'
 import type { MarketPin } from './types'
@@ -38,7 +38,7 @@ const BEAT_IMG = [
   { src: '/zone/finale-ligure.jpg', alt: 'Finalborgo visto dal castello' },
   { src: '/zone/vita-mercato-ventimiglia.jpg', alt: 'Il mercato del venerdì a Ventimiglia' },
 ]
-const BEAT_ACCENT = ['#15607C', '#C2502E', '#F4B62C']
+const BEAT_ACCENT = ['#15607C', '#D24B3F', '#D69A12']
 
 export default function MapHome({ pins }: { pins: MarketPin[] }) {
   const router = useRouter()
@@ -223,8 +223,8 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
               <span className="inline-flex items-center gap-1.5 font-alt text-[11px] font-bold uppercase tracking-[0.12em] text-sole">
                 <Sun className="w-3.5 h-3.5" aria-hidden="true" /> {copy.heroChips.today}
               </span>
-              <span className="font-alt text-[11px] font-bold text-ink bg-sole rounded-full px-2 py-0.5 group-hover:bg-sole-600 transition-colors">
-                {todayComuni.length} <ArrowRight className="inline w-3 h-3 -mt-px" aria-hidden="true" />
+              <span className="imk-cartellino px-2.5 py-px font-hand text-[17px] font-bold leading-snug">
+                {todayComuni.length} <ArrowRight className="inline w-3 h-3 -mt-0.5" aria-hidden="true" />
               </span>
             </span>
             {/* Nastro: contenitore con clipping proprio (contain:paint) così il
@@ -286,7 +286,8 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
                   />
                 </div>
                 <div>
-                  <p className="font-display italic text-6xl md:text-8xl leading-none" style={{ color: BEAT_ACCENT[i] }}>{b.stat}</p>
+                  {/* La cifra "scritta a mano" col pennarello del banco (Caveat) */}
+                  <p className="font-hand font-bold text-7xl md:text-9xl leading-none -rotate-2 origin-left w-fit" style={{ color: BEAT_ACCENT[i] }}>{b.stat}</p>
                   <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mt-2">{b.statLabel}</p>
                   <h3 className="font-alt font-extrabold text-2xl md:text-3xl text-ink mt-5">{b.t}</h3>
                   <p className="mt-3 text-base text-ink-soft leading-relaxed max-w-md">{b.d}</p>
@@ -344,13 +345,14 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
                   loading="lazy"
                   className="w-full aspect-[4/3] object-cover"
                 />
-                <figcaption className="mt-1 px-1 font-accent text-sm text-ink-soft leading-tight">Sanremo, 1962</figcaption>
+                <figcaption className="mt-1 px-1 font-accent text-lg text-ink-soft leading-tight">Sanremo, 1962</figcaption>
               </figure>
             </div>
           </div>
 
 
-          {/* Gli ambulanti, in evidenza: card grandi, non chip */}
+          {/* I Maestri, in evidenza: mini-ritratti sul notte, come sui social —
+              nome in Italiana col punto + riga di servizio gialla. */}
           {operators.length > 0 && (
             <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {operators.slice(0, 8).map((op, i) => (
@@ -358,17 +360,18 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
                   key={op.id}
                   href={op.market ? `/${op.market.slug}/operators/${op.id}` : '/operatori'}
                   aria-label={`Scopri ${op.name}`}
-                  className={`imk-lift group flex items-start gap-3.5 bg-white border-2 border-ink/10 imk-edge p-4 hover:border-mare transition-colors ${
+                  className={`imk-lift group relative overflow-hidden flex items-start gap-3.5 bg-notte border-2 border-notte imk-edge p-4 pt-5 hover:border-sole transition-colors ${
                     i % 4 === 1 ? 'imk-tilt-l' : i % 4 === 2 ? 'imk-tilt-r' : ''
                   }`}
                 >
-                  <BancoAvatar name={op.name} size={52} />
+                  <span aria-hidden="true" className="absolute top-0 inset-x-0 h-1.5 imk-awning" />
+                  <BancoAvatar name={op.name} size={52} className="border-2 border-carta/20" />
                   <span className="min-w-0 flex-1">
-                    <span className="block font-alt font-bold text-base text-ink leading-tight group-hover:text-mare-600 transition-colors">{op.name}</span>
-                    <span className="block font-alt text-[11px] font-semibold uppercase tracking-wider text-fiore-600 mt-1">{categoryLabel(op.category, lang)}</span>
-                    {op.market && <span className="block text-xs text-ink-muted mt-0.5 truncate">{op.market.name}</span>}
+                    <span className="block font-display text-[1.35rem] text-carta leading-tight group-hover:text-sole transition-colors">{op.name.replace(/\.+$/, '')}.</span>
+                    <span className="block font-alt text-[11px] font-bold uppercase tracking-wider text-sole mt-1">{categoryLabel(op.category, lang)}</span>
+                    {op.market && <span className="block text-xs text-marel/75 mt-0.5 truncate">{op.market.name}</span>}
                   </span>
-                  <ArrowRight className="w-4 h-4 text-ink-muted group-hover:text-mare-600 group-hover:translate-x-0.5 transition-all flex-shrink-0 mt-1" aria-hidden="true" />
+                  <ArrowRight className="w-4 h-4 text-carta/50 group-hover:text-sole group-hover:translate-x-0.5 transition-all flex-shrink-0 mt-1" aria-hidden="true" />
                 </Link>
               ))}
             </div>
@@ -450,16 +453,17 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
                   <p className="font-accent text-2xl text-mare-600">{ui.tipiciEmptyCalendar}</p>
                 </WaterCard>
               ) : (
-                <div className="space-y-4">
-                  {prossimiTipici.map((t, i) => (
-                    <Link key={t.id} href="/tipici" className="block">
-                      <WaterCard tilt={i % 2 === 0 ? 'r' : 'l'} className="p-5 hover:border-mare/60 transition-colors">
-                        <span className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.1em]" style={{ color: CATEGORY_COLOR[t.cat] }}>
-                          <CalendarDays className="w-3.5 h-3.5" aria-hidden="true" /> {fmtDate(t.date.toISOString())} · {categoryLabelI18n(t.cat, lang)}
-                        </span>
-                        <h3 className="font-alt font-bold text-lg text-ink leading-tight mt-1.5">{t.comune}</h3>
-                        <p className="mt-1 text-sm text-ink-muted">{t.giorno}</p>
-                      </WaterCard>
+                /* Tabellone "da stazione": data … comune, col leader puntinato
+                   (lo stesso formato del post-servizio della settimana). */
+                <div>
+                  {prossimiTipici.map((t) => (
+                    <Link key={t.id} href="/tipici" className="group flex items-baseline gap-3 py-3.5 border-b border-carta/10 hover:border-sole/60 transition-colors">
+                      <span className="font-alt text-sm font-bold uppercase tracking-wide text-sole tabular-nums whitespace-nowrap">{fmtDate(t.date.toISOString())}</span>
+                      <span className="imk-leader text-carta" aria-hidden="true" />
+                      <span className="min-w-0 text-right">
+                        <span className="block font-alt font-bold text-lg text-carta leading-tight group-hover:text-sole transition-colors">{t.comune}</span>
+                        <span className="block text-[11px] font-alt font-semibold uppercase tracking-wider text-marel/70">{categoryLabelI18n(t.cat, lang)}</span>
+                      </span>
                     </Link>
                   ))}
                 </div>

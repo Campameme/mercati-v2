@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Italiana, Figtree } from 'next/font/google'
+import { Italiana, Figtree, Caveat } from 'next/font/google'
 import './globals.css'
 import Providers from '@/components/Providers'
 import Footer from '@/components/Footer'
@@ -21,6 +21,15 @@ const italiana = Italiana({
 const figtree = Figtree({
   subsets: ['latin'],
   variable: '--font-alt',
+  display: 'swap',
+})
+
+// La "mano del banco": Caveat SOLO per ciò che al mercato si scrive a mano
+// — prezzi, numeri di banco, didascalie — mai per testi di servizio.
+const caveat = Caveat({
+  subsets: ['latin'],
+  weight: ['600', '700'],
+  variable: '--font-hand',
   display: 'swap',
 })
 
@@ -55,7 +64,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="it" className={`${italiana.variable} ${figtree.variable}`}>
+    <html lang="it" className={`${italiana.variable} ${figtree.variable} ${caveat.variable}`}>
       <body className="font-sans bg-carta text-ink antialiased">
         <SmoothScroll />
         <Providers>

@@ -350,9 +350,9 @@ body {
   z-index: 2;
 }
 
-/* --- Marquee "mercato oggi": nastro che scorre (raddoppia il contenuto) --- */
-.imk-marquee { display: inline-flex; white-space: nowrap; animation: imk-marquee 36s linear infinite; }
-@keyframes imk-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+/* (Il marquee "mercato oggi" è definito più sotto: SOLO la .imk-marquee-track
+   interna anima — il contenitore .imk-marquee non deve MAI traslare, o il
+   testo esce dal box clippato. Qui c'era una vecchia definizione doppia.) */
 
 /* --- Chevron scroll-cue: cascata verso il basso --- */
 .imk-chev { animation: imk-chev 1.8s ease-in-out infinite; }
@@ -368,7 +368,7 @@ body {
   .imk-drift-a, .imk-drift-b, .imk-drift-c { animation: none !important; }
   .imk-water::before { animation: none !important; }
   .imk-tilt-l, .imk-tilt-r { transform: none !important; }
-  .imk-marquee, .imk-chev, .imk-march { animation: none !important; }
+  .imk-chev, .imk-march { animation: none !important; }
 }
 
 /* ============================================================
@@ -489,4 +489,36 @@ body {
 }
 .imk-awning--sole {
   background-image: repeating-linear-gradient(90deg, #F4B62C 0 28px, #F7EFDD 28px 56px);
+}
+
+/* ============================================================
+   Maestri del Banco — gli asset del kit social, sul sito
+   ============================================================ */
+/* Cartellino del banco: etichetta gialla ruotata con la scrittura a mano
+   (font-hand). Dentro un .group si raddrizza al passaggio del mouse. */
+.imk-cartellino {
+  display: inline-block;
+  background: #F4B62C;
+  color: #0E3040;
+  border-radius: 8px 10px 8px 11px / 10px 8px 11px 8px;
+  transform: rotate(-2deg);
+  box-shadow: 0 2px 8px -2px rgba(14, 48, 64, 0.35);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.imk-cartellino--r { transform: rotate(2deg); }
+.group:hover .imk-cartellino { transform: rotate(0deg); }
+
+/* Leader puntinato "da tabellone": giorno … mercato (riempi lo spazio) */
+.imk-leader {
+  flex: 1 1 auto;
+  min-width: 1.5rem;
+  border-bottom: 2px dotted currentColor;
+  opacity: 0.35;
+  transform: translateY(-0.3em);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .imk-cartellino { transition: none; }
+  .group:hover .imk-cartellino { transform: rotate(-2deg); }
+  .group:hover .imk-cartellino--r { transform: rotate(2deg); }
 }

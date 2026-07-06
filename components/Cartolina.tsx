@@ -35,7 +35,7 @@ export default function Cartolina({
         <ZoneImage query={query} fallbackQuery={fallbackQuery} alt={alt ?? query} aspect={aspect} hoverZoom={!kenBurns} kenBurns={kenBurns} priority={priority} />
       </div>
       {caption && (
-        <figcaption className="mt-1.5 px-1 font-accent text-base text-ink-soft leading-tight">{caption}</figcaption>
+        <figcaption className="mt-1.5 px-1 font-accent text-lg text-ink-soft leading-tight">{caption}</figcaption>
       )}
     </figure>
   )

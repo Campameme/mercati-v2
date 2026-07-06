@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Search, CalendarDays, BadgeCheck, MessageCircle } from 'lucide-react'
-import { WaveTaglia } from '@/components/decorations'
+import { WaveTaglia, CanopyEdge } from '@/components/decorations'
 import { BancoPlaceholder } from '@/components/BancoAvatar'
 import DriftBackdrop from '@/components/motion/DriftBackdrop'
 
@@ -101,6 +101,9 @@ export default function OperatoriHubPage() {
 
   return (
     <div>
+      {/* Il tendone all'ingresso: banda a righe + smerlo, come sui social */}
+      <div aria-hidden="true" className="imk-awning h-2.5" />
+      <CanopyEdge color="#15607C" className="h-3 md:h-3.5 -mt-px" />
       {/* Header di sezione: sfondo carta con silhouette che derivano + cartoline */}
       <section className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
         <DriftBackdrop tone="light" variant="section" />
@@ -114,8 +117,8 @@ export default function OperatoriHubPage() {
               I banchi <span className="imk-mark text-ink">della provincia</span>
             </h1>
             {!loading && operators.length > 0 && (
-              <p className="font-alt text-xs font-semibold text-ink-soft bg-white border-2 border-ink/10 rounded-full px-3.5 py-1.5 tabular-nums">
-                {operators.length} operator{operators.length === 1 ? 'e' : 'i'}
+              <p className="imk-cartellino imk-cartellino--r px-3.5 py-1 font-hand font-bold text-xl leading-none">
+                {operators.length} banc{operators.length === 1 ? 'o' : 'hi'}
               </p>
             )}
           </div>
@@ -208,7 +211,7 @@ export default function OperatoriHubPage() {
                 </div>
                 <div className="p-5 flex-1 flex flex-col">
                   <div className="flex items-start justify-between gap-2 mb-1">
-                    <h3 className="font-alt font-bold text-lg text-ink leading-tight group-hover:text-mare-600 transition-colors">{op.name}</h3>
+                    <h3 className="font-display text-[1.45rem] text-ink leading-tight group-hover:text-mare-600 transition-colors">{op.name.replace(/\.+$/, '')}.</h3>
                     <span className="flex-shrink-0 font-alt text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 bg-sole/30 text-ink rounded-full">
                       {CAT_LABEL[op.category] ?? op.category}
                     </span>

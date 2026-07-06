@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, MapPin, Instagram, Facebook, Globe, Navigation2, CalendarDays, MessageCircle, BadgeCheck } from 'lucide-react'
+import { ArrowLeft, Instagram, Facebook, Globe, Navigation2, MessageCircle, BadgeCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import FavoriteButton from '@/components/FavoriteButton'
 import { BancoPlaceholder } from '@/components/BancoAvatar'
+import { CanopyEdge } from '@/components/decorations'
 import PageviewTracker from '@/components/analytics/PageviewTracker'
 
 const CAT_LABEL: Record<string, string> = {
@@ -72,62 +73,71 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
         <ArrowLeft className="w-3.5 h-3.5" /> Tutti i banchi
       </Link>
 
-      <div className="border-b-2 border-ink/10 pb-6 mb-8">
-        <div className="flex items-start gap-4 flex-wrap">
-          {/* Figurina: foto o placeholder duotone mare→sole */}
-          <div className="flex-shrink-0">
-            {operator.photos?.[0] ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={operator.photos[0]} alt={operator.name} className="w-24 h-24 md:w-28 md:h-28 object-cover rounded-xl border-2 border-ink/10" />
-            ) : (
-              <BancoPlaceholder name={operator.name} className="w-24 h-24 md:w-28 md:h-28 rounded-xl border-2 border-ink/10" />
-            )}
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-start gap-2">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="font-display text-3xl md:text-5xl text-ink leading-tight">{operator.name}</h1>
-                  {operator.verified && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-sole text-ink rounded-full font-alt text-[11px] font-semibold uppercase tracking-wider">
-                      <BadgeCheck className="w-3.5 h-3.5" /> Verificato
-                    </span>
-                  )}
-                </div>
+      {/* Il ritratto del Maestro: pannello notte col tendone in testa, nome in
+          Italiana col punto e riga di servizio gialla — come sui social. */}
+      <div className="relative overflow-hidden imk-edge border-2 border-notte bg-notte text-carta mb-8">
+        <div aria-hidden="true" className="imk-awning h-2.5" />
+        <CanopyEdge color="#F7EFDD" className="h-3 md:h-3.5 -mt-px" />
+        <div className="p-5 md:p-8">
+          <div className="flex items-start gap-4 md:gap-6 flex-wrap">
+            {/* Figurina: foto o placeholder duotone mare→sole */}
+            <div className="flex-shrink-0">
+              {operator.photos?.[0] ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={operator.photos[0]} alt={operator.name} className="w-24 h-24 md:w-32 md:h-32 object-cover rounded-xl border-2 border-carta/25" />
+              ) : (
+                <BancoPlaceholder name={operator.name} className="w-24 h-24 md:w-32 md:h-32 rounded-xl border-2 border-carta/25" />
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-start gap-2">
+                <h1 className="flex-1 font-display text-4xl md:text-6xl leading-[1.02] text-carta">
+                  {operator.name.replace(/\.+$/, '')}<span className="text-sole">.</span>
+                </h1>
+                <span className="rounded-full bg-carta/90 shadow-sm">
+                  <FavoriteButton kind="operator" id={operator.id} label={operator.name} />
+                </span>
               </div>
-              <FavoriteButton kind="operator" id={operator.id} label={operator.name} />
-            </div>
-            <div className="flex items-center gap-2 mt-3 flex-wrap text-sm text-ink-soft">
-              <span className="px-2.5 py-1 bg-sole/30 text-ink rounded-full font-alt text-[11px] font-semibold uppercase tracking-wider">{CAT_LABEL[operator.category] ?? operator.category}</span>
-              {operator.stall_number && (
-                <span className="flex items-center text-ink-muted"><MapPin className="w-3 h-3 mr-1" />Banco {operator.stall_number}</span>
-              )}
-            </div>
-            <div className="flex items-center gap-2 mt-4 flex-wrap">
-              {social.whatsapp && (
-                <a
-                  href={social.whatsapp.startsWith('http') ? social.whatsapp : `https://wa.me/${social.whatsapp.replace(/[^0-9]/g, '')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#25D366] text-white rounded-full text-sm font-alt font-semibold hover:opacity-90 transition-opacity"
-                >
-                  <MessageCircle className="w-4 h-4" /> WhatsApp
-                </a>
-              )}
-              {operator.location_lat != null && operator.location_lng != null && (
-                <a
-                  href={`https://www.google.com/maps/dir/?api=1&destination=${operator.location_lat},${operator.location_lng}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-mare text-white rounded-full text-sm font-alt font-semibold hover:bg-mare-600 transition-colors"
-                >
-                  <Navigation2 className="w-4 h-4" /> Indicazioni
-                </a>
-              )}
+              <div className="flex items-center gap-x-3 gap-y-2 mt-3 flex-wrap">
+                <p className="font-alt text-xs md:text-sm font-bold uppercase tracking-[0.14em] text-sole">
+                  {CAT_LABEL[operator.category] ?? operator.category}
+                  {operator.markets?.name ? ` · ${operator.markets.name}` : ''}
+                </p>
+                {operator.verified && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-carta/15 text-carta rounded-full font-alt text-[11px] font-semibold uppercase tracking-wider">
+                    <BadgeCheck className="w-3.5 h-3.5 text-sole" /> Verificato
+                  </span>
+                )}
+                {operator.stall_number && (
+                  <span className="imk-cartellino px-3 py-0.5 font-hand font-bold text-xl leading-snug">banco {operator.stall_number}</span>
+                )}
+              </div>
+              <div className="flex items-center gap-2 mt-5 flex-wrap">
+                {social.whatsapp && (
+                  <a
+                    href={social.whatsapp.startsWith('http') ? social.whatsapp : `https://wa.me/${social.whatsapp.replace(/[^0-9]/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#25D366] text-white rounded-full text-sm font-alt font-semibold hover:opacity-90 transition-opacity"
+                  >
+                    <MessageCircle className="w-4 h-4" /> WhatsApp
+                  </a>
+                )}
+                {operator.location_lat != null && operator.location_lng != null && (
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${operator.location_lat},${operator.location_lng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-carta text-ink rounded-full text-sm font-alt font-semibold hover:bg-sole transition-colors"
+                  >
+                    <Navigation2 className="w-4 h-4" /> Indicazioni
+                  </a>
+                )}
+              </div>
             </div>
           </div>
+          {operator.description && <p className="text-carta/85 mt-5 max-w-2xl leading-relaxed">{operator.description}</p>}
         </div>
-        {operator.description && <p className="text-ink-soft mt-4 max-w-2xl">{operator.description}</p>}
       </div>
 
       {operator.photos?.length > 1 && (
@@ -148,33 +158,35 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
         {sessions.length === 0 ? (
           <p className="text-sm text-ink-muted italic">Nessuna sessione configurata.</p>
         ) : (
-          <ul className="rounded-xl border-2 border-ink/10 bg-white divide-y divide-ink/5">
+          /* Tabellone "da stazione": comune … giorno, col leader puntinato
+             (lo stesso formato-settimana del kit social). */
+          <ul className="imk-edge border-2 border-ink/10 bg-white px-5 md:px-6 divide-y divide-ink/10">
             {sessions.map((s) => (
-              <li key={s.scheduleId} className="px-4 py-4 flex items-center gap-4 flex-wrap">
-                <CalendarDays className="w-4 h-4 text-mare flex-shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-baseline gap-2 flex-wrap">
-                    <span className="font-alt font-bold text-lg text-ink">{s.comune}</span>
-                    <span className="text-sm text-ink-muted">· {s.giorno}</span>
-                    {s.orario && <span className="text-xs text-ink-muted tabular-nums">{s.orario}</span>}
-                  </div>
-                  {s.luogo && (
-                    <p className="text-sm text-ink-soft flex items-center gap-1 mt-0.5">
-                      <MapPin className="w-3 h-3" /> {s.luogo}
-                      {s.stallNumber && <span className="text-xs text-ink-muted">· Banco {s.stallNumber}</span>}
-                    </p>
+              <li key={s.scheduleId} className="py-4 flex items-baseline gap-3">
+                <span className="font-alt font-bold text-lg text-ink whitespace-nowrap">{s.comune}</span>
+                <span className="imk-leader text-ink" aria-hidden="true" />
+                <span className="min-w-0 text-right">
+                  <span className="block font-alt font-semibold text-sm text-mare-600">
+                    {s.giorno}
+                    {s.orario && <span className="text-ink-muted font-normal tabular-nums"> · {s.orario}</span>}
+                  </span>
+                  {(s.luogo || s.stallNumber) && (
+                    <span className="block text-xs text-ink-muted mt-0.5">
+                      {s.luogo}
+                      {s.stallNumber && ` · banco ${s.stallNumber}`}
+                    </span>
                   )}
-                </div>
-                {s.lat != null && s.lng != null && (
-                  <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-mare hover:text-mare-600 underline underline-offset-2"
-                  >
-                    <Navigation2 className="w-3 h-3" /> Indicazioni
-                  </a>
-                )}
+                  {s.lat != null && s.lng != null && (
+                    <a
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-mare hover:text-mare-600 underline underline-offset-2 mt-1"
+                    >
+                      <Navigation2 className="w-3 h-3" /> Indicazioni
+                    </a>
+                  )}
+                </span>
               </li>
             ))}
           </ul>
@@ -218,7 +230,7 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {products.map((p) => (
-            <div key={p.id} className="imk-lift bg-white border-2 border-ink/10 rounded-xl overflow-hidden flex flex-col">
+            <div key={p.id} className="imk-lift group bg-white border-2 border-ink/10 rounded-xl overflow-hidden flex flex-col">
               {p.photos?.[0] && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={p.photos[0]} alt={p.name} className="w-full h-40 object-cover" />
@@ -227,8 +239,11 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
                 <h3 className="font-alt font-bold text-lg text-ink">{p.name}</h3>
                 {p.description && <p className="text-sm text-ink-soft mt-1 flex-1">{p.description}</p>}
                 {p.price !== null && (
-                  <p className="text-mare-700 font-semibold mt-2 tabular-nums">
-                    {new Intl.NumberFormat('it-IT', { style: 'currency', currency: p.currency }).format(p.price)}
+                  /* Il prezzo sul cartellino, scritto a mano: "prezzo onesto" */
+                  <p className="mt-3">
+                    <span className="imk-cartellino px-3 py-0.5 font-hand font-bold text-2xl leading-snug">
+                      {new Intl.NumberFormat('it-IT', { style: 'currency', currency: p.currency }).format(p.price)}
+                    </span>
                   </p>
                 )}
               </div>

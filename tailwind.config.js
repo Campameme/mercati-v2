@@ -25,13 +25,15 @@ module.exports = {
         // ai token canonici e rimossi il 2026-07-03. Usare SOLO i token sopra.
       },
       fontFamily: {
-        // Sistema a due caratteri: titolo = Italiana (display/serif, solo 400),
-        // tutto il resto = Figtree (sans/alt/accent), gerarchia via pesi.
+        // Sistema a due caratteri + la mano: titolo = Italiana (display/serif,
+        // solo 400), tutto il resto = Figtree (sans/alt), e Caveat (hand/accent)
+        // SOLO per ciò che al banco si scrive a mano: prezzi, numeri, didascalie.
         sans: ['var(--font-alt)', 'system-ui', 'sans-serif'],
         alt: ['var(--font-alt)', 'system-ui', 'sans-serif'],
         display: ['var(--font-display)', 'Italiana', 'Georgia', 'serif'],
         serif: ['var(--font-display)', 'Italiana', 'Georgia', 'serif'],
-        accent: ['var(--font-alt)', 'system-ui', 'sans-serif'],
+        accent: ['var(--font-hand)', 'cursive'],
+        hand: ['var(--font-hand)', 'cursive'],
       },
       letterSpacing: {
         'widest-plus': '0.22em',
