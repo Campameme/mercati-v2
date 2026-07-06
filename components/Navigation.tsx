@@ -23,6 +23,18 @@ export default function Navigation() {
   // I link di recupero password di Supabase atterrano sulla Site URL (root):
   // da qualunque pagina, portiamo l'utente al form "nuova password".
   useEffect(() => {
+    // Link scaduto/non valido: Supabase mette l'errore nell'hash della root
+    // (es. #error=access_denied&error_code=otp_expired). Invece di lasciare
+    // l'utente sulla home con l'URL sporco, lo portiamo al login con un avviso.
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.slice(1)
+      const params = new URLSearchParams(hash || window.location.search)
+      const errCode = params.get('error_code') || params.get('error')
+      if (errCode && !pathname.startsWith('/login')) {
+        window.location.assign(`/login?autherror=${encodeURIComponent(errCode)}`)
+        return
+      }
+    }
     const supabase = createClient()
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY' && !pathname.startsWith('/login')) {

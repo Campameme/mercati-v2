@@ -30,8 +30,9 @@ function LoginPageInner() {
   const t = LOGIN_I18N[lang]
 
   const recovery = !!search.get('recovery')
-  const [world, setWorld] = useState<World>(recovery ? 'staff' : 'citizen')
-  const [staffMode, setStaffMode] = useState<StaffMode>(recovery ? 'update' : 'signin')
+  const autherror = search.get('autherror')
+  const [world, setWorld] = useState<World>(recovery || autherror ? 'staff' : 'citizen')
+  const [staffMode, setStaffMode] = useState<StaffMode>(recovery ? 'update' : autherror ? 'reset' : 'signin')
 
   // OTP
   const [otpStep, setOtpStep] = useState<'email' | 'code'>('email')
@@ -45,6 +46,11 @@ function LoginPageInner() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
+    if (autherror) {
+      setError(autherror.includes('expired')
+        ? 'Il link è scaduto o è già stato usato. Richiedine uno nuovo qui sotto.'
+        : 'Il link non è più valido. Richiedine uno nuovo qui sotto.')
+    }
     const hashRecovery = typeof window !== 'undefined' && window.location.hash.includes('type=recovery')
     if (hashRecovery) { setWorld('staff'); setStaffMode('update') }
     const supabase = createClient()
