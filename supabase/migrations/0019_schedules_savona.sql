@@ -26,12 +26,12 @@ begin
   insert into market_schedules (market_id, comune, giorno, orario, settori, luogo, lat, lng) values
     -- Alassio
     (id_baia_del_sole, 'Alassio', 'Sabato', '08.00 - 14.00', 'Merci Varie', 'Via Pera e adiacenze', 44.0049, 8.1729),
-    (id_baia_del_sole, 'Alassio', '23 febbraio 29 marzo 13 aprile 1 -31 maggio 15 – 22 - 29 giugno 9 – 14 – 21 - 28 luglio 4 – 18 – 20 – 27 - 31 agosto 7 settembre 28 ottobre', '10.00 - 19.00', 'Artigianato', 'P.zza della Libertà (giardini comunali)', 44.0049, 8.1729),
+    (id_baia_del_sole, 'Alassio', 'Date singole da febbraio a ottobre (tutto maggio)', '10.00 - 19.00', 'Artigianato', 'P.zza della Libertà (giardini comunali)', 44.0049, 8.1729),
     -- Albenga
     (id_albenganese, 'Albenga', 'Mercoledì', '8.00 / 18.00', 'Merci varie', 'Via Dalmazia Via Isonzo Viale Liguria Piazza Panizza Piazza Parcheggio Peter Pan', 44.0494, 8.2131),
     (id_albenganese, 'Albenga', 'tutti', '7.30 / 13.00', 'Produttori agricoli', 'Piazza del Popolo', 44.0494, 8.2131),
-    (id_albenganese, 'Albenga', 'dal 24 al 26 luglio dal 31 luglio al 2 agosto dal 8 al 10 agosto dal 14 al 16 agosto dal 21 al 23 agosto dal 28 al 30 agosto', '9.00 / 19.00', 'Mercatino dell''Antiquariato e hobbistico', 'Lungomare C. Colombo', 44.0494, 8.2131),
-    (id_albenganese, 'Albenga', '1 e 2 febbraio 4 e 5 aprile 6 e 7 giugno 12 e 13 settembre 7 e 8 novembre 5 e 6 dicembre', null, 'Expo Gustitalia - mostra mercato di prodotti alimentari tipivi regionali e dell''artigianato artistico', 'Viale dei Mille', 44.0494, 8.2131),
+    (id_albenganese, 'Albenga', 'Venerdì, sabato e domenica dal 24/7 al 30/8', '9.00 / 19.00', 'Mercatino dell''Antiquariato e hobbistico', 'Lungomare C. Colombo', 44.0494, 8.2131),
+    (id_albenganese, 'Albenga', 'Un fine settimana a febbraio, aprile, giugno, settembre, novembre e dicembre', null, 'Expo Gustitalia - mostra mercato di prodotti alimentari tipivi regionali e dell''artigianato artistico', 'Viale dei Mille', 44.0494, 8.2131),
     -- Albisola Superiore
     (id_savonese, 'Albisola Superiore', 'Mercoledì', '8.00 / 13.00', 'Merci varie / Alimentari', 'Via del Grosso / Via dei Conradi / P.zza dei Mille / Via dei Seirullo / Via Nino Bixio', 44.3391, 8.5115),
     (id_savonese, 'Albisola Superiore', 'Mercoledì', '8.00 / 13.00', 'Agricoltura/ Allevamento', 'Via dei Conradi', 44.3391, 8.5115),
@@ -60,7 +60,7 @@ begin
     (id_albenganese, 'Borghetto Santo Spirito', '2^ sabato del mese', '8.00 / 20.00', 'Mercatino dell''artigianato', 'Piazza Libertà', 44.1114, 8.2422),
     -- Borgio Verezzi
     (id_loano_pietra, 'Borgio Verezzi', 'Martedì', '1/6-30/9 7.00-14.00 1/10-31/5 8.00-13.00', 'Merci Varie', 'Via IV Novembre', 44.1601, 8.3057),
-    (id_loano_pietra, 'Borgio Verezzi', '1/6-31/10 lunedì mercoledì venerdì 1/11-31/5 Sabato', '1/6-31/10 14.00-17.30 1/11-31/5 16.00-19.30', 'Merci ortofrutticole', 'Piazzetta inters.Viale Colombo Via IV Novembre', 44.1601, 8.3057),
+    (id_loano_pietra, 'Borgio Verezzi', 'Lunedì, mercoledì e venerdì dal 1/6 al 31/10; sabato dal 1/11 al 31/5', '1/6-31/10 14.00-17.30 1/11-31/5 16.00-19.30', 'Merci ortofrutticole', 'Piazzetta inters.Viale Colombo Via IV Novembre', 44.1601, 8.3057),
     -- Cairo Montenotte
     (id_val_bormida, 'Cairo Montenotte', 'Giovedì', '8.00 / 13.00', 'Merci varie / Agricoltura', 'P.zza della Vittoria - P.zza Abba - Viale Vittorio Veneto - Via F.lli Francia - C.so di Vittorio', 44.3987, 8.277),
     (id_val_bormida, 'Cairo Montenotte', '2° Sabato del mese', '8.00 / 13.00', 'Mercati della Terra / Agricoltura / Allevamento / Biologico', 'P.zza della Vittoria', 44.3987, 8.277),
@@ -87,7 +87,7 @@ begin
     (id_finalese, 'Finale Ligure', 'Mercoledì stagionale (dal 15/6 al 15/9)', '08.00 / 14.00', 'Alimentare / Non alimentare', 'Varigotti', 44.1691, 8.3437),
     (id_finalese, 'Finale Ligure', 'estivo', '18.00 / 24.00', 'Mercatino dell''artigianato serale', 'Rioni di Marina-Borgo-Pia-Varigotti', 44.1691, 8.3437),
     (id_finalese, 'Finale Ligure', '1° Sabato e Domenica di ogni mese', '8.00 / 20.00', 'Antiquariato / Hobbistica', 'Centro Storico - rione Borgo', 44.1691, 8.3437),
-    (id_finalese, 'Finale Ligure', 'dall''1/10 al 15/5: Merc / Sab dal 16/5 al 30/9: Lunedì / Merc / Sab', '15.00 / 19.00 16.00 / 20.00', 'Ortoflorofrutticolo', 'Lungomare Migliorini', 44.1691, 8.3437),
+    (id_finalese, 'Finale Ligure', 'Mercoledì e sabato dal 1/10 al 15/5; anche lunedì dal 16/5 al 30/9', '15.00 / 19.00 16.00 / 20.00', 'Ortoflorofrutticolo', 'Lungomare Migliorini', 44.1691, 8.3437),
     (id_finalese, 'Finale Ligure', 'Venerdì dal 15/5 al 30/9', '16.00 / 20.00', 'Ortoflorofrutticolo', 'Varigotti Via Aurelia', 44.1691, 8.3437),
     -- Giusvalla
     (id_val_bormida, 'Giusvalla', 'sabato', '8.00 / 12.00', 'Merci varie', 'P.zza del Municipio', 44.4489, 8.3934),

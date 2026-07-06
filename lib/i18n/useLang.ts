@@ -1,50 +1,70 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useSyncExternalStore } from 'react'
 import { useRouter } from 'next/navigation'
 import { LANGS, type Lang } from './home'
 
-/**
- * Stato lingua condiviso da TUTTI i componenti client: localStorage
- * (`imk:lang`, storico) + cookie `imk_lang` (letto dalle pagine server) +
- * <html lang>. Il cambio lingua fa router.refresh() così anche i contenuti
- * renderizzati lato server (zone, comuni, tipici) cambiano subito.
- */
+// Store GLOBALE della lingua: tutte le istanze del hook (navbar, hero della
+// home, esploratori…) condividono lo stesso stato e si aggiornano insieme —
+// prima ogni componente aveva il suo stato locale e i selettori "non si
+// parlavano". Persistenza: localStorage (client) + cookie (pagine server).
+
+let current: Lang = 'it'
+let initialized = false
+const listeners = new Set<() => void>()
+
+function readInitial(): Lang {
+  try {
+    const saved = localStorage.getItem('imk:lang') as Lang | null
+    if (saved && LANGS.includes(saved)) return saved
+  } catch { /* ignore */ }
+  return 'it'
+}
+
+function ensureInit() {
+  if (initialized || typeof window === 'undefined') return
+  initialized = true
+  current = readInitial()
+  try {
+    document.cookie = `imk_lang=${current}; path=/; max-age=31536000; samesite=lax`
+    document.documentElement.lang = current
+  } catch { /* ignore */ }
+  // sincronizza anche tra tab diverse
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'imk:lang' && e.newValue && LANGS.includes(e.newValue as Lang) && e.newValue !== current) {
+      current = e.newValue as Lang
+      listeners.forEach((fn) => fn())
+    }
+  })
+}
+
+function subscribe(fn: () => void): () => void {
+  ensureInit()
+  listeners.add(fn)
+  return () => listeners.delete(fn)
+}
+
+function setGlobalLang(l: Lang) {
+  if (!LANGS.includes(l) || l === current) return
+  current = l
+  try {
+    localStorage.setItem('imk:lang', l)
+    document.cookie = `imk_lang=${l}; path=/; max-age=31536000; samesite=lax`
+    document.documentElement.lang = l
+  } catch { /* ignore */ }
+  listeners.forEach((fn) => fn())
+}
+
 export function useLang(): [Lang, (l: Lang) => void] {
   const router = useRouter()
-  const [lang, setLangState] = useState<Lang>('it')
-
-  useEffect(() => {
-    const saved = (typeof localStorage !== 'undefined' && localStorage.getItem('imk:lang')) as Lang | null
-    if (saved && LANGS.includes(saved)) setLangState(saved)
-  }, [])
-
+  const lang = useSyncExternalStore(subscribe, () => (ensureInit(), current), () => 'it' as Lang)
   const setLang = useCallback(
     (l: Lang) => {
-      if (!LANGS.includes(l)) return
-      setLangState(l)
-      try {
-        localStorage.setItem('imk:lang', l)
-        document.cookie = `imk_lang=${l}; path=/; max-age=31536000; samesite=lax`
-        document.documentElement.lang = l
-      } catch {
-        /* storage non disponibile: pazienza */
-      }
+      setGlobalLang(l)
+      // le pagine server leggono il cookie: rigenerale subito
       router.refresh()
     },
     [router],
   )
-
-  // Allinea cookie e <html lang> anche al primo caricamento (per chi aveva
-  // già la preferenza nel solo localStorage).
-  useEffect(() => {
-    try {
-      document.cookie = `imk_lang=${lang}; path=/; max-age=31536000; samesite=lax`
-      document.documentElement.lang = lang
-    } catch {
-      /* ignore */
-    }
-  }, [lang])
-
   return [lang, setLang]
 }

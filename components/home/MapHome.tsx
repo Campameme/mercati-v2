@@ -168,34 +168,39 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
                 {copy.searchCta} <ArrowRight className="imk-march w-4 h-4" />
               </button>
             </form>
-            {/* Ticker vivo: dove c'è mercato OGGI — unica scorciatoia sotto la
-                ricerca. min-w-0 sul nastro: senza, il testo sborda sopra
-                l'etichetta; il fade a sinistra fa sparire i nomi con grazia. */}
-            {todayComuni.length > 0 && (
-              <Link
-                data-anim
-                href="/mappa?d=oggi"
-                className="group mt-6 flex items-center max-w-xl rounded-full border border-carta/25 bg-notte/60 backdrop-blur-[2px] hover:border-sole/70 transition-colors"
-                aria-label={copy.heroChips.today}
-              >
-                <span className="relative z-10 flex items-center gap-1.5 flex-shrink-0 font-alt text-[11px] font-bold uppercase tracking-[0.12em] text-ink bg-sole rounded-full m-1 px-3 py-1.5">
-                  <Sun className="w-3.5 h-3.5" aria-hidden="true" /> {copy.heroChips.today}
-                </span>
-                <span className="imk-marquee relative flex-1 min-w-0 overflow-hidden whitespace-nowrap py-2 rounded-r-full" aria-hidden="true">
-                  <span className="imk-marquee-track inline-block font-alt text-sm text-carta/90 pl-3">
-                    {[...todayComuni, ...todayComuni].map((c, i) => (
-                      <span key={i} className="mx-3">
-                        {c} <span className="text-sole mx-1">·</span>
-                      </span>
-                    ))}
-                  </span>
-                  <span className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-notte/70 to-transparent" />
-                  <span className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-notte/70 to-transparent" />
-                </span>
-              </Link>
-            )}
           </div>
         </div>
+
+        {/* Box "Oggi al mercato": informativo e cliccabile, in basso a destra.
+            Su mobile resta in flusso sopra il bordo-onda. */}
+        {todayComuni.length > 0 && (
+          <Link
+            data-anim
+            href="/mappa?d=oggi"
+            aria-label={copy.heroChips.today}
+            className="group relative z-10 mx-4 mb-4 block lg:absolute lg:bottom-16 lg:right-8 lg:m-0 lg:w-[22rem] imk-edge border border-carta/25 bg-notte/65 backdrop-blur-[3px] hover:border-sole/80 transition-colors"
+          >
+            <span className="flex items-center justify-between gap-2 px-3.5 pt-2.5">
+              <span className="inline-flex items-center gap-1.5 font-alt text-[11px] font-bold uppercase tracking-[0.12em] text-sole">
+                <Sun className="w-3.5 h-3.5" aria-hidden="true" /> {copy.heroChips.today}
+              </span>
+              <span className="font-alt text-[11px] font-bold text-ink bg-sole rounded-full px-2 py-0.5 group-hover:bg-sole-600 transition-colors">
+                {todayComuni.length} <ArrowRight className="inline w-3 h-3 -mt-px" aria-hidden="true" />
+              </span>
+            </span>
+            <span className="imk-marquee relative block min-w-0 overflow-hidden whitespace-nowrap pb-2.5 pt-1.5" aria-hidden="true">
+              <span className="imk-marquee-track inline-block font-alt text-sm text-carta/90 pl-3.5">
+                {[...todayComuni, ...todayComuni].map((c, i) => (
+                  <span key={i} className="mx-3">
+                    {c} <span className="text-sole mx-1">·</span>
+                  </span>
+                ))}
+              </span>
+              <span className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-notte/70 to-transparent" />
+              <span className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-notte/70 to-transparent" />
+            </span>
+          </Link>
+        )}
 
         <a href="#valori" aria-label={copy.heroScrollCue} className="relative z-10 mx-auto mb-8 mt-3 flex flex-col items-center text-carta/70 hover:text-carta">
           <span className="font-alt text-[11px] font-semibold uppercase tracking-[0.14em] mb-1">{copy.heroScrollCue}</span>
