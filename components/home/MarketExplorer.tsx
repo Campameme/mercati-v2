@@ -294,8 +294,9 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
 
   return (
     <div className="flex flex-col md:h-[calc(100svh-4rem)]">
-      {/* ===== Barra controlli (sopra la mappa, mai sovrapposta) ===== */}
-      <div className="sticky top-16 z-30 bg-carta/95 backdrop-blur-sm border-b-2 border-ink/10 flex-shrink-0">
+      {/* ===== Barra controlli: NON sticky (prima, scorrendo, copriva le prime
+           righe della lista); resta z-30 così i suoi menu passano sopra la mappa ===== */}
+      <div className="relative z-30 bg-carta border-b-2 border-ink/10 flex-shrink-0">
         <div className="container mx-auto px-4 md:px-6 pt-3 pb-2 space-y-2.5">
           {/* riga 1: ricerca + posizione + lingua */}
           <div className="flex items-center gap-2.5">

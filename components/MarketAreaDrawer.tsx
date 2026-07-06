@@ -72,7 +72,7 @@ function GeomanLayer({ initialPolygon, onPolygonChange }: Pick<Props, 'initialPo
     ;(map as any).pm.setGlobalOptions({ allowSelfIntersection: false })
 
     if (initialPolygon) {
-      const layer = L.geoJSON(initialPolygon, { style: { color: '#f97316', fillOpacity: 0.2 } }).getLayers()[0]
+      const layer = L.geoJSON(initialPolygon, { style: { color: '#15607C', fillOpacity: 0.2 } }).getLayers()[0]
       if (layer) {
         layer.addTo(map)
         layerRef.current = layer
@@ -117,7 +117,9 @@ export default function MarketAreaDrawer({ center, zoom, initialPolygon, onPolyg
     <MapContainer center={center} zoom={zoom} style={{ width: '100%', height: 560 }}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+        subdomains="abcd"
+        maxZoom={20}
       />
       <GeomanLayer initialPolygon={initialPolygon} onPolygonChange={onPolygonChange} />
     </MapContainer>

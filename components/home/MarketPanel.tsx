@@ -11,6 +11,7 @@ import type { MarketPin, MarketSession } from './types'
 import { type Lang, type HomeDict, categoryLabel } from '@/lib/i18n/home'
 import { type MarketStatus, fmtHour } from '@/lib/markets/hours'
 import { classifyMany, CATEGORY_COLOR, CATEGORY_GLYPH, categoryLabelI18n } from '@/lib/schedules/classify'
+import { comuneDescription } from '@/lib/markets/comuni'
 import { nearestParkings } from '@/lib/markets/parkings'
 
 interface Props {
@@ -150,8 +151,8 @@ export default function MarketPanel({ pin, session, status, lang, dict, onClose 
       <div className="flex-1 overflow-y-auto imk-scroll px-5 py-4" data-lenis-prevent>
         {/* Cartolina del comune: dà calore "carta del banco" coerente con la home */}
         <Cartolina
-          query={`${pin.comune} Liguria`}
-          fallbackQuery={`${pin.marketName} Liguria`}
+          query={pin.comune}
+          fallbackQuery={`${pin.comune} Liguria`}
           caption={pin.luogo ?? pin.comune}
           alt={pin.comune}
           aspect="aspect-[16/9]"
@@ -160,18 +161,26 @@ export default function MarketPanel({ pin, session, status, lang, dict, onClose 
           className="mb-4"
         />
 
-        {/* Promessa di brand */}
-        <p className="font-accent text-xl text-mare-600 leading-tight mb-4">{dict.tagline}</p>
+        {/* Il borgo, in due righe (descrizione curata, niente slogan) */}
+        {comuneDescription(pin.comune, lang) && (
+          <p className="text-sm text-ink-soft leading-relaxed mb-4 line-clamp-3">{comuneDescription(pin.comune, lang)}</p>
+        )}
 
         {/* Giorni e orari (tutte le sessioni del mercato) */}
         <h3 className="font-alt text-xs uppercase tracking-[0.12em] text-ink-muted mb-2">{dict.daysHours}</h3>
         <ul className="imk-water imk-edge mb-5 border-2 border-ink/10 bg-white divide-y divide-ink/5">
-          {pin.sessions.map((s) => (
-            <li key={s.scheduleId} className="flex items-center justify-between gap-3 px-3 py-2">
-              <span className="text-sm font-medium text-ink">{s.giorno ?? '—'}</span>
-              <span className="text-sm text-ink-soft tabular-nums">{s.orario ?? dict.hoursUnknown}</span>
-            </li>
-          ))}
+          {pin.sessions.map((s) => {
+            const isActive = s.scheduleId === session.scheduleId
+            return (
+              <li key={s.scheduleId} className={`flex items-center justify-between gap-3 px-3 py-2 ${isActive ? 'bg-marel/50' : ''}`}>
+                <span className={`text-sm font-medium text-ink flex items-center gap-2 ${isActive ? 'font-semibold' : ''}`}>
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-mare flex-shrink-0" aria-hidden="true" />}
+                  {s.giorno ?? '—'}
+                </span>
+                <span className="text-sm text-ink-soft tabular-nums">{s.orario ?? dict.hoursUnknown}</span>
+              </li>
+            )
+          })}
         </ul>
 
         {/* Cosa trovi (settori) */}
@@ -200,15 +209,17 @@ export default function MarketPanel({ pin, session, status, lang, dict, onClose 
         ) : (
           <ul className="space-y-2 mb-5">
             {operators.map((op) => (
-              <li key={op.id} className="imk-op imk-lift imk-edge flex items-center gap-3 border-2 border-ink/10 bg-white px-3 py-2.5">
-                <BancoAvatar name={op.name} size={36} />
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-[15px] leading-tight truncate">{op.name}</div>
-                  <div className="text-xs text-ink-muted truncate">
-                    {categoryLabel(op.category, lang)}
-                    {op.location?.stallNumber ? ` · ${dict.stall} ${op.location.stallNumber}` : ''}
+              <li key={op.id} className="imk-op imk-lift imk-edge flex items-center gap-3 border-2 border-ink/10 bg-white px-3 py-2.5 hover:border-mare transition-colors">
+                <Link href={`/${pin.marketSlug}/operators/${op.id}`} className="flex items-center gap-3 flex-1 min-w-0 group">
+                  <BancoAvatar name={op.name} size={36} />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-[15px] leading-tight truncate group-hover:text-mare-600 transition-colors">{op.name}</div>
+                    <div className="text-xs text-ink-muted truncate">
+                      {categoryLabel(op.category, lang)}
+                      {op.location?.stallNumber ? ` · ${dict.stall} ${op.location.stallNumber}` : ''}
+                    </div>
                   </div>
-                </div>
+                </Link>
                 {typeof op.rating === 'number' && op.rating > 0 && (
                   <span className="inline-flex items-center gap-0.5 text-xs font-semibold text-ink-soft flex-shrink-0">
                     <Star className="w-3.5 h-3.5 text-sole-600 fill-sole" aria-hidden="true" />

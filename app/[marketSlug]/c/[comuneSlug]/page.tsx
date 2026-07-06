@@ -37,7 +37,7 @@ export default async function ComunePage({
 
   const { data: schedules } = await supabase
     .from('market_schedules')
-    .select('id, comune, giorno, orario, luogo, settori, lat, lng')
+    .select('id, comune, giorno, orario, luogo, settori, lat, lng, polygon_geojson, market_places(polygon_geojson)')
     .eq('market_id', market.id)
     .eq('is_active', true)
     .order('comune', { ascending: true })
@@ -53,6 +53,8 @@ export default async function ComunePage({
     settori: s.settori,
     lat: s.lat,
     lng: s.lng,
+    // area del mercato: preferita quella del luogo (place), poi quella legacy
+    polygon: (s.market_places?.polygon_geojson ?? s.polygon_geojson ?? null),
   }))
 
   const comune = forComune[0].comune
@@ -93,26 +95,27 @@ export default async function ComunePage({
   const [{ data: links }, { data: legacy }] = await Promise.all([
     supabase
       .from('operator_schedules')
-      .select('schedule_id, stall_number, operators(id, name, category, description)')
+      .select('schedule_id, stall_number, location_lat, location_lng, operators(id, name, category, description)')
       .in('schedule_id', scheduleIds),
     supabase
       .from('operators')
-      .select('id, name, category, description, stall_number, schedule_id')
+      .select('id, name, category, description, stall_number, schedule_id, location_lat, location_lng')
       .eq('market_id', market.id)
       .in('schedule_id', scheduleIds),
   ])
-  const opMap = new Map<string, { id: string; name: string; category: string; description: string | null; stall_number: string | null; schedule_id: string | null }>()
+  const opMap = new Map<string, { id: string; name: string; category: string; description: string | null; stall_number: string | null; schedule_id: string | null; location_lat: number | null; location_lng: number | null }>()
   for (const l of (links ?? []) as any[]) {
     const op = l.operators
     if (!op) continue
     opMap.set(`${op.id}:${l.schedule_id}`, {
       id: op.id, name: op.name, category: op.category, description: op.description ?? null,
       stall_number: l.stall_number ?? null, schedule_id: l.schedule_id,
+      location_lat: l.location_lat ?? null, location_lng: l.location_lng ?? null,
     })
   }
   for (const o of (legacy ?? []) as any[]) {
     const k = `${o.id}:${o.schedule_id}`
-    if (!opMap.has(k)) opMap.set(k, { id: o.id, name: o.name, category: o.category, description: o.description ?? null, stall_number: o.stall_number ?? null, schedule_id: o.schedule_id })
+    if (!opMap.has(k)) opMap.set(k, { id: o.id, name: o.name, category: o.category, description: o.description ?? null, stall_number: o.stall_number ?? null, schedule_id: o.schedule_id, location_lat: o.location_lat ?? null, location_lng: o.location_lng ?? null })
   }
   const operators = Array.from(opMap.values())
 

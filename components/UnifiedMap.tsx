@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, GeoJSON, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { CATEGORY_COLOR, CATEGORY_COLOR_DARK, type ScheduleCategory } from '@/lib/schedules/classify'
@@ -15,7 +15,11 @@ export interface UnifiedMapPin {
   title: string
   subtitle?: string
   href?: string
-  /** Accettato per compatibilità ma NON disegnato: le aree/zone evidenziate sono state rimosse dal linguaggio del sito. */
+  /**
+   * Area del mercato (poligono disegnato in admin). Disegnata SOLO dove viene
+   * passata: le schede del singolo mercato (pagina comune) la mostrano, le
+   * mappe di panoramica (home, /mappa, zona) restano a soli pin.
+   */
   polygon?: GeoJSON.Feature<GeoJSON.Polygon> | null
   /** Solo per parking: distanza in metri dal mercato (mostrata nel popup) */
   distance?: number
@@ -240,7 +244,24 @@ export default function UnifiedMap({
           <PanTo pin={{ id: '__user', lat: userLocation.lat, lng: userLocation.lng, kind: 'market', title: '' }} />
         )}
 
-        {/* Markers — icona banco unica, niente aree/zone evidenziate */}
+        {/* Aree mercato (sotto i marker) — solo per i pin che le portano */}
+        {allPins.map((pin) =>
+          pin.polygon ? (
+            <GeoJSON
+              key={`area-${pin.id}`}
+              data={pin.polygon}
+              style={{
+                color: '#0E3040',
+                fillColor: '#15607C',
+                fillOpacity: 0.16,
+                weight: 2,
+                opacity: 0.85,
+              } as any}
+            />
+          ) : null,
+        )}
+
+        {/* Markers — icona banco unica */}
         {allPins.map((pin) => {
           const icon = pinIcon(pin, pin.id === selectedId)
           return (

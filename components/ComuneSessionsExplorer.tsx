@@ -18,6 +18,8 @@ interface SessionLite {
   settori: string | null
   lat: number | null
   lng: number | null
+  /** area del mercato disegnata in admin (mostrata su questa scheda) */
+  polygon?: GeoJSON.Feature<GeoJSON.Polygon> | null
 }
 
 interface OperatorLite {
@@ -27,6 +29,8 @@ interface OperatorLite {
   description: string | null
   stall_number: string | null
   schedule_id: string | null
+  location_lat?: number | null
+  location_lng?: number | null
 }
 
 interface Props {
@@ -102,9 +106,16 @@ export default function ComuneSessionsExplorer({
     })
   }, [operators, sessionById, active])
 
+  // Mappa della sessione attiva: pin del mercato + AREA evidenziata (se
+  // disegnata in admin) + gli operatori caricati con la loro posizione.
   const mapPins = useMemo(() => {
     if (!active || active.lat == null || active.lng == null) return []
-    return [{
+    const pins: Array<{
+      id: string; lat: number; lng: number; kind: 'market' | 'operator'
+      title: string; subtitle?: string; href?: string
+      category?: ReturnType<typeof classifySchedule>
+      polygon?: GeoJSON.Feature<GeoJSON.Polygon> | null
+    }> = [{
       id: active.id,
       lat: active.lat,
       lng: active.lng,
@@ -112,8 +123,23 @@ export default function ComuneSessionsExplorer({
       title: `${active.comune} · ${active.giorno}`,
       subtitle: active.luogo ?? active.settori ?? undefined,
       category: classifySchedule(active.settori),
+      polygon: active.polygon ?? null,
     }]
-  }, [active])
+    for (const op of operators) {
+      if (op.schedule_id !== active.id) continue
+      if (op.location_lat == null || op.location_lng == null) continue
+      pins.push({
+        id: `op-${op.id}`,
+        lat: op.location_lat,
+        lng: op.location_lng,
+        kind: 'operator' as const,
+        title: op.name,
+        subtitle: op.stall_number ? `${ui.comuneBanchi} ${op.stall_number}` : undefined,
+        href: `/${marketSlug}/operators/${op.id}`,
+      })
+    }
+    return pins
+  }, [active, operators, marketSlug, ui])
 
   if (!active) return null
 
