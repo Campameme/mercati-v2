@@ -43,6 +43,8 @@ export default async function TipiciPage() {
 
   return (
     <div className="relative overflow-hidden bg-carta bg-paper-grain min-h-screen">
+      {/* banda-tendone: filo di brand in cima */}
+      <div className="imk-awning h-2" aria-hidden="true" />
       <DriftBackdrop tone="light" variant="section" />
       <div className="relative z-10 container mx-auto px-4 md:px-6 py-12 md:py-16 max-w-5xl">
         <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{ui.tipiciEyebrow}</p>

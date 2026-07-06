@@ -9,7 +9,7 @@ import { ZONES } from '@/lib/markets/zones'
 import { ZONES_I18N } from '@/lib/markets/zones.i18n'
 import { useLang } from '@/lib/i18n/useLang'
 import { zoneHeroKey } from '@/lib/zonePhotos'
-import DriftBackdrop from '@/components/motion/DriftBackdrop'
+import { CanopyEdge, BigWaves } from '@/components/decorations'
 import ZoneImage from '@/components/ZoneImage'
 
 // Sezione zone: le 8 zone del Ponente come card fotografiche → pagina zona.
@@ -49,7 +49,9 @@ export default function BorghiSection({
 
   return (
     <section id="borghi" ref={rootRef} className={`relative overflow-hidden ${className}`}>
-      <DriftBackdrop tone="light" variant="section" />
+      {/* Il tendone copre la sezione dall'alto; il mare la riempie dal basso */}
+      <CanopyEdge color="#F4B62C" className="absolute top-0 inset-x-0" />
+      <BigWaves className="absolute bottom-0 inset-x-0 h-40 md:h-64 pointer-events-none" />
       <div className="relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-5xl">
         <p className="bsec-reveal font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{eyebrow}</p>
         <h2 className="bsec-reveal font-alt font-extrabold tracking-tight text-3xl md:text-5xl leading-[1.04] text-ink mb-3">{title}</h2>

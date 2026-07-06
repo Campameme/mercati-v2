@@ -10,6 +10,7 @@ import DriftBackdrop from '@/components/motion/DriftBackdrop'
 import WaterCard from '@/components/motion/WaterCard'
 import BancoAvatar from '@/components/BancoAvatar'
 import PhotoFx from './PhotoFx'
+import { StringLights } from '@/components/decorations'
 import { occursOn } from '@/lib/markets/hours'
 import { categoryLabel } from '@/lib/i18n/home'
 import { mountAqua } from '@/lib/home/aqua'
@@ -218,6 +219,13 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
            chi cerca con chi tiene banco. Prima sezione, la più ricca. ===== */}
       <section id="valori" className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
         <DriftBackdrop tone="light" variant="section" />
+        {/* Lettera fantasma: il Ponente in Italiana, come filigrana di carta */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none select-none absolute -top-8 right-[-4%] font-display italic text-[24vw] md:text-[17rem] leading-none text-mare/[0.06]"
+        >
+          Ponente
+        </span>
         <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-6xl">
           <div className="grid lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-16 items-center">
             <div>
@@ -314,10 +322,10 @@ export default function MapHome({ pins, events = [] }: { pins: MarketPin[]; even
         cta={{ label: copy.exploreMapCta, href: '/mappa' }}
       />
 
-      {/* ===== LA SETTIMANA — notizie ed eventi, di sera: sezione notturna ===== */}
+      {/* ===== LA SETTIMANA — notizie ed eventi, di sera: le luci da sagra ===== */}
       <section id="settimana" className="relative overflow-hidden bg-notte text-carta border-b-2 border-notte">
-        <DriftBackdrop tone="dark" variant="section" />
-        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-5xl">
+        <StringLights className="absolute top-0 inset-x-0" />
+        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 pt-24 pb-16 md:pt-28 md:pb-24 max-w-5xl">
           <div className="max-w-2xl mb-9">
             <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-sole mb-2">{copy.weekEyebrow}</p>
             <h2 className="font-alt font-extrabold tracking-tight text-3xl md:text-4xl leading-[1.04] text-carta">{copy.weekTitle}</h2>

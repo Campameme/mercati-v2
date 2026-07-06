@@ -481,3 +481,12 @@ body {
   .imk-marquee-track { animation: none; }
   .imk-word, .imk-word:hover { transition: none; transform: none; }
 }
+
+/* ===== Sfondi v2: la materia del mercato ===== */
+/* Strisce da tendone (banda-brand in cima alle pagine interne) */
+.imk-awning {
+  background-image: repeating-linear-gradient(90deg, #15607C 0 28px, #F7EFDD 28px 56px);
+}
+.imk-awning--sole {
+  background-image: repeating-linear-gradient(90deg, #F4B62C 0 28px, #F7EFDD 28px 56px);
+}

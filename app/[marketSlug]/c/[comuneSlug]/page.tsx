@@ -125,6 +125,8 @@ export default async function ComunePage({
       {/* HERO compatto: foto sx, titolo + descrizione del paese a dx */}
       <section className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
         <DriftBackdrop tone="light" variant="section" />
+        {/* banda-tendone: filo di brand in cima */}
+        <div className="imk-awning h-2" aria-hidden="true" />
         <div className="container mx-auto px-4 md:px-6 py-8 md:py-10 max-w-6xl relative z-10">
           <div className="grid md:grid-cols-[220px_1fr] gap-6 md:gap-10 items-start">
             <Reveal>

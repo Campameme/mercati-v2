@@ -115,6 +115,8 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
       {/* HERO: foto a sinistra (piccola) + testo + mappa above-the-fold a destra */}
       <section className="relative overflow-hidden bg-carta bg-paper-grain border-b-2 border-ink/10">
         <DriftBackdrop tone="light" variant="section" />
+        {/* banda-tendone: filo di brand in cima */}
+        <div className="imk-awning h-2" aria-hidden="true" />
         <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl relative z-10">
           <div className="grid md:grid-cols-[280px_1fr] gap-8 md:gap-10 items-start">
             {/* Foto a sinistra, leggermente più piccola — cartolina */}

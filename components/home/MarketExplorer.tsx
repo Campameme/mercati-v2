@@ -294,6 +294,8 @@ export default function MarketExplorer({ pins, initialQuery = '', initialZone = 
 
   return (
     <div className="flex flex-col md:h-[calc(100svh-4rem)]">
+      {/* banda-tendone: filo di brand in cima */}
+      <div className="imk-awning h-2" aria-hidden="true" />
       {/* ===== Barra controlli: NON sticky (prima, scorrendo, copriva le prime
            righe della lista); resta z-30 così i suoi menu passano sopra la mappa ===== */}
       <div className="relative z-30 bg-carta border-b-2 border-ink/10 flex-shrink-0">
