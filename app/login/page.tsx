@@ -32,12 +32,21 @@ function LoginPageInner() {
   // il client emette PASSWORD_RECOVERY. In quel caso mostriamo il form
   // "imposta nuova password" (sessione già attiva).
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.location.hash.includes('type=recovery')) setMode('update')
+    const hashRecovery = typeof window !== 'undefined' && window.location.hash.includes('type=recovery')
+    if (hashRecovery) setMode('update')
     const supabase = createClient()
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') setMode('update')
     })
+    // Già autenticato e NON in modalità recovery → niente doppio login:
+    // portiamo subito l'utente dove gli compete (admin, operatore, home).
+    if (!hashRecovery && !search.get('recovery')) {
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (user) routeByRole(supabase)
+      })
+    }
     return () => sub.subscription.unsubscribe()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   /** Dopo il login (o il cambio password) porta l'utente dove gli compete. */
