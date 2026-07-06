@@ -33,7 +33,7 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
     .maybeSingle()
   if (!operator || operator.markets?.slug !== params.marketSlug) notFound()
 
-  const [{ data: products }, { data: presences }] = await Promise.all([
+  const [{ data: products }, { data: presences }, { data: marketLinks }] = await Promise.all([
     supabase
       .from('products')
       .select('*')
@@ -45,7 +45,21 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
       .from('operator_schedules')
       .select('schedule_id, location_lat, location_lng, stall_number, market_schedules(id, comune, giorno, orario, luogo, lat, lng, markets(slug, name))')
       .eq('operator_id', operator.id),
+    // Mercati assegnati (nuovo modello multi-mercato). Difensivo: se la tabella
+    // non esiste ancora (pre-migration) `data` è null e si ignora.
+    supabase
+      .from('operator_markets')
+      .select('market_id, location_lat, location_lng, stall_number, markets(slug, name)')
+      .eq('operator_id', operator.id),
   ])
+
+  const assignedMarkets = (marketLinks ?? []).map((m: any) => ({
+    slug: m.markets?.slug ?? null,
+    name: m.markets?.name ?? '',
+    lat: m.location_lat ?? null,
+    lng: m.location_lng ?? null,
+    stall: m.stall_number ?? null,
+  })).sort((a, b) => a.name.localeCompare(b.name))
 
   const social = (operator.social_links ?? {}) as Record<string, string>
   const sessions = (presences ?? [])
@@ -153,10 +167,36 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
       <section className="mb-10">
         <div className="flex items-baseline gap-3 mb-4">
           <p className="text-xs font-alt font-semibold uppercase tracking-[0.14em] text-ink-muted">Dove lo trovi</p>
-          <h2 className="font-alt font-bold text-2xl text-ink">{sessions.length} presenz{sessions.length === 1 ? 'a' : 'e'}</h2>
+          {(() => { const n = sessions.length || assignedMarkets.length; return (
+            <h2 className="font-alt font-bold text-2xl text-ink">{n} {sessions.length ? `presenz${n === 1 ? 'a' : 'e'}` : `mercat${n === 1 ? 'o' : 'i'}`}</h2>
+          ) })()}
         </div>
         {sessions.length === 0 ? (
-          <p className="text-sm text-ink-muted italic">Nessuna sessione configurata.</p>
+          assignedMarkets.length === 0 ? (
+            <p className="text-sm text-ink-muted italic">Nessun mercato configurato.</p>
+          ) : (
+            /* Nuovo modello: i mercati assegnati con la posizione sulla mappa. */
+            <ul className="imk-edge border-2 border-ink/10 bg-white px-5 md:px-6 divide-y divide-ink/10">
+              {assignedMarkets.map((m) => (
+                <li key={m.slug ?? m.name} className="py-4 flex items-baseline gap-3">
+                  <span className="font-alt font-bold text-lg text-ink whitespace-nowrap">{m.name}</span>
+                  <span className="imk-leader text-ink" aria-hidden="true" />
+                  <span className="min-w-0 text-right">
+                    {m.stall && <span className="block text-xs text-ink-muted">banco {m.stall}</span>}
+                    {m.lat != null && m.lng != null && (
+                      <a
+                        href={`https://www.google.com/maps/dir/?api=1&destination=${m.lat},${m.lng}`}
+                        target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-mare hover:text-mare-600 underline underline-offset-2 mt-1"
+                      >
+                        <Navigation2 className="w-3 h-3" /> Indicazioni
+                      </a>
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )
         ) : (
           /* Tabellone "da stazione": comune … giorno, col leader puntinato
              (lo stesso formato-settimana del kit social). */

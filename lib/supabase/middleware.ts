@@ -37,6 +37,7 @@ export async function updateSession(request: NextRequest) {
       pathname.startsWith('/admin') ||
       pathname === '/operator' ||
       pathname.startsWith('/operator/') || // dashboard operatore (NON la pubblica /operatori)
+      pathname === '/tessera' || // la tessera personale del cittadino
       !!pathname.match(/^\/[^\/]+\/admin/)
     )
   if (needsAuth && !user) {

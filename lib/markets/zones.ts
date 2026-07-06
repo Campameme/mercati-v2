@@ -178,3 +178,11 @@ export const ZONES: ZoneMeta[] = [
 ]
 
 export const ZONE_BY_SLUG: Record<string, ZoneMeta> = Object.fromEntries(ZONES.map((z) => [z.slug, z]))
+
+// Le zone della provincia di IMPERIA (le prime, seed 0007). La gestione
+// operatori lavora per ora solo su queste; le zone di Savona (0019) restano
+// fuori dall'assegnazione finché non le riattiviamo.
+export const IMPERIA_ZONE_SLUGS = [
+  'ventimiglia', 'val-nervia', 'bordighera-ospedaletti', 'sanremo',
+  'taggia-e-costa', 'imperia', 'golfo-dianese', 'entroterra',
+] as const

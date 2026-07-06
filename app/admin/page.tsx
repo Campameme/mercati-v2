@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Power, Settings, MapPin, ArrowRight, BarChart3, Mail, TrendingUp, Eye, Users } from 'lucide-react'
+import { Power, Settings, MapPin, ArrowRight, BarChart3, Mail, TrendingUp, Eye, Users, Store, Ticket } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import Logo from '@/components/Logo'
 
@@ -102,12 +102,24 @@ export default async function AdminRoot() {
         </div>
 
         {/* Quick actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+          <ActionCard
+            href="/admin/operatori"
+            icon={Store}
+            title="Gestione operatori"
+            desc="Crea i Maestri del Banco, assegnali ai mercati con la posizione, invia i link di accesso."
+          />
           <ActionCard
             href="/admin/sessions"
             icon={Power}
             title="Accendi / Spegni"
             desc="Toggle zone e singole sessioni. Cascade automatica zona → sessioni."
+          />
+          <ActionCard
+            href="/admin/tessera"
+            icon={Ticket}
+            title="Punti e coupon"
+            desc="La tessera del mercato: saldo di ogni iscritto, assegna punti, emetti coupon."
           />
           <ActionCard
             href="/admin/markets"

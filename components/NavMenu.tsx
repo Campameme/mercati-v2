@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   X, Map as MapIcon, Store, Calendar, Newspaper, Cloud, MapPin, ChevronDown,
-  Search, Shield, LogIn, ShoppingBasket,
+  Search, Shield, LogIn, ShoppingBasket, Ticket,
 } from 'lucide-react'
 import Logo from '@/components/Logo'
 import { slugifyName } from '@/lib/markets/slug'
@@ -278,6 +278,9 @@ export default function NavMenu({ open, onClose }: Props) {
             {role ? (
               <div className="space-y-1.5">
                 {userEmail && <p className="px-3 text-xs text-ink-muted mb-1">{userEmail}</p>}
+                <Link href="/tessera" onClick={onClose} className="flex items-center gap-3 px-3 py-3 rounded-xl border-2 border-transparent hover:border-ink/10 hover:bg-white text-ink font-alt text-sm font-semibold">
+                  <Ticket className="w-4 h-4 text-mare" aria-hidden="true" /> La mia tessera
+                </Link>
                 {role === 'super_admin' && (
                   <>
                     <Link href="/admin" onClick={onClose} className="flex items-center gap-3 px-3 py-3 rounded-xl border-2 border-transparent hover:border-ink/10 hover:bg-white text-ink font-alt text-sm font-semibold">
