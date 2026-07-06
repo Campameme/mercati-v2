@@ -48,9 +48,10 @@ npm install
 - **Comuni** (descrizione con le peculiarità): `lib/markets/comuni.ts`
 - **Copy della home** (claim, sezioni, 4 lingue): `lib/i18n/homeCopy.ts`
 - **Fotografie dei borghi** (selezione curata + crediti): `lib/zonePhotos.ts` + `public/zone/`
-- **Tono di voce e stato del brand**: `docs/brand-voice.md`
+- **Regole operative**: `CLAUDE.md` · **voce**: `docs/brand-voice.md` · **grafica**: `docs/brand-system.md`
 
 ## 6. Sezioni del sito
-- `/` home · `/mappa` esplora · `/tipici` mercati tipici (≠ merci varie, con ricorrenze)
+- `/` home · `/mappa` esplora (solo merci varie) · `/tipici` mercati tipici con
+  mappa e calendario propri (`/eventi` e `/calendar` reindirizzano qui)
 - `/{zona}` pagina zona · `/{zona}/c/{comune}` pagina comune ("Scegli un giorno" + vicini)
-- `/calendar` calendario · `/eventi` · `/notizie` · `/operatori` · `/crediti` crediti foto
+- `/notizie` bacheca (DB + stampa live) · `/operatori` i Maestri · `/crediti` crediti foto
