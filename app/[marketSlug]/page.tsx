@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Store, Newspaper, Calendar, Cloud, ArrowRight, ChevronLeft } from 'lucide-react'
+import { Store, Newspaper, Calendar, Cloud, ArrowRight, ChevronLeft, SquareParking } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { formatMarketDays } from '@/lib/markets/days'
 import { SunRay, WaveDivider } from '@/components/decorations'
@@ -16,7 +16,6 @@ import Reveal from '@/components/Reveal'
 import MarketViewer from '@/components/MarketViewer'
 import FavoriteButton from '@/components/FavoriteButton'
 import PageviewTracker from '@/components/analytics/PageviewTracker'
-import DriftBackdrop from '@/components/motion/DriftBackdrop'
 import Cartolina from '@/components/Cartolina'
 
 export const dynamic = 'force-dynamic'
@@ -50,6 +49,9 @@ const ZONE_HERO_COMUNE: Record<string, string> = {
   'golfo-dianese':          'Cervo',
   'entroterra':             'Pieve di Teco',
 }
+
+// Label "Parcheggi" nelle 4 lingue (UI_I18N non toccato: mappa inline locale).
+const PARKING_LABEL: Record<string, string> = { it: 'Parcheggi', fr: 'Parkings', de: 'Parkplätze', en: 'Parking' }
 
 export default async function MarketHomePage({ params }: { params: { marketSlug: string } }) {
   const lang = getLang()
@@ -108,6 +110,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
     { href: `/${marketFull.slug}/calendar`,  label: ui.featCalendar, icon: Calendar },
     { href: `/${marketFull.slug}/news`,      label: ui.featNews,     icon: Newspaper },
     { href: `/${marketFull.slug}/weather`,   label: ui.featWeather,  icon: Cloud },
+    { href: `/mappa?zone=${marketFull.slug}&parcheggi=1`, label: PARKING_LABEL[lang], icon: SquareParking },
   ]
 
   return (
@@ -115,7 +118,6 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
       <PageviewTracker type="view_market" marketId={marketFull.id} />
       {/* HERO: foto a sinistra (piccola) + testo + mappa above-the-fold a destra */}
       <section className="relative overflow-hidden bg-carta border-b-2 border-ink/10">
-        <DriftBackdrop tone="light" variant="section" />
         {/* banda-tendone: filo di brand in cima */}
         <div className="imk-awning h-2" aria-hidden="true" />
         <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl relative z-10">
@@ -183,7 +185,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
 
       <div className="container mx-auto px-4 md:px-6 max-w-5xl">
         {/* Shortcut */}
-        <Reveal as="nav" className="grid grid-cols-2 md:grid-cols-4 gap-2 py-8 border-b-2 border-ink/10">
+        <Reveal as="nav" className="grid grid-cols-2 md:grid-cols-5 gap-2 py-8 border-b-2 border-ink/10">
           {features.map((f, i) => {
             const Icon = f.icon
             return (

@@ -3,7 +3,6 @@ import { ChevronLeft } from 'lucide-react'
 import AdesioneForm from '@/components/AdesioneForm'
 import { SunRay } from '@/components/decorations'
 import Reveal from '@/components/Reveal'
-import DriftBackdrop from '@/components/motion/DriftBackdrop'
 import WaterCard from '@/components/motion/WaterCard'
 import Cartolina from '@/components/Cartolina'
 
@@ -30,9 +29,8 @@ const SCHEDA = [
 export default function AderisciPage() {
   return (
     <div>
-      {/* HERO: sfondo carta con silhouette liguri che derivano */}
+      {/* HERO: color-block carta pieno */}
       <section className="relative overflow-hidden bg-carta border-b-2 border-ink/10">
-        <DriftBackdrop tone="light" variant="hero" />
         <div className="container mx-auto px-4 md:px-6 max-w-5xl py-10 md:py-16 relative z-10">
           <Link
             href="/"

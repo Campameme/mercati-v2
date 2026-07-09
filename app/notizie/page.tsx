@@ -4,7 +4,6 @@ import { ArrowRight, Newspaper } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { fetchLiveNews, generalNewsQuery } from '@/lib/news/live'
 import WaterCard from '@/components/motion/WaterCard'
-import DriftBackdrop from '@/components/motion/DriftBackdrop'
 
 export const dynamic = 'force-dynamic'
 
@@ -45,7 +44,6 @@ export default async function NotiziePage() {
 
   return (
     <div className="relative overflow-hidden bg-carta min-h-[70vh]">
-      <DriftBackdrop tone="light" variant="hero" />
       <div className="relative z-10 container mx-auto px-4 md:px-6 py-12 md:py-16 max-w-5xl">
         <div className="max-w-2xl mb-10">
           <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">Dai comuni</p>

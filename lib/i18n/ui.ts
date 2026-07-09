@@ -6,6 +6,7 @@ import type { Lang } from './home'
 export interface UiDict {
   // navigazione / footer
   navMap: string
+  navZone: string
   navTipici: string
   navOperators: string
   navCalendar: string
@@ -61,6 +62,7 @@ export interface UiDict {
 export const UI_I18N: Record<Lang, UiDict> = {
   it: {
     navMap: 'Mappa dei mercati',
+    navZone: 'Le zone',
     navTipici: 'Mercati tipici',
     navOperators: 'I Maestri del Banco',
     navCalendar: 'Calendario eventi',
@@ -111,6 +113,7 @@ export const UI_I18N: Record<Lang, UiDict> = {
   },
   fr: {
     navMap: 'Carte des marchés',
+    navZone: 'Les zones',
     navTipici: 'Marchés typiques',
     navOperators: 'Les Maîtres de l’étal',
     navCalendar: 'Calendrier des événements',
@@ -161,6 +164,7 @@ export const UI_I18N: Record<Lang, UiDict> = {
   },
   de: {
     navMap: 'Karte der Märkte',
+    navZone: 'Die Zonen',
     navTipici: 'Typische Märkte',
     navOperators: 'Die Meister des Standes',
     navCalendar: 'Veranstaltungskalender',
@@ -211,6 +215,7 @@ export const UI_I18N: Record<Lang, UiDict> = {
   },
   en: {
     navMap: 'Market map',
+    navZone: 'The areas',
     navTipici: 'Typical markets',
     navOperators: 'The Stall Masters',
     navCalendar: 'Events calendar',

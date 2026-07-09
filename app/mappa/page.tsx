@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import MarketExplorer from '@/components/home/MarketExplorer'
 import { loadPins } from '@/lib/markets/loadPins'
 import PageviewTracker from '@/components/analytics/PageviewTracker'
-import DriftBackdrop from '@/components/motion/DriftBackdrop'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,7 +17,7 @@ const DAY_TOKEN: Record<string, number> = { dom: 0, lun: 1, mar: 2, mer: 3, gio:
 export default async function MappaPage({
   searchParams,
 }: {
-  searchParams: { q?: string; zone?: string; d?: string; vicino?: string }
+  searchParams: { q?: string; zone?: string; d?: string; vicino?: string; parcheggi?: string }
 }) {
   const pins = await loadPins()
   const dTokens = (searchParams.d ?? '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean)
@@ -27,20 +26,17 @@ export default async function MappaPage({
   return (
     <>
       <PageviewTracker type="view_homepage" />
-      {/* Cornice carta: silhouette liguri in ombra dietro a barra/lista, senza
-          disturbare la mappa Leaflet (che vive in un layer opaco). */}
-      <div className="relative overflow-hidden bg-carta">
-        <DriftBackdrop tone="light" variant="section" />
-        <div className="relative z-10">
-          <MarketExplorer
-            pins={pins}
-            initialQuery={searchParams.q ?? ''}
-            initialZone={searchParams.zone ?? 'all'}
-            initialToday={initialToday}
-            initialDays={initialDays}
-            initialNear={searchParams.vicino === '1'}
-          />
-        </div>
+      {/* Fondo carta pieno (color-block di brand) dietro a barra/lista/mappa. */}
+      <div className="bg-carta">
+        <MarketExplorer
+          pins={pins}
+          initialQuery={searchParams.q ?? ''}
+          initialZone={searchParams.zone ?? 'all'}
+          initialToday={initialToday}
+          initialDays={initialDays}
+          initialNear={searchParams.vicino === '1'}
+          initialParking={searchParams.parcheggi === '1'}
+        />
       </div>
     </>
   )

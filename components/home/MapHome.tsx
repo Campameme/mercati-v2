@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation'
 import { gsap } from '@/lib/motion/gsap'
 import { Search, Store, ArrowRight, CalendarDays, ChevronDown, Sun, Newspaper } from 'lucide-react'
 import Logo from '@/components/Logo'
-import DriftBackdrop from '@/components/motion/DriftBackdrop'
 import WaterCard from '@/components/motion/WaterCard'
 import BancoAvatar from '@/components/BancoAvatar'
 import PhotoFx from './PhotoFx'
@@ -16,7 +15,8 @@ import { categoryLabel } from '@/lib/i18n/home'
 import { UI_I18N } from '@/lib/i18n/ui'
 import { classifySchedule, categoryLabelI18n } from '@/lib/schedules/classify'
 import { mountAqua } from '@/lib/home/aqua'
-import BorghiSection from './BorghiSection'
+import ZoneGrid from './ZoneGrid'
+import { ZONE_BY_SLUG } from '@/lib/markets/zones'
 import type { MarketPin } from './types'
 import type { NewsItem } from '@/types/news'
 import type { LiveNewsItem } from '@/lib/news/live'
@@ -40,6 +40,11 @@ const BEAT_IMG = [
 ]
 // Accenti dei beat SUL MARE (sezione bg-mare): sole, fiore chiaro, marel
 const BEAT_ACCENT = ['#F4B62C', '#FBE0D9', '#DCEBEC']
+
+// Le 5 zone "di testa" mostrate in home; tutte le altre stanno su /zone.
+const BEST_OF = ['ventimiglia', 'sanremo', 'bordighera-ospedaletti', 'imperia', 'golfo-dianese']
+  .map((s) => ZONE_BY_SLUG[s])
+  .filter(Boolean)
 
 export default function MapHome({ pins }: { pins: MarketPin[] }) {
   const router = useRouter()
@@ -306,7 +311,6 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
       <section id="valori" className="relative overflow-hidden bg-carta">
         {/* Il tendone del mare qui sopra si chiude sulla carta */}
         <CanopyEdge color="#15607C" className="absolute top-0 inset-x-0" />
-        <DriftBackdrop tone="light" variant="section" />
         {/* Lettera fantasma: il Ponente in Italiana, come filigrana di carta */}
         <span
           aria-hidden="true"
@@ -393,14 +397,22 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
         </div>
       </section>
 
-      {/* ===== LE ZONE — quindici zone, quindici racconti (aria di marel) ===== */}
-      <BorghiSection
-        className="bg-sole"
-        eyebrow={dict.zones.eyebrow}
-        title={copy.valueProject.title}
-        lead={copy.valueProject.lead}
-        cta={{ label: copy.exploreMapCta, href: '/mappa' }}
-      />
+      {/* ===== LE ZONE — best of (5); tutte su /zone. Fondo color-block sole ===== */}
+      <section id="zone" className="relative overflow-hidden bg-sole">
+        <div className="home-reveal container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-6xl">
+          <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
+            <div className="max-w-2xl">
+              <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink/70 mb-2">{dict.zones.eyebrow}</p>
+              <h2 className="font-display text-4xl md:text-5xl leading-[1.02] text-ink">Da Ventimiglia a Varazze</h2>
+              <p className="mt-3 text-base text-ink/80 max-w-xl">Quindici zone, dalla costa ai borghi dell’entroterra. Ecco cinque per cominciare.</p>
+            </div>
+            <Link href="/zone" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-ink text-carta px-6 py-3.5 rounded-full hover:bg-mare transition-colors flex-shrink-0">
+              {ui.navZone} <ArrowRight className="imk-march w-4 h-4" />
+            </Link>
+          </div>
+          <ZoneGrid zones={BEST_OF} className="lg:grid-cols-5" />
+        </div>
+      </section>
 
       {/* ===== LA SETTIMANA — notizie ed eventi, di sera: le luci da sagra ===== */}
       <section id="settimana" className="relative overflow-hidden bg-notte text-carta border-b-2 border-notte">

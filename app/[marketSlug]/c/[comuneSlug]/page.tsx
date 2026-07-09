@@ -7,7 +7,6 @@ import { SunRay } from '@/components/decorations'
 import Reveal from '@/components/Reveal'
 import ComuneSessionsExplorer from '@/components/ComuneSessionsExplorer'
 import PageviewTracker from '@/components/analytics/PageviewTracker'
-import DriftBackdrop from '@/components/motion/DriftBackdrop'
 import Cartolina from '@/components/Cartolina'
 import ZoneImage from '@/components/ZoneImage'
 import { comuneDescription } from '@/lib/markets/comuni'
@@ -124,7 +123,6 @@ export default async function ComunePage({
       <PageviewTracker type="view_comune" marketId={market.id} comune={comune} />
       {/* HERO compatto: foto sx, titolo + descrizione del paese a dx */}
       <section className="relative overflow-hidden bg-carta border-b-2 border-ink/10">
-        <DriftBackdrop tone="light" variant="section" />
         {/* banda-tendone: filo di brand in cima */}
         <div className="imk-awning h-2" aria-hidden="true" />
         <div className="container mx-auto px-4 md:px-6 py-8 md:py-10 max-w-6xl relative z-10">

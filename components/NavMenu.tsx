@@ -1,30 +1,16 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import {
-  X, Map as MapIcon, Store, Calendar, Newspaper, Cloud, MapPin, ChevronDown,
-  Search, Shield, LogIn, ShoppingBasket, Ticket,
+  X, Map as MapIcon, MapPin, Store, Search, Shield, LogIn, ShoppingBasket, Ticket,
 } from 'lucide-react'
 import Logo from '@/components/Logo'
-import { slugifyName } from '@/lib/markets/slug'
 import { createClient } from '@/lib/supabase/client'
 import { useLang } from '@/lib/i18n/useLang'
 import { UI_I18N } from '@/lib/i18n/ui'
 import type { UserRole } from '@/types/market'
-
-interface MarketLite {
-  id: string
-  slug: string
-  name: string
-  city: string
-}
-
-interface ScheduleLite {
-  market_id: string
-  comune: string
-}
 
 interface Props {
   open: boolean
@@ -33,37 +19,24 @@ interface Props {
 
 export default function NavMenu({ open, onClose }: Props) {
   const pathname = usePathname()
-  const [markets, setMarkets] = useState<MarketLite[]>([])
-  const [comuniByMarket, setComuniByMarket] = useState<Record<string, string[]>>({})
+  const router = useRouter()
   const [role, setRole] = useState<UserRole | null>(null)
   const [userEmail, setUserEmail] = useState<string | null>(null)
-  const [expanded, setExpanded] = useState<string | null>(null)
   const [q, setQ] = useState('')
 
-  // Load data once on first open (cached thereafter)
-  useEffect(() => {
-    if (!open || markets.length > 0) return
-    ;(async () => {
-      const [mRes, sRes] = await Promise.all([
-        fetch('/api/markets').then((r) => r.json()),
-        fetch('/api/schedules/occurrences').then((r) => r.json()),
-      ])
-      const m: MarketLite[] = (mRes.data ?? [])
-        .filter((x: any) => x.is_active)
-        .map((x: any) => ({ id: x.id, slug: x.slug, name: x.name, city: x.city }))
-        .sort((a: MarketLite, b: MarketLite) => a.name.localeCompare(b.name, 'it'))
-      setMarkets(m)
-      const byMarket: Record<string, string[]> = {}
-      for (const s of (sRes.data ?? []) as ScheduleLite[]) {
-        const arr = byMarket[s.market_id] ?? (byMarket[s.market_id] = [])
-        if (!arr.includes(s.comune)) arr.push(s.comune)
-      }
-      for (const id of Object.keys(byMarket)) byMarket[id].sort((a, b) => a.localeCompare(b, 'it'))
-      setComuniByMarket(byMarket)
-    })()
-  }, [open, markets.length])
+  const [lang] = useLang()
+  const ui = UI_I18N[lang]
 
-  // Auth role
+  // Voci di navigazione: la mappa, le zone (pagina indice), i tipici, i Maestri.
+  // Niente più elenco di tutte le zone qui dentro: si apre /zone.
+  const globalLinks = [
+    { href: '/mappa', label: ui.navMap, icon: MapIcon },
+    { href: '/zone', label: ui.navZone, icon: MapPin },
+    { href: '/tipici', label: ui.navTipici, icon: ShoppingBasket },
+    { href: '/operatori', label: ui.navOperators, icon: Store },
+  ]
+
+  // Auth role (solo quando aperto)
   useEffect(() => {
     if (!open) return
     const supabase = createClient()
@@ -99,25 +72,13 @@ export default function NavMenu({ open, onClose }: Props) {
     }
   }, [open, onClose])
 
-  const [lang] = useLang()
-  const ui = UI_I18N[lang]
-  const globalLinks = [
-    { href: '/mappa',      label: ui.navMap,       icon: MapIcon },
-    { href: '/tipici',     label: ui.navTipici,    icon: ShoppingBasket },
-    { href: '/operatori',  label: ui.navOperators, icon: Store },
-  ]
-
-  // Filtro testuale su zone + comuni
-  const filteredMarkets = useMemo(() => {
-    const needle = q.trim().toLowerCase()
-    if (!needle) return markets
-    return markets.filter((m) => {
-      if (m.name.toLowerCase().includes(needle)) return true
-      if (m.city.toLowerCase().includes(needle)) return true
-      const c = comuniByMarket[m.id] ?? []
-      return c.some((x) => x.toLowerCase().includes(needle))
-    })
-  }, [markets, comuniByMarket, q])
+  // La ricerca del menu porta alla mappa (dove vive davvero la ricerca).
+  function submitSearch(e: FormEvent) {
+    e.preventDefault()
+    const term = q.trim()
+    onClose()
+    router.push(term ? `/mappa?q=${encodeURIComponent(term)}` : '/mappa')
+  }
 
   return (
     <div
@@ -125,10 +86,7 @@ export default function NavMenu({ open, onClose }: Props) {
       aria-hidden={!open}
     >
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-notte/45 backdrop-blur-[2px]"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-notte/45 backdrop-blur-[2px]" onClick={onClose} />
 
       {/* Drawer */}
       <aside
@@ -150,9 +108,9 @@ export default function NavMenu({ open, onClose }: Props) {
           </button>
         </div>
 
-        {/* Search */}
+        {/* Search → mappa */}
         <div className="px-5 md:px-7 pt-5 flex-shrink-0">
-          <div className="relative">
+          <form onSubmit={submitSearch} className="relative">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted" aria-hidden="true" />
             <input
               autoFocus
@@ -162,15 +120,13 @@ export default function NavMenu({ open, onClose }: Props) {
               aria-label="Cerca zona, comune o banco"
               className="w-full pl-10 pr-3 py-3 bg-white border-2 border-ink/15 rounded-xl text-[15px] focus:outline-none focus:border-mare"
             />
-          </div>
+          </form>
         </div>
 
-        {/* Body scrollable (min-h-0: indispensabile per scrollare dentro un flex-col;
-            data-lenis-prevent: altrimenti Lenis dirotta la rotella sulla finestra) */}
+        {/* Body scrollable */}
         <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain imk-scroll px-5 md:px-7 py-6 space-y-8" data-lenis-prevent>
-          {/* Provincia */}
-          <section>
-            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-3">Provincia</p>
+          {/* Navigazione principale */}
+          <nav>
             <ul className="space-y-1.5">
               {globalLinks.map((l) => {
                 const Icon = l.icon
@@ -180,97 +136,18 @@ export default function NavMenu({ open, onClose }: Props) {
                     <Link
                       href={l.href}
                       onClick={onClose}
-                      className={`group flex items-center gap-3 px-3 py-3 rounded-xl border-2 transition-colors ${
+                      className={`group flex items-center gap-3 px-3 py-3.5 rounded-xl border-2 transition-colors ${
                         active ? 'bg-ink text-carta border-ink' : 'border-transparent hover:border-ink/10 hover:bg-white text-ink'
                       }`}
                     >
-                      <Icon className={`w-4 h-4 ${active ? 'text-carta' : 'text-mare'}`} aria-hidden="true" />
-                      <span className="font-alt text-sm font-semibold">{l.label}</span>
+                      <Icon className={`w-5 h-5 ${active ? 'text-carta' : 'text-mare'}`} aria-hidden="true" />
+                      <span className="font-alt text-base font-semibold">{l.label}</span>
                     </Link>
                   </li>
                 )
               })}
             </ul>
-          </section>
-
-          {/* Zone */}
-          <section>
-            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-3">
-              Zone · {filteredMarkets.length}
-            </p>
-            {filteredMarkets.length === 0 ? (
-              <p className="text-sm text-ink-muted">Nessuna zona trovata.</p>
-            ) : (
-              <ul className="space-y-1">
-                {filteredMarkets.map((m) => {
-                  const comuni = comuniByMarket[m.id] ?? []
-                  const isAgg = comuni.length > 1
-                  const isExpanded = expanded === m.id
-                  return (
-                    <li key={m.id} className="border-b border-ink/10 last:border-0">
-                      <div className="flex items-stretch">
-                        <Link
-                          href={`/${m.slug}`}
-                          onClick={onClose}
-                          className="group flex-1 flex items-center justify-between gap-3 px-3 py-3 hover:bg-white rounded-xl transition-colors"
-                        >
-                          <div className="min-w-0">
-                            <span className="font-alt font-bold text-base text-ink leading-tight block group-hover:text-mare-600 transition-colors">
-                              {m.name}
-                            </span>
-                            {isAgg ? (
-                              <span className="text-xs text-ink-muted">{comuni.length} comuni</span>
-                            ) : (
-                              <span className="text-xs text-ink-muted">{m.city}</span>
-                            )}
-                          </div>
-                        </Link>
-                        {isAgg && (
-                          <button
-                            onClick={() => setExpanded(isExpanded ? null : m.id)}
-                            aria-label={isExpanded ? 'Nascondi comuni' : 'Mostra comuni'}
-                            aria-expanded={isExpanded}
-                            className="px-3 text-ink-muted hover:text-ink"
-                          >
-                            <ChevronDown
-                              className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                            />
-                          </button>
-                        )}
-                      </div>
-
-                      {/* Comuni */}
-                      {isAgg && isExpanded && (
-                        <ul className="pl-4 pb-3 pt-1 space-y-0.5">
-                          {comuni.map((c) => (
-                            <li key={c}>
-                              <Link
-                                href={`/${m.slug}/c/${slugifyName(c)}`}
-                                onClick={onClose}
-                                className="flex items-center gap-2 px-2 py-1.5 text-sm text-ink-soft hover:text-ink hover:bg-white rounded-lg transition-colors"
-                              >
-                                <MapPin className="w-3.5 h-3.5 text-mare" aria-hidden="true" />
-                                {c}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-
-                      {/* Shortcut sotto ogni zona */}
-                      {!isAgg && (
-                        <div className="flex gap-1.5 pb-2 pl-3 text-xs">
-                          <Link href={`/${m.slug}/operators`} onClick={onClose} className="font-alt font-semibold px-2.5 py-1 rounded-full border-2 border-ink/10 bg-white text-ink hover:border-mare transition-colors">Banchi</Link>
-                          <Link href={`/${m.slug}/calendar`} onClick={onClose} className="font-alt font-semibold px-2.5 py-1 rounded-full border-2 border-ink/10 bg-white text-ink hover:border-mare transition-colors">Calendario</Link>
-                          <Link href={`/${m.slug}/news`} onClick={onClose} className="font-alt font-semibold px-2.5 py-1 rounded-full border-2 border-ink/10 bg-white text-ink hover:border-mare transition-colors">Notizie</Link>
-                        </div>
-                      )}
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
-          </section>
+          </nav>
 
           {/* Account / Admin */}
           <section>
@@ -310,7 +187,7 @@ export default function NavMenu({ open, onClose }: Props) {
         {/* Footer */}
         <div className="px-5 md:px-7 py-4 border-t-2 border-ink/10 text-[11px] text-ink-muted flex items-center gap-2 flex-shrink-0 text-ink">
           <Logo inline className="text-[0.9rem]" />
-          <span className="text-ink-muted">· Liguria · Provincia di Imperia</span>
+          <span className="text-ink-muted">· Liguria · da Ventimiglia a Varazze</span>
         </div>
       </aside>
     </div>

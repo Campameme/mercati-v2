@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { Search, CalendarDays, BadgeCheck, MessageCircle } from 'lucide-react'
 import { WaveTaglia, CanopyEdge } from '@/components/decorations'
 import { BancoPlaceholder } from '@/components/BancoAvatar'
-import DriftBackdrop from '@/components/motion/DriftBackdrop'
 
 interface HubOperator {
   id: string
@@ -106,7 +105,6 @@ export default function OperatoriHubPage() {
       {/* Header di sezione: color-block MARE, come i ritratti dei Maestri */}
       <section className="relative overflow-hidden bg-mare">
         <CanopyEdge color="#F7EFDD" className="absolute top-0 inset-x-0" />
-        <DriftBackdrop tone="dark" variant="section" />
         <div className="container mx-auto px-4 md:px-6 pt-12 pb-10 md:pt-16 md:pb-14 relative z-10">
           <div className="flex items-center gap-3 mb-2 text-marel">
             <WaveTaglia className="w-8 h-2.5 text-sole" aria-hidden="true" />

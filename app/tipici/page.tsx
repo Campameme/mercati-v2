@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { classifySchedule } from '@/lib/schedules/classify'
 import TipiciExplorer, { type TipicoItem } from '@/components/TipiciExplorer'
-import DriftBackdrop from '@/components/motion/DriftBackdrop'
 import { getLang } from '@/lib/i18n/getLang'
 import { UI_I18N } from '@/lib/i18n/ui'
 
@@ -47,7 +46,6 @@ export default async function TipiciPage() {
     <div className="relative overflow-hidden bg-carta min-h-screen">
       {/* banda-tendone: filo di brand in cima */}
       <div className="imk-awning h-2" aria-hidden="true" />
-      <DriftBackdrop tone="light" variant="section" />
       <div className="relative z-10 container mx-auto px-4 md:px-6 py-12 md:py-16 max-w-5xl">
         <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{ui.tipiciEyebrow}</p>
         <h1 className="font-alt font-extrabold tracking-tight text-3xl md:text-5xl leading-[1.04] text-ink mb-3">{ui.tipiciTitle}</h1>

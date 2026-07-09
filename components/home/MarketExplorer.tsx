@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { Search, Crosshair, Navigation as NavIcon, ChevronDown, Check, History, X } from 'lucide-react'
+import { Search, Crosshair, Navigation as NavIcon, ChevronDown, Check, History, X, SquareParking } from 'lucide-react'
 import UnifiedMapClient from '@/components/UnifiedMapClient'
 import type { UnifiedMapPin } from '@/components/UnifiedMap'
 import MarketPanel from './MarketPanel'
@@ -25,6 +25,7 @@ const WD_FULL: Record<Lang, string[]> = {
 const WD_ORDER = [1, 2, 3, 4, 5, 6, 0]
 const DAYS_LABEL: Record<Lang, string> = { it: 'Giorni', fr: 'Jours', de: 'Tage', en: 'Days' }
 const RESET_LABEL: Record<Lang, string> = { it: 'Azzera', fr: 'Effacer', de: 'Zurücksetzen', en: 'Clear' }
+const PARKING_LABEL: Record<Lang, string> = { it: 'Parcheggi', fr: 'Parkings', de: 'Parkplätze', en: 'Parking' }
 
 interface HubOperator {
   id: string
@@ -122,13 +123,16 @@ interface Props {
   initialDays?: number[]
   /** dai chip della home: chiede subito la posizione e ordina per distanza */
   initialNear?: boolean
+  /** da /mappa?parcheggi=1 o dal pulsante "Parcheggi": mostra i parcheggi OSM vicini sulla mappa */
+  initialParking?: boolean
 }
 
-export default function MarketExplorer({ pins: allPins, initialQuery = '', initialZone = 'all', initialToday = false, initialDays = [], initialNear = false }: Props) {
+export default function MarketExplorer({ pins: allPins, initialQuery = '', initialZone = 'all', initialToday = false, initialDays = [], initialNear = false, initialParking = false }: Props) {
   const [lang, setLang] = useLang()
   const [days, setDays] = useState<number[]>(initialDays)
   const [today, setToday] = useState(initialToday)
   const [openNow, setOpenNow] = useState(false)
+  const [showParking, setShowParking] = useState(initialParking)
   const [recents, setRecents] = useState<string[]>([])
   const [zone, setZone] = useState<string>(initialZone && ZONE_BY_SLUG[initialZone] ? initialZone : 'all')
   const [sort, setSort] = useState<'az' | 'near'>('az')
@@ -438,6 +442,19 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
               )}
             </FilterDropdown>
 
+            {/* Parcheggi: overlay sulla mappa dei parcheggi OSM vicini a ogni mercato */}
+            <button
+              type="button"
+              onClick={() => setShowParking((v) => !v)}
+              aria-pressed={showParking}
+              className={`inline-flex items-center gap-1.5 font-alt text-xs font-semibold px-3 py-1.5 rounded-full border-2 transition-colors ${
+                showParking ? 'bg-ink text-carta border-ink' : 'bg-white text-ink border-ink/15 hover:border-ink'
+              }`}
+            >
+              <SquareParking className="w-3.5 h-3.5" aria-hidden="true" />
+              {PARKING_LABEL[lang]}
+            </button>
+
             {/* "Sono le HH:MM · N aperti adesso": è un FILTRO cliccabile */}
             {now && (
               <button
@@ -538,6 +555,7 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
               pins={mapPins}
               height="100%"
               bare
+              showParkingNearby={showParking}
               onPinClick={(p) => selectMarket(p.id)}
               selectedId={selectedId}
               panToSelected
