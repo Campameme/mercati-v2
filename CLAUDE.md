@@ -5,9 +5,11 @@ vale questo file. Dettaglio grafico: `docs/brand-system.md` · voce e copy:
 `docs/brand-voice.md` · installazione: `SETUP.md`.
 
 ## Il progetto
-"Mercati della Riviera di Ponente" (https://mercati-fiere.netlify.app): guida ai
+"Mercati della Riviera di Ponente" (https://mercatidiponente.it): guida ai
 mercati settimanali da Ventimiglia a Varazze. Next.js 14 App Router + Supabase +
-Tailwind + GSAP/Lenis + Leaflet. Produzione = branch `main` (deploy Netlify automatico).
+Tailwind + GSAP/Lenis + Leaflet. Produzione = branch `main` → **deploy automatico
+su Vercel** (mercatidiponente.it); anche Netlify (mercati-fiere.netlify.app) è
+collegato, ma il sito di riferimento ora è Vercel.
 
 ## Regole di copy (del proprietario — non negoziabili)
 - MAI slogan da agenzia, mai il brief come testo di pagina ("gli ambulanti sono il
