@@ -1,20 +1,25 @@
 import { createClient } from '@/lib/supabase/server'
 import { slugifyName } from '@/lib/markets/slug'
+import { IMPERIA_ZONE_SLUGS } from '@/lib/markets/zones'
 import type { MarketPin } from '@/components/home/types'
 
 /**
  * Carica i mercati attivi + le sessioni e li raggruppa in MarketPin (uno per
  * LUOGO fisico: mercato + comune + luogo). Condiviso tra la home e /mappa.
+ * PERIMETRO: solo la Riviera dei Fiori (provincia di Imperia) — le zone di
+ * Savona restano nel DB ma fuori da ogni interfaccia.
  */
 export async function loadPins(): Promise<MarketPin[]> {
   const supabase = createClient()
+  const riviera = [...IMPERIA_ZONE_SLUGS]
   const [{ data: markets }, { data: schedules }] = await Promise.all([
-    supabase.from('markets').select('id, slug, name, city, market_days').eq('is_active', true),
+    supabase.from('markets').select('id, slug, name, city, market_days').eq('is_active', true).in('slug', riviera),
     supabase
       .from('market_schedules')
-      .select('id, market_id, comune, giorno, orario, settori, luogo, lat, lng, is_active, markets!inner(is_active)')
+      .select('id, market_id, comune, giorno, orario, settori, luogo, lat, lng, is_active, markets!inner(is_active, slug)')
       .eq('is_active', true)
-      .eq('markets.is_active', true),
+      .eq('markets.is_active', true)
+      .in('markets.slug', riviera),
   ])
 
   const marketInfo = new Map(

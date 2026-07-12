@@ -10,7 +10,7 @@ import { HOME_I18N, LANGS, type Lang } from '@/lib/i18n/home'
 import { useLang } from '@/lib/i18n/useLang'
 import { marketStatus, weekdaysOf, occursOn, fmtHour, type MarketStatus } from '@/lib/markets/hours'
 import { classifyMany, CATEGORY_COLOR, type ScheduleCategory } from '@/lib/schedules/classify'
-import { ZONES, ZONE_BY_SLUG } from '@/lib/markets/zones'
+import { ZONES, ZONE_BY_SLUG, IMPERIA_ZONE_SLUGS } from '@/lib/markets/zones'
 import { haversineMeters } from '@/lib/markets/geo'
 import { HOME_COPY } from '@/lib/i18n/homeCopy'
 import { useTypewriter } from '@/lib/useTypewriter'
@@ -25,6 +25,13 @@ const WD_FULL: Record<Lang, string[]> = {
 const WD_ORDER = [1, 2, 3, 4, 5, 6, 0]
 const DAYS_LABEL: Record<Lang, string> = { it: 'Giorni', fr: 'Jours', de: 'Tage', en: 'Days' }
 const RESET_LABEL: Record<Lang, string> = { it: 'Azzera', fr: 'Effacer', de: 'Zurücksetzen', en: 'Clear' }
+// Striscia legenda: cosa indicano il pin e i due stati d'orario della lista.
+const LEGEND_I18N: Record<Lang, { pin: string; open: string; opens: string }> = {
+  it: { pin: 'Mercato settimanale', open: 'Aperto adesso', opens: 'Apre più tardi' },
+  fr: { pin: 'Marché hebdomadaire', open: 'Ouvert maintenant', opens: 'Ouvre plus tard' },
+  de: { pin: 'Wochenmarkt', open: 'Jetzt geöffnet', opens: 'Öffnet später' },
+  en: { pin: 'Weekly market', open: 'Open now', opens: 'Opens later' },
+}
 
 interface HubOperator {
   id: string
@@ -70,13 +77,13 @@ function FilterDropdown({
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className={`inline-flex items-center gap-1.5 font-alt text-xs font-semibold px-3 py-1.5 rounded-full border-2 transition-colors ${
-          active ? 'bg-ink text-carta border-ink' : 'bg-white text-ink border-ink/15 hover:border-ink'
+        className={`inline-flex items-center gap-1.5 font-alt text-xs font-semibold px-3 py-1.5 rounded-full border-[1.5px] transition-colors ${
+          active ? 'bg-alga text-crema border-alga' : 'bg-white text-alga-600 border-alga/60 hover:border-alga'
         }`}
       >
         {label}
         {active && (
-          <span className="grid place-items-center min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-sole text-ink text-[11px] leading-none">
+          <span className="grid place-items-center min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-limone text-ink text-[11px] leading-none">
             {count}
           </span>
         )}
@@ -84,7 +91,7 @@ function FilterDropdown({
       </button>
       {open && (
         <div
-          className="absolute left-0 top-full mt-1.5 z-50 w-60 max-w-[80vw] bg-white border-2 border-ink/15 imk-edge shadow-xl p-1.5 max-h-[60vh] overflow-y-auto imk-scroll"
+          className="absolute left-0 top-full mt-1.5 z-50 w-60 max-w-[80vw] bg-white border border-[#e0d7c1] rounded-xl shadow-xl p-1.5 max-h-[60vh] overflow-y-auto imk-scroll"
           data-lenis-prevent
         >
           {children}
@@ -101,10 +108,10 @@ function CheckRow({
     <button
       type="button"
       onClick={onClick}
-      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-marel/50 text-left transition-colors"
+      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-crema-2/70 text-left transition-colors"
     >
-      <span className={`grid place-items-center w-4 h-4 rounded border-2 flex-shrink-0 ${checked ? 'bg-ink border-ink' : 'border-ink/25'}`}>
-        {checked && <Check className="w-3 h-3 text-carta" aria-hidden="true" />}
+      <span className={`grid place-items-center w-4 h-4 rounded border-2 flex-shrink-0 ${checked ? 'bg-alga border-alga' : 'border-ink/25'}`}>
+        {checked && <Check className="w-3 h-3 text-crema" aria-hidden="true" />}
       </span>
       {color && <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: color }} aria-hidden="true" />}
       <span className="font-alt text-sm text-ink">{label}</span>
@@ -293,15 +300,15 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
 
   return (
     <div className="flex flex-col md:h-[calc(100svh-4rem)]">
-      {/* banda-tendone: filo di brand in cima */}
-      <div className="imk-awning h-2" aria-hidden="true" />
+      {/* band di testa: filo di brand in cima (crosshatch alga) */}
+      <div className="mz-band" aria-hidden="true" />
       {/* ===== Barra controlli: NON sticky (prima, scorrendo, copriva le prime
            righe della lista); resta z-30 così i suoi menu passano sopra la mappa ===== */}
-      <div className="relative z-30 bg-carta border-b-2 border-ink/10 flex-shrink-0">
+      <div className="relative z-30 bg-crema border-b border-[#e0d7c1] flex-shrink-0">
         <div className="container mx-auto px-4 md:px-6 pt-3 pb-2 space-y-2.5">
           {/* riga 1: ricerca + posizione + lingua */}
           <div className="flex items-center gap-2.5">
-            <form onSubmit={submitSearch} role="search" className="imk-edge relative flex-1 min-w-0 bg-white border-2 border-ink/15 shadow-sm focus-within:border-mare">
+            <form onSubmit={submitSearch} role="search" className="relative flex-1 min-w-0 bg-white text-ink border border-[#e0d7c1] rounded-xl shadow-[0_12px_26px_-18px_rgba(38,36,30,0.5)] focus-within:border-alga">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-muted z-10" aria-hidden="true" />
               <input
                 value={query}
@@ -311,27 +318,27 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
                 placeholder={typedPlaceholder}
                 aria-label={dict.searchPlaceholder}
                 enterKeyHint="search"
-                className="relative w-full pl-11 pr-12 py-3 bg-transparent rounded-2xl text-[15px] focus:outline-none"
+                className="relative w-full pl-11 pr-12 py-3 bg-transparent rounded-xl text-[15px] focus:outline-none"
               />
               {/* Invio esplicito: seleziona il miglior risultato */}
               <button
                 type="submit"
                 aria-label={dict.searchPlaceholder}
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 grid place-items-center w-9 h-9 rounded-full bg-ink text-carta hover:bg-mare transition-colors z-10"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 grid place-items-center w-9 h-9 rounded-full bg-terracotta text-crema hover:bg-terracotta-600 transition-colors z-10"
               >
                 <Search className="w-4 h-4" aria-hidden="true" />
               </button>
               {/* Ricerche recenti (a focus, prima di digitare) */}
               {open && query.trim().length < 2 && recents.length > 0 && (
                 <div
-                  className="absolute left-0 right-0 top-full mt-1.5 bg-white border-2 border-ink/15 imk-edge shadow-xl z-40 overflow-hidden"
+                  className="absolute left-0 right-0 top-full mt-1.5 bg-white border border-[#e0d7c1] rounded-xl shadow-xl z-40 overflow-hidden"
                   data-lenis-prevent
                 >
                   {recents.map((r) => (
                     <button
                       key={r}
                       onMouseDown={(e) => { e.preventDefault(); setQuery(r); setOpen(true) }}
-                      className="w-full text-left flex items-center gap-2.5 px-3 py-2.5 hover:bg-marel/50 border-b border-ink/5 last:border-0"
+                      className="w-full text-left flex items-center gap-2.5 px-3 py-2.5 hover:bg-crema-2/70 border-b border-ink/5 last:border-0"
                     >
                       <History className="w-4 h-4 text-ink-muted flex-shrink-0" aria-hidden="true" />
                       <span className="font-alt text-sm text-ink truncate">{r}</span>
@@ -351,7 +358,7 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
               )}
               {open && query.trim().length >= 2 && (
                 <div
-                  className="absolute left-0 right-0 top-full mt-1.5 bg-white border-2 border-ink/15 imk-edge shadow-xl z-40 max-h-[60vh] overflow-y-auto imk-scroll"
+                  className="absolute left-0 right-0 top-full mt-1.5 bg-white border border-[#e0d7c1] rounded-xl shadow-xl z-40 max-h-[60vh] overflow-y-auto imk-scroll"
                   data-lenis-prevent
                 >
                   <div className="px-3 py-2 text-[11px] uppercase tracking-[0.14em] text-ink-muted border-b border-ink/10">
@@ -366,7 +373,7 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
                         <button
                           key={r.pin.id}
                           onMouseDown={(e) => { e.preventDefault(); selectMarket(r.pin.id, query) }}
-                          className="w-full text-left flex items-start gap-2.5 px-3 py-2.5 hover:bg-marel/50 border-b border-ink/5 last:border-0"
+                          className="w-full text-left flex items-start gap-2.5 px-3 py-2.5 hover:bg-crema-2/70 border-b border-ink/5 last:border-0"
                         >
                           <span className="mt-0.5 w-3 h-3 rounded-full flex-shrink-0" style={{ background: CATEGORY_COLOR[cat] }} aria-hidden="true" />
                           <span className="min-w-0 flex-1">
@@ -391,8 +398,8 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
               onClick={locateNearest}
               disabled={locating}
               aria-pressed={sort === 'near'}
-              className={`imk-lift imk-edge flex-shrink-0 inline-flex items-center justify-center gap-2 font-alt font-semibold text-sm border-2 px-3.5 py-3 transition-colors disabled:opacity-60 ${
-                sort === 'near' ? 'bg-mare text-white border-mare' : 'border-ink/15 bg-white hover:border-mare hover:text-mare'
+              className={`imk-lift flex-shrink-0 inline-flex items-center justify-center gap-2 font-alt font-semibold text-sm border rounded-xl px-3.5 py-3 transition-colors disabled:opacity-60 ${
+                sort === 'near' ? 'bg-alga text-crema border-alga' : 'border-[#e0d7c1] bg-white hover:border-alga hover:text-alga-600'
               }`}
             >
               <Crosshair className="w-4 h-4" />
@@ -404,7 +411,7 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
                   key={l}
                   onClick={() => setLang(l)}
                   aria-pressed={lang === l}
-                  className={`text-xs font-bold uppercase px-2 py-1 rounded-md border-2 transition-colors ${lang === l ? 'bg-ink text-carta border-ink' : 'text-ink border-ink/15 hover:border-ink'}`}
+                  className={`text-xs font-bold uppercase px-2 py-1 rounded-md border-2 transition-colors ${lang === l ? 'bg-ink text-crema border-ink' : 'text-ink border-ink/20 hover:border-ink'}`}
                 >
                   {l}
                 </button>
@@ -418,10 +425,12 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
               value={zone}
               onChange={(e) => setZone(e.target.value)}
               aria-label={dict.filterZone}
-              className="flex-shrink-0 font-alt text-xs font-semibold px-3 py-1.5 rounded-full border-2 border-ink/15 bg-white text-ink focus:outline-none focus:border-mare"
+              className={`flex-shrink-0 font-alt text-xs font-semibold px-3 py-1.5 rounded-full border-[1.5px] focus:outline-none focus:border-alga transition-colors ${
+                zone !== 'all' ? 'bg-alga text-crema border-alga' : 'bg-white text-alga-600 border-alga/60'
+              }`}
             >
               <option value="all">{dict.allZones}</option>
-              {ZONES.map((z) => <option key={z.slug} value={z.slug}>{z.name}</option>)}
+              {ZONES.filter((z) => (IMPERIA_ZONE_SLUGS as readonly string[]).includes(z.slug)).map((z) => <option key={z.slug} value={z.slug}>{z.name}</option>)}
             </select>
 
 
@@ -443,12 +452,12 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
               <button
                 onClick={() => setOpenNow((v) => !v)}
                 aria-pressed={openNow}
-                className={`inline-flex items-center gap-1.5 font-alt text-xs font-semibold px-3 py-1.5 rounded-full border-2 transition-colors ${
-                  openNow ? 'bg-mare text-white border-mare' : 'bg-white text-ink-soft border-ink/15 hover:border-mare'
+                className={`inline-flex items-center gap-1.5 font-alt text-xs font-semibold px-3 py-1.5 rounded-full border-[1.5px] transition-colors ${
+                  openNow ? 'bg-alga text-crema border-alga' : 'bg-white text-ink-soft border-alga/60 hover:border-alga'
                 }`}
               >
-                <span className={`w-2 h-2 rounded-full ${openNow ? 'bg-white' : 'bg-sole'}`} aria-hidden="true" />
-                {nowText} · <b className={openNow ? 'text-white' : 'text-mare-600'}>{openCount}</b>{' '}
+                <span className={`w-2 h-2 rounded-full ${openNow ? 'bg-crema' : 'bg-terracotta'}`} aria-hidden="true" />
+                {nowText} · <b className={openNow ? 'text-crema' : 'text-alga-600'}>{openCount}</b>{' '}
                 {openCount > 0 ? dict.openSuffix : dict.noneOpen}
               </button>
             )}
@@ -462,23 +471,39 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
               </button>
             )}
           </div>
+
+          {/* riga 3: striscia legenda — pin e stati d'orario, a colpo d'occhio */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pb-1 font-alt text-[11px] text-ink-soft">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: CATEGORY_COLOR.generale }} aria-hidden="true" />
+              {LEGEND_I18N[lang].pin}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="w-4 h-2.5 rounded-full bg-alga flex-shrink-0" aria-hidden="true" />
+              {LEGEND_I18N[lang].open}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="w-4 h-2.5 rounded-full bg-terracotta-50 border border-terracotta/40 flex-shrink-0" aria-hidden="true" />
+              {LEGEND_I18N[lang].opens}
+            </span>
+          </div>
         </div>
       </div>
 
       {/* ===== Lista + Mappa (riempiono l'altezza rimanente, scroll interni) ===== */}
       <div className="flex-1 flex flex-col md:flex-row md:min-h-0">
         <aside
-          className="order-2 md:order-1 w-full md:w-[340px] md:flex-shrink-0 bg-carta/85 border-t-2 md:border-t-0 md:border-r-2 border-ink/10 h-[42svh] md:h-auto md:min-h-0 overflow-y-auto imk-scroll"
+          className="order-2 md:order-1 w-full md:w-[340px] md:flex-shrink-0 bg-crema border-t md:border-t-0 md:border-r border-[#e0d7c1] h-[42svh] md:h-auto md:min-h-0 overflow-y-auto imk-scroll"
           data-lenis-prevent
         >
-          <div className="sticky top-0 bg-carta/95 backdrop-blur-sm px-4 py-2.5 border-b border-ink/10 flex items-center justify-between gap-2 z-10">
+          <div className="sticky top-0 bg-crema/95 backdrop-blur-sm px-4 py-2.5 border-b border-[#e0d7c1] flex items-center justify-between gap-2 z-10">
             <span className="font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted">
-              <span className="imk-mark text-ink">{sortedPins.length}</span> {dict.list}
+              <span className="font-display font-extrabold text-sm text-ink">{sortedPins.length}</span> {dict.list}
             </span>
             <button
               onClick={() => setSort('az')}
               aria-pressed={sort === 'az'}
-              className={`text-xs font-semibold px-2 py-1 rounded-md ${sort === 'az' ? 'bg-ink text-carta' : 'text-ink-soft hover:bg-ink/5'}`}
+              className={`text-xs font-semibold px-2 py-1 rounded-md ${sort === 'az' ? 'bg-alga text-crema' : 'text-ink-soft hover:bg-ink/5'}`}
             >
               {dict.sortAZ}
             </button>
@@ -487,7 +512,7 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
           {sortedPins.length === 0 ? (
             <p className="px-4 py-6 text-sm text-ink-muted">{dict.listEmpty}</p>
           ) : (
-            <ul className="divide-y divide-ink/5">
+            <ul className="p-3 space-y-2">
               {sortedPins.map((p) => {
                 const cat = meta.get(p.id)?.category ?? 'generale'
                 const st = statuses.get(p.id)
@@ -497,20 +522,22 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
                   <li key={p.id}>
                     <button
                       onClick={() => selectMarket(p.id)}
-                      className={`w-full text-left flex items-start gap-3 px-4 py-3 transition-colors ${isSel ? 'bg-marel/60' : 'hover:bg-marel/40'}`}
+                      className={`w-full text-left flex items-start gap-3 px-3.5 py-3 bg-white rounded-xl border shadow-[0_10px_20px_-18px_rgba(38,36,30,0.45)] transition-colors ${
+                        isSel ? 'border-alga bg-alga-50/60' : 'border-[#e0d7c1] hover:border-alga/60'
+                      }`}
                     >
                       <span className="mt-1 w-3 h-3 rounded-full flex-shrink-0" style={{ background: CATEGORY_COLOR[cat] }} aria-hidden="true" />
                       <span className="min-w-0 flex-1">
-                        <span className="font-alt font-semibold text-[15px] text-ink leading-tight block truncate">{p.comune}</span>
+                        <span className="font-display font-extrabold tracking-tight text-[15px] text-ink leading-tight block truncate">{p.comune}</span>
                         {p.luogo && <span className="block text-xs text-ink-muted truncate">{p.luogo}</span>}
                         <span className="mt-1 flex items-center gap-2 flex-wrap">
                           {st && st.state === 'open' && (
-                            <span className="text-[11px] font-semibold rounded-full px-2 py-0.5 text-white" style={{ background: '#15607C' }}>
+                            <span className="text-[11px] font-semibold rounded-full px-2 py-0.5 bg-alga text-crema">
                               {dict.openUntil} {fmtHour(st.hour ?? 0)}
                             </span>
                           )}
                           {st && st.state === 'opens' && (
-                            <span className="text-[11px] font-semibold rounded-full px-2 py-0.5 text-ink" style={{ background: '#F4B62C' }}>
+                            <span className="text-[11px] font-semibold rounded-full px-2 py-0.5 bg-terracotta-50 text-terracotta-600">
                               {dict.opensAt} {fmtHour(st.hour ?? 0)}
                             </span>
                           )}
@@ -532,7 +559,7 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
 
         {/* z-0: crea uno stacking context così mappa E card mercato restano
             SOTTO la barra filtri sticky (z-30), senza clippare i suoi menu. */}
-        <div className="order-1 md:order-2 relative z-0 flex-1 h-[55svh] md:h-auto min-h-[420px] overflow-hidden bg-notte">
+        <div className="order-1 md:order-2 relative z-0 flex-1 h-[55svh] md:h-auto min-h-[420px] overflow-hidden bg-ink">
           <div className="absolute inset-0">
             <UnifiedMapClient
               pins={mapPins}
@@ -548,7 +575,7 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
 
           {!selected && (
             <div className="absolute left-1/2 bottom-3 -translate-x-1/2 z-[900] pointer-events-none">
-              <span className="font-alt font-semibold text-sm text-carta bg-notte/55 backdrop-blur-sm px-4 py-2 rounded-full">{dict.hint}</span>
+              <span className="font-alt font-semibold text-sm text-crema bg-ink/55 backdrop-blur-sm px-4 py-2 rounded-full">{dict.hint}</span>
             </div>
           )}
 

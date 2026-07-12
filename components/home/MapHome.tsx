@@ -4,19 +4,15 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { gsap } from '@/lib/motion/gsap'
-import { Search, Store, ArrowRight, CalendarDays, ChevronDown, Sun, Newspaper } from 'lucide-react'
-import Logo from '@/components/Logo'
-import DriftBackdrop from '@/components/motion/DriftBackdrop'
+import { Search, Store, ArrowRight, CalendarDays, ChevronDown, Newspaper } from 'lucide-react'
+import Logo, { LogoMark } from '@/components/Logo'
+import Bollino from '@/components/Bollino'
 import WaterCard from '@/components/motion/WaterCard'
 import BancoAvatar from '@/components/BancoAvatar'
-import PhotoFx from './PhotoFx'
-import { BigWaves, CanopyEdge, StringLights } from '@/components/decorations'
 import { occursOn, isNonWeekly } from '@/lib/markets/hours'
 import { categoryLabel } from '@/lib/i18n/home'
 import { UI_I18N } from '@/lib/i18n/ui'
-import { classifySchedule, categoryLabelI18n } from '@/lib/schedules/classify'
-import { mountAqua } from '@/lib/home/aqua'
-import BorghiSection from './BorghiSection'
+import { classifySchedule, categoryLabelI18n, CATEGORY_COLOR, CATEGORY_COLOR_DARK } from '@/lib/schedules/classify'
 import type { MarketPin } from './types'
 import type { NewsItem } from '@/types/news'
 import type { LiveNewsItem } from '@/lib/news/live'
@@ -32,14 +28,76 @@ interface HubOperator {
   market: { slug: string; name: string } | null
 }
 
-// Immagini e accenti dei tre beat de "La Liguria vera"
-const BEAT_IMG = [
-  { src: '/zone/alassio.jpg', alt: 'La spiaggia di Alassio con l’isola Gallinara' },
-  { src: '/zone/finale-ligure.jpg', alt: 'Finalborgo visto dal castello' },
-  { src: '/zone/vita-mercato-ventimiglia.jpg', alt: 'Il mercato del venerdì a Ventimiglia' },
-]
-// Accenti dei beat SUL MARE (sezione bg-mare): sole, fiore chiaro, marel
-const BEAT_ACCENT = ['#F4B62C', '#FBE0D9', '#DCEBEC']
+
+// Micro-copy locale della home (4 lingue) — il resto vive in homeCopy.ts
+const HERO_EYEBROW: Record<Lang, string> = {
+  it: 'La Riviera dei Fiori · provincia di Imperia',
+  fr: 'La Riviera dei Fiori · province d’Imperia',
+  de: 'Die Riviera dei Fiori · Provinz Imperia',
+  en: 'The Riviera dei Fiori · province of Imperia',
+}
+const DAYS_I18N: Record<Lang, string[]> = {
+  it: ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'],
+  fr: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+  de: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
+  en: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+}
+const DAY_PARAM = ['lun', 'mar', 'mer', 'gio', 'ven', 'sab', 'dom']
+const TODAY_SHORT: Record<Lang, string> = { it: 'oggi', fr: 'auj.', de: 'heute', en: 'today' }
+const TIPICI_TITLE: Record<Lang, string> = { it: 'Un’altra famiglia di mercati.', fr: 'Une autre famille de marchés.', de: 'Eine andere Familie von Märkten.', en: 'Another family of markets.' }
+const TIPICI_LEAD: Record<Lang, string> = {
+  it: 'C’è il mercato di ogni settimana, e poi ci sono i giorni speciali: l’antiquariato sotto i portici, i produttori in piazza, l’artigianato nelle sere d’estate. Sono le ricorrenze che scandiscono l’anno della Riviera — ognuna col suo colore.',
+  fr: 'Il y a le marché de chaque semaine, et puis il y a les jours spéciaux : les antiquités sous les arcades, les producteurs sur la place, l’artisanat les soirs d’été. Ce sont les rendez-vous qui rythment l’année de la Riviera — chacun avec sa couleur.',
+  de: 'Es gibt den Markt jeder Woche — und dann die besonderen Tage: Antiquitäten unter den Arkaden, Erzeuger auf dem Platz, Handwerk an Sommerabenden. Diese Termine geben dem Jahr der Riviera den Takt — jeder mit seiner Farbe.',
+  en: 'There’s the weekly market — and then there are the special days: antiques under the arcades, growers in the square, crafts on summer evenings. These are the dates that mark the Riviera’s year — each with its own colour.',
+}
+const TIPICI_CTA: Record<Lang, string> = { it: 'Tutti i mercati tipici', fr: 'Tous les marchés typiques', de: 'Alle typischen Märkte', en: 'All the special markets' }
+// Il "cosa" del progetto: percorso di qualità, operatori a portata, servizi in più
+const WHAT_I18N: Record<Lang, { t: string; d: string }[]> = {
+  it: [
+    { t: 'Un percorso di qualità', d: 'La rete dei banchi di fiducia: banco curato, prodotti di qualità, serietà. Riconosci al volo chi ci mette la faccia.' },
+    { t: 'Operatori facili da trovare', d: 'Cerchi un banco, un prodotto o un giorno: la mappa ti porta al posto giusto — e il mercato più vicino te lo dice lei.' },
+    { t: 'Servizi in più', d: 'La tessera punti, le offerte dei banchi e i vantaggi riservati a chi il mercato lo vive con noi.' },
+  ],
+  fr: [
+    { t: 'Un parcours de qualité', d: 'Le réseau des étals de confiance : étal soigné, produits de qualité, sérieux. Tu reconnais tout de suite qui s’engage.' },
+    { t: 'Des marchands faciles à trouver', d: 'Tu cherches un étal, un produit ou un jour : la carte t’amène au bon endroit — et t’indique le marché le plus proche.' },
+    { t: 'Des services en plus', d: 'La carte de fidélité, les offres des étals et les avantages réservés à qui vit le marché avec nous.' },
+  ],
+  de: [
+    { t: 'Ein Weg der Qualität', d: 'Das Netz der Stände des Vertrauens: gepflegter Stand, gute Produkte, Verlässlichkeit. Du erkennst sofort, wer dahintersteht.' },
+    { t: 'Stände, leicht zu finden', d: 'Du suchst einen Stand, ein Produkt oder einen Tag: die Karte bringt dich hin — und zeigt dir den nächsten Markt.' },
+    { t: 'Mehr als nur Einkauf', d: 'Die Punktekarte, die Angebote der Stände und Vorteile für alle, die den Markt mit uns leben.' },
+  ],
+  en: [
+    { t: 'A path of quality', d: 'The network of trusted stalls: well-kept stalls, quality products, reliability. You can tell at a glance who stands behind it.' },
+    { t: 'Stallholders easy to find', d: 'Looking for a stall, a product or a day: the map takes you to the right place — and tells you the nearest market.' },
+    { t: 'Extra services', d: 'The loyalty card, stall offers and perks reserved for those who live the market with us.' },
+  ],
+}
+const APERTI: Record<Lang, string> = { it: 'aperti', fr: 'ouverts', de: 'geöffnet', en: 'open' }
+const RETE_I18N: Record<Lang, { pill: string; title: string; req: string[]; cta: string }> = {
+  it: {
+    pill: 'La rete', title: 'Hai un banco? Entra nella rete.',
+    req: ['Banco pulito e curato', 'Prodotti di qualità', 'Serietà con colleghi e clienti'],
+    cta: 'Chiedi di entrare',
+  },
+  fr: {
+    pill: 'Le réseau', title: 'Tu as un étal ? Rejoins le réseau.',
+    req: ['Étal propre et soigné', 'Produits de qualité', 'Sérieux avec collègues et clients'],
+    cta: 'Demande d’entrer',
+  },
+  de: {
+    pill: 'Das Netz', title: 'Hast du einen Stand? Mach mit.',
+    req: ['Sauberer, gepflegter Stand', 'Qualitätsprodukte', 'Verlässlichkeit'],
+    cta: 'Frag an, dabei zu sein',
+  },
+  en: {
+    pill: 'The network', title: 'Got a stall? Join the network.',
+    req: ['A clean, well-kept stall', 'Quality products', 'Reliability'],
+    cta: 'Ask to join',
+  },
+}
 
 export default function MapHome({ pins }: { pins: MarketPin[] }) {
   const router = useRouter()
@@ -49,12 +107,12 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
   const [news, setNews] = useState<NewsItem[]>([])
   const [liveNews, setLiveNews] = useState<LiveNewsItem[]>([])
   const heroRef = useRef<HTMLDivElement>(null)
-  const aquaRef = useRef<HTMLCanvasElement>(null)
-  const heroPhotoRef = useRef<HTMLDivElement>(null)
+  const oggiRef = useRef<HTMLSpanElement>(null)
 
   const dict = HOME_I18N[lang]
   const ui = UI_I18N[lang]
   const copy = HOME_COPY[lang]
+  const rete = RETE_I18N[lang]
   const typed = useTypewriter(copy.searchExamples)
 
   // I prossimi Mercati tipici (ricorrenze speciali ≠ merci varie): hanno
@@ -81,7 +139,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
     return out.filter((t) => (seen.has(t.id) ? false : (seen.add(t.id), true))).slice(0, 3)
   }, [pins])
 
-  // Ticker vivo dell'hero: i comuni dove OGGI c'è davvero mercato.
+  // I comuni dove OGGI c'è davvero mercato (contatore dell'hero).
   const todayComuni = useMemo(() => {
     const now = new Date()
     const set = new Set<string>()
@@ -89,58 +147,46 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
     return Array.from(set).sort((a, b) => a.localeCompare(b, 'it'))
   }, [pins])
 
+  // Indice del giorno di oggi (0 = lunedì) per le chips dei giorni.
+  const todayIdx = useMemo(() => (new Date().getDay() + 6) % 7, [])
+
   useEffect(() => {
     fetch('/api/operators?all=1').then((r) => r.json()).then((j) => setOperators(Array.isArray(j?.data) ? j.data : [])).catch(() => {})
     fetch('/api/news?all=1').then((r) => r.json()).then((j) => setNews(Array.isArray(j?.data) ? j.data : [])).catch(() => {})
     fetch('/api/news/live').then((r) => r.json()).then((j) => setLiveNews(Array.isArray(j?.data) ? j.data : [])).catch(() => {})
   }, [])
 
-  // Hero: ingresso cinetico (transform-only → sempre leggibile)
+  // Hero: ingresso cinetico del contenuto (transform-only → sempre leggibile).
+  // Lo sfondo resta fermo: l'animazione vive sugli elementi.
   useEffect(() => {
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
     const ctx = gsap.context(() => {
       const root = heroRef.current
       if (!root) return
-      gsap.from(root.querySelectorAll('[data-word]'), { yPercent: 120, rotate: 5, stagger: 0.06, duration: 0.85, ease: 'back.out(1.5)', clearProps: 'transform' })
+      gsap.from(root.querySelectorAll('[data-word]'), { yPercent: 120, rotate: 4, stagger: 0.06, duration: 0.85, ease: 'back.out(1.4)', clearProps: 'transform' })
       gsap.from(root.querySelectorAll('[data-anim]'), { y: 16, duration: 0.6, stagger: 0.08, delay: 0.2, ease: 'power3.out', clearProps: 'transform' })
+      gsap.from(root.querySelectorAll('[data-chip]'), { y: 14, scale: 0.9, stagger: 0.05, delay: 0.55, duration: 0.5, ease: 'back.out(1.6)', clearProps: 'transform' })
     }, heroRef)
     return () => ctx.revert()
   }, [])
 
-  // Effetto acqua nell'hero: bollicine + increspature/alone al passaggio del
-  // mouse, sopra la foto ferma. Reduced-motion safe (gestito in mountAqua).
+  // Conta-su del numero "Oggi al mercato".
   useEffect(() => {
-    const c = aquaRef.current, host = heroRef.current
-    if (!c || !host) return
-    return mountAqua(c, host, { bubbles: 32 })
-  }, [])
+    const el = oggiRef.current
+    if (!el || !todayComuni.length) return
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) { el.textContent = String(todayComuni.length); return }
+    const obj = { v: 0 }
+    const tw = gsap.to(obj, { v: todayComuni.length, duration: 1, ease: 'power2.out', onUpdate: () => { el.textContent = String(Math.round(obj.v)) } })
+    return () => { tw.kill() }
+  }, [todayComuni.length])
 
-  // Parallasse leggera della foto hero al movimento del mouse (solo desktop,
-  // reduced-motion safe): la scena "respira" dietro il titolo.
-  useEffect(() => {
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
-    const host = heroRef.current, photo = heroPhotoRef.current
-    if (!host || !photo) return
-    const onMove = (e: MouseEvent) => {
-      const r = host.getBoundingClientRect()
-      const dx = (e.clientX - r.left) / r.width - 0.5
-      const dy = (e.clientY - r.top) / r.height - 0.5
-      gsap.to(photo, { x: dx * -14, y: dy * -10, scale: 1.04, duration: 0.9, ease: 'power2.out' })
-    }
-    const onLeave = () => gsap.to(photo, { x: 0, y: 0, scale: 1.02, duration: 1.1, ease: 'power2.out' })
-    host.addEventListener('mousemove', onMove)
-    host.addEventListener('mouseleave', onLeave)
-    return () => { host.removeEventListener('mousemove', onMove); host.removeEventListener('mouseleave', onLeave) }
-  }, [])
-
-  // Reveal d'ingresso delle sezioni (solo transform → mai testo invisibile)
+  // Reveal d'ingresso delle sezioni + parallasse leggera sulle foto.
   useEffect(() => {
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
     const ctx = gsap.context(() => {
       gsap.utils.toArray<HTMLElement>('.home-reveal').forEach((el) => {
         gsap.from(el, { y: 30, duration: 0.7, ease: 'power3.out', clearProps: 'transform', scrollTrigger: { trigger: el, start: 'top 88%', once: true } })
       })
-      // parallasse leggera sulle immagini del racconto (scrub)
       gsap.utils.toArray<HTMLElement>('[data-plx]').forEach((img) => {
         gsap.fromTo(
           img,
@@ -165,324 +211,320 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
 
   return (
     <>
-      {/* ===== HERO — foto ferma + velo blu + acqua reattiva. UNA sola azione. ===== */}
-      <section ref={heroRef} className="relative min-h-[100svh] flex flex-col overflow-hidden bg-notte text-carta">
-        <div ref={heroPhotoRef} className="absolute -inset-4 scale-[1.02] will-change-transform">
-          <PhotoFx query="Sanremo" fallbackQuery="Sanremo Liguria" alt="La Riviera di Ponente" fill priority tint="none" />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-mare-700/60 via-notte/45 to-notte/90 pointer-events-none" aria-hidden="true" />
-        <canvas ref={aquaRef} className="pointer-events-none absolute inset-0 h-full w-full z-[1]" aria-hidden="true" />
-        <div className="absolute inset-0 bg-gradient-to-b from-notte/25 via-transparent to-notte/75 pointer-events-none z-[1]" aria-hidden="true" />
-
-        <div className="relative z-10 container mx-auto px-4 md:px-6 pt-7 flex items-start justify-between gap-3">
-          <div data-anim className="text-carta text-base"><Logo inline /></div>
-          <div data-anim className="flex gap-1">
-            {LANGS.map((l) => (
-              <button key={l} onClick={() => setLang(l)} aria-pressed={lang === l}
-                className={`text-xs font-bold uppercase px-2.5 py-1 rounded-md border-2 transition-colors ${lang === l ? 'bg-carta text-ink border-carta' : 'text-carta border-carta/30 hover:border-carta'}`}>
-                {l}
-              </button>
-            ))}
+      {/* ===== HERO (proposta B "L'Intreccio") — crema + tratteggio tenue,
+           contenuto a sinistra, collage fotografico a destra. ===== */}
+      <section ref={heroRef} className="relative min-h-[92svh] flex flex-col overflow-hidden bg-crema text-ink">
+        <div className="relative z-10 container mx-auto px-4 md:px-6 pt-7 flex items-center justify-between gap-3 flex-wrap">
+          <div data-anim><Logo inline className="text-ink" /></div>
+          <div data-anim className="flex items-center gap-3">
+            <div className="flex gap-1">
+              {LANGS.map((l) => (
+                <button key={l} onClick={() => setLang(l)} aria-pressed={lang === l}
+                  className={`text-xs font-bold uppercase px-2.5 py-1 rounded-md border-2 transition-colors ${lang === l ? 'bg-ink text-crema border-ink' : 'text-ink border-ink/20 hover:border-ink'}`}>
+                  {l}
+                </button>
+              ))}
+            </div>
+            <Link href="/aderisci" className="hidden sm:inline-flex font-alt font-semibold text-sm bg-alga text-crema px-4 py-1.5 rounded-full hover:bg-alga-600 transition-colors">
+              {rete.pill}
+            </Link>
           </div>
         </div>
 
         <div className="relative z-10 flex-1 flex items-center">
-          <div className="container mx-auto px-4 md:px-6 py-10">
-            <h1 className="font-display text-carta text-[14vw] leading-[0.96] tracking-[0.01em] max-w-[14ch] md:text-[8rem] [text-shadow:0_2px_28px_rgba(14,48,64,0.55)]">
-              {headlineWords.map((w, i) => (
-                <span key={i} className="inline-block overflow-hidden align-bottom pr-[0.14em]">
-                  <span data-word className={`imk-word inline-block ${i === headlineWords.length - 1 ? 'italic text-sole' : ''}`}>{w}</span>
-                </span>
-              ))}
-            </h1>
-            <p data-anim className="mt-5 max-w-2xl text-lg md:text-xl text-carta [text-shadow:0_1px_14px_rgba(14,48,64,0.6)]">{copy.heroSubtitle}</p>
-            {/* Ricerca direttamente nell'hero: una sola azione forte, sopra la piega
-                (la vecchia sezione #cerca separata è stata assorbita qui). */}
-            <form data-anim onSubmit={submitSearch} className="mt-8 flex flex-col sm:flex-row gap-2.5 max-w-xl">
-              <div className="imk-edge relative flex-1 min-w-0 bg-white text-ink border-2 border-transparent shadow-lg focus-within:border-sole">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-muted z-10" aria-hidden="true" />
-                <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={typed} aria-label={dict.searchPlaceholder}
-                  className="w-full pl-12 pr-4 py-4 bg-transparent rounded-2xl text-[16px] focus:outline-none" />
+          <div className="container mx-auto px-4 md:px-6 py-12 grid md:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-14 items-center">
+            <div className="max-w-2xl">
+              <p data-anim className="font-alt text-xs font-bold uppercase tracking-[0.2em] text-alga mb-6">{HERO_EYEBROW[lang]}</p>
+              <h1 className="font-display font-extrabold tracking-[-0.02em] text-ink text-[11vw] leading-[1.04] md:text-[4.4rem]">
+                {headlineWords.map((w, i) => (
+                  <span key={i} className="inline-block overflow-hidden align-bottom pr-[0.16em]">
+                    <span data-word className={`imk-word inline-block ${i >= headlineWords.length - 2 ? 'text-alga' : ''}`}>{w}</span>
+                  </span>
+                ))}
+              </h1>
+              <p data-anim className="mt-6 max-w-xl text-lg text-ink-soft leading-relaxed">{copy.heroSubtitle}</p>
+              <form data-anim onSubmit={submitSearch} className="mt-8 flex flex-col sm:flex-row gap-2.5 max-w-xl">
+                <div className="relative flex-1 min-w-0 bg-white text-ink border border-[#e0d7c1] rounded-xl shadow-[0_12px_26px_-18px_rgba(38,36,30,0.5)] focus-within:border-alga">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-muted z-10" aria-hidden="true" />
+                  <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={typed} aria-label={dict.searchPlaceholder}
+                    className="w-full pl-12 pr-4 py-4 bg-transparent rounded-xl text-[16px] focus:outline-none" />
+                </div>
+                <button type="submit" className="group imk-lift inline-flex items-center justify-center gap-2 font-alt font-semibold text-sm bg-terracotta text-crema px-6 py-4 rounded-xl hover:bg-terracotta-600 transition-colors flex-shrink-0">
+                  {copy.searchCta} <ArrowRight className="imk-march w-4 h-4" />
+                </button>
+              </form>
+              {/* Chips dei giorni (dal mockup): il giorno di oggi è pieno alga */}
+              <div className="mt-5 flex flex-wrap gap-2" aria-label={copy.heroChips.today}>
+                {DAYS_I18N[lang].map((d, i) => (
+                  <Link
+                    key={d}
+                    data-chip
+                    href={i === todayIdx ? '/mappa?d=oggi' : `/mappa?d=${DAY_PARAM[i]}`}
+                    className={`font-alt text-[13px] font-semibold rounded-full px-3.5 py-1.5 border-[1.5px] transition-colors ${
+                      i === todayIdx
+                        ? 'bg-alga text-crema border-alga'
+                        : 'text-alga-600 border-alga/60 bg-crema/70 hover:bg-alga hover:text-crema hover:border-alga'
+                    }`}
+                  >
+                    {d}{i === todayIdx ? ` · ${TODAY_SHORT[lang]}` : ''}
+                  </Link>
+                ))}
               </div>
-              <button type="submit" className="group imk-lift inline-flex items-center justify-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-6 py-4 imk-edge hover:bg-sole-600 transition-colors flex-shrink-0">
-                {copy.searchCta} <ArrowRight className="imk-march w-4 h-4" />
-              </button>
-            </form>
+              {todayComuni.length > 0 && (
+                <Link data-anim href="/mappa?d=oggi" className="group mt-5 inline-flex items-baseline gap-2 font-alt text-sm font-semibold text-terracotta-600 hover:text-terracotta">
+                  <span>{copy.heroChips.today}: <span ref={oggiRef} className="font-display font-extrabold text-xl text-ink">{todayComuni.length}</span> {APERTI[lang]}</span>
+                  <ArrowRight className="w-4 h-4 self-center group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
+                </Link>
+              )}
+            </div>
+
+            {/* Collage fotografico: i mercati, uno sopra l'altro, sparsi sul lato destro. */}
+            <div data-anim className="relative hidden md:block pr-4 pt-6 pb-10">
+              <div className="relative overflow-hidden rounded-2xl border border-[#e0d7c1] shadow-xl aspect-[4/5]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/zone/vita-mercato-ventimiglia.jpg"
+                  alt="Il mercato del venerdì a Ventimiglia"
+                  data-plx
+                  className="absolute inset-0 w-full h-full object-cover scale-110 will-change-transform"
+                />
+              </div>
+              <figure className="absolute -top-2 -right-2 w-[42%] rotate-2 bg-white border border-[#e0d7c1] rounded-md p-1.5 pb-2 shadow-lg">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/zone/vita-fiori-sanremo-1962.jpg" alt="Il mercato dei fiori di Sanremo nel 1962" loading="lazy" className="w-full aspect-[4/3] object-cover rounded-sm" />
+                <figcaption className="mt-1 px-1 font-alt italic text-xs text-ink-soft leading-tight">Sanremo, 1962</figcaption>
+              </figure>
+              <figure className="absolute -bottom-5 -left-5 w-[46%] -rotate-3 bg-white border border-[#e0d7c1] rounded-md p-1.5 pb-2 shadow-xl">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/zone/vita-mercato-coperto-ventimiglia.jpg" alt="L’interno del mercato coperto di Ventimiglia" loading="lazy" className="w-full aspect-[4/3] object-cover rounded-sm" />
+                <figcaption className="mt-1 px-1 font-alt italic text-xs text-ink-soft leading-tight">Il mercato coperto, Ventimiglia</figcaption>
+              </figure>
+            </div>
           </div>
         </div>
 
-        {/* Box "Oggi al mercato": informativo e cliccabile, in basso a destra.
-            Su mobile resta in flusso sopra il bordo-onda. */}
-        {todayComuni.length > 0 && (
-          <Link
-            data-anim
-            href="/mappa?d=oggi"
-            aria-label={copy.heroChips.today}
-            className="group relative z-10 mx-4 mb-4 block lg:absolute lg:bottom-16 lg:right-8 lg:m-0 lg:w-[22rem] imk-edge border border-carta/25 bg-notte/65 backdrop-blur-[3px] hover:border-sole/80 transition-colors"
-          >
-            <span className="flex items-center justify-between gap-2 px-3.5 pt-2.5">
-              <span className="inline-flex items-center gap-1.5 font-alt text-[11px] font-bold uppercase tracking-[0.12em] text-sole">
-                <Sun className="w-3.5 h-3.5" aria-hidden="true" /> {copy.heroChips.today}
-              </span>
-              <span className="imk-cartellino px-2.5 py-px font-hand text-[17px] font-bold leading-snug">
-                {todayComuni.length} <ArrowRight className="inline w-3 h-3 -mt-0.5" aria-hidden="true" />
-              </span>
-            </span>
-            {/* Nastro: contenitore con clipping proprio (contain:paint) così il
-                testo NON può uscire dal box; due metà identiche per il loop. */}
-            <span className="imk-marquee relative block w-full overflow-hidden pb-2.5 pt-1.5 [contain:paint]" aria-hidden="true">
-              <span className="imk-marquee-track flex w-max whitespace-nowrap will-change-transform font-alt text-sm text-carta/90">
-                {[0, 1].map((half) => (
-                  <span key={half} className="flex whitespace-nowrap pl-3.5">
-                    {todayComuni.map((c, i) => (
-                      <span key={`${half}-${i}`} className="mx-3 flex-shrink-0">
-                        {c} <span className="text-sole mx-1">·</span>
-                      </span>
-                    ))}
-                  </span>
-                ))}
-              </span>
-              <span className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-notte to-transparent opacity-80" />
-              <span className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-notte to-transparent opacity-80" />
-            </span>
-          </Link>
-        )}
-
-        <a href="#liguria" aria-label={copy.heroScrollCue} className="relative z-10 mx-auto mb-8 mt-3 flex flex-col items-center text-carta/70 hover:text-carta">
+        <a href="#perche" aria-label={copy.heroScrollCue} className="relative z-10 mx-auto mb-7 mt-2 flex flex-col items-center text-ink/50 hover:text-ink">
           <span className="font-alt text-[11px] font-semibold uppercase tracking-[0.14em] mb-1">{copy.heroScrollCue}</span>
           <span className="flex flex-col -space-y-1.5">
             <ChevronDown className="imk-chev w-4 h-4" /><ChevronDown className="imk-chev w-4 h-4" /><ChevronDown className="imk-chev w-4 h-4" />
           </span>
         </a>
-
-        {/* Bordo a onda: l'hero "sfocia" nella carta della pagina */}
-        <svg
-          className="pointer-events-none absolute bottom-0 inset-x-0 w-full h-7 md:h-10 text-mare z-[2]"
-          viewBox="0 0 1440 48"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-        >
-          <path d="M0 28 C 90 46 180 10 288 26 C 396 42 486 8 576 24 C 666 40 756 10 864 26 C 972 42 1062 8 1152 24 C 1242 40 1350 12 1440 28 L1440 48 L0 48 Z" fill="currentColor" />
-        </svg>
       </section>
 
-      {/* ===== LA LIGURIA VERA — dentro il mare: sezione color-block #15607C,
-           l'hero ci "sfocia" con l'onda, la schiuma chiara chiude in basso ===== */}
-      <section id="liguria" className="relative overflow-hidden bg-mare">
-        <BigWaves color="#F7EFDD" className="absolute bottom-0 inset-x-0 h-40 md:h-64 pointer-events-none" />
+      {/* ===== IL PROGETTO — storytelling emotivo: le informazioni si intendono,
+           non si elencano. Una foto che parla + tre passaggi di racconto. ===== */}
+      <section id="perche" className="relative overflow-hidden bg-crema-2">
+        <div aria-hidden="true" className="mz-band absolute top-0 inset-x-0" />
         <div className="relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-6xl">
-          <div className="home-reveal max-w-2xl mb-12 md:mb-16">
-            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-sole mb-2">{copy.liguria.eyebrow}</p>
-            <h2 className="font-display text-4xl md:text-6xl leading-[1.02] text-carta">{copy.liguria.title}</h2>
+          <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-16 items-center">
+            <div className="home-reveal relative overflow-hidden rounded-2xl border border-[#e0d7c1] shadow-lg aspect-[4/5] hidden sm:block">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                data-plx
+                src="/zone/vita-piazza-mercato-sanremo-1880.jpg"
+                alt="Sanremo, la piazza del mercato a fine Ottocento"
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover scale-110 will-change-transform"
+              />
+              <span className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink/70 to-transparent pointer-events-none" aria-hidden="true" />
+              <span className="absolute left-4 bottom-3 font-alt italic text-sm text-crema/90">Sanremo, piazza del mercato — fine Ottocento</span>
+            </div>
+            <div className="home-reveal">
+              <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-terracotta mb-2">{copy.liguria.eyebrow}</p>
+              <h2 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">{copy.liguria.title}</h2>
+              <div className="mt-7 space-y-5 max-w-xl">
+                {copy.liguria.beats.map((b) => (
+                  <p key={b.t} className="text-base md:text-lg text-ink-soft leading-relaxed">
+                    <span className="font-alt italic font-semibold text-terracotta">{b.t}.</span> {b.d}
+                  </p>
+                ))}
+              </div>
+            </div>
           </div>
-          <div className="space-y-14 md:space-y-24">
-            {copy.liguria.beats.map((b, i) => (
-              <div key={b.t} className="home-reveal grid md:grid-cols-2 gap-8 md:gap-14 items-center">
-                <div className={`relative overflow-hidden imk-edge border-2 border-carta/25 shadow-lg aspect-[4/3] ${i % 2 === 1 ? 'md:order-2' : ''}`}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    data-plx
-                    src={BEAT_IMG[i].src}
-                    alt={BEAT_IMG[i].alt}
-                    loading="lazy"
-                    className="absolute inset-0 w-full h-full object-cover scale-110 will-change-transform"
-                  />
-                </div>
-                <div>
-                  {/* La cifra "scritta a mano" col pennarello del banco (Caveat) */}
-                  <p className="font-hand font-bold text-7xl md:text-9xl leading-none -rotate-2 origin-left w-fit" style={{ color: BEAT_ACCENT[i] }}>{b.stat}</p>
-                  <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-marel/80 mt-2">{b.statLabel}</p>
-                  <h3 className="font-alt font-extrabold text-2xl md:text-3xl text-carta mt-5">{b.t}</h3>
-                  <p className="mt-3 text-base text-carta/85 leading-relaxed max-w-md">{b.d}</p>
-                </div>
+
+          {/* Il "cosa" del progetto: percorso di qualità, operatori a portata, servizi in più */}
+          <div className="home-reveal mt-12 md:mt-14 grid sm:grid-cols-3 gap-5 md:gap-6">
+            {WHAT_I18N[lang].map((w) => (
+              <div key={w.t} className="flex flex-col gap-2 bg-crema rounded-2xl border border-[#e0d7c1] p-5 md:p-6 shadow-[0_16px_30px_-24px_rgba(38,36,30,0.45)]">
+                <LogoMark className="w-8 h-7 text-terracotta" capo={false} />
+                <h3 className="font-display font-extrabold tracking-tight text-lg md:text-xl leading-tight text-ink">{w.t}</h3>
+                <p className="text-[15px] text-ink-soft leading-relaxed">{w.d}</p>
               </div>
             ))}
+          </div>
+          <div className="home-reveal mt-8">
+            <Link href="/mappa?vicino=1" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-alga text-crema px-6 py-3.5 rounded-full hover:bg-alga-600 transition-colors">
+              {copy.heroChips.near} <ArrowRight className="imk-march w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ===== LE PERSONE — il manifesto del progetto: mettere in contatto
-           chi cerca con chi tiene banco. Prima sezione, la più ricca. ===== */}
-      <section id="valori" className="relative overflow-hidden bg-carta">
-        {/* Il tendone del mare qui sopra si chiude sulla carta */}
-        <CanopyEdge color="#15607C" className="absolute top-0 inset-x-0" />
-        <DriftBackdrop tone="light" variant="section" />
-        {/* Lettera fantasma: il Ponente in Italiana, come filigrana di carta */}
-        <span
-          aria-hidden="true"
-          className="pointer-events-none select-none absolute -top-8 right-[-4%] font-display italic text-[24vw] md:text-[17rem] leading-none text-mare/[0.06]"
-        >
-          Ponente
-        </span>
+      {/* ===== MERCATI TIPICI — dentro il racconto: un'altra famiglia di mercati ===== */}
+      <section id="tipici" className="relative overflow-hidden bg-crema">
+        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-20 max-w-6xl">
+          <div className="max-w-2xl mb-8">
+            <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-terracotta mb-2">{ui.navTipici}</p>
+            <h2 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">{TIPICI_TITLE[lang]}</h2>
+            <p className="mt-3 text-ink-soft">{TIPICI_LEAD[lang]}</p>
+          </div>
+          {prossimiTipici.length > 0 && (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {prossimiTipici.map((t) => (
+                <Link key={t.id} href="/tipici" className="imk-lift group flex flex-col bg-white rounded-xl border border-[#e0d7c1] overflow-hidden">
+                  <span aria-hidden="true" className="mz-band" style={{ ['--band' as string]: CATEGORY_COLOR[t.cat] }} />
+                  <span className="p-5">
+                    <span className="block font-display font-extrabold tracking-tight text-2xl leading-none" style={{ color: CATEGORY_COLOR_DARK[t.cat] }}>
+                      {fmtDate(t.date.toISOString())}
+                    </span>
+                    <span className="mt-1.5 block font-display font-extrabold tracking-tight text-lg text-ink leading-tight">{t.comune}</span>
+                    <span className="mt-2 inline-block rounded-full px-2.5 py-0.5 text-[10px] font-alt font-bold uppercase tracking-wider text-crema" style={{ background: CATEGORY_COLOR[t.cat] }}>
+                      {categoryLabelI18n(t.cat, lang)}
+                    </span>
+                    <span className="mt-2 block text-xs text-ink-muted leading-snug">{t.giorno}</span>
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
+          <div className="mt-8">
+            <Link href="/tipici" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-terracotta text-crema px-6 py-3.5 rounded-full hover:bg-terracotta-600 transition-colors">
+              <CalendarDays className="w-4 h-4" /> {TIPICI_CTA[lang]} <ArrowRight className="imk-march w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== TI ASPETTANO AL BANCO — sneak peek dei banchi di fiducia ===== */}
+      <section id="valori" className="relative overflow-hidden bg-crema-2">
         <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-6xl">
           <div className="grid lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-16 items-center">
             <div>
-              <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-2">{copy.valueProject.k}</p>
-              <h2 className="font-display text-4xl md:text-6xl leading-[1.02] text-ink">
+              <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-2">{copy.operatorsEyebrow}</p>
+              <h2 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">
                 {copy.operatorsTitle.split(' ').map((w, i, arr) => (
-                  <span key={i} className={i === arr.length - 1 ? 'italic text-fiore' : ''}>{w} </span>
+                  <span key={i} className={i === arr.length - 1 ? 'text-terracotta' : ''}>{w} </span>
                 ))}
               </h2>
               <p className="mt-4 text-base md:text-lg text-ink-soft leading-relaxed">{copy.operatorsLead}</p>
+              <div className="mt-7">
+                <Link href="/operatori" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-terracotta text-crema px-6 py-3.5 rounded-full hover:bg-terracotta-600 transition-colors">
+                  <Store className="w-4 h-4" /> {copy.operatorsCta} <ArrowRight className="imk-march w-4 h-4" />
+                </Link>
+              </div>
             </div>
-
-            {/* Collage di vita di mercato: il calore, non i concetti */}
-            <div className="relative pt-4 pb-10 pr-4 hidden sm:block">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/zone/vita-mercato-ventimiglia.jpg"
-                alt="Il mercato del venerdì a Ventimiglia, con la città alta alle spalle"
-                loading="lazy"
-                className="imk-edge imk-tilt-r w-full aspect-[4/3] object-cover border-2 border-ink/10 shadow-md"
-              />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/zone/vita-banco-verdure.jpg"
-                alt="Un banco di verdure al mercato, tra venditore e clienti"
-                loading="lazy"
-                className="imk-edge imk-tilt-l absolute -bottom-2 -left-3 w-1/2 aspect-[4/3] object-cover border-[3px] border-carta shadow-xl"
-              />
-              <figure className="absolute -top-3 -right-1 w-[38%] rotate-2 bg-white border-2 border-ink/10 imk-edge p-1.5 pb-2 shadow-lg">
+            {/* Due foto di operatori, a lato: il banco e le mani, non i concetti */}
+            <div className="relative hidden lg:block pt-4 pb-10 pr-3">
+              <div className="relative overflow-hidden rounded-2xl border border-[#e0d7c1] shadow-lg aspect-[4/3]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/zone/vita-fiori-sanremo-1962.jpg"
-                  alt="Il mercato dei fiori di Sanremo nel 1962"
+                  data-plx
+                  src="/zone/vita-banco-verdure.jpg"
+                  alt="Un banco di verdure al mercato, tra venditore e clienti"
                   loading="lazy"
-                  className="w-full aspect-[4/3] object-cover"
+                  className="absolute inset-0 w-full h-full object-cover scale-110 will-change-transform"
                 />
-                <figcaption className="mt-1 px-1 font-accent text-lg text-ink-soft leading-tight">Sanremo, 1962</figcaption>
+              </div>
+              <figure className="absolute -bottom-6 -left-4 w-[46%] -rotate-2 bg-white border border-[#e0d7c1] rounded-md p-1.5 pb-2 shadow-xl">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/zone/vita-sapori.jpg" alt="Sapori e prodotti sul banco del mercato" loading="lazy" className="w-full aspect-[4/3] object-cover rounded-sm" />
+                <figcaption className="mt-1 px-1 font-alt italic text-xs text-ink-soft leading-tight">I sapori del banco</figcaption>
               </figure>
             </div>
           </div>
 
-
-          {/* I Maestri, in evidenza: mini-ritratti sul notte, come sui social —
-              nome in Italiana col punto + riga di servizio gialla. */}
+          {/* I banchi di fiducia: card bianche con la band terracotta */}
           {operators.length > 0 && (
             <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {operators.slice(0, 8).map((op, i) => (
+              {operators.slice(0, 8).map((op) => (
                 <Link
                   key={op.id}
                   href={op.market ? `/${op.market.slug}/operators/${op.id}` : '/operatori'}
                   aria-label={`Scopri ${op.name}`}
-                  className={`imk-lift group relative overflow-hidden flex items-start gap-3.5 bg-notte border-2 border-notte imk-edge p-4 pt-5 hover:border-sole transition-colors ${
-                    i % 4 === 1 ? 'imk-tilt-l' : i % 4 === 2 ? 'imk-tilt-r' : ''
-                  }`}
+                  className="imk-lift group flex flex-col bg-white border border-[#e0d7c1] rounded-xl overflow-hidden hover:border-terracotta transition-colors"
                 >
-                  <span aria-hidden="true" className="absolute top-0 inset-x-0 h-1.5 imk-awning" />
-                  <BancoAvatar name={op.name} size={52} className="border-2 border-carta/20" />
-                  <span className="min-w-0 flex-1">
-                    <span className="block font-display text-[1.35rem] text-carta leading-tight group-hover:text-sole transition-colors">{op.name.replace(/\.+$/, '')}.</span>
-                    <span className="block font-alt text-[11px] font-bold uppercase tracking-wider text-sole mt-1">{categoryLabel(op.category, lang)}</span>
-                    {op.market && <span className="block text-xs text-marel/75 mt-0.5 truncate">{op.market.name}</span>}
+                  <span aria-hidden="true" className="mz-band" style={{ ['--band' as string]: '#C4593C' }} />
+                  <span className="flex items-start gap-3.5 p-4">
+                    <BancoAvatar name={op.name} size={48} className="border border-[#e0d7c1]" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block font-display font-extrabold tracking-tight text-lg text-ink leading-tight group-hover:text-terracotta transition-colors">{op.name.replace(/\.+$/, '')}.</span>
+                      <span className="mt-1 inline-block font-alt text-[11px] font-bold uppercase tracking-wide text-terracotta-600 bg-terracotta-50 rounded-full px-2 py-0.5">{categoryLabel(op.category, lang)}</span>
+                      {op.market && <span className="block text-xs text-ink-muted mt-1 truncate">{op.market.name}</span>}
+                    </span>
+                    <ArrowRight className="w-4 h-4 text-ink-muted group-hover:text-terracotta group-hover:translate-x-0.5 transition-all flex-shrink-0 mt-1" aria-hidden="true" />
                   </span>
-                  <ArrowRight className="w-4 h-4 text-carta/50 group-hover:text-sole group-hover:translate-x-0.5 transition-all flex-shrink-0 mt-1" aria-hidden="true" />
                 </Link>
               ))}
             </div>
           )}
 
-          <div className="mt-9 flex flex-wrap gap-3">
-            <Link href="/operatori" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-sole text-ink px-6 py-3.5 rounded-full hover:bg-sole-600 transition-colors">
-              <Store className="w-4 h-4" /> {copy.operatorsCta} <ArrowRight className="imk-march w-4 h-4" />
-            </Link>
-            <Link href="/aderisci" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-ink text-carta px-6 py-3.5 rounded-full hover:bg-mare transition-colors">
-              {copy.operatorsJoinCta} <ArrowRight className="imk-march w-4 h-4" />
-            </Link>
-          </div>
         </div>
       </section>
 
-      {/* ===== LE ZONE — quindici zone, quindici racconti (aria di marel) ===== */}
-      <BorghiSection
-        className="bg-sole"
-        eyebrow={dict.zones.eyebrow}
-        title={copy.valueProject.title}
-        lead={copy.valueProject.lead}
-        cta={{ label: copy.exploreMapCta, href: '/mappa' }}
-      />
+      {/* ===== LA RETE — striscia compatta per chi tiene banco (il resto vive su /aderisci) ===== */}
+      <section id="rete" className="relative overflow-hidden bg-alga text-crema">
+        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-9 md:py-11 max-w-5xl flex flex-wrap items-center gap-x-8 gap-y-5">
+          <Bollino className="w-20 md:w-24 flex-shrink-0" />
+          <div className="flex-1 min-w-[240px]">
+            <h2 className="font-display font-extrabold tracking-tight text-xl md:text-2xl leading-tight text-crema">{rete.title}</h2>
+            <p className="mt-2 flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-crema/90">
+              {rete.req.map((r) => (
+                <span key={r} className="inline-flex items-center gap-1.5 font-alt font-semibold">
+                  <LogoMark className="w-5 h-4 flex-shrink-0 text-limone" capo={false} /> {r}
+                </span>
+              ))}
+            </p>
+          </div>
+          <Link href="/aderisci" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-terracotta text-crema px-6 py-3.5 rounded-full hover:bg-terracotta-600 transition-colors flex-shrink-0">
+            {rete.cta} <ArrowRight className="imk-march w-4 h-4" />
+          </Link>
+        </div>
+      </section>
 
-      {/* ===== LA SETTIMANA — notizie ed eventi, di sera: le luci da sagra ===== */}
-      <section id="settimana" className="relative overflow-hidden bg-notte text-carta border-b-2 border-notte">
-        <StringLights className="absolute top-0 inset-x-0" />
-        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 pt-24 pb-16 md:pt-28 md:pb-24 max-w-5xl">
+      {/* ===== GLI ARTICOLI — le notizie dei comuni, al posto delle zone ===== */}
+      <section id="settimana" className="relative overflow-hidden bg-ink text-crema">
+        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-5xl">
           <div className="max-w-2xl mb-9">
-            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-sole mb-2">{copy.weekEyebrow}</p>
-            <h2 className="font-alt font-extrabold tracking-tight text-3xl md:text-4xl leading-[1.04] text-carta">{copy.weekTitle}</h2>
-            <p className="mt-2 text-sm text-carta/70">{copy.weekLead}</p>
+            <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-limone mb-2">{copy.weekEyebrow}</p>
+            <h2 className="font-display font-extrabold tracking-tight text-3xl md:text-4xl leading-[1.04] text-crema">{copy.weekTitle}</h2>
+            <p className="mt-2 text-sm text-crema/70">{copy.weekLead}</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
-            {/* colonna notizie */}
-            <div>
-              <p className="inline-flex items-center gap-2 font-alt text-xs font-semibold uppercase tracking-[0.14em] text-marel mb-4">
-                <Newspaper className="w-4 h-4" aria-hidden="true" /> {copy.newsColTitle}
-              </p>
-              {news.length === 0 && liveNews.length === 0 ? (
-                <WaterCard className="px-6 py-9 text-center">
-                  <p className="font-accent text-2xl text-mare-600">{copy.newsEmpty}</p>
-                  <p className="mt-2 text-sm text-ink-soft">{copy.newsEmptyLead}</p>
+          <p className="inline-flex items-center gap-2 font-alt text-xs font-bold uppercase tracking-[0.16em] text-crema/70 mb-4">
+            <Newspaper className="w-4 h-4" aria-hidden="true" /> {copy.newsColTitle}
+          </p>
+          {news.length === 0 && liveNews.length === 0 ? (
+            <WaterCard className="px-6 py-9 text-center max-w-xl">
+              <p className="font-display font-extrabold text-xl text-alga">{copy.newsEmpty}</p>
+              <p className="mt-2 text-sm text-ink-soft">{copy.newsEmptyLead}</p>
+            </WaterCard>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+              {news.slice(0, 4).map((n) => (
+                <WaterCard key={n.id} className="p-5">
+                  <span className="font-alt text-xs font-semibold uppercase tracking-[0.1em] text-alga">
+                    {fmtDate(n.publish_from)}{n.markets?.name ? ` · ${n.markets.name}` : ''}
+                  </span>
+                  <h3 className="font-display font-extrabold tracking-tight text-lg text-ink leading-tight mt-1.5">{n.title}</h3>
+                  {n.content && <p className="mt-1.5 text-sm text-ink-soft leading-snug line-clamp-2">{n.content}</p>}
                 </WaterCard>
-              ) : (
-                <div className="space-y-4">
-                  {news.slice(0, 3).map((n, i) => (
-                    <WaterCard key={n.id} tilt={i % 2 === 0 ? 'l' : 'r'} className="p-5">
-                      <span className="font-alt text-xs font-semibold uppercase tracking-[0.1em] text-mare-600">
-                        {fmtDate(n.publish_from)}{n.markets?.name ? ` · ${n.markets.name}` : ''}
-                      </span>
-                      <h3 className="font-alt font-bold text-lg text-ink leading-tight mt-1.5">{n.title}</h3>
-                      {n.content && <p className="mt-1.5 text-sm text-ink-soft leading-snug line-clamp-2">{n.content}</p>}
-                    </WaterCard>
-                  ))}
-                  {liveNews.slice(0, Math.max(0, 3 - news.length)).map((n, i) => (
-                    <a key={n.link} href={n.link} target="_blank" rel="noopener noreferrer" className="block">
-                      <WaterCard tilt={i % 2 === 0 ? 'r' : 'l'} className="p-5 hover:border-mare/60 transition-colors">
-                        <span className="font-alt text-xs font-semibold uppercase tracking-[0.1em] text-mare-600">
-                          {n.publishedAt ? fmtDate(n.publishedAt) : ''}{n.source ? ` · ${n.source}` : ''} ↗
-                        </span>
-                        <h3 className="font-alt font-bold text-lg text-ink leading-tight mt-1.5 line-clamp-2">{n.title}</h3>
-                      </WaterCard>
-                    </a>
-                  ))}
-                </div>
-              )}
+              ))}
+              {liveNews.slice(0, Math.max(0, 4 - news.length)).map((n) => (
+                <a key={n.link} href={n.link} target="_blank" rel="noopener noreferrer" className="block">
+                  <WaterCard className="p-5 hover:border-alga/60 transition-colors">
+                    <span className="font-alt text-xs font-semibold uppercase tracking-[0.1em] text-alga">
+                      {n.publishedAt ? fmtDate(n.publishedAt) : ''}{n.source ? ` · ${n.source}` : ''} ↗
+                    </span>
+                    <h3 className="font-display font-extrabold tracking-tight text-lg text-ink leading-tight mt-1.5 line-clamp-2">{n.title}</h3>
+                  </WaterCard>
+                </a>
+              ))}
             </div>
+          )}
 
-            {/* colonna Mercati tipici: i prossimi appuntamenti speciali */}
-            <div>
-              <p className="inline-flex items-center gap-2 font-alt text-xs font-semibold uppercase tracking-[0.14em] text-sole mb-4">
-                <CalendarDays className="w-4 h-4" aria-hidden="true" /> {ui.navTipici}
-              </p>
-              {prossimiTipici.length === 0 ? (
-                <WaterCard className="px-6 py-9 text-center">
-                  <p className="font-accent text-2xl text-mare-600">{ui.tipiciEmptyCalendar}</p>
-                </WaterCard>
-              ) : (
-                /* Tabellone "da stazione": data … comune, col leader puntinato
-                   (lo stesso formato del post-servizio della settimana). */
-                <div>
-                  {prossimiTipici.map((t) => (
-                    <Link key={t.id} href="/tipici" className="group flex items-baseline gap-3 py-3.5 border-b border-carta/10 hover:border-sole/60 transition-colors">
-                      <span className="font-alt text-sm font-bold uppercase tracking-wide text-sole tabular-nums whitespace-nowrap">{fmtDate(t.date.toISOString())}</span>
-                      <span className="imk-leader text-carta" aria-hidden="true" />
-                      <span className="min-w-0 text-right">
-                        <span className="block font-alt font-bold text-lg text-carta leading-tight group-hover:text-sole transition-colors">{t.comune}</span>
-                        <span className="block text-[11px] font-alt font-semibold uppercase tracking-wider text-marel/70">{categoryLabelI18n(t.cat, lang)}</span>
-                      </span>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* pulsanti evidenti verso le sezioni dedicate */}
-          <div className="mt-10 flex flex-wrap gap-3">
-            <Link href="/notizie" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-carta text-ink px-6 py-3.5 rounded-full hover:bg-sole transition-colors">
+          <div className="mt-10">
+            <Link href="/notizie" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-crema text-ink px-6 py-3.5 rounded-full hover:bg-limone transition-colors">
               <Newspaper className="w-4 h-4" /> {copy.newsAllCta} <ArrowRight className="imk-march w-4 h-4" />
-            </Link>
-            <Link href="/tipici" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-ink text-carta px-6 py-3.5 rounded-full hover:bg-mare transition-colors">
-              <CalendarDays className="w-4 h-4" /> {ui.navTipici} <ArrowRight className="imk-march w-4 h-4" />
             </Link>
           </div>
         </div>

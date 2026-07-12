@@ -62,9 +62,9 @@ export const UI_I18N: Record<Lang, UiDict> = {
   it: {
     navMap: 'Mappa dei mercati',
     navTipici: 'Mercati tipici',
-    navOperators: 'I Maestri del Banco',
+    navOperators: 'I banchi di fiducia',
     navCalendar: 'Calendario eventi',
-    footerTagline: 'Guida ai mercati della Riviera di Ponente.',
+    footerTagline: 'Guida ai mercati della Riviera dei Fiori.',
     footerNews: 'Notizie',
     footerEvents: 'Eventi',
     footerJoin: 'Aderisci',
@@ -98,7 +98,7 @@ export const UI_I18N: Record<Lang, UiDict> = {
     tipiciEyebrow: 'Oltre le merci varie',
     tipiciTitle: 'Mercati tipici',
     tipiciLead:
-      'Antiquariato e collezionismo, produttori e sapori, artigianato: i mercati speciali del Ponente, con le loro ricorrenze — la prima domenica, il terzo sabato, le sere d’estate. Da Ventimiglia a Varazze.',
+      'Antiquariato e collezionismo, produttori e sapori, artigianato: i mercati speciali della Riviera dei Fiori, con le loro ricorrenze — la prima domenica, il terzo sabato, le sere d’estate. Da Ventimiglia a Diano.',
     tipiciCalendarTab: 'Calendario',
     tipiciListTab: 'Tutti i mercati',
     tipiciAllZones: 'Tutte le zone',
@@ -112,9 +112,9 @@ export const UI_I18N: Record<Lang, UiDict> = {
   fr: {
     navMap: 'Carte des marchés',
     navTipici: 'Marchés typiques',
-    navOperators: 'Les Maîtres de l’étal',
+    navOperators: 'Les étals de confiance',
     navCalendar: 'Calendrier des événements',
-    footerTagline: 'Guide des marchés de la Riviera di Ponente.',
+    footerTagline: 'Guide des marchés de la Riviera dei Fiori.',
     footerNews: 'Actualités',
     footerEvents: 'Événements',
     footerJoin: 'Adhérer',
@@ -148,7 +148,7 @@ export const UI_I18N: Record<Lang, UiDict> = {
     tipiciEyebrow: 'Au-delà du tout-venant',
     tipiciTitle: 'Marchés typiques',
     tipiciLead:
-      'Antiquités et collection, producteurs et saveurs, artisanat : les marchés spéciaux du Ponant, avec leurs récurrences — le premier dimanche, le troisième samedi, les soirs d’été. De Vintimille à Varazze.',
+      'Antiquités et collection, producteurs et saveurs, artisanat : les marchés spéciaux de la Riviera dei Fiori, avec leurs récurrences — le premier dimanche, le troisième samedi, les soirs d’été. De Vintimille à Diano.',
     tipiciCalendarTab: 'Calendrier',
     tipiciListTab: 'Tous les marchés',
     tipiciAllZones: 'Toutes les zones',
@@ -162,9 +162,9 @@ export const UI_I18N: Record<Lang, UiDict> = {
   de: {
     navMap: 'Karte der Märkte',
     navTipici: 'Typische Märkte',
-    navOperators: 'Die Meister des Standes',
+    navOperators: 'Die Stände des Vertrauens',
     navCalendar: 'Veranstaltungskalender',
-    footerTagline: 'Führer zu den Märkten der Riviera di Ponente.',
+    footerTagline: 'Führer zu den Märkten der Riviera dei Fiori.',
     footerNews: 'Nachrichten',
     footerEvents: 'Termine',
     footerJoin: 'Mitmachen',
@@ -198,7 +198,7 @@ export const UI_I18N: Record<Lang, UiDict> = {
     tipiciEyebrow: 'Mehr als Allerlei',
     tipiciTitle: 'Typische Märkte',
     tipiciLead:
-      'Antiquitäten und Sammlerstücke, Erzeuger und Spezialitäten, Handwerk: die besonderen Märkte des Ponente mit ihren Terminen — erster Sonntag, dritter Samstag, Sommerabende. Von Ventimiglia bis Varazze.',
+      'Antiquitäten und Sammlerstücke, Erzeuger und Spezialitäten, Handwerk: die besonderen Märkte der Riviera dei Fiori mit ihren Terminen — erster Sonntag, dritter Samstag, Sommerabende. Von Ventimiglia bis Diano.',
     tipiciCalendarTab: 'Kalender',
     tipiciListTab: 'Alle Märkte',
     tipiciAllZones: 'Alle Zonen',
@@ -212,9 +212,9 @@ export const UI_I18N: Record<Lang, UiDict> = {
   en: {
     navMap: 'Market map',
     navTipici: 'Typical markets',
-    navOperators: 'The Stall Masters',
+    navOperators: 'The trusted stalls',
     navCalendar: 'Events calendar',
-    footerTagline: 'Guide to the markets of the Riviera di Ponente.',
+    footerTagline: 'Guide to the markets of the Riviera dei Fiori.',
     footerNews: 'News',
     footerEvents: 'Events',
     footerJoin: 'Join us',
@@ -248,7 +248,7 @@ export const UI_I18N: Record<Lang, UiDict> = {
     tipiciEyebrow: 'Beyond the everyday market',
     tipiciTitle: 'Typical markets',
     tipiciLead:
-      'Antiques and collectables, growers and flavours, crafts: the special markets of the Ponente with their recurrences — first Sunday, third Saturday, summer evenings. From Ventimiglia to Varazze.',
+      'Antiques and collectables, growers and flavours, crafts: the special markets of the Riviera dei Fiori with their recurrences — first Sunday, third Saturday, summer evenings. From Ventimiglia to Diano.',
     tipiciCalendarTab: 'Calendar',
     tipiciListTab: 'All markets',
     tipiciAllZones: 'All areas',

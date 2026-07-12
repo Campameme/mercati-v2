@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Cloud, Droplet, Wind, Sun, AlertTriangle, RefreshCw, MapPin } from 'lucide-react'
 import { useNotifications } from '@/components/NotificationProvider'
-import { SunRay } from '@/components/decorations'
 import { format } from 'date-fns'
 import { it } from 'date-fns/locale/it'
 import { useParams } from 'next/navigation'
@@ -109,10 +108,9 @@ export default function WeatherPage() {
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="flex items-center gap-3 mb-1 text-ink-soft">
-            <SunRay className="w-5 h-5 text-sole" aria-hidden="true" />
             <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">{marketName || 'Meteo'}</p>
           </div>
-          <h1 className="font-display text-3xl md:text-5xl text-ink leading-[1.06]">Meteo per {selectedComune || 'comune'}</h1>
+          <h1 className="font-display font-extrabold text-3xl md:text-5xl text-ink leading-[1.06]">Meteo per {selectedComune || 'comune'}</h1>
           {lastUpdate && (
             <p className="text-xs text-ink-muted mt-1">
               Aggiornato alle {format(lastUpdate, 'HH:mm', { locale: it })}
@@ -122,11 +120,11 @@ export default function WeatherPage() {
         <div className="flex items-center gap-2">
           {comuni.length > 0 && (
             <label className="flex items-center gap-2 text-sm">
-              <MapPin className="w-4 h-4 text-mare" />
+              <MapPin className="w-4 h-4 text-alga" />
               <select
                 value={selectedComune}
                 onChange={(e) => setSelectedComune(e.target.value)}
-                className="px-3 py-2 border-2 border-ink/15 rounded-xl bg-white text-sm focus:outline-none focus:border-mare"
+                className="px-3 py-2 border-2 border-ink/15 rounded-xl bg-white text-sm focus:outline-none focus:border-alga"
               >
                 {comuni.map((c) => (
                   <option key={c.comune} value={c.comune}>{c.comune}</option>
@@ -137,7 +135,7 @@ export default function WeatherPage() {
           <button
             onClick={() => loadWeather(false)}
             disabled={isRefreshing}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-ink text-carta rounded-full font-alt text-xs font-semibold hover:bg-mare transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-ink text-crema rounded-full font-alt text-xs font-semibold hover:bg-alga transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
             <span>{isRefreshing ? 'Aggiornamento…' : 'Aggiorna'}</span>
@@ -156,11 +154,11 @@ export default function WeatherPage() {
                   key={i}
                   className={`border-2 rounded-xl p-4 flex items-start gap-3 ${
                     alert.severity === 'severe'
-                      ? 'bg-fiore/10 border-fiore/40'
+                      ? 'bg-terracotta/10 border-terracotta/40'
                       : 'bg-white border-ink/10'
                   }`}
                 >
-                  <AlertTriangle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${alert.severity === 'severe' ? 'text-fiore-600' : 'text-mare'}`} />
+                  <AlertTriangle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${alert.severity === 'severe' ? 'text-terracotta-600' : 'text-alga'}`} />
                   <div>
                     <h3 className="font-alt font-bold text-ink mb-0.5">
                       Allerta {alert.type === 'wind' ? 'Vento' : alert.type === 'rain' ? 'Pioggia' : 'Temporale'}
@@ -180,7 +178,7 @@ export default function WeatherPage() {
                 <div className="text-sm text-ink-soft mt-1">{weather.current.condition}</div>
               </div>
               <div className="flex flex-wrap gap-4 text-sm text-ink-soft">
-                <div className="flex items-center gap-2"><Droplet className="w-4 h-4 text-mare" /> {weather.current.humidity}%</div>
+                <div className="flex items-center gap-2"><Droplet className="w-4 h-4 text-alga" /> {weather.current.humidity}%</div>
                 <div className="flex items-center gap-2"><Wind className="w-4 h-4 text-ink-muted" /> {weather.current.windSpeed} km/h</div>
               </div>
             </div>
@@ -194,7 +192,7 @@ export default function WeatherPage() {
                   <div key={i} className="flex-shrink-0 text-center">
                     <div className="text-xs text-ink-muted mb-1">{format(h.time, 'HH:mm')}</div>
                     <div className="font-alt font-bold text-xl text-ink tabular-nums">{Math.round(h.temperature)}°</div>
-                    {h.precipitation > 0 && <div className="text-[11px] text-mare-600 mt-0.5">{h.precipitation.toFixed(1)}mm</div>}
+                    {h.precipitation > 0 && <div className="text-[11px] text-alga-600 mt-0.5">{h.precipitation.toFixed(1)}mm</div>}
                   </div>
                 ))}
               </div>
@@ -211,14 +209,14 @@ export default function WeatherPage() {
                       <div className="text-sm text-ink capitalize">{i === 0 ? 'Oggi' : format(d.date, 'EEEE', { locale: it })}</div>
                       <div className="text-xs text-ink-muted">{format(d.date, 'dd MMMM', { locale: it })}</div>
                     </div>
-                    {d.icon === 'sunny' && <Sun className="w-5 h-5 text-sole" />}
+                    {d.icon === 'sunny' && <Sun className="w-5 h-5 text-terracotta" />}
                     {d.icon === 'cloudy' && <Cloud className="w-5 h-5 text-ink-muted" />}
-                    {d.icon === 'rainy' && <Droplet className="w-5 h-5 text-mare" />}
+                    {d.icon === 'rainy' && <Droplet className="w-5 h-5 text-alga" />}
                     {d.icon === 'windy' && <Wind className="w-5 h-5 text-ink-muted" />}
                     <div className="text-sm text-ink-soft">{d.condition}</div>
                   </div>
                   <div className="flex items-center gap-4 text-sm tabular-nums">
-                    {d.precipitation > 0 && <span className="text-mare-600">{d.precipitation}mm</span>}
+                    {d.precipitation > 0 && <span className="text-alga-600">{d.precipitation}mm</span>}
                     <span className="font-semibold text-ink">{Math.round(d.maxTemp)}°</span>
                     <span className="text-ink-muted">{Math.round(d.minTemp)}°</span>
                   </div>

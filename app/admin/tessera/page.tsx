@@ -78,14 +78,14 @@ export default function AdminTesseraPage() {
   }
 
   return (
-    <div className="min-h-screen bg-carta">
+    <div className="min-h-screen bg-crema">
       <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl">
-        <Link href="/admin" className="inline-flex items-center gap-1.5 text-xs font-alt font-semibold uppercase tracking-[0.14em] text-ink-muted hover:text-mare mb-3">
+        <Link href="/admin" className="inline-flex items-center gap-1.5 text-xs font-alt font-semibold uppercase tracking-[0.14em] text-ink-muted hover:text-alga mb-3">
           <ArrowLeft className="w-3.5 h-3.5" /> Dashboard
         </Link>
         <div className="mb-6 border-b-2 border-ink/10 pb-4">
-          <p className="text-xs font-alt uppercase tracking-[0.14em] text-mare-600 mb-1">Tessera del mercato</p>
-          <h1 className="font-alt font-bold text-3xl text-ink flex items-center gap-2"><Ticket className="w-6 h-6 text-mare" /> Punti e coupon</h1>
+          <p className="text-xs font-alt uppercase tracking-[0.14em] text-alga-600 mb-1">Tessera del mercato</p>
+          <h1 className="font-alt font-bold text-3xl text-ink flex items-center gap-2"><Ticket className="w-6 h-6 text-alga" /> Punti e coupon</h1>
           <p className="text-sm text-ink-soft mt-1">I punti raccolti da ogni iscritto. Assegna punti, emetti o annulla coupon.</p>
         </div>
 
@@ -94,7 +94,7 @@ export default function AdminTesseraPage() {
           <div>
             <div className="relative mb-3">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted" />
-              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cerca per email…" className="w-full pl-10 pr-3 py-2.5 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-mare" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cerca per email…" className="w-full pl-10 pr-3 py-2.5 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-alga" />
             </div>
             {loading ? (
               <p className="text-sm text-ink-muted py-8 text-center">Caricamento…</p>
@@ -106,13 +106,13 @@ export default function AdminTesseraPage() {
                   <li key={u.id}>
                     <button
                       onClick={() => { setSelected(u); setMsg(null) }}
-                      className={`w-full text-left px-4 py-3 flex items-center justify-between gap-3 hover:bg-carta transition-colors ${selected?.id === u.id ? 'bg-marel/40' : ''}`}
+                      className={`w-full text-left px-4 py-3 flex items-center justify-between gap-3 hover:bg-crema transition-colors ${selected?.id === u.id ? 'bg-crema-2/40' : ''}`}
                     >
                       <span className="min-w-0">
                         <span className="block text-sm text-ink truncate">{u.email}</span>
                         {u.activeCoupons > 0 && <span className="block text-[11px] text-ink-muted">{u.activeCoupons} coupon attiv{u.activeCoupons === 1 ? 'o' : 'i'}</span>}
                       </span>
-                      <span className="font-hand font-bold text-2xl text-mare-600 leading-none flex-shrink-0">{u.balance}</span>
+                      <span className="font-alt font-bold text-2xl text-alga-600 leading-none flex-shrink-0">{u.balance}</span>
                     </button>
                   </li>
                 ))}
@@ -130,19 +130,19 @@ export default function AdminTesseraPage() {
               <div className="bg-white border-2 border-ink/10 rounded-xl p-5 space-y-5">
                 <div>
                   <p className="text-sm text-ink truncate">{selected.email}</p>
-                  <p className="font-hand font-bold text-4xl text-mare-600 leading-none mt-1">{selected.balance} <span className="font-alt text-xs uppercase tracking-wider text-ink-muted">punti</span></p>
+                  <p className="font-alt font-bold text-4xl text-alga-600 leading-none mt-1">{selected.balance} <span className="font-alt text-xs uppercase tracking-wider text-ink-muted">punti</span></p>
                 </div>
 
-                {msg && <p className="text-sm text-mare-700 bg-marel/40 rounded-lg px-3 py-2">{msg}</p>}
+                {msg && <p className="text-sm text-alga-600 bg-crema-2/40 rounded-lg px-3 py-2">{msg}</p>}
 
                 {/* Assegna punti */}
                 <div className="border-t-2 border-ink/10 pt-4">
                   <p className="font-alt text-xs font-semibold uppercase tracking-wider text-ink-muted mb-2">Assegna punti</p>
                   <div className="flex gap-2">
-                    <input type="number" value={points} onChange={(e) => setPoints(e.target.value)} placeholder="±punti" className="w-24 px-3 py-2 bg-carta border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-mare" />
-                    <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Causale (es. spesa di sabato)" className="flex-1 px-3 py-2 bg-carta border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-mare" />
+                    <input type="number" value={points} onChange={(e) => setPoints(e.target.value)} placeholder="±punti" className="w-24 px-3 py-2 bg-crema border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-alga" />
+                    <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Causale (es. spesa di sabato)" className="flex-1 px-3 py-2 bg-crema border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-alga" />
                   </div>
-                  <button onClick={assignPoints} disabled={busy || !points} className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 bg-mare text-white rounded-full text-sm font-alt font-semibold hover:bg-mare-600 disabled:opacity-50">
+                  <button onClick={assignPoints} disabled={busy || !points} className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 bg-alga text-white rounded-full text-sm font-alt font-semibold hover:bg-alga-600 disabled:opacity-50">
                     <Plus className="w-4 h-4" /> Aggiungi al saldo
                   </button>
                 </div>
@@ -150,8 +150,8 @@ export default function AdminTesseraPage() {
                 {/* Emetti coupon */}
                 <div className="border-t-2 border-ink/10 pt-4">
                   <p className="font-alt text-xs font-semibold uppercase tracking-wider text-ink-muted mb-2">Emetti un coupon</p>
-                  <input value={couponLabel} onChange={(e) => setCouponLabel(e.target.value)} placeholder="Es. −10% dal banco di Rita" className="w-full px-3 py-2 bg-carta border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-mare" />
-                  <button onClick={issueCoupon} disabled={busy || !couponLabel.trim()} className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 bg-sole text-ink rounded-full text-sm font-alt font-semibold hover:bg-sole-600 disabled:opacity-50">
+                  <input value={couponLabel} onChange={(e) => setCouponLabel(e.target.value)} placeholder="Es. −10% dal banco di Rita" className="w-full px-3 py-2 bg-crema border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-alga" />
+                  <button onClick={issueCoupon} disabled={busy || !couponLabel.trim()} className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 bg-terracotta text-ink rounded-full text-sm font-alt font-semibold hover:bg-terracotta-600 disabled:opacity-50">
                     <Ticket className="w-4 h-4" /> Emetti (codice automatico)
                   </button>
                 </div>
@@ -164,13 +164,13 @@ export default function AdminTesseraPage() {
                       <div key={c.id} className="flex items-center justify-between gap-2 text-sm">
                         <span className="min-w-0">
                           <span className="block text-ink truncate">{c.label}</span>
-                          <span className="font-hand text-lg text-mare-600 leading-none">{c.code}</span>
+                          <span className="font-alt text-lg text-alga-600 leading-none">{c.code}</span>
                         </span>
                         <span className="flex items-center gap-1 flex-shrink-0">
                           {c.status === 'active' ? (
                             <>
-                              <button onClick={() => setCouponStatus(c.id, 'used')} title="Segna usato" className="p-1.5 rounded-full bg-mare/10 text-mare-700 hover:bg-mare/20"><Check className="w-3.5 h-3.5" /></button>
-                              <button onClick={() => setCouponStatus(c.id, 'void')} title="Annulla" className="p-1.5 rounded-full bg-fiore/10 text-fiore-600 hover:bg-fiore/20"><X className="w-3.5 h-3.5" /></button>
+                              <button onClick={() => setCouponStatus(c.id, 'used')} title="Segna usato" className="p-1.5 rounded-full bg-alga/10 text-alga-600 hover:bg-alga/20"><Check className="w-3.5 h-3.5" /></button>
+                              <button onClick={() => setCouponStatus(c.id, 'void')} title="Annulla" className="p-1.5 rounded-full bg-terracotta/10 text-terracotta-600 hover:bg-terracotta/20"><X className="w-3.5 h-3.5" /></button>
                             </>
                           ) : (
                             <span className="text-[11px] font-alt uppercase tracking-wider text-ink-muted">{c.status === 'used' ? 'usato' : 'annullato'}</span>

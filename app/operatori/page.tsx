@@ -2,10 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { Search, CalendarDays, BadgeCheck, MessageCircle } from 'lucide-react'
-import { WaveTaglia, CanopyEdge } from '@/components/decorations'
-import { BancoPlaceholder } from '@/components/BancoAvatar'
-import DriftBackdrop from '@/components/motion/DriftBackdrop'
+import { Search, CalendarDays, BadgeCheck, MessageCircle, ArrowRight } from 'lucide-react'
+import BancoAvatar from '@/components/BancoAvatar'
 
 interface HubOperator {
   id: string
@@ -100,36 +98,33 @@ export default function OperatoriHubPage() {
   }, [operators, marketFilter, categoryFilter, comuneFilter, q])
 
   return (
-    <div>
-      {/* Il tendone all'ingresso: banda a righe + smerlo di tela sul mare */}
-      <div aria-hidden="true" className="imk-awning h-2.5" />
-      {/* Header di sezione: color-block MARE, come i ritratti dei Maestri */}
-      <section className="relative overflow-hidden bg-mare">
-        <CanopyEdge color="#F7EFDD" className="absolute top-0 inset-x-0" />
-        <DriftBackdrop tone="dark" variant="section" />
-        <div className="container mx-auto px-4 md:px-6 pt-12 pb-10 md:pt-16 md:pb-14 relative z-10">
-          <div className="flex items-center gap-3 mb-2 text-marel">
-            <WaveTaglia className="w-8 h-2.5 text-sole" aria-hidden="true" />
-            <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">Riviera di Ponente · la carta del banco</p>
-          </div>
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <h1 className="font-display text-3xl md:text-5xl text-carta leading-tight">
-              I banchi della provincia
+    <div className="bg-crema min-h-screen">
+      {/* Filo di brand in testa: la band terracotta dei banchi */}
+      <div aria-hidden="true" className="mz-band" style={{ ['--band' as string]: '#C4593C' }} />
+
+      {/* Header racconto: eyebrow alga, titolo display, il conto dei banchi */}
+      <section className="bg-crema-2 border-b border-[#e0d7c1]">
+        <div className="container mx-auto px-4 md:px-6 pt-12 pb-10 md:pt-16 md:pb-12 max-w-6xl">
+          <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-2">La Riviera dei Fiori · la rete dei banchi</p>
+          <div className="flex items-end justify-between gap-4 flex-wrap">
+            <h1 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">
+              I banchi di <span className="text-terracotta">fiducia.</span>
             </h1>
             {!loading && operators.length > 0 && (
-              <p className="imk-cartellino imk-cartellino--r px-3.5 py-1 font-hand font-bold text-xl leading-none">
-                {operators.length} banc{operators.length === 1 ? 'o' : 'hi'}
+              <p className="font-alt text-sm font-semibold text-ink-soft">
+                <span className="font-display font-extrabold tracking-tight text-2xl text-ink">{operators.length}</span>{' '}
+                banc{operators.length === 1 ? 'o' : 'hi'} nella rete
               </p>
             )}
           </div>
-          <p className="text-sm text-marel/90 mt-3 max-w-xl">
-            Ogni venditore della Riviera con la sua figurina e i mercati che frequenta ogni settimana.
-            Filtra per zona, comune o categoria per trovare subito quello che cerchi.
+          <p className="text-base text-ink-soft mt-4 max-w-xl leading-relaxed">
+            Banco curato, prodotti di qualità, serietà: qui c&apos;è chi ci mette la faccia, con i mercati
+            che frequenta ogni settimana. Filtra per zona, comune o categoria per trovare subito quello che cerchi.
           </p>
         </div>
       </section>
 
-      <div className="container mx-auto px-4 md:px-6 py-10 md:py-14">
+      <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl">
       {/* Filtri */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-8">
         <div className="relative md:col-span-1">
@@ -139,14 +134,14 @@ export default function OperatoriHubPage() {
             onChange={(e) => setQ(e.target.value)}
             placeholder="Cerca banco, comune…"
             aria-label="Cerca banco o comune"
-            className="w-full pl-10 pr-3 py-3 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-mare"
+            className="w-full pl-10 pr-3 py-3 bg-white border border-[#e0d7c1] rounded-xl text-sm focus:outline-none focus:border-alga"
           />
         </div>
         <select
           value={marketFilter}
           onChange={(e) => setMarketFilter(e.target.value)}
           aria-label="Filtra per zona"
-          className="py-3 px-3 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-mare"
+          className="py-3 px-3 bg-white border border-[#e0d7c1] rounded-xl text-sm focus:outline-none focus:border-alga"
         >
           <option value="all">Tutte le zone</option>
           {markets.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
@@ -155,7 +150,7 @@ export default function OperatoriHubPage() {
           value={comuneFilter}
           onChange={(e) => setComuneFilter(e.target.value)}
           aria-label="Filtra per comune"
-          className="py-3 px-3 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-mare"
+          className="py-3 px-3 bg-white border border-[#e0d7c1] rounded-xl text-sm focus:outline-none focus:border-alga"
         >
           <option value="all">Tutti i comuni</option>
           {comuni.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -164,19 +159,19 @@ export default function OperatoriHubPage() {
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
           aria-label="Filtra per categoria"
-          className="py-3 px-3 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-mare"
+          className="py-3 px-3 bg-white border border-[#e0d7c1] rounded-xl text-sm focus:outline-none focus:border-alga"
         >
           <option value="all">Tutte le categorie</option>
           {categories.map((c) => <option key={c} value={c}>{CAT_LABEL[c] ?? c}</option>)}
         </select>
       </div>
 
-      {/* Schede operatori */}
+      {/* Le card dei banchi: bianche, band terracotta in testa (come in home) */}
       {loading ? (
         <p className="text-center py-12 text-ink-muted text-sm">Caricamento…</p>
       ) : filtered.length === 0 ? (
-        <div className="imk-water imk-edge bg-white border-2 border-ink/10 p-10 text-center text-ink-muted max-w-lg mx-auto">
-          <p className="font-accent text-2xl text-mare-600">Nessun banco, per ora</p>
+        <div className="bg-white rounded-xl border border-[#e0d7c1] shadow-[0_16px_30px_-24px_rgba(38,36,30,0.45)] p-10 text-center text-ink-muted max-w-lg mx-auto">
+          <p className="font-display font-extrabold tracking-tight text-xl text-alga">Nessun banco, per ora</p>
           <p className="mt-1 text-sm">Nessun operatore coi filtri correnti.</p>
           {operators.length === 0 && (
             <p className="text-xs mt-2">Gli admin di zona possono aggiungere banchi dall&apos;area di gestione.</p>
@@ -184,7 +179,7 @@ export default function OperatoriHubPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filtered.map((op, i) => {
+          {filtered.map((op) => {
             const sessions = op.schedules ?? []
             const preview = sessions.slice(0, 3)
             const more = sessions.length - preview.length
@@ -193,42 +188,41 @@ export default function OperatoriHubPage() {
               <Link
                 key={op.id}
                 href={href}
-                className={`imk-water imk-edge imk-lift ${i % 3 === 0 ? 'imk-tilt-l' : i % 3 === 2 ? 'imk-tilt-r' : ''} group bg-white border-2 border-ink/10 overflow-hidden flex flex-col hover:border-mare transition-colors`}
+                className="imk-lift group flex flex-col bg-white border border-[#e0d7c1] rounded-xl overflow-hidden hover:border-terracotta transition-colors"
               >
-                {/* Testata figurina: foto o placeholder duotone mare→sole */}
-                <div className="relative">
-                  {op.photos?.[0] ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={op.photos[0]} alt={op.name} className="w-full h-40 object-cover" />
-                  ) : (
-                    <BancoPlaceholder name={op.name} className="w-full h-40 border-b-2 border-ink/10" />
-                  )}
-                  {op.verified && (
-                    <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 bg-sole text-ink rounded-full font-alt text-[11px] font-semibold uppercase tracking-wider shadow-sm">
-                      <BadgeCheck className="w-3.5 h-3.5" /> Verificato
-                    </span>
-                  )}
-                </div>
-                <div className="p-5 flex-1 flex flex-col">
-                  <div className="flex items-start justify-between gap-2 mb-1">
-                    <h3 className="font-display text-[1.45rem] text-ink leading-tight group-hover:text-mare-600 transition-colors">{op.name.replace(/\.+$/, '')}.</h3>
-                    <span className="flex-shrink-0 font-alt text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 bg-sole/30 text-ink rounded-full">
-                      {CAT_LABEL[op.category] ?? op.category}
-                    </span>
+                <span aria-hidden="true" className="mz-band" style={{ ['--band' as string]: '#C4593C' }} />
+                <div className="p-4 md:p-5 flex-1 flex flex-col">
+                  <div className="flex items-start gap-3.5">
+                    <BancoAvatar name={op.name} size={48} className="border border-[#e0d7c1]" />
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-display font-extrabold tracking-tight text-lg text-ink leading-tight group-hover:text-terracotta transition-colors">
+                        {op.name.replace(/\.+$/, '')}.
+                      </h3>
+                      <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                        <span className="inline-block font-alt text-[11px] font-bold uppercase tracking-wide text-terracotta-600 bg-terracotta-50 rounded-full px-2 py-0.5">
+                          {CAT_LABEL[op.category] ?? op.category}
+                        </span>
+                        {op.verified && (
+                          <span className="inline-flex items-center gap-1 font-alt text-[11px] font-bold uppercase tracking-wide text-alga-600 bg-alga-50 rounded-full px-2 py-0.5">
+                            <BadgeCheck className="w-3 h-3" aria-hidden="true" /> Verificato
+                          </span>
+                        )}
+                      </div>
+                      {op.market && <p className="text-xs text-ink-muted mt-1 truncate">{op.market.name}</p>}
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-ink-muted group-hover:text-terracotta group-hover:translate-x-0.5 transition-all flex-shrink-0 mt-1" aria-hidden="true" />
                   </div>
-                  {op.market && (
-                    <p className="font-alt text-xs font-semibold text-ink-muted uppercase tracking-wider mb-2">{op.market.name}</p>
-                  )}
                   {op.description && (
-                    <p className="text-sm text-ink-soft line-clamp-2 mb-3">{op.description}</p>
+                    <p className="text-sm text-ink-soft line-clamp-2 mt-3">{op.description}</p>
                   )}
-                  <div className="mt-auto space-y-1.5">
+                  {/* I mercati che frequenta ogni settimana */}
+                  <div className="mt-auto pt-3 space-y-1.5">
                     {preview.length === 0 ? (
                       <p className="text-xs text-ink-muted italic">Nessun mercato configurato</p>
                     ) : (
                       preview.map((s) => (
                         <div key={s.scheduleId} className="flex items-center gap-1.5 text-xs text-ink-soft">
-                          <CalendarDays className="w-3.5 h-3.5 text-mare flex-shrink-0" aria-hidden="true" />
+                          <CalendarDays className="w-3.5 h-3.5 text-alga flex-shrink-0" aria-hidden="true" />
                           <span className="truncate">
                             <strong className="text-ink">{s.comune}</strong> · {s.giorno}
                             {s.luogo && <span className="text-ink-muted"> — {s.luogo}</span>}
@@ -257,7 +251,7 @@ export default function OperatoriHubPage() {
                           window.open(waHref(op.socialLinks!.whatsapp!), '_blank', 'noopener,noreferrer')
                         }
                       }}
-                      className="mt-3 inline-flex items-center gap-1.5 self-start px-3 py-1.5 bg-[#25D366] text-white rounded-full font-alt text-[11px] font-semibold uppercase tracking-wider hover:opacity-90 transition-opacity cursor-pointer"
+                      className="mt-3 inline-flex items-center gap-1.5 self-start px-3 py-1.5 bg-alga text-crema rounded-full font-alt text-[11px] font-semibold uppercase tracking-wider hover:bg-alga-600 transition-colors cursor-pointer"
                     >
                       <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
                     </span>

@@ -136,7 +136,7 @@ export default function AdminPlaceAreaPage() {
           <button
             type="button"
             onClick={handleClear}
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-carta hover:bg-carta text-ink rounded-sm text-sm"
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-crema hover:bg-crema text-ink rounded-sm text-sm"
           >
             <Trash2 className="w-3.5 h-3.5" /> Rimuovi area
           </button>
@@ -144,7 +144,7 @@ export default function AdminPlaceAreaPage() {
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-carta rounded-full text-sm hover:bg-ink/90 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-crema rounded-full text-sm hover:bg-ink/90 disabled:opacity-50"
           >
             <Save className="w-4 h-4" /> {saving ? 'Salvataggio…' : 'Salva area'}
           </button>

@@ -1,24 +1,19 @@
-// Skeleton degli ambulanti: intestazione + griglia di card.
+// Skeleton dei banchi di fiducia: fondo crema coerente col resto del sito
+// (Nodo × Mezzogiorno), nodo + lockup così il primo paint è già "brand".
+import { LogoMark } from '@/components/Logo'
+
 export default function Loading() {
   return (
-    <div className="bg-carta">
-      <div className="container mx-auto px-4 md:px-6 py-10 max-w-6xl space-y-6">
-        <div className="space-y-3">
-          <div className="imk-skel h-3 w-36" />
-          <div className="imk-skel h-9 w-72 max-w-full" />
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <div className="imk-skel h-9 w-28 rounded-full" />
-          <div className="imk-skel h-9 w-24 rounded-full" />
-          <div className="imk-skel h-9 w-32 rounded-full" />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="imk-skel h-44 rounded-3xl" />
-          ))}
-        </div>
+    <div className="min-h-[100svh] bg-crema flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4 text-ink">
+        <LogoMark className="w-16 h-[3.3rem] text-ink" draw />
+        <span className="text-center leading-snug">
+          <span className="block font-display font-extrabold tracking-tight text-lg">I banchi di fiducia</span>
+          <span className="block font-alt italic text-sm text-alga">della Riviera dei Fiori</span>
+        </span>
+        <span className="imk-skel h-1.5 w-40" aria-hidden="true" />
+        <span className="sr-only">Caricamento banchi…</span>
       </div>
-      <span className="sr-only">Caricamento ambulanti…</span>
     </div>
   )
 }

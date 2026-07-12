@@ -4,7 +4,6 @@ import { notFound } from 'next/navigation'
 import { Store, Newspaper, Calendar, Cloud, ArrowRight, ChevronLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { formatMarketDays } from '@/lib/markets/days'
-import { SunRay, WaveDivider } from '@/components/decorations'
 import { slugifyName } from '@/lib/markets/slug'
 import { classifySchedule, CATEGORY_COLOR } from '@/lib/schedules/classify'
 import { ZONE_BY_SLUG } from '@/lib/markets/zones'
@@ -16,8 +15,6 @@ import Reveal from '@/components/Reveal'
 import MarketViewer from '@/components/MarketViewer'
 import FavoriteButton from '@/components/FavoriteButton'
 import PageviewTracker from '@/components/analytics/PageviewTracker'
-import DriftBackdrop from '@/components/motion/DriftBackdrop'
-import Cartolina from '@/components/Cartolina'
 
 export const dynamic = 'force-dynamic'
 
@@ -39,6 +36,14 @@ export async function generateMetadata({ params }: { params: { marketSlug: strin
       market.description?.slice(0, 160) ||
       `Il mercato di ${market.city ?? market.name}: giorni e orari, banchi, ambulanti e come arrivarci — Riviera dei Fiori, provincia di Imperia.`,
   }
+}
+
+// Eyebrow del territorio (stesso giro di lingue dell'hero della home).
+const RIVIERA_EYEBROW: Record<string, string> = {
+  it: 'La Riviera dei Fiori',
+  fr: 'La Riviera dei Fiori',
+  de: 'Die Riviera dei Fiori',
+  en: 'The Riviera dei Fiori',
 }
 
 // Comune della foto-hero di ogni zona (le foto sono la selezione curata in
@@ -114,44 +119,41 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
     <div>
       <PageviewTracker type="view_market" marketId={marketFull.id} />
       {/* HERO: foto a sinistra (piccola) + testo + mappa above-the-fold a destra */}
-      <section className="relative overflow-hidden bg-carta border-b-2 border-ink/10">
-        <DriftBackdrop tone="light" variant="section" />
-        {/* banda-tendone: filo di brand in cima */}
-        <div className="imk-awning h-2" aria-hidden="true" />
+      <section className="relative overflow-hidden bg-crema border-b border-[#e0d7c1]">
+        {/* band di testa: filo di brand in cima (crosshatch alga) */}
+        <div className="mz-band" aria-hidden="true" />
         <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl relative z-10">
           <div className="grid md:grid-cols-[280px_1fr] gap-8 md:gap-10 items-start">
-            {/* Foto a sinistra, leggermente più piccola — cartolina */}
+            {/* Foto a sinistra, leggermente più piccola — cornice bianca semplice */}
             <Reveal>
               <Link
                 href="/"
-                className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-mare-600 mb-4 transition-colors"
+                className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-alga-600 mb-4 transition-colors"
               >
                 <ChevronLeft className="w-3.5 h-3.5" /> {ui.zoneBack}
               </Link>
-              <Cartolina
-                query={heroQuery}
-                fallbackQuery={comuni[0] ?? marketFull.city}
-                alt={marketFull.name}
-                caption={heroQuery}
-                aspect="aspect-[4/5]"
-                tilt="l"
-                tape
-                priority
-              />
+              <figure className="-rotate-1 bg-white border border-[#e0d7c1] rounded-md p-1.5 pb-2 shadow-lg">
+                <ZoneImage
+                  query={heroQuery}
+                  fallbackQuery={comuni[0] ?? marketFull.city}
+                  alt={marketFull.name}
+                  aspect="aspect-[4/5]"
+                  className="rounded-sm"
+                  priority
+                />
+                <figcaption className="mt-1 px-1 font-alt italic text-xs text-ink-soft leading-tight">{heroQuery}</figcaption>
+              </figure>
             </Reveal>
 
             {/* Testo + mappa */}
             <div>
               <Reveal>
-                <div className="flex items-center gap-3 mb-4 text-ink-soft">
-                  <SunRay className="w-5 h-5 text-sole" aria-hidden="true" />
-                  <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">
-                    {comuni.length > 1 ? `${comuni.length} ${ui.comuniWord}` : marketFull.city}
-                  </p>
-                </div>
+                <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-4">
+                  {RIVIERA_EYEBROW[lang]} · {comuni.length > 1 ? `${comuni.length} ${ui.comuniWord}` : marketFull.city}
+                </p>
                 <div className="flex items-start gap-2">
-                  <h1 className="font-display text-3xl md:text-5xl leading-[1.06] text-ink flex-1">
-                    <span className="imk-mark text-ink">{marketFull.name}</span>
+                  <h1 className="font-display font-extrabold tracking-tight text-4xl md:text-6xl leading-[1.04] text-ink flex-1">
+                    {marketFull.name}
                   </h1>
                   <FavoriteButton kind="market" id={marketFull.slug} label={marketFull.name} />
                 </div>
@@ -182,22 +184,22 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
       </section>
 
       <div className="container mx-auto px-4 md:px-6 max-w-5xl">
-        {/* Shortcut */}
-        <Reveal as="nav" className="grid grid-cols-2 md:grid-cols-4 gap-2 py-8 border-b-2 border-ink/10">
+        {/* Shortcut — pill di navigazione */}
+        <Reveal as="nav" className="grid grid-cols-2 md:grid-cols-4 gap-2 py-8 border-b border-[#e0d7c1]">
           {features.map((f, i) => {
             const Icon = f.icon
             return (
               <Link
                 key={f.href}
                 href={f.href}
-                className="imk-water imk-edge imk-lift group flex items-center justify-between gap-3 px-4 py-3 border-2 border-ink/10 bg-white hover:border-mare transition-colors"
+                className="imk-lift group flex items-center justify-between gap-3 px-5 py-3 rounded-full bg-white border border-[#e0d7c1] hover:border-alga transition-colors"
                 style={{ transitionDelay: `${i * 20}ms` }}
               >
                 <span className="flex items-center gap-2.5 font-alt text-sm text-ink font-semibold">
-                  <Icon className="w-4 h-4 text-mare" aria-hidden="true" />
+                  <Icon className="w-4 h-4 text-alga" aria-hidden="true" />
                   {f.label}
                 </span>
-                <ArrowRight className="w-3.5 h-3.5 text-ink-muted group-hover:text-mare-600 group-hover:translate-x-0.5 transition-all" />
+                <ArrowRight className="imk-march w-3.5 h-3.5 text-ink-muted group-hover:text-terracotta transition-colors" />
               </Link>
             )
           })}
@@ -206,12 +208,9 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
         {/* Comuni con foto */}
         {comuni.length > 1 && (
           <section className="py-12 md:py-16">
-            <Reveal className="flex items-end justify-between mb-8">
-              <div>
-                <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-1">{ui.zoneComuni}</p>
-                <h2 className="font-alt font-bold text-2xl md:text-3xl text-ink">{ui.zoneComuniTitle}</h2>
-              </div>
-              <WaveDivider className="w-24 text-mare opacity-60 hidden md:block" aria-hidden="true" />
+            <Reveal className="mb-8">
+              <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-1">{ui.zoneComuni}</p>
+              <h2 className="font-display font-extrabold tracking-tight text-3xl md:text-4xl text-ink">{ui.zoneComuniTitle}</h2>
             </Reveal>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -221,12 +220,13 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                   <Reveal key={c} delayMs={Math.min(i, 5) * 60}>
                     <Link
                       href={`/${marketFull.slug}/c/${slug}`}
-                      className={`imk-water imk-edge imk-lift ${i % 3 === 0 ? 'imk-tilt-l' : i % 3 === 2 ? 'imk-tilt-r' : ''} group block bg-white border-2 border-ink/10 overflow-hidden hover:border-mare transition-colors`}
+                      className="imk-lift group block bg-white rounded-xl border border-[#e0d7c1] overflow-hidden hover:border-alga transition-colors"
                     >
+                      <span aria-hidden="true" className="mz-band block" />
                       <ZoneImage query={c} aspect="aspect-[3/2]" hoverZoom />
                       <div className="p-4 flex items-baseline justify-between">
-                        <h3 className="font-alt font-bold text-lg text-ink leading-tight group-hover:text-mare-600 transition-colors">{c}</h3>
-                        <span className="text-ink-muted group-hover:text-mare-600 group-hover:translate-x-0.5 transition-all">→</span>
+                        <h3 className="font-display font-extrabold tracking-tight text-lg text-ink leading-tight group-hover:text-alga-600 transition-colors">{c}</h3>
+                        <ArrowRight className="imk-march w-4 h-4 self-center text-ink-muted group-hover:text-terracotta transition-colors" aria-hidden="true" />
                       </div>
                     </Link>
                   </Reveal>
@@ -241,10 +241,10 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
           <section className="py-12 md:py-16">
             <Reveal className="flex items-end justify-between mb-8">
               <div>
-                <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted mb-1">{ui.zoneLocalCalendar}</p>
-                <h2 className="font-alt font-bold text-2xl md:text-3xl text-ink"><span className="imk-mark text-ink">{ui.zoneMarketsTitle}</span></h2>
+                <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-1">{ui.zoneLocalCalendar}</p>
+                <h2 className="font-display font-extrabold tracking-tight text-3xl md:text-4xl text-ink">{ui.zoneMarketsTitle}</h2>
               </div>
-              <Link href={`/${marketFull.slug}/calendar`} className="font-alt text-xs font-semibold text-ink-muted hover:text-mare-600 underline underline-offset-2">
+              <Link href={`/${marketFull.slug}/calendar`} className="font-alt text-xs font-semibold text-alga-600 hover:text-terracotta underline underline-offset-2">
                 {ui.zoneFullCalendar}
               </Link>
             </Reveal>
@@ -254,14 +254,14 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                 const cat = classifySchedule(s.settori)
                 const comuneSlug = slugifyName(s.comune)
                 return (
-                  <Reveal as="li" key={i} delayMs={Math.min(i, 8) * 40} className="border-t-2 border-ink/10 last:border-b-2">
+                  <Reveal as="li" key={i} delayMs={Math.min(i, 8) * 40} className="border-t border-[#e0d7c1] last:border-b">
                     <Link
                       href={`/${marketFull.slug}/c/${comuneSlug}`}
                       className="group grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-6 items-baseline py-5 md:py-6 hover:bg-white -mx-4 px-4 md:-mx-6 md:px-6 transition-colors"
                     >
                       <div className="md:col-span-3 flex items-center gap-2.5">
                         <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: CATEGORY_COLOR[cat] }} />
-                        <h3 className="font-alt font-bold text-lg md:text-xl text-ink group-hover:text-mare-600 transition-colors">{s.comune}</h3>
+                        <h3 className="font-display font-extrabold tracking-tight text-lg md:text-xl text-ink group-hover:text-alga-600 transition-colors">{s.comune}</h3>
                       </div>
                       <div className="md:col-span-4">
                         <p className="text-sm text-ink">{s.giorno}</p>
@@ -272,7 +272,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                         {s.settori && <p className="text-xs text-ink-muted mt-1 italic line-clamp-1">{s.settori}</p>}
                       </div>
                       <div className="md:col-span-1 flex md:justify-end items-center">
-                        <span className="text-ink-muted group-hover:text-mare-600 group-hover:translate-x-1 transition-all">→</span>
+                        <span className="text-ink-muted group-hover:text-terracotta group-hover:translate-x-1 transition-all">→</span>
                       </div>
                     </Link>
                   </Reveal>

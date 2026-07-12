@@ -238,7 +238,7 @@ export default function AdminSessionPage() {
         </div>
         {session.luogo && (
           <p className="text-sm text-ink flex items-center gap-1.5 mt-2">
-            <MapPin className="w-4 h-4 text-mare" /> {session.luogo}
+            <MapPin className="w-4 h-4 text-alga" /> {session.luogo}
             {session.lat != null && session.lng != null && (
               <a
                 href={`https://www.google.com/maps/dir/?api=1&destination=${session.lat},${session.lng}`}
@@ -257,7 +257,7 @@ export default function AdminSessionPage() {
       {/* Info area del luogo (place) */}
       {placeInfo && (
         <div className="mb-6 bg-white border border-ink/15 rounded-sm p-4 flex items-start gap-3 flex-wrap">
-          <MapIcon className="w-4 h-4 text-mare mt-0.5 flex-shrink-0" />
+          <MapIcon className="w-4 h-4 text-alga mt-0.5 flex-shrink-0" />
           <div className="min-w-0 flex-1">
             <p className="text-sm text-ink">
               {placeInfo.hasPolygon ? (
@@ -281,7 +281,7 @@ export default function AdminSessionPage() {
           {session.place_id && (
             <Link
               href={`/${slug}/admin/places/${session.place_id}/area`}
-              className="inline-flex items-center gap-1.5 px-3 py-2 bg-carta hover:bg-carta text-ink rounded-sm text-xs flex-shrink-0"
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-crema hover:bg-crema text-ink rounded-sm text-xs flex-shrink-0"
             >
               <MapIcon className="w-3.5 h-3.5" /> Modifica area del luogo
             </Link>
@@ -299,13 +299,13 @@ export default function AdminSessionPage() {
           <div className="flex gap-2">
             <button
               onClick={() => { setShowLink((s) => !s); setShowCreate(false) }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-carta hover:bg-carta text-ink rounded-full text-sm"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-crema hover:bg-crema text-ink rounded-full text-sm"
             >
               <Link2 className="w-4 h-4" /> Aggiungi esistente
             </button>
             <button
               onClick={() => { setShowCreate((s) => !s); setShowLink(false) }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-carta rounded-full text-sm hover:bg-ink/90"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-crema rounded-full text-sm hover:bg-ink/90"
             >
               <Plus className="w-4 h-4" /> Nuovo banco
             </button>
@@ -323,13 +323,13 @@ export default function AdminSessionPage() {
                   onChange={(e) => setSearchQ(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); searchOperators() } }}
                   placeholder="Cerca per nome, codice, descrizione…"
-                  className="w-full pl-9 pr-3 py-2 border border-ink/15 rounded-sm bg-carta text-sm"
+                  className="w-full pl-9 pr-3 py-2 border border-ink/15 rounded-sm bg-crema text-sm"
                 />
               </div>
               <button
                 type="button"
                 onClick={searchOperators}
-                className="px-4 py-2 bg-ink text-carta rounded-full text-sm hover:bg-ink/90"
+                className="px-4 py-2 bg-ink text-crema rounded-full text-sm hover:bg-ink/90"
               >
                 Cerca
               </button>
@@ -344,7 +344,7 @@ export default function AdminSessionPage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline gap-2 flex-wrap">
                         <span className="font-alt font-bold text-base text-ink">{op.name}</span>
-                        {op.code && <span className="text-[11px] uppercase tracking-wider px-1.5 py-0.5 bg-carta rounded-sm text-ink-muted">{op.code}</span>}
+                        {op.code && <span className="text-[11px] uppercase tracking-wider px-1.5 py-0.5 bg-crema rounded-sm text-ink-muted">{op.code}</span>}
                       </div>
                       <p className="text-xs text-ink-muted">
                         {op.category}
@@ -355,7 +355,7 @@ export default function AdminSessionPage() {
                       type="button"
                       onClick={() => linkExistingOperator(op.id)}
                       disabled={linkBusy}
-                      className="px-3 py-1.5 text-xs bg-mare-600 hover:bg-mare-700 text-carta rounded-full disabled:opacity-50"
+                      className="px-3 py-1.5 text-xs bg-alga-600 hover:bg-alga-600 text-crema rounded-full disabled:opacity-50"
                     >
                       Aggiungi qui
                     </button>
@@ -381,7 +381,7 @@ export default function AdminSessionPage() {
                   required
                   value={createForm.name}
                   onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-ink/15 rounded-sm bg-carta"
+                  className="w-full px-3 py-2 border border-ink/15 rounded-sm bg-crema"
                 />
               </label>
               <label className="block">
@@ -389,7 +389,7 @@ export default function AdminSessionPage() {
                 <select
                   value={createForm.category}
                   onChange={(e) => setCreateForm({ ...createForm, category: e.target.value })}
-                  className="w-full px-3 py-2 border border-ink/15 rounded-sm bg-carta"
+                  className="w-full px-3 py-2 border border-ink/15 rounded-sm bg-crema"
                 >
                   {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
@@ -399,7 +399,7 @@ export default function AdminSessionPage() {
                 <input
                   value={createForm.stall_number}
                   onChange={(e) => setCreateForm({ ...createForm, stall_number: e.target.value })}
-                  className="w-full px-3 py-2 border border-ink/15 rounded-sm bg-carta"
+                  className="w-full px-3 py-2 border border-ink/15 rounded-sm bg-crema"
                 />
               </label>
             </div>
@@ -417,10 +417,10 @@ export default function AdminSessionPage() {
               />
             </div>
 
-            {error && <p className="text-sm text-fiore-600">{error}</p>}
+            {error && <p className="text-sm text-terracotta-600">{error}</p>}
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 bg-carta hover:bg-carta text-ink rounded-sm text-sm">Annulla</button>
-              <button type="submit" className="px-4 py-2 bg-ink text-carta rounded-full text-sm hover:bg-ink/90">Crea</button>
+              <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 bg-crema hover:bg-crema text-ink rounded-sm text-sm">Annulla</button>
+              <button type="submit" className="px-4 py-2 bg-ink text-crema rounded-full text-sm hover:bg-ink/90">Crea</button>
             </div>
           </form>
         )}
@@ -436,7 +436,7 @@ export default function AdminSessionPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-alt font-bold text-lg text-ink">{o.name}</h3>
-                    <span className="text-xs px-2 py-0.5 bg-carta text-ink rounded-sm">{o.category}</span>
+                    <span className="text-xs px-2 py-0.5 bg-crema text-ink rounded-sm">{o.category}</span>
                     {o.stall_number && <span className="text-xs text-ink-muted">· Banco {o.stall_number}</span>}
                   </div>
                   {o.location_lat != null && o.location_lng != null && (
@@ -455,7 +455,7 @@ export default function AdminSessionPage() {
                   </Link>
                   <button
                     onClick={() => handleDelete(o.id)}
-                    className="p-2 text-ink-soft hover:text-fiore"
+                    className="p-2 text-ink-soft hover:text-terracotta"
                     title="Elimina"
                   >
                     <Trash2 className="w-4 h-4" />

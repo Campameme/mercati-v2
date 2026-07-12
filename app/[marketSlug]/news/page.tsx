@@ -3,7 +3,6 @@ import { AlertTriangle, Calendar, Megaphone, Clock, Globe2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { fetchLiveNews, zoneNewsQuery } from '@/lib/news/live'
 import { ZONE_BY_SLUG } from '@/lib/markets/zones'
-import { SunRay } from '@/components/decorations'
 import type { NewsItem, NewsType, NewsPriority } from '@/types/news'
 
 export const dynamic = 'force-dynamic'
@@ -15,8 +14,8 @@ const TYPE_ICON: Record<NewsType, React.ComponentType<{ className?: string }>> =
 // Priorità → colore bordo sinistro, in palette brand (mare/sole/fiore).
 const PRIO_CLASS: Record<NewsPriority, string> = {
   low: 'border-l-ink/20 bg-white',
-  medium: 'border-l-mare bg-marel/40',
-  high: 'border-l-fiore bg-fiore/5',
+  medium: 'border-l-alga bg-crema-2/40',
+  high: 'border-l-terracotta bg-terracotta/5',
 }
 
 export default async function NewsPage({ params }: { params: { marketSlug: string } }) {
@@ -47,10 +46,9 @@ export default async function NewsPage({ params }: { params: { marketSlug: strin
   return (
     <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-3xl">
       <div className="flex items-center gap-3 mb-3 text-ink-soft">
-        <SunRay className="w-5 h-5 text-sole" aria-hidden="true" />
         <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">{market.name} · notizie</p>
       </div>
-      <h1 className="font-display text-3xl md:text-5xl text-ink leading-[1.06] mb-2">Notizie</h1>
+      <h1 className="font-display font-extrabold text-3xl md:text-5xl text-ink leading-[1.06] mb-2">Notizie</h1>
       <p className="text-sm text-ink-soft mb-8">Aggiornamenti e avvisi dal mercato di {market.name}.</p>
 
       {items.length === 0 ? (
@@ -64,11 +62,11 @@ export default async function NewsPage({ params }: { params: { marketSlug: strin
             return (
               <div key={n.id} className={`rounded-xl border-2 border-ink/10 border-l-4 p-5 ${PRIO_CLASS[n.priority]}`}>
                 <div className="flex items-center gap-2 mb-2 text-xs text-ink-muted flex-wrap">
-                  <Icon className="w-4 h-4 text-mare" aria-hidden="true" />
+                  <Icon className="w-4 h-4 text-alga" aria-hidden="true" />
                   <span className="font-alt font-semibold uppercase tracking-[0.08em]">{TYPE_LABEL[n.type]}</span>
                   {n.is_global && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-sole/20 text-sole-600 font-alt font-semibold uppercase tracking-[0.08em] text-[11px]">
-                      <Globe2 className="w-3 h-3" /> Mercati della Riviera di Ponente
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-terracotta/20 text-terracotta-600 font-alt font-semibold uppercase tracking-[0.08em] text-[11px]">
+                      <Globe2 className="w-3 h-3" /> I Mercati della Riviera dei Fiori
                     </span>
                   )}
                   <span>· {new Date(n.publish_from).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
@@ -93,13 +91,13 @@ export default async function NewsPage({ params }: { params: { marketSlug: strin
               <li key={n.link}>
                 <a href={n.link} target="_blank" rel="noopener noreferrer" className="group flex items-baseline justify-between gap-4 py-3.5 hover:bg-white -mx-2 px-2 transition-colors">
                   <span className="min-w-0">
-                    <span className="block font-alt font-semibold text-[15px] text-ink leading-snug group-hover:text-mare-600 transition-colors">{n.title}</span>
+                    <span className="block font-alt font-semibold text-[15px] text-ink leading-snug group-hover:text-alga-600 transition-colors">{n.title}</span>
                     <span className="block text-xs text-ink-muted mt-1">
                       {n.source ?? ''}
                       {n.publishedAt ? ` · ${new Date(n.publishedAt).toLocaleDateString('it-IT', { day: '2-digit', month: 'short' })}` : ''}
                     </span>
                   </span>
-                  <span className="text-ink-muted group-hover:text-mare-600 flex-shrink-0">↗</span>
+                  <span className="text-ink-muted group-hover:text-alga-600 flex-shrink-0">↗</span>
                 </a>
               </li>
             ))}

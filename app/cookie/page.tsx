@@ -1,10 +1,9 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
-import { SunRay } from '@/components/decorations'
 
 export const metadata = {
-  title: 'Cookie Policy — Mercati della Riviera di Ponente',
-  description: 'Come usiamo cookie e storage del browser su Mercati della Riviera di Ponente.',
+  title: 'Cookie Policy',
+  description: 'Come usiamo cookie e storage del browser sul sito I Mercati della Riviera dei Fiori.',
 }
 
 const LAST_UPDATE = '14 maggio 2026'
@@ -12,24 +11,21 @@ const LAST_UPDATE = '14 maggio 2026'
 export default function CookiePage() {
   return (
     <div className="container mx-auto px-4 md:px-6 max-w-3xl py-10 md:py-14">
-      <Link href="/" className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-mare-600 mb-6 transition-colors">
+      <Link href="/" className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-alga mb-6 transition-colors">
         <ChevronLeft className="w-3.5 h-3.5" /> Homepage
       </Link>
 
-      <div className="flex items-center gap-3 mb-4 text-ink-soft">
-        <SunRay className="w-5 h-5 text-sole" aria-hidden="true" />
-        <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">Informativa</p>
-      </div>
+      <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-3">Informativa</p>
 
-      <h1 className="font-display text-3xl md:text-5xl text-ink leading-[1.06] mb-3">
-        Cookie <span className="text-mare-600">Policy</span>
+      <h1 className="font-display font-extrabold tracking-tight text-3xl md:text-5xl text-ink leading-[1.06] mb-3">
+        Cookie <span className="text-alga">Policy</span>
       </h1>
       <p className="text-sm text-ink-muted mb-10">Ultimo aggiornamento: {LAST_UPDATE}</p>
 
       <div className="space-y-8 text-ink-soft leading-relaxed">
         <section>
           <p className="text-lg text-ink mb-4">
-            <strong>Mercati della Riviera di Ponente non usa cookie di profilazione, tracciamento o pubblicità.</strong>
+            <strong>Il sito I Mercati della Riviera dei Fiori non usa cookie di profilazione, tracciamento o pubblicità.</strong>
           </p>
           <p>
             Le nostre statistiche di visita sono <em>cookieless</em>: usiamo un identificatore tecnico
@@ -40,12 +36,12 @@ export default function CookiePage() {
         </section>
 
         <section>
-          <h2 className="font-alt font-bold text-2xl text-ink mb-3">Cookie tecnici (strettamente necessari)</h2>
-          <p className="mb-4">Sono gli unici cookie che Mercati della Riviera di Ponente impone, solo quando servono davvero:</p>
+          <h2 className="font-display font-extrabold tracking-tight text-2xl text-ink mb-3">Cookie tecnici (strettamente necessari)</h2>
+          <p className="mb-4">Sono gli unici cookie che il sito imposta, solo quando servono davvero:</p>
 
-          <div className="border-2 border-ink/10 rounded-xl overflow-hidden bg-white">
+          <div className="border border-[#e0d7c1] rounded-xl overflow-hidden bg-white">
             <table className="w-full text-sm">
-              <thead className="bg-carta">
+              <thead className="bg-crema-2">
                 <tr className="text-left">
                   <th className="px-4 py-2.5 font-alt font-semibold uppercase tracking-[0.08em] text-xs text-ink-soft">Nome</th>
                   <th className="px-4 py-2.5 font-alt font-semibold uppercase tracking-[0.08em] text-xs text-ink-soft">Origine</th>
@@ -69,11 +65,11 @@ export default function CookiePage() {
         </section>
 
         <section>
-          <h2 className="font-alt font-bold text-2xl text-ink mb-3">Storage del browser (localStorage)</h2>
+          <h2 className="font-display font-extrabold tracking-tight text-2xl text-ink mb-3">Storage del browser (localStorage)</h2>
           <p className="mb-3">Per ricordare le tue preferenze sul tuo dispositivo, usiamo localStorage:</p>
-          <div className="border-2 border-ink/10 rounded-xl overflow-hidden bg-white">
+          <div className="border border-[#e0d7c1] rounded-xl overflow-hidden bg-white">
             <table className="w-full text-sm">
-              <thead className="bg-carta">
+              <thead className="bg-crema-2">
                 <tr className="text-left">
                   <th className="px-4 py-2.5 font-alt font-semibold uppercase tracking-[0.08em] text-xs text-ink-soft">Chiave</th>
                   <th className="px-4 py-2.5 font-alt font-semibold uppercase tracking-[0.08em] text-xs text-ink-soft">Contiene</th>
@@ -96,7 +92,7 @@ export default function CookiePage() {
         </section>
 
         <section>
-          <h2 className="font-alt font-bold text-2xl text-ink mb-3">Come disabilitarli</h2>
+          <h2 className="font-display font-extrabold tracking-tight text-2xl text-ink mb-3">Come disabilitarli</h2>
           <p>
             Puoi sempre bloccare o cancellare cookie e localStorage dalle impostazioni del tuo browser.
             Se blocchi i cookie di Supabase, potresti non riuscire ad accedere all&apos;area admin —
@@ -105,10 +101,10 @@ export default function CookiePage() {
         </section>
 
         <section>
-          <h2 className="font-alt font-bold text-2xl text-ink mb-3">Domande?</h2>
+          <h2 className="font-display font-extrabold tracking-tight text-2xl text-ink mb-3">Domande?</h2>
           <p>
-            Scrivi a <a href="mailto:emanueleecampanini@gmail.com" className="text-mare-700 underline underline-offset-2 hover:text-mare-600">emanueleecampanini@gmail.com</a>.
-            Per il quadro completo, vedi la <Link href="/privacy" className="text-mare-700 underline underline-offset-2 hover:text-mare-600">Privacy Policy</Link>.
+            Scrivi a <a href="mailto:emanueleecampanini@gmail.com" className="text-alga-600 underline underline-offset-2 hover:text-alga">emanueleecampanini@gmail.com</a>.
+            Per il quadro completo, vedi la <Link href="/privacy" className="text-alga-600 underline underline-offset-2 hover:text-alga">Privacy Policy</Link>.
           </p>
         </section>
       </div>

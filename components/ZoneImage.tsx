@@ -61,10 +61,10 @@ export default function ZoneImage({
   }, [query, fallbackQuery])
 
   return (
-    <div className={`relative overflow-hidden bg-carta ${aspect} ${className}`}>
+    <div className={`relative overflow-hidden bg-crema ${aspect} ${className}`}>
       {/* Placeholder sempre presente sotto */}
-      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-marel via-carta to-fiore-100">
-        <svg viewBox="0 0 120 40" className="w-24 h-8 text-mare opacity-35" fill="none" stroke="currentColor" strokeWidth="1">
+      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-crema-2 via-crema to-terracotta-50">
+        <svg viewBox="0 0 120 40" className="w-24 h-8 text-alga opacity-35" fill="none" stroke="currentColor" strokeWidth="1">
           <path d="M0 20 C 40 20, 80 20, 120 20" />
           <ellipse cx="25" cy="12" rx="6" ry="3" transform="rotate(-18 25 12)" fill="currentColor" opacity="0.8" />
           <ellipse cx="45" cy="28" rx="6" ry="3" transform="rotate(18 45 28)" fill="currentColor" opacity="0.8" />

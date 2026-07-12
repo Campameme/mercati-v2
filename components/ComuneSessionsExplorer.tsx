@@ -162,7 +162,7 @@ export default function ComuneSessionsExplorer({
               id="comune-giorno"
               value={active.id}
               onChange={(e) => setActiveId(e.target.value)}
-              className="w-full appearance-none font-alt font-semibold text-sm text-ink bg-white border-2 border-ink/15 rounded-full pl-9 pr-10 py-3 focus:outline-none focus:border-mare cursor-pointer"
+              className="w-full appearance-none font-alt font-semibold text-sm text-ink bg-white border-[1.5px] border-alga/60 rounded-full pl-9 pr-10 py-3 focus:outline-none focus:border-alga cursor-pointer"
             >
               {sessions.map((s) => (
                 <option key={s.id} value={s.id}>
@@ -176,24 +176,25 @@ export default function ComuneSessionsExplorer({
         </section>
       )}
 
-      {/* Dettaglio sessione */}
+      {/* Dettaglio sessione: card bianca con band della tipologia */}
       <section className="mb-6">
-        <div className="bg-white border-2 border-ink/10 rounded-xl p-5">
-          <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="bg-white rounded-xl border border-[#e0d7c1] overflow-hidden shadow-[0_16px_30px_-24px_rgba(38,36,30,0.45)]">
+          <span aria-hidden="true" className="mz-band block" style={{ ['--band' as string]: CATEGORY_COLOR[cat] }} />
+          <div className="p-5 flex items-start justify-between gap-4 flex-wrap">
             <div className="min-w-0 flex-1">
-              <div className="flex items-baseline flex-wrap gap-x-3 mb-1">
-                <h2 className="font-alt font-bold text-2xl text-ink">{active.giorno}</h2>
+              <div className="flex items-baseline flex-wrap gap-x-3 gap-y-1.5 mb-1">
+                <h2 className="font-display font-extrabold tracking-tight text-2xl text-ink">{active.giorno}</h2>
                 {active.orario && <span className="text-sm text-ink-muted tabular-nums">{active.orario}</span>}
                 <span
-                  className="font-alt text-[11px] font-semibold uppercase tracking-wider"
-                  style={{ color: CATEGORY_COLOR[cat] }}
+                  className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-alt font-bold uppercase tracking-wider text-crema"
+                  style={{ background: CATEGORY_COLOR[cat] }}
                 >
                   {CATEGORY_LABEL[cat]}
                 </span>
               </div>
               {active.luogo && (
                 <p className="text-sm text-ink flex items-center gap-1.5 mt-1">
-                  <MapPin className="w-4 h-4 text-mare" aria-hidden="true" /> {active.luogo}
+                  <MapPin className="w-4 h-4 text-alga" aria-hidden="true" /> {active.luogo}
                 </p>
               )}
               {active.settori && <p className="text-xs text-ink-muted italic mt-2">{active.settori}</p>}
@@ -203,7 +204,7 @@ export default function ComuneSessionsExplorer({
                 href={`https://www.google.com/maps/dir/?api=1&destination=${active.lat},${active.lng}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="imk-lift inline-flex items-center gap-1.5 px-4 py-2.5 bg-ink text-carta rounded-full font-alt text-sm font-semibold hover:bg-mare transition-colors flex-shrink-0"
+                className="imk-lift inline-flex items-center gap-1.5 px-4 py-2.5 bg-terracotta text-crema rounded-full font-alt text-sm font-semibold hover:bg-terracotta-600 transition-colors flex-shrink-0"
               >
                 <Navigation2 className="w-4 h-4" /> {ui.comuneDirections}
               </a>
@@ -228,11 +229,11 @@ export default function ComuneSessionsExplorer({
           </h3>
         </div>
         {comuneOperators.length === 0 ? (
-          <div className="bg-white border-2 border-ink/10 rounded-xl p-6 text-sm text-ink-muted">
+          <div className="bg-white rounded-xl border border-[#e0d7c1] p-6 text-sm text-ink-muted">
             {ui.comuneNoOperators}
           </div>
         ) : (
-          <ul className="divide-y-2 divide-ink/10 border-y-2 border-ink/10">
+          <ul className="divide-y divide-[#e0d7c1] border-y border-[#e0d7c1]">
             {comuneOperators.map((op) => (
               <li key={op.id}>
                 <Link
@@ -240,19 +241,19 @@ export default function ComuneSessionsExplorer({
                   className="group flex items-baseline justify-between gap-4 py-3.5 hover:bg-white -mx-3 px-3 transition-colors"
                 >
                   <div className="min-w-0 flex-1">
-                    <h4 className="font-alt font-bold text-base text-ink leading-tight">{op.name}</h4>
+                    <h4 className="font-display font-extrabold tracking-tight text-base text-ink leading-tight group-hover:text-terracotta transition-colors">{op.name}</h4>
                     {op.description && <p className="text-sm text-ink-soft line-clamp-1 mt-0.5">{op.description}</p>}
                     <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-ink-muted mt-1">
-                      <span className="font-alt font-semibold uppercase tracking-wider">{CAT_LABEL[op.category] ?? op.category}</span>
+                      <span className="font-alt font-semibold uppercase tracking-wider text-terracotta-600 bg-terracotta-50 rounded-full px-2 py-0.5">{CAT_LABEL[op.category] ?? op.category}</span>
                       {op.stall_number && <span>· Banco {op.stall_number}</span>}
                       {sessions.length > 1 && op.schedule_id && sessionById.get(op.schedule_id) && (
-                        <span className={`font-alt font-semibold ${op.schedule_id === active.id ? 'text-mare-600' : ''}`}>
+                        <span className={`font-alt font-semibold ${op.schedule_id === active.id ? 'text-alga-600' : ''}`}>
                           · {shortLabel(sessionById.get(op.schedule_id)!.giorno)}
                         </span>
                       )}
                     </div>
                   </div>
-                  <span className="text-ink-muted group-hover:text-mare-600 group-hover:translate-x-0.5 transition-all">→</span>
+                  <span className="text-ink-muted group-hover:text-terracotta group-hover:translate-x-0.5 transition-all">→</span>
                 </Link>
               </li>
             ))}

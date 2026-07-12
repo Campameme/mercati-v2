@@ -80,10 +80,10 @@ export default async function AdminRoot() {
   const adesioniRows = (recentAdesioni ?? []) as AdesioneRow[]
 
   return (
-    <div className="min-h-screen bg-carta">
+    <div className="min-h-screen bg-crema">
       <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl">
         <div className="mb-8 border-b-2 border-ink/10 pb-5">
-          <p className="text-xs font-alt uppercase tracking-[0.14em] text-mare-600 mb-1">Super-admin</p>
+          <p className="text-xs font-alt uppercase tracking-[0.14em] text-alga-600 mb-1">Super-admin</p>
           <h1 className="font-alt font-bold text-3xl md:text-4xl text-ink leading-tight flex items-center gap-3">
             Dashboard <Logo inline />
           </h1>
@@ -107,7 +107,7 @@ export default async function AdminRoot() {
             href="/admin/operatori"
             icon={Store}
             title="Gestione operatori"
-            desc="Crea i Maestri del Banco, assegnali ai mercati con la posizione, invia i link di accesso."
+            desc="Crea i banchi di fiducia, assegnali ai mercati con la posizione, invia i link di accesso."
           />
           <ActionCard
             href="/admin/sessions"
@@ -140,7 +140,7 @@ export default async function AdminRoot() {
         <section className="mb-10">
           <div className="flex items-baseline justify-between mb-4 border-b-2 border-ink/10 pb-2">
             <div className="flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-mare" />
+              <BarChart3 className="w-4 h-4 text-alga" />
               <h2 className="font-alt font-bold text-lg text-ink">Zone più viste · ultimi 30 giorni</h2>
             </div>
             <p className="text-[11px] text-ink-muted italic">Statistiche anonime cookieless</p>
@@ -150,7 +150,7 @@ export default async function AdminRoot() {
           ) : (
             <div className="bg-white border-2 border-ink/10 rounded-xl overflow-hidden">
               <table className="w-full text-sm">
-                <thead className="text-[11px] font-alt uppercase tracking-wider text-ink-muted bg-carta">
+                <thead className="text-[11px] font-alt uppercase tracking-wider text-ink-muted bg-crema">
                   <tr className="text-left">
                     <th className="py-2.5 pl-4">Zona</th>
                     <th className="py-2.5 text-right tabular-nums">Views 30g</th>
@@ -161,9 +161,9 @@ export default async function AdminRoot() {
                 </thead>
                 <tbody className="divide-y divide-ink/10">
                   {topMarketsRows.map((m) => (
-                    <tr key={m.market_id} className="hover:bg-carta">
+                    <tr key={m.market_id} className="hover:bg-crema">
                       <td className="py-2.5 pl-4">
-                        <Link href={`/${m.market_slug}`} className="font-alt text-ink hover:text-mare-600">
+                        <Link href={`/${m.market_slug}`} className="font-alt text-ink hover:text-alga-600">
                           {m.market_name}
                         </Link>
                       </td>
@@ -183,7 +183,7 @@ export default async function AdminRoot() {
         <section className="mb-10">
           <div className="flex items-baseline justify-between mb-4 border-b-2 border-ink/10 pb-2">
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-mare" />
+              <TrendingUp className="w-4 h-4 text-alga" />
               <h2 className="font-alt font-bold text-lg text-ink">Operatori più visti · ultimi 30 giorni</h2>
             </div>
           </div>
@@ -192,7 +192,7 @@ export default async function AdminRoot() {
           ) : (
             <div className="bg-white border-2 border-ink/10 rounded-xl overflow-hidden">
               <table className="w-full text-sm">
-                <thead className="text-[11px] font-alt uppercase tracking-wider text-ink-muted bg-carta">
+                <thead className="text-[11px] font-alt uppercase tracking-wider text-ink-muted bg-crema">
                   <tr className="text-left">
                     <th className="py-2.5 pl-4">Operatore</th>
                     <th className="py-2.5 text-right tabular-nums">Views 30g</th>
@@ -203,7 +203,7 @@ export default async function AdminRoot() {
                 </thead>
                 <tbody className="divide-y divide-ink/10">
                   {topOperatorsRows.map((o) => (
-                    <tr key={o.operator_id} className="hover:bg-carta">
+                    <tr key={o.operator_id} className="hover:bg-crema">
                       <td className="py-2.5 pl-4">
                         <span className="text-ink">{o.operator_name}</span>
                       </td>
@@ -223,10 +223,10 @@ export default async function AdminRoot() {
         <section>
           <div className="flex items-baseline justify-between mb-4 border-b-2 border-ink/10 pb-2">
             <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-mare" />
+              <Mail className="w-4 h-4 text-alga" />
               <h2 className="font-alt font-bold text-lg text-ink">Ultime adesioni</h2>
             </div>
-            <Link href="/admin/adesioni" className="text-xs font-alt uppercase tracking-wider text-mare-600 hover:text-mare-700">
+            <Link href="/admin/adesioni" className="text-xs font-alt uppercase tracking-wider text-alga-600 hover:text-alga-600">
               Vedi tutte →
             </Link>
           </div>
@@ -258,10 +258,10 @@ function Stat({ label, value, sub, icon: Icon, highlight }: {
 }) {
   return (
     <div className={`rounded-xl p-4 border-2 ${
-      highlight ? 'bg-sole/15 border-sole' : 'bg-white border-ink/10'
+      highlight ? 'bg-terracotta/15 border-terracotta' : 'bg-white border-ink/10'
     }`}>
       <div className="flex items-center gap-2 mb-1">
-        <Icon className={`w-3.5 h-3.5 ${highlight ? 'text-fiore-600' : 'text-mare'}`} />
+        <Icon className={`w-3.5 h-3.5 ${highlight ? 'text-terracotta-600' : 'text-alga'}`} />
         <p className="text-[11px] font-alt uppercase tracking-wider text-ink-muted">{label}</p>
       </div>
       <p className="font-alt font-bold text-2xl text-ink tabular-nums">{value}</p>
@@ -276,19 +276,19 @@ function ActionCard({ href, icon: Icon, title, desc, badge }: {
   return (
     <Link
       href={href}
-      className="group relative bg-white border-2 border-ink/10 rounded-xl p-5 hover:border-mare hover:-translate-y-0.5 transition-all"
+      className="group relative bg-white border-2 border-ink/10 rounded-xl p-5 hover:border-alga hover:-translate-y-0.5 transition-all"
     >
-      <Icon className="w-8 h-8 text-mare mb-3" />
+      <Icon className="w-8 h-8 text-alga mb-3" />
       {typeof badge === 'number' && badge > 0 && (
-        <span className="absolute top-3 right-3 bg-fiore text-white text-[11px] font-bold rounded-full px-2 py-0.5">
+        <span className="absolute top-3 right-3 bg-terracotta text-white text-[11px] font-bold rounded-full px-2 py-0.5">
           {badge}
         </span>
       )}
-      <h2 className="font-alt font-bold text-lg text-ink mb-1 group-hover:text-mare-600 transition-colors">
+      <h2 className="font-alt font-bold text-lg text-ink mb-1 group-hover:text-alga-600 transition-colors">
         {title}
       </h2>
       <p className="text-sm text-ink-soft">{desc}</p>
-      <span className="inline-flex items-center gap-1 mt-3 text-xs font-alt uppercase tracking-wider text-mare-600 group-hover:translate-x-0.5 transition-transform">
+      <span className="inline-flex items-center gap-1 mt-3 text-xs font-alt uppercase tracking-wider text-alga-600 group-hover:translate-x-0.5 transition-transform">
         Apri <ArrowRight className="w-3 h-3" />
       </span>
     </Link>
@@ -297,10 +297,10 @@ function ActionCard({ href, icon: Icon, title, desc, badge }: {
 
 function StatoBadge({ stato }: { stato: string }) {
   const config: Record<string, { label: string; cls: string }> = {
-    nuovo:        { label: 'Nuovo',         cls: 'bg-mare/15 text-mare-700 border-mare/40' },
-    in_contatto:  { label: 'In contatto',   cls: 'bg-sole/20 text-ink-soft border-sole' },
-    aderito:      { label: 'Aderito',       cls: 'bg-mare text-white border-mare' },
-    scartato:     { label: 'Scartato',      cls: 'bg-carta text-ink-muted border-ink/15' },
+    nuovo:        { label: 'Nuovo',         cls: 'bg-alga/15 text-alga-600 border-alga/40' },
+    in_contatto:  { label: 'In contatto',   cls: 'bg-terracotta/20 text-ink-soft border-terracotta' },
+    aderito:      { label: 'Aderito',       cls: 'bg-alga text-white border-alga' },
+    scartato:     { label: 'Scartato',      cls: 'bg-crema text-ink-muted border-ink/15' },
   }
   const c = config[stato] ?? config.nuovo
   return (

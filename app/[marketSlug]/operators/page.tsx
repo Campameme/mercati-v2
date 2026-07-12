@@ -10,7 +10,6 @@ import FavoriteButton from '@/components/FavoriteButton'
 import BancoAvatar from '@/components/BancoAvatar'
 import type { UnifiedMapPin } from '@/components/UnifiedMap'
 import { Operator, OperatorCategory } from '@/types/operator'
-import { WaveTaglia } from '@/components/decorations'
 import { useFavorites } from '@/lib/favorites'
 
 const CAT_LABEL: Record<string, string> = {
@@ -133,11 +132,10 @@ export default function OperatorsPage() {
     <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl">
       <div className="mb-8 border-b-2 border-ink/10 pb-6">
         <div className="flex items-center gap-3 mb-2 text-ink-soft">
-          <WaveTaglia className="w-8 h-2.5 text-mare" aria-hidden="true" />
           <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">{marketCity ?? 'Mercato'} · la carta del banco</p>
         </div>
-        <h1 className="font-display text-3xl md:text-5xl text-ink leading-tight">
-          I banchi {marketName ? <span className="text-mare-600">di {marketName}</span> : ''}
+        <h1 className="font-display font-extrabold text-3xl md:text-5xl text-ink leading-tight">
+          I banchi {marketName ? <span className="text-alga-600">di {marketName}</span> : ''}
         </h1>
         <p className="text-sm text-ink-soft mt-3 max-w-2xl">
           Sfoglia i venditori. Clicca <strong>Vedi sulla mappa</strong> su una o più figurine per
@@ -157,17 +155,17 @@ export default function OperatorsPage() {
           type="button"
           onClick={() => setOnlyFavs((v) => !v)}
           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-alt font-semibold uppercase tracking-wider border-2 transition-colors ${
-            onlyFavs ? 'bg-sole/30 border-sole text-ink' : 'bg-white border-ink/15 text-ink-soft hover:border-mare'
+            onlyFavs ? 'bg-terracotta/30 border-terracotta text-ink' : 'bg-white border-ink/15 text-ink-soft hover:border-alga'
           }`}
         >
-          <Star className={`w-3.5 h-3.5 ${onlyFavs ? 'fill-sole text-sole' : ''}`} />
+          <Star className={`w-3.5 h-3.5 ${onlyFavs ? 'fill-terracotta text-terracotta' : ''}`} />
           Solo preferiti
         </button>
         {filteredOperators.some((op) => op.location?.lat && op.location?.lng) && (
           <button
             type="button"
             onClick={pinAllVisible}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-alt font-semibold uppercase tracking-wider bg-white border-2 border-ink/15 text-ink-soft hover:border-mare transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-alt font-semibold uppercase tracking-wider bg-white border-2 border-ink/15 text-ink-soft hover:border-alga transition-colors"
           >
             <MapIcon className="w-3.5 h-3.5" />
             Mostra tutti sulla mappa
@@ -177,7 +175,7 @@ export default function OperatorsPage() {
           <button
             type="button"
             onClick={clearPinned}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-alt font-semibold uppercase tracking-wider bg-notte text-carta hover:bg-mare transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-alt font-semibold uppercase tracking-wider bg-ink text-crema hover:bg-alga transition-colors"
           >
             <X className="w-3.5 h-3.5" />
             Chiudi mappa ({pins.length})
@@ -187,12 +185,12 @@ export default function OperatorsPage() {
 
       {loading ? (
         <div className="bg-white border-2 border-ink/10 rounded-xl p-12 text-center">
-          <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-mare"></div>
+          <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-alga"></div>
           <p className="mt-4 text-ink-soft text-sm">Caricamento operatori…</p>
         </div>
       ) : error ? (
-        <div className="bg-fiore/10 border-2 border-fiore/30 rounded-xl p-4">
-          <p className="text-fiore-600 font-semibold mb-2">Errore</p>
+        <div className="bg-terracotta/10 border-2 border-terracotta/30 rounded-xl p-4">
+          <p className="text-terracotta-600 font-semibold mb-2">Errore</p>
           <p className="text-ink-soft text-sm">{error}</p>
         </div>
       ) : (
@@ -222,7 +220,7 @@ export default function OperatorsPage() {
                     <li
                       key={op.id}
                       className={`imk-lift relative bg-white border-2 rounded-xl p-4 transition-colors ${
-                        onMap ? 'border-mare' : 'border-ink/10 hover:border-mare'
+                        onMap ? 'border-alga' : 'border-ink/10 hover:border-alga'
                       }`}
                     >
                       <div className="flex items-start gap-3">
@@ -232,11 +230,11 @@ export default function OperatorsPage() {
                           className="min-w-0 flex-1 group"
                         >
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="font-alt font-bold text-base text-ink leading-tight group-hover:text-mare-600 transition-colors">
+                            <span className="font-alt font-bold text-base text-ink leading-tight group-hover:text-alga-600 transition-colors">
                               {op.name}
                             </span>
                             {verified && (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-sole text-ink rounded-full font-alt text-[9px] font-semibold uppercase tracking-wider">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-terracotta text-ink rounded-full font-alt text-[9px] font-semibold uppercase tracking-wider">
                                 <BadgeCheck className="w-3 h-3" /> Verificato
                               </span>
                             )}
@@ -245,7 +243,7 @@ export default function OperatorsPage() {
                             <p className="text-sm text-ink-soft line-clamp-2 mt-1">{op.description}</p>
                           )}
                           <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-ink-muted mt-2">
-                            <span className="font-alt font-semibold uppercase tracking-wider text-mare-700">{CAT_LABEL[op.category] ?? op.category}</span>
+                            <span className="font-alt font-semibold uppercase tracking-wider text-alga-600">{CAT_LABEL[op.category] ?? op.category}</span>
                             {op.location?.stallNumber && <span>· Banco {op.location.stallNumber}</span>}
                           </div>
                         </Link>
@@ -258,8 +256,8 @@ export default function OperatorsPage() {
                             onClick={() => togglePin(op.id)}
                             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-alt font-semibold uppercase tracking-wider transition-colors ${
                               onMap
-                                ? 'bg-mare text-white hover:bg-mare-600'
-                                : 'bg-carta text-ink hover:bg-marel border border-ink/10'
+                                ? 'bg-alga text-white hover:bg-alga-600'
+                                : 'bg-crema text-ink hover:bg-crema-2 border border-ink/10'
                             }`}
                           >
                             <MapIcon className="w-3 h-3" />

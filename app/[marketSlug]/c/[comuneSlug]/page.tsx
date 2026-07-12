@@ -3,12 +3,9 @@ import { notFound } from 'next/navigation'
 import { ChevronLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { slugifyName } from '@/lib/markets/slug'
-import { SunRay } from '@/components/decorations'
 import Reveal from '@/components/Reveal'
 import ComuneSessionsExplorer from '@/components/ComuneSessionsExplorer'
 import PageviewTracker from '@/components/analytics/PageviewTracker'
-import DriftBackdrop from '@/components/motion/DriftBackdrop'
-import Cartolina from '@/components/Cartolina'
 import ZoneImage from '@/components/ZoneImage'
 import { comuneDescription } from '@/lib/markets/comuni'
 import { getLang } from '@/lib/i18n/getLang'
@@ -123,28 +120,27 @@ export default async function ComunePage({
     <div>
       <PageviewTracker type="view_comune" marketId={market.id} comune={comune} />
       {/* HERO compatto: foto sx, titolo + descrizione del paese a dx */}
-      <section className="relative overflow-hidden bg-carta border-b-2 border-ink/10">
-        <DriftBackdrop tone="light" variant="section" />
-        {/* banda-tendone: filo di brand in cima */}
-        <div className="imk-awning h-2" aria-hidden="true" />
+      <section className="relative overflow-hidden bg-crema border-b border-[#e0d7c1]">
+        {/* band di testa: filo di brand in cima (crosshatch alga) */}
+        <div className="mz-band" aria-hidden="true" />
         <div className="container mx-auto px-4 md:px-6 py-8 md:py-10 max-w-6xl relative z-10">
           <div className="grid md:grid-cols-[220px_1fr] gap-6 md:gap-10 items-start">
             <Reveal>
               <Link
                 href={`/${market.slug}`}
-                className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-mare-600 mb-3 transition-colors"
+                className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-alga-600 mb-3 transition-colors"
               >
                 <ChevronLeft className="w-3.5 h-3.5" /> {market.name}
               </Link>
-              <Cartolina query={comune} alt={comune} caption={comune} aspect="aspect-[4/5]" tilt="l" tape priority />
+              <figure className="-rotate-1 bg-white border border-[#e0d7c1] rounded-md p-1.5 pb-2 shadow-lg">
+                <ZoneImage query={comune} alt={comune} aspect="aspect-[4/5]" className="rounded-sm" priority />
+                <figcaption className="mt-1 px-1 font-alt italic text-xs text-ink-soft leading-tight">{comune}</figcaption>
+              </figure>
             </Reveal>
 
             <Reveal>
-              <div className="flex items-center gap-3 mb-3 text-ink-soft">
-                <SunRay className="w-5 h-5 text-sole" aria-hidden="true" />
-                <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">{ui.comuneLabel}</p>
-              </div>
-              <h1 className="font-display text-3xl md:text-5xl text-ink leading-[1.06]"><span className="imk-mark text-ink">{comune}</span></h1>
+              <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-3">{ui.comuneLabel}</p>
+              <h1 className="font-display font-extrabold tracking-tight text-4xl md:text-6xl text-ink leading-[1.04]">{comune}</h1>
               {descrizione && (
                 <p className="mt-4 text-sm md:text-base text-ink-soft max-w-2xl leading-relaxed">{descrizione}</p>
               )}
@@ -168,10 +164,10 @@ export default async function ComunePage({
 
         {/* Sulla Riviera: i comuni limitrofi coi loro mercati (link alla pagina comune) */}
         {vicini.length > 0 && (
-          <section className="mt-12 pt-10 border-t-2 border-ink/10">
+          <section className="mt-12 pt-10 border-t border-[#e0d7c1]">
             <Reveal className="mb-6">
-              <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em] text-mare-600 mb-1">{ui.comuneRiviera}</p>
-              <h2 className="font-alt font-bold text-2xl text-ink">{ui.comuneAround} {comune}</h2>
+              <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-1">{ui.comuneRiviera}</p>
+              <h2 className="font-display font-extrabold tracking-tight text-2xl md:text-3xl text-ink">{ui.comuneAround} {comune}</h2>
               <p className="mt-1 text-sm text-ink-soft">{ui.comuneAroundLead}</p>
             </Reveal>
             <Reveal delayMs={60} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -179,12 +175,13 @@ export default async function ComunePage({
                 <Link
                   key={v.slug}
                   href={`/${v.marketSlug}/c/${v.slug}`}
-                  className="imk-lift group flex flex-col bg-white border-2 border-ink/10 imk-edge overflow-hidden hover:border-mare transition-colors"
+                  className="imk-lift group flex flex-col bg-white rounded-xl border border-[#e0d7c1] overflow-hidden hover:border-alga transition-colors"
                 >
+                  <span aria-hidden="true" className="mz-band block" />
                   <div className="relative">
                     <ZoneImage query={v.comune} alt={v.comune} aspect="aspect-[4/3]" hoverZoom />
-                    <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-notte/80 to-transparent pointer-events-none" aria-hidden="true" />
-                    <span className="absolute left-3 bottom-2.5 right-3 font-alt font-bold text-lg text-carta leading-tight [text-shadow:0_1px_8px_rgba(14,48,64,0.5)]">
+                    <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-ink/80 to-transparent pointer-events-none" aria-hidden="true" />
+                    <span className="absolute left-3 bottom-2.5 right-3 font-display font-extrabold tracking-tight text-lg text-crema leading-tight [text-shadow:0_1px_8px_rgba(38,36,30,0.5)]">
                       {v.comune}
                     </span>
                   </div>

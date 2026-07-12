@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { createClient } from '@supabase/supabase-js'
 import { SITE_URL } from '@/lib/site'
+import { IMPERIA_ZONE_SLUGS } from '@/lib/markets/zones'
 
 // Rigenerata al più ogni ora: le rotte statiche + una voce per ogni zona attiva.
 export const revalidate = 3600
@@ -27,10 +28,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (url && key) {
       const supabase = createClient(url, key, { auth: { persistSession: false } })
       // NB: markets non ha updated_at (solo created_at)
+      // Solo la Riviera dei Fiori (provincia di Imperia): le zone di Savona
+      // restano nel DB ma fuori dal sito.
       const { data: markets, error } = await supabase
         .from('markets')
         .select('slug')
         .eq('is_active', true)
+        .in('slug', [...IMPERIA_ZONE_SLUGS])
       if (error) console.warn('[sitemap] query zone fallita:', error.message)
       for (const m of markets ?? []) {
         entries.push({

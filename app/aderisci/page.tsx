@@ -1,129 +1,195 @@
 import Link from 'next/link'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, ArrowRight } from 'lucide-react'
 import AdesioneForm from '@/components/AdesioneForm'
-import { SunRay } from '@/components/decorations'
 import Reveal from '@/components/Reveal'
-import DriftBackdrop from '@/components/motion/DriftBackdrop'
-import WaterCard from '@/components/motion/WaterCard'
-import Cartolina from '@/components/Cartolina'
+import Bollino from '@/components/Bollino'
+import { LogoMark } from '@/components/Logo'
 
 export const metadata = {
-  title: 'Aderisci — Mercati della Riviera di Ponente',
-  description: 'Sei un operatore di mercato della Riviera ligure di Ponente? Entra nei primi dieci banchi raccontati da Mercati della Riviera di Ponente. Gratis per sempre.',
+  title: 'Entra nella rete dei banchi',
+  description:
+    'Hai un banco in provincia di Imperia, da Ventimiglia a Diano? La rete dei banchi di fiducia non è un abbonamento: è un gruppo che si sceglie. Tre requisiti: banco pulito e curato, prodotti di qualità, serietà con colleghi e clienti.',
 }
 
-const SCHEDA = [
+// I tre requisiti della rete — sempre con queste parole (docs/brand-voice.md).
+const REQUISITI = [
   {
-    title: 'Una scheda vostra. Vera.',
-    body: 'Foto del banco, vostra faccia, prodotti che vendete, dove e quando vi trovano. Non un profilo finto: la pagina che il cliente cerca quando vuole sapere dove andate sabato.',
+    title: 'Banco pulito e curato',
+    body: 'L’ordine si vede da tre metri: merce esposta con cura, prezzi chiari, il banco a posto dall’apertura alla chiusura.',
   },
   {
-    title: 'Vi raccontiamo noi, la prima volta.',
-    body: 'La mattina al banco la passo io: faccio foto decenti, raccolgo due storie, le mettiamo per iscritto insieme. Voi continuate a vendere. Dalla seconda volta in poi, ve la cavate da soli.',
+    title: 'Prodotti di qualità',
+    body: 'Merce scelta e dichiarata per quella che è: la stagione quando è stagione, la provenienza quando te la chiedono.',
   },
   {
-    title: 'Turismo di prossimità, non turisti di passaggio.',
-    body: 'Mercati della Riviera di Ponente arriva a chi vive a 15–60 minuti da voi: i cugini di Cuneo, i ponentini di Genova, i francesi della Costa Azzurra. Non promettiamo "tanti follower" — promettiamo persone che entrano al banco e vi chiamano per nome.',
+    title: 'Serietà con colleghi e clienti',
+    body: 'La parola data vale, col cliente come col banco accanto. Al mercato ci si rivede ogni settimana: la fiducia è tutto.',
+  },
+]
+
+// Cosa ci guadagna il banco: vantaggi concreti, senza promesse da agenzia.
+const VANTAGGI = [
+  {
+    title: 'Una vetrina vera',
+    body: 'La pagina del tuo banco con la tua storia raccontata: chi ci sta dietro, cosa vendi, dove e quando ti si trova.',
+    tag: '#DietroIlBanco',
+  },
+  {
+    title: 'Clienti che arrivano già informati',
+    body: 'Chi ti trova sul sito arriva al banco sapendo cosa vendi, che giorno ci sei e in che piazza. Resta solo da servirlo bene.',
+  },
+  {
+    title: 'Tessera punti e offerte',
+    body: 'Le tue offerte arrivano a chi ha la tessera, e i punti riportano i clienti al banco la settimana dopo.',
+  },
+  {
+    title: 'La rete dà valore a chi lavora bene',
+    body: 'Il bollino dice a colpo d’occhio come tieni il banco. E stare accanto ad altri banchi seri dà valore anche al tuo.',
   },
 ]
 
 export default function AderisciPage() {
   return (
     <div>
-      {/* HERO: sfondo carta con silhouette liguri che derivano */}
-      <section className="relative overflow-hidden bg-carta border-b-2 border-ink/10">
-        <DriftBackdrop tone="light" variant="hero" />
-        <div className="container mx-auto px-4 md:px-6 max-w-5xl py-10 md:py-16 relative z-10">
+      {/* HERO: crema con velo di tratteggio, il bollino della rete a fianco */}
+      <section className="relative overflow-hidden bg-crema border-b border-ink/10">
+        <div aria-hidden="true" className="mz-hatch absolute inset-0" />
+        <div className="relative z-10 container mx-auto px-4 md:px-6 max-w-5xl py-10 md:py-16">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-mare-600 mb-6 transition-colors"
+            className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-alga mb-8 transition-colors"
           >
             <ChevronLeft className="w-3.5 h-3.5" /> Homepage
           </Link>
 
-          <div className="grid lg:grid-cols-[1fr_280px] gap-10 items-start">
+          <div className="grid md:grid-cols-[1fr_auto] gap-10 items-center">
             <Reveal>
-              <div className="flex items-center gap-3 mb-4 text-ink-soft">
-                <SunRay className="w-5 h-5 text-sole" aria-hidden="true" />
-                <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">Per gli operatori</p>
-              </div>
-              <h1 className="font-display text-3xl md:text-5xl text-ink leading-[1.06] mb-5">
-                State al mercato da anni.
-                <br />
-                <span className="imk-mark text-ink">Fatevi trovare anche fuori.</span>
+              <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-4">
+                Per chi tiene banco · da Ventimiglia a Diano
+              </p>
+              <h1 className="font-display font-extrabold tracking-tight text-4xl md:text-6xl text-ink leading-[1.04] mb-5">
+                Entra nella <span className="text-alga">rete dei banchi</span>.
               </h1>
-              <p className="text-base md:text-lg text-ink-soft leading-relaxed mb-3">
-                Mercati della Riviera di Ponente racconta i banchi della Riviera ligure di Ponente ai cittadini di prossimità
-                — quelli che vivono a 15–60 minuti da voi. Persone che cercano una mattina diversa il
-                sabato, non una vetrina online qualunque.
+              <p className="font-alt font-semibold text-lg md:text-xl text-ink mb-3">
+                Non è un abbonamento: è un gruppo che si sceglie.
               </p>
-              <p className="text-base text-ink-soft leading-relaxed">
-                I primi dieci operatori entrano <strong className="text-ink">gratis</strong>.
-                Restano gratis, per sempre. In cambio chiediamo una mattina al vostro banco e una
-                storia da raccontare.
+              <p className="max-w-xl text-base md:text-lg text-ink-soft leading-relaxed">
+                La rete raccoglie i banchi di fiducia dei mercati della provincia di Imperia.
+                Si entra in un modo solo: tenendo fede a tre requisiti, ogni giorno di mercato.
               </p>
+              <div className="mt-7">
+                <a
+                  href="#richiesta"
+                  className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-terracotta text-crema px-6 py-3.5 rounded-full hover:bg-terracotta-600 transition-colors"
+                >
+                  Chiedi di entrare <ArrowRight className="imk-march w-4 h-4" />
+                </a>
+              </div>
             </Reveal>
 
-            {/* Cartolina: il mercato della Riviera */}
-            <Reveal delayMs={80} className="hidden lg:block">
-              <Cartolina query="Pieve di Teco" caption="I portici di Pieve di Teco" tilt="r" aspect="aspect-[4/5]" tape priority />
+            <Reveal delayMs={80} className="hidden md:block">
+              <Bollino className="w-44 lg:w-52" />
             </Reveal>
           </div>
         </div>
       </section>
 
-      <div className="container mx-auto px-4 md:px-6 max-w-3xl py-10 md:py-16">
-        <Reveal delayMs={60}>
-          <div className="mb-10">
-            <h2 className="font-alt font-bold text-2xl md:text-3xl text-ink leading-tight mb-2">
-              Cosa cambia per voi,
-              <br />
-              <span className="imk-mark text-ink">in concreto.</span>
+      {/* I TRE REQUISITI: card bianche con band alga piena e nodo-bullet */}
+      <section id="requisiti" className="bg-crema-2">
+        <div className="container mx-auto px-4 md:px-6 max-w-5xl py-12 md:py-16">
+          <Reveal>
+            <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-terracotta mb-2">I tre requisiti</p>
+            <h2 className="font-display font-extrabold tracking-tight text-3xl md:text-4xl text-ink leading-[1.05] mb-3">
+              Si entra così, e così si resta.
             </h2>
-            <p className="text-sm text-ink-muted mb-8">Non è marketing. È il lavoro che facciamo insieme nei primi tre mesi.</p>
-            <ul className="space-y-5">
-              {SCHEDA.map((s, i) => (
-                <li key={s.title}>
-                  <WaterCard tilt={i % 2 === 0 ? 'l' : 'r'} className="grid grid-cols-[2.5rem_1fr] gap-4 items-start p-5">
-                    <span className="font-alt font-bold text-2xl text-mare tabular-nums leading-none pt-1">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <div>
-                      <p className="font-alt font-bold text-xl text-ink mb-1">{s.title}</p>
-                      <p className="text-ink-soft leading-relaxed">{s.body}</p>
-                    </div>
-                  </WaterCard>
-                </li>
-              ))}
-            </ul>
+            <p className="max-w-2xl text-ink-soft leading-relaxed mb-8">
+              Valgono uguali per tutti, dal banco dei fiori a quello del pesce. Facili da dire, seri da mantenere.
+            </p>
+          </Reveal>
+          <div className="grid sm:grid-cols-3 gap-5">
+            {REQUISITI.map((r, i) => (
+              <Reveal key={r.title} delayMs={i * 60} className="h-full">
+                <div className="h-full flex flex-col bg-white rounded-xl border border-[#e0d7c1] overflow-hidden">
+                  <span aria-hidden="true" className="mz-band mz-band--solid" style={{ ['--band' as string]: '#46683B' }} />
+                  <div className="flex flex-col gap-2 p-5">
+                    <LogoMark className="w-6 h-5 text-terracotta" capo={false} />
+                    <h3 className="font-display font-extrabold tracking-tight text-lg text-ink leading-tight">{r.title}</h3>
+                    <p className="text-[15px] text-ink-soft leading-relaxed">{r.body}</p>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
           </div>
-        </Reveal>
+        </div>
+      </section>
 
-        <Reveal delayMs={120}>
-          <div className="border-t-2 border-ink/10 pt-10">
-            <h2 className="font-alt font-bold text-2xl text-ink mb-1">Raccontateci di voi</h2>
+      {/* I VANTAGGI: cosa ci guadagna il banco, punto per punto */}
+      <section id="vantaggi" className="bg-crema">
+        <div className="container mx-auto px-4 md:px-6 max-w-5xl py-12 md:py-16">
+          <Reveal>
+            <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-2">Cosa ci guadagna il banco</p>
+            <h2 className="font-display font-extrabold tracking-tight text-3xl md:text-4xl text-ink leading-[1.05] mb-3">
+              Vantaggi concreti.
+            </h2>
+            <p className="max-w-2xl text-ink-soft leading-relaxed mb-8">
+              Quello che la rete dà a ogni banco, dal giorno in cui entra.
+            </p>
+          </Reveal>
+          <div className="grid sm:grid-cols-2 gap-5">
+            {VANTAGGI.map((v, i) => (
+              <Reveal key={v.title} delayMs={i * 60} className="h-full">
+                <div className="h-full flex flex-col bg-white rounded-xl border border-[#e0d7c1] overflow-hidden">
+                  <span aria-hidden="true" className="mz-band" style={{ ['--band' as string]: '#C4593C' }} />
+                  <div className="flex flex-col gap-2 p-5">
+                    <h3 className="font-display font-extrabold tracking-tight text-lg text-ink leading-tight">{v.title}</h3>
+                    <p className="text-[15px] text-ink-soft leading-relaxed">{v.body}</p>
+                    {v.tag && (
+                      <span className="mt-1 w-fit font-alt text-[11px] font-bold uppercase tracking-wide text-terracotta-600 bg-terracotta-50 rounded-full px-2 py-0.5">
+                        {v.tag}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* LA RICHIESTA: il form di adesione (logica invariata) */}
+      <section id="richiesta" className="relative overflow-hidden bg-crema-2">
+        <div aria-hidden="true" className="mz-band absolute top-0 inset-x-0" />
+        <div className="relative z-10 container mx-auto px-4 md:px-6 max-w-3xl py-12 md:py-16">
+          <Reveal>
+            <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-terracotta mb-2">La richiesta</p>
+            <h2 className="font-display font-extrabold tracking-tight text-3xl md:text-4xl text-ink leading-[1.05] mb-2">
+              Chiedi di entrare.
+            </h2>
             <p className="text-sm text-ink-muted mb-8">
               Cinque minuti. Risposte brevi vanno benissimo — al resto pensiamo insieme.
             </p>
             <AdesioneForm />
-          </div>
-        </Reveal>
+          </Reveal>
 
-        <Reveal delayMs={200}>
-          <div className="mt-12 pt-8 border-t-2 border-ink/10 text-sm text-ink-soft">
-            <p className="mb-2 font-medium text-ink">Preferite scriverci direttamente?</p>
-            <p>
-              Email:{' '}
-              <a href="mailto:emanueleecampanini@gmail.com" className="text-mare-700 underline underline-offset-2 hover:text-mare-600">
-                emanueleecampanini@gmail.com
-              </a>
-            </p>
-            <p className="mt-3 text-ink-muted text-xs">
-              Vi rispondiamo entro 48 ore. Sempre da una persona, mai da un autorisponditore.
-            </p>
-          </div>
-        </Reveal>
-      </div>
+          <Reveal delayMs={120}>
+            <div className="mt-12 pt-8 border-t border-ink/10 text-sm text-ink-soft">
+              <p className="mb-2 font-alt font-semibold text-ink">Preferisci scrivere direttamente?</p>
+              <p>
+                Email:{' '}
+                <a
+                  href="mailto:emanueleecampanini@gmail.com"
+                  className="text-alga-600 underline underline-offset-2 hover:text-alga"
+                >
+                  emanueleecampanini@gmail.com
+                </a>
+              </p>
+              <p className="mt-3 text-ink-muted text-xs">
+                Ti rispondiamo entro 48 ore. Sempre una persona, mai un autorisponditore.
+              </p>
+            </div>
+          </Reveal>
+        </div>
+      </section>
     </div>
   )
 }

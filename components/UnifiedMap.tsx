@@ -46,52 +46,37 @@ interface Props {
   userLocation?: { lat: number; lng: number } | null
 }
 
-// ---- Icona unica del brand: il banco col tendone ---------------------------
-// Un solo linguaggio su TUTTE le mappe (home, /mappa, pagine zona): banco con
-// tendone colorato per tipologia, P scura per i parcheggi, punto mare per gli
-// operatori. Niente varianti per pagina.
-
-/** SVG di un banco con tendone (awning) colorato per tipologia. */
-function bancoSvg(color: string, dark: string): string {
-  return (
-    `<svg viewBox="0 0 28 32" width="100%" height="100%" style="display:block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))">` +
-    // pole + base point (il punto esatto)
-    `<rect x="13" y="13" width="2" height="13" fill="${dark}"/>` +
-    `<circle cx="14" cy="27" r="3.2" fill="${dark}" stroke="#F7EFDD" stroke-width="1.5"/>` +
-    // canopy (tendone) con bordo carta
-    `<rect x="2.5" y="6" width="23" height="5.2" rx="2.2" fill="${color}" stroke="#F7EFDD" stroke-width="1.2"/>` +
-    // scallops del tendone
-    `<path d="M3 11 q2.875 4.4 5.75 0 q2.875 4.4 5.75 0 q2.875 4.4 5.75 0 q2.875 4.4 5.75 0 L25 11 Z" fill="${color}" stroke="#F7EFDD" stroke-width="0.8"/>` +
-    `</svg>`
-  )
-}
+// ---- Pin del sistema Nodo × Mezzogiorno ------------------------------------
+// Un solo linguaggio su TUTTE le mappe (home, /mappa, pagine zona): PUNTI
+// semplici e discreti, colorati per tipologia (alga=generale, verde orto=
+// alimentare, terracotta=antiquariato, viola=artigianato). Il selezionato
+// cresce e prende l'anello; P scura per i parcheggi, puntino per gli operatori.
 
 function pinIcon(pin: UnifiedMapPin, selected: boolean): L.DivIcon {
   const kind = pin.kind
   if (kind === 'parking') {
-    const html = `<div style="width:24px;height:24px;border-radius:8px;background:#1A1714;color:#F4B62C;border:2px solid #F7EFDD;display:flex;align-items:center;justify-content:center;font-family:'Archivo Black',sans-serif;font-weight:700;font-size:13px;box-shadow:0 2px 6px rgba(0,0,0,0.35)">P</div>`
-    return L.divIcon({ className: '', html, iconSize: [24, 24], iconAnchor: [12, 12] })
+    const html = `<div style="width:22px;height:22px;border-radius:7px;background:#26241E;color:#EAC54F;border:2px solid #FBF6EC;display:flex;align-items:center;justify-content:center;font-family:var(--font-alt),sans-serif;font-weight:800;font-size:12px;box-shadow:0 2px 6px rgba(0,0,0,0.3)">P</div>`
+    return L.divIcon({ className: '', html, iconSize: [22, 22], iconAnchor: [11, 11] })
   }
   if (kind === 'operator') {
-    const html = `<div style="width:14px;height:14px;border-radius:50%;background:#15607C;border:2px solid #F7EFDD;box-shadow:0 1px 4px rgba(0,0,0,0.35)"></div>`
-    return L.divIcon({ className: '', html, iconSize: [14, 14], iconAnchor: [7, 7] })
+    const html = `<div style="width:13px;height:13px;border-radius:50%;background:#46683B;border:2px solid #FBF6EC;box-shadow:0 1px 4px rgba(0,0,0,0.3)"></div>`
+    return L.divIcon({ className: '', html, iconSize: [13, 13], iconAnchor: [7, 7] })
   }
-  // market → icona banco colorata per tipologia
+  // market → punto colorato per tipologia (selezionato: più grande + anello)
   const cat = pin.category ?? 'generale'
-  const color = selected ? '#F4B62C' : CATEGORY_COLOR[cat]
-  const dark = selected ? '#B07D08' : CATEGORY_COLOR_DARK[cat]
-  const w = selected ? 44 : 32
-  const h = Math.round((w * 32) / 28)
-  const ring = selected ? `<span class="imk-pin-ring" style="color:${color};position:absolute;left:50%;top:84%;transform:translate(-50%,-50%)"></span>` : ''
+  const color = CATEGORY_COLOR[cat]
+  const dark = CATEGORY_COLOR_DARK[cat]
+  const size = selected ? 26 : 17
+  const ring = selected ? `<span class="imk-pin-ring" style="color:${color};position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)"></span>` : ''
   const html =
-    `<div style="position:relative;width:${w}px;height:${h}px">${ring}${bancoSvg(color, dark)}</div>`
-  // anchor sul punto base (cerchio in basso ≈ 84% dell'altezza)
-  return L.divIcon({ className: '', html, iconSize: [w, h], iconAnchor: [w / 2, Math.round(h * 0.84)] })
+    `<div style="position:relative;width:${size}px;height:${size}px">${ring}` +
+    `<div style="width:100%;height:100%;border-radius:50%;background:${color};border:2.5px solid #FBF6EC;box-shadow:0 0 0 1px ${dark}40, 0 2px 6px rgba(0,0,0,0.3)"></div></div>`
+  return L.divIcon({ className: '', html, iconSize: [size, size], iconAnchor: [size / 2, size / 2] })
 }
 
 const userIcon = L.divIcon({
   className: '',
-  html: `<div style="position:relative;width:22px;height:22px"><span class="imk-pin-ring" style="color:#EC6A5E"></span><div style="width:16px;height:16px;margin:3px;border-radius:50%;background:#EC6A5E;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div></div>`,
+  html: `<div style="position:relative;width:22px;height:22px"><span class="imk-pin-ring" style="color:#C4593C"></span><div style="width:16px;height:16px;margin:3px;border-radius:50%;background:#C4593C;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div></div>`,
   iconSize: [22, 22],
   iconAnchor: [11, 11],
 })

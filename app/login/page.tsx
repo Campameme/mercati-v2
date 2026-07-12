@@ -147,34 +147,34 @@ function LoginPageInner() {
     } finally { setLoading(false) }
   }
 
-  const inputCls = 'w-full px-3 py-2.5 bg-carta border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-mare transition-colors'
-  const btnCls = 'w-full flex items-center justify-center gap-2 px-4 py-3 bg-mare text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-mare-600 disabled:opacity-50 transition-colors'
+  const inputCls = 'w-full px-3 py-2.5 bg-crema border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-alga transition-colors'
+  const btnCls = 'w-full flex items-center justify-center gap-2 px-4 py-3 bg-alga text-white font-alt uppercase tracking-wider text-sm rounded-full hover:bg-alga-600 disabled:opacity-50 transition-colors'
 
   return (
-    <div className="min-h-[80vh] bg-carta flex items-center justify-center px-4 py-12">
+    <div className="min-h-[80vh] bg-crema flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         {/* Tendone in testa alla tessera d'accesso */}
-        <div aria-hidden="true" className="imk-awning h-2.5 rounded-t-xl" />
+        <div aria-hidden="true" className="h-2.5 rounded-t-xl" />
         <div className="bg-white rounded-b-xl border-2 border-t-0 border-ink/10 shadow-sm p-8">
-          <div className="flex items-center justify-center gap-2 text-mare-600 mb-1">
+          <div className="flex items-center justify-center gap-2 text-alga-600 mb-1">
             <Logo inline className="text-sm" />
           </div>
 
           {world === 'citizen' ? (
             <>
-              <h1 className="font-display text-3xl text-ink mb-1 text-center">{t.title}</h1>
+              <h1 className="font-display font-extrabold text-3xl text-ink mb-1 text-center">{t.title}</h1>
               <p className="text-sm text-ink-soft text-center mb-5">{t.lead}</p>
 
               {otpStep === 'email' ? (
                 <form onSubmit={sendCode} className="space-y-4">
                   <label className="block">
                     <span className="flex items-center text-xs font-alt uppercase tracking-wider text-ink-soft mb-1.5">
-                      <Mail className="w-4 h-4 mr-1.5 text-mare" /> {t.emailLabel}
+                      <Mail className="w-4 h-4 mr-1.5 text-alga" /> {t.emailLabel}
                     </span>
                     <input type="email" required autoFocus value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} />
                   </label>
-                  {error && <p className="text-sm text-fiore-600">{error}</p>}
-                  {notice && <p className="text-sm text-mare-700">{notice}</p>}
+                  {error && <p className="text-sm text-terracotta-600">{error}</p>}
+                  {notice && <p className="text-sm text-alga-600">{notice}</p>}
                   <button type="submit" disabled={loading} className={btnCls}>
                     <Mail className="w-4 h-4" /> {loading ? 'Attendi…' : t.sendCode}
                   </button>
@@ -182,24 +182,24 @@ function LoginPageInner() {
                 </form>
               ) : (
                 <form onSubmit={verifyCode} className="space-y-4">
-                  <p className="text-sm text-mare-700 text-center">{t.codeSent}</p>
+                  <p className="text-sm text-alga-600 text-center">{t.codeSent}</p>
                   <label className="block">
                     <span className="flex items-center text-xs font-alt uppercase tracking-wider text-ink-soft mb-1.5">
-                      <KeyRound className="w-4 h-4 mr-1.5 text-mare" /> {t.codeLabel}
+                      <KeyRound className="w-4 h-4 mr-1.5 text-alga" /> {t.codeLabel}
                     </span>
                     <input
                       inputMode="numeric" autoComplete="one-time-code" required autoFocus
                       value={code} onChange={(e) => setCode(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
-                      className={`${inputCls} text-center text-2xl font-hand tracking-[0.3em]`}
+                      className={`${inputCls} text-center text-2xl font-alt tracking-[0.3em]`}
                     />
                   </label>
-                  {error && <p className="text-sm text-fiore-600">{error}</p>}
+                  {error && <p className="text-sm text-terracotta-600">{error}</p>}
                   <button type="submit" disabled={loading || code.length < 6} className={btnCls}>
                     {loading ? 'Attendi…' : t.verify} <ArrowRight className="w-4 h-4" />
                   </button>
                   <div className="flex items-center justify-between text-xs text-ink-muted">
-                    <button type="button" onClick={sendCode} className="hover:text-mare-600">{t.resend}</button>
-                    <button type="button" onClick={() => { setOtpStep('email'); setCode(''); setError(null) }} className="hover:text-mare-600">{t.changeEmail}</button>
+                    <button type="button" onClick={sendCode} className="hover:text-alga-600">{t.resend}</button>
+                    <button type="button" onClick={() => { setOtpStep('email'); setCode(''); setError(null) }} className="hover:text-alga-600">{t.changeEmail}</button>
                   </div>
                 </form>
               )}
@@ -207,14 +207,14 @@ function LoginPageInner() {
               <button
                 type="button"
                 onClick={() => { setWorld('staff'); setStaffMode('signin'); setError(null); setNotice(null) }}
-                className="mt-6 w-full text-center text-sm text-ink-muted hover:text-mare-600 transition-colors"
+                className="mt-6 w-full text-center text-sm text-ink-muted hover:text-alga-600 transition-colors"
               >
                 {t.staffLink}
               </button>
             </>
           ) : (
             <>
-              <h1 className="font-display text-3xl text-ink mb-2 text-center">
+              <h1 className="font-display font-extrabold text-3xl text-ink mb-2 text-center">
                 {staffMode === 'reset' ? 'Recupera password' : staffMode === 'update' ? 'Nuova password' : 'Accesso riservato'}
               </h1>
               {staffMode === 'signin' && <p className="text-sm text-ink-soft text-center mb-4">Operatori e amministratori.</p>}
@@ -223,7 +223,7 @@ function LoginPageInner() {
                 {staffMode !== 'update' && (
                   <label className="block">
                     <span className="flex items-center text-xs font-alt uppercase tracking-wider text-ink-soft mb-1.5">
-                      <Mail className="w-4 h-4 mr-1.5 text-mare" /> Email
+                      <Mail className="w-4 h-4 mr-1.5 text-alga" /> Email
                     </span>
                     <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} />
                   </label>
@@ -231,7 +231,7 @@ function LoginPageInner() {
                 {staffMode !== 'reset' && (
                   <label className="block">
                     <span className="flex items-center text-xs font-alt uppercase tracking-wider text-ink-soft mb-1.5">
-                      <Lock className="w-4 h-4 mr-1.5 text-mare" /> {staffMode === 'update' ? 'Nuova password' : 'Password'}
+                      <Lock className="w-4 h-4 mr-1.5 text-alga" /> {staffMode === 'update' ? 'Nuova password' : 'Password'}
                     </span>
                     <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={inputCls} />
                   </label>
@@ -239,13 +239,13 @@ function LoginPageInner() {
                 {staffMode === 'update' && (
                   <label className="block">
                     <span className="flex items-center text-xs font-alt uppercase tracking-wider text-ink-soft mb-1.5">
-                      <Lock className="w-4 h-4 mr-1.5 text-mare" /> Ripeti la nuova password
+                      <Lock className="w-4 h-4 mr-1.5 text-alga" /> Ripeti la nuova password
                     </span>
                     <input type="password" required minLength={6} value={password2} onChange={(e) => setPassword2(e.target.value)} className={inputCls} />
                   </label>
                 )}
-                {error && <p className="text-sm text-fiore-600">{error}</p>}
-                {notice && <p className="text-sm text-mare-700">{notice}</p>}
+                {error && <p className="text-sm text-terracotta-600">{error}</p>}
+                {notice && <p className="text-sm text-alga-600">{notice}</p>}
                 <button type="submit" disabled={loading} className={btnCls}>
                   <KeyRound className="w-4 h-4" />
                   {loading ? 'Attendi…' : staffMode === 'signin' ? 'Accedi' : staffMode === 'reset' ? 'Invia il link' : 'Salva la nuova password'}
@@ -253,7 +253,7 @@ function LoginPageInner() {
               </form>
 
               {staffMode === 'signin' && (
-                <button type="button" onClick={() => { setStaffMode('reset'); setError(null); setNotice(null) }} className="mt-3 w-full text-center text-sm text-ink-muted hover:text-mare-600">
+                <button type="button" onClick={() => { setStaffMode('reset'); setError(null); setNotice(null) }} className="mt-3 w-full text-center text-sm text-ink-muted hover:text-alga-600">
                   Password dimenticata?
                 </button>
               )}
@@ -261,7 +261,7 @@ function LoginPageInner() {
                 <button
                   type="button"
                   onClick={() => { setWorld('citizen'); setStaffMode('signin'); setOtpStep('email'); setError(null); setNotice(null) }}
-                  className="mt-4 w-full inline-flex items-center justify-center gap-1.5 text-sm text-ink-muted hover:text-mare-600 transition-colors"
+                  className="mt-4 w-full inline-flex items-center justify-center gap-1.5 text-sm text-ink-muted hover:text-alga-600 transition-colors"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" /> {t.backCitizen}
                 </button>

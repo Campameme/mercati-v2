@@ -32,7 +32,7 @@ export default function AdminMarketOperatorsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-carta">
+    <div className="min-h-screen bg-crema">
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         <div className="mb-6">
           <Link href={`/${slug}/admin`} className="text-xs font-alt uppercase tracking-wider text-ink-muted hover:text-ink transition-colors">← Gestione mercato</Link>
@@ -40,13 +40,13 @@ export default function AdminMarketOperatorsPage() {
         </div>
 
         {/* La creazione ora è centralizzata: un operatore può stare in più mercati. */}
-        <Link href="/admin/operatori" className="group flex items-center gap-4 bg-notte text-carta imk-edge border-2 border-notte p-5 mb-6 hover:border-sole transition-colors">
-          <Store className="w-8 h-8 text-sole flex-shrink-0" />
+        <Link href="/admin/operatori" className="group flex items-center gap-4 bg-ink text-crema border-2 border-ink p-5 mb-6 hover:border-terracotta transition-colors">
+          <Store className="w-8 h-8 text-terracotta flex-shrink-0" />
           <span className="flex-1 min-w-0">
             <span className="block font-alt font-bold text-lg">Crea e assegna dall’area operatori</span>
-            <span className="block text-sm text-marel/85">Gli operatori si creano una volta e si assegnano a uno o più mercati, con la posizione sulla mappa e il link di accesso.</span>
+            <span className="block text-sm text-crema-2/85">Gli operatori si creano una volta e si assegnano a uno o più mercati, con la posizione sulla mappa e il link di accesso.</span>
           </span>
-          <ArrowRight className="w-5 h-5 text-sole group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
+          <ArrowRight className="w-5 h-5 text-terracotta group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
         </Link>
 
         <div className="mb-6">
@@ -62,14 +62,14 @@ export default function AdminMarketOperatorsPage() {
               <div key={o.id} className="p-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <h2 className="font-alt text-base text-ink">{o.name}</h2>
-                  <span className="text-[11px] font-alt uppercase tracking-wider px-2 py-0.5 bg-mare/15 text-mare-700 rounded-full">{o.category}</span>
+                  <span className="text-[11px] font-alt uppercase tracking-wider px-2 py-0.5 bg-alga/15 text-alga-600 rounded-full">{o.category}</span>
                   {o.stall_number && <span className="text-xs text-ink-muted">• {o.stall_number}</span>}
                 </div>
                 <div className="flex items-center gap-1">
-                  <Link href={`/${slug}/admin/operators/${o.id}`} className="p-2 text-ink-muted hover:text-mare-600 transition-colors" title="Modifica">
+                  <Link href={`/${slug}/admin/operators/${o.id}`} className="p-2 text-ink-muted hover:text-alga-600 transition-colors" title="Modifica">
                     <Pencil className="w-5 h-5" />
                   </Link>
-                  <button onClick={() => handleDelete(o.id)} className="p-2 text-ink-muted hover:text-fiore-600 transition-colors" title="Elimina">
+                  <button onClick={() => handleDelete(o.id)} className="p-2 text-ink-muted hover:text-terracotta-600 transition-colors" title="Elimina">
                     <Trash2 className="w-5 h-5" />
                   </button>
                 </div>

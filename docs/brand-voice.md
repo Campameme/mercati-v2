@@ -1,46 +1,52 @@
-# Mercati della Riviera di Ponente — Brand Voice
+# I Mercati della Riviera dei Fiori — Brand Voice
 
 > Grafica e motion: [`brand-system.md`](./brand-system.md) · regole operative:
-> [`../CLAUDE.md`](../CLAUDE.md). Aggiornato al **2026-07-06** — il brainstorming
-> storico è stato rimosso: le decisioni superate vivono nella storia dei commit.
+> [`../CLAUDE.md`](../CLAUDE.md). Aggiornato al **2026-07-12** (svolta "Nodo ×
+> Mezzogiorno": il brainstorming precedente vive nella storia dei commit).
 
 ## Identità e perimetro
-- Nome ufficiale **"Mercati della Riviera di Ponente"**; *"Riviera dei Fiori"*
-  resta solo come descrittore geografico/heritage, mai come nome del progetto.
-- Perimetro: **da Ventimiglia a Varazze** (province di Imperia e Savona, costa ed
-  entroterra): 15 zone con `carattere` + `story` (`lib/markets/zones.ts`) e ~50
-  comuni con descrizione curata (`lib/markets/comuni.ts`).
-- Posizionamento: esperienza di **qualità e autoctona ad accesso aperto** — mai
-  "élite", mai "banchi selezionati" (la selezione non esiste), mai "premium" o
-  "esclusivo" nel copy visibile.
+- Nome **"I Mercati della Riviera dei Fiori"** ("Mercati della Riviera di
+  Ponente" = naming precedente, in dismissione; "Riviera dei Fiori" torna a
+  essere il cuore del nome, non solo descrittore).
+- Perimetro: **provincia di Imperia, da Ventimiglia a Diano/Cervo** — 8 zone
+  (`lib/markets/zones.ts`, IMPERIA_ZONE_SLUGS). Le zone di Savona restano nei
+  dati ma FUORI dalla comunicazione, per ora.
+- Posizionamento: il mercato come **esperienza** — perché venirci (o tornarci),
+  raccontato con storytelling, mai in modo funzionale. Valori: qualità vera,
+  **sostenibilità, seconda mano, vicinanza al territorio**; per tutti — clienti
+  abituali, turisti, ragazzi. Mai "élite/premium/selezionato": la **rete dei
+  banchi** è un gruppo che si sceglie, parallela al mercato standard senza
+  disprezzarlo ("non è un abbonamento: è un gruppo che si sceglie").
 
 ## Voce
-- Prima persona plurale, concreta, ligure: si raccontano **giorni, piazze e gesti
-  veri**. MAI slogan da agenzia (bandita *"gli ambulanti sono il prodotto"*), mai
-  il brief come testo di pagina.
-- Gli operatori sono **I Maestri del Banco**: si presentano per nome (col punto),
-  con gli anni di mestiere e i fatti — non con gli aggettivi.
-- Niente anglicismi. 4 lingue IT/FR/DE/EN; **il francese viene prima** nei
-  contenuti di servizio pensati per i turisti (settimana, come arrivare).
-- Target: 40–80 e turisti (soprattutto francesi da Nizza/Mentone, il venerdì di
-  Ventimiglia è un'istituzione); i giovani si agganciano col **valore** (prezzi
-  veri, stagionalità), non col tono giovanilistico.
-- Date e ricorrenze sempre in **forma contratta** ("venerdì, sabato e domenica
-  dal 24/7 al 30/8"), mai elenchi di date.
-- Lessico sì: mare, mattina, banco, maestro, caruggio, fresco, autentico, di
-  stagione, vicino a te. Vietato: motivi a foglia d'ulivo (basilico/pesto ok).
+- Prima persona plurale, concreta, ligure: **giorni, piazze e gesti veri**. MAI
+  slogan da agenzia, mai il brief come testo di pagina.
+- Gli operatori sono **i banchi di fiducia della rete**: si presentano col nome
+  del banco ("Il banco di Antonio."), il mestiere, e parlano in **prima
+  persona** («Nella mia famiglia sono la quinta generazione di bagnatori di
+  stoccafisso.») — hashtag **#DietroIlBanco**. ("I Maestri del Banco" = naming
+  precedente.)
+- I tre requisiti della rete, sempre con queste parole: **banco pulito e
+  curato · prodotti di qualità · serietà con colleghi e clienti**.
+- Niente anglicismi. 4 lingue IT/FR/DE/EN (`lib/i18n/*`); il francese prima nei
+  contenuti di servizio per i turisti (il venerdì di Ventimiglia è
+  un'istituzione per chi scende dalla Costa Azzurra).
+- Date e ricorrenze sempre in **forma contratta**, mai elenchi di date.
+- Lessico sì: banco, fiducia, rete, mestiere, di stagione, seconda mano,
+  vicino, mattina, piazza. Vietato: foglia d'ulivo come motivo (il basilico e
+  il pesto come prodotti sono ok).
 
 ## Claim e heritage (verificati, citabili)
-- Hero: **"I mercati che profumano di mare."** + sottotitolo con il perimetro
-  Ventimiglia→Varazze.
-- Dati veri da usare nei racconti (mai come elenco in hero): Sanremo **1882**
-  primo mercato dei fiori · **Ventimiglia** tra i più grandi mercati all'aperto
-  d'Italia, meta storica dei francesi · Bordighera palme al Vaticano dal **1586**
-  · Pieve di Teco città mercatale (**1233**) · Albenga città delle cento torri ·
-  Noli repubblica marinara · le Albisole capitali della ceramica · Liguria **1ª
-  per Bandiere Blu 2026** · Savona provincia con più borghi d'Italia.
+- Hero (mockup): **"Il tuo banco di fiducia, da Ventimiglia a Diano."** ·
+  claim storico ancora valido come alternativa: "I mercati che profumano di
+  mare." (scelta finale legata alle proposte above-the-fold).
+- Dati veri da usare nei racconti (mai in elenco nell'hero): Sanremo **1882**
+  primo mercato dei fiori d'Italia · **Ventimiglia** il venerdì, tra i più
+  grandi mercati all'aperto d'Italia · Bordighera palme al Vaticano dal
+  **1586** · Pieve di Teco città mercatale (**1233**) · il golfo Dianese coi
+  mercati quasi ogni giorno.
 
 ## Dove vivono i testi
 - Home ×4 lingue: `lib/i18n/homeCopy.ts` · UI: `lib/i18n/ui.ts`
 - Territorio: `lib/markets/zones.ts` / `comuni.ts` + `*.i18n.ts` (FR/DE/EN)
-- Il kit social (guideline + template "Maestri del Banco") è **fuori repo**.
+- Il kit social (guideline + template #DietroIlBanco) è **fuori repo**.

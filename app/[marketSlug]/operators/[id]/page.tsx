@@ -3,8 +3,7 @@ import { notFound } from 'next/navigation'
 import { ArrowLeft, Instagram, Facebook, Globe, Navigation2, MessageCircle, BadgeCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import FavoriteButton from '@/components/FavoriteButton'
-import { BancoPlaceholder } from '@/components/BancoAvatar'
-import { CanopyEdge } from '@/components/decorations'
+import BancoAvatar from '@/components/BancoAvatar'
 import PageviewTracker from '@/components/analytics/PageviewTracker'
 
 const CAT_LABEL: Record<string, string> = {
@@ -77,220 +76,215 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
     }))
     .sort((a, b) => a.comune.localeCompare(b.comune))
 
+  const presenzeCount = sessions.length || assignedMarkets.length
+
   return (
-    <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-4xl">
-      <PageviewTracker type="view_operator" operatorId={operator.id} />
-      <Link
-        href={`/${params.marketSlug}/operators`}
-        className="inline-flex items-center gap-1.5 text-xs font-alt font-semibold uppercase tracking-[0.14em] text-ink-muted hover:text-mare mb-3 transition-colors"
-      >
-        <ArrowLeft className="w-3.5 h-3.5" /> Tutti i banchi
-      </Link>
+    <div className="bg-crema min-h-screen">
+      <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-4xl">
+        <PageviewTracker type="view_operator" operatorId={operator.id} />
+        <Link
+          href={`/${params.marketSlug}/operators`}
+          className="inline-flex items-center gap-1.5 text-xs font-alt font-semibold uppercase tracking-[0.14em] text-ink-muted hover:text-alga-600 mb-4 transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" /> Tutti i banchi
+        </Link>
 
-      {/* Il ritratto del Maestro: pannello notte col tendone in testa, nome in
-          Italiana col punto e riga di servizio gialla — come sui social. */}
-      <div className="relative overflow-hidden imk-edge border-2 border-notte bg-notte text-carta mb-8">
-        <div aria-hidden="true" className="imk-awning h-2.5" />
-        <CanopyEdge color="#F7EFDD" className="h-3 md:h-3.5 -mt-px" />
-        <div className="p-5 md:p-8">
-          <div className="flex items-start gap-4 md:gap-6 flex-wrap">
-            {/* Figurina: foto o placeholder duotone mare→sole */}
-            <div className="flex-shrink-0">
-              {operator.photos?.[0] ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={operator.photos[0]} alt={operator.name} className="w-24 h-24 md:w-32 md:h-32 object-cover rounded-xl border-2 border-carta/25" />
-              ) : (
-                <BancoPlaceholder name={operator.name} className="w-24 h-24 md:w-32 md:h-32 rounded-xl border-2 border-carta/25" />
-              )}
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-start gap-2">
-                <h1 className="flex-1 font-display text-4xl md:text-6xl leading-[1.02] text-carta">
-                  {operator.name.replace(/\.+$/, '')}<span className="text-sole">.</span>
-                </h1>
-                <span className="rounded-full bg-carta/90 shadow-sm">
+        {/* La carta del banco: card bianca grande con la band terracotta in
+            testa — avatar, nome col punto, mestiere, bio e contatti. */}
+        <article className="overflow-hidden bg-white rounded-xl border border-[#e0d7c1] shadow-[0_16px_30px_-24px_rgba(38,36,30,0.45)]">
+          <span aria-hidden="true" className="mz-band" style={{ ['--band' as string]: '#C4593C' }} />
+
+          <div className="p-5 md:p-8">
+            <div className="flex items-start gap-4 md:gap-6 flex-wrap">
+              <div className="flex-shrink-0">
+                {operator.photos?.[0] ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={operator.photos[0]} alt={operator.name} className="w-24 h-24 md:w-32 md:h-32 object-cover rounded-xl border border-[#e0d7c1]" />
+                ) : (
+                  <BancoAvatar name={operator.name} size={96} className="border border-[#e0d7c1]" />
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start gap-2">
+                  <h1 className="flex-1 font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.02] text-ink">
+                    {operator.name.replace(/\.+$/, '')}<span className="text-terracotta">.</span>
+                  </h1>
                   <FavoriteButton kind="operator" id={operator.id} label={operator.name} />
-                </span>
-              </div>
-              <div className="flex items-center gap-x-3 gap-y-2 mt-3 flex-wrap">
-                <p className="font-alt text-xs md:text-sm font-bold uppercase tracking-[0.14em] text-sole">
-                  {CAT_LABEL[operator.category] ?? operator.category}
-                  {operator.markets?.name ? ` · ${operator.markets.name}` : ''}
-                </p>
-                {operator.verified && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-carta/15 text-carta rounded-full font-alt text-[11px] font-semibold uppercase tracking-wider">
-                    <BadgeCheck className="w-3.5 h-3.5 text-sole" /> Verificato
+                </div>
+                <div className="flex items-center gap-x-2 gap-y-2 mt-3 flex-wrap">
+                  <span className="inline-block font-alt text-[11px] font-bold uppercase tracking-wide text-terracotta-600 bg-terracotta-50 rounded-full px-2.5 py-1">
+                    {CAT_LABEL[operator.category] ?? operator.category}
                   </span>
+                  {operator.verified && (
+                    <span className="inline-flex items-center gap-1 font-alt text-[11px] font-bold uppercase tracking-wide text-alga-600 bg-alga-50 rounded-full px-2.5 py-1">
+                      <BadgeCheck className="w-3.5 h-3.5" aria-hidden="true" /> Verificato
+                    </span>
+                  )}
+                  {operator.stall_number && (
+                    <span className="inline-block font-alt text-[11px] font-bold uppercase tracking-wide text-alga-600 bg-alga-50 rounded-full px-2.5 py-1">
+                      banco {operator.stall_number}
+                    </span>
+                  )}
+                  {operator.markets?.name && (
+                    <span className="font-alt text-xs font-semibold text-ink-muted">{operator.markets.name}</span>
+                  )}
+                </div>
+                {operator.description && (
+                  <p className="text-ink-soft mt-4 max-w-2xl leading-relaxed">{operator.description}</p>
                 )}
-                {operator.stall_number && (
-                  <span className="imk-cartellino px-3 py-0.5 font-hand font-bold text-xl leading-snug">banco {operator.stall_number}</span>
-                )}
-              </div>
-              <div className="flex items-center gap-2 mt-5 flex-wrap">
-                {social.whatsapp && (
-                  <a
-                    href={social.whatsapp.startsWith('http') ? social.whatsapp : `https://wa.me/${social.whatsapp.replace(/[^0-9]/g, '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#25D366] text-white rounded-full text-sm font-alt font-semibold hover:opacity-90 transition-opacity"
-                  >
-                    <MessageCircle className="w-4 h-4" /> WhatsApp
-                  </a>
-                )}
-                {operator.location_lat != null && operator.location_lng != null && (
-                  <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${operator.location_lat},${operator.location_lng}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-carta text-ink rounded-full text-sm font-alt font-semibold hover:bg-sole transition-colors"
-                  >
-                    <Navigation2 className="w-4 h-4" /> Indicazioni
-                  </a>
-                )}
+                <div className="flex items-center gap-2 mt-5 flex-wrap">
+                  {social.whatsapp && (
+                    <a
+                      href={social.whatsapp.startsWith('http') ? social.whatsapp : `https://wa.me/${social.whatsapp.replace(/[^0-9]/g, '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="imk-lift inline-flex items-center gap-1.5 px-5 py-2.5 bg-alga text-crema rounded-full text-sm font-alt font-semibold hover:bg-alga-600 transition-colors"
+                    >
+                      <MessageCircle className="w-4 h-4" /> WhatsApp
+                    </a>
+                  )}
+                  {operator.location_lat != null && operator.location_lng != null && (
+                    <a
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${operator.location_lat},${operator.location_lng}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="imk-lift inline-flex items-center gap-1.5 px-5 py-2.5 bg-terracotta text-crema rounded-full text-sm font-alt font-semibold hover:bg-terracotta-600 transition-colors"
+                    >
+                      <Navigation2 className="w-4 h-4" /> Indicazioni
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
+
+            {operator.photos?.length > 1 && (
+              <div className="flex gap-3 mt-6 overflow-x-auto pb-1">
+                {operator.photos.slice(1).map((url: string) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img key={url} src={url} alt="" className="w-40 h-40 object-cover rounded-xl flex-shrink-0 border border-[#e0d7c1]" />
+                ))}
+              </div>
+            )}
           </div>
-          {operator.description && <p className="text-carta/85 mt-5 max-w-2xl leading-relaxed">{operator.description}</p>}
-        </div>
-      </div>
 
-      {operator.photos?.length > 1 && (
-        <div className="flex gap-3 mb-8 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
-          {operator.photos.slice(1).map((url: string) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img key={url} src={url} alt="" className="w-48 h-48 object-cover rounded-xl flex-shrink-0 border-2 border-ink/10" />
-          ))}
-        </div>
-      )}
-
-      {/* Presenze nei mercati */}
-      <section className="mb-10">
-        <div className="flex items-baseline gap-3 mb-4">
-          <p className="text-xs font-alt font-semibold uppercase tracking-[0.14em] text-ink-muted">Dove lo trovi</p>
-          {(() => { const n = sessions.length || assignedMarkets.length; return (
-            <h2 className="font-alt font-bold text-2xl text-ink">{n} {sessions.length ? `presenz${n === 1 ? 'a' : 'e'}` : `mercat${n === 1 ? 'o' : 'i'}`}</h2>
-          ) })()}
-        </div>
-        {sessions.length === 0 ? (
-          assignedMarkets.length === 0 ? (
-            <p className="text-sm text-ink-muted italic">Nessun mercato configurato.</p>
-          ) : (
-            /* Nuovo modello: i mercati assegnati con la posizione sulla mappa. */
-            <ul className="imk-edge border-2 border-ink/10 bg-white px-5 md:px-6 divide-y divide-ink/10">
-              {assignedMarkets.map((m) => (
-                <li key={m.slug ?? m.name} className="py-4 flex items-baseline gap-3">
-                  <span className="font-alt font-bold text-lg text-ink whitespace-nowrap">{m.name}</span>
-                  <span className="imk-leader text-ink" aria-hidden="true" />
-                  <span className="min-w-0 text-right">
-                    {m.stall && <span className="block text-xs text-ink-muted">banco {m.stall}</span>}
-                    {m.lat != null && m.lng != null && (
+          {/* Presenze nei mercati: comune + chip del giorno */}
+          <section className="border-t border-[#e0d7c1] p-5 md:p-8">
+            <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-1">Dove lo trovi</p>
+            <h2 className="font-display font-extrabold tracking-tight text-2xl text-ink mb-3">
+              {presenzeCount} {sessions.length ? `presenz${presenzeCount === 1 ? 'a' : 'e'}` : `mercat${presenzeCount === 1 ? 'o' : 'i'}`}
+            </h2>
+            {sessions.length === 0 ? (
+              assignedMarkets.length === 0 ? (
+                <p className="text-sm text-ink-muted italic">Nessun mercato configurato.</p>
+              ) : (
+                /* Nuovo modello: i mercati assegnati con la posizione sulla mappa. */
+                <ul className="divide-y divide-[#e0d7c1]">
+                  {assignedMarkets.map((m) => (
+                    <li key={m.slug ?? m.name} className="py-3.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                      <span className="font-display font-extrabold tracking-tight text-lg text-ink">{m.name}</span>
+                      {m.stall && (
+                        <span className="inline-flex items-center rounded-full border-[1.5px] border-alga/60 px-3 py-0.5 font-alt text-[13px] font-semibold text-alga-600">
+                          banco {m.stall}
+                        </span>
+                      )}
+                      {m.lat != null && m.lng != null && (
+                        <a
+                          href={`https://www.google.com/maps/dir/?api=1&destination=${m.lat},${m.lng}`}
+                          target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs font-alt font-semibold text-alga-600 hover:text-alga underline underline-offset-2"
+                        >
+                          <Navigation2 className="w-3 h-3" /> Indicazioni
+                        </a>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )
+            ) : (
+              <ul className="divide-y divide-[#e0d7c1]">
+                {sessions.map((s) => (
+                  <li key={s.scheduleId} className="py-3.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                    <span className="font-display font-extrabold tracking-tight text-lg text-ink">{s.comune}</span>
+                    <span className="inline-flex items-center rounded-full border-[1.5px] border-alga/60 px-3 py-0.5 font-alt text-[13px] font-semibold text-alga-600">
+                      {s.giorno}
+                    </span>
+                    {s.orario && <span className="font-alt text-xs font-semibold text-ink-muted tabular-nums">{s.orario}</span>}
+                    {(s.luogo || s.stallNumber) && (
+                      <span className="text-xs text-ink-muted">
+                        {s.luogo}
+                        {s.stallNumber && `${s.luogo ? ' · ' : ''}banco ${s.stallNumber}`}
+                      </span>
+                    )}
+                    {s.lat != null && s.lng != null && (
                       <a
-                        href={`https://www.google.com/maps/dir/?api=1&destination=${m.lat},${m.lng}`}
-                        target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs text-mare hover:text-mare-600 underline underline-offset-2 mt-1"
+                        href={`https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs font-alt font-semibold text-alga-600 hover:text-alga underline underline-offset-2"
                       >
                         <Navigation2 className="w-3 h-3" /> Indicazioni
                       </a>
                     )}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )
-        ) : (
-          /* Tabellone "da stazione": comune … giorno, col leader puntinato
-             (lo stesso formato-settimana del kit social). */
-          <ul className="imk-edge border-2 border-ink/10 bg-white px-5 md:px-6 divide-y divide-ink/10">
-            {sessions.map((s) => (
-              <li key={s.scheduleId} className="py-4 flex items-baseline gap-3">
-                <span className="font-alt font-bold text-lg text-ink whitespace-nowrap">{s.comune}</span>
-                <span className="imk-leader text-ink" aria-hidden="true" />
-                <span className="min-w-0 text-right">
-                  <span className="block font-alt font-semibold text-sm text-mare-600">
-                    {s.giorno}
-                    {s.orario && <span className="text-ink-muted font-normal tabular-nums"> · {s.orario}</span>}
-                  </span>
-                  {(s.luogo || s.stallNumber) && (
-                    <span className="block text-xs text-ink-muted mt-0.5">
-                      {s.luogo}
-                      {s.stallNumber && ` · banco ${s.stallNumber}`}
-                    </span>
-                  )}
-                  {s.lat != null && s.lng != null && (
-                    <a
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-mare hover:text-mare-600 underline underline-offset-2 mt-1"
-                    >
-                      <Navigation2 className="w-3 h-3" /> Indicazioni
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          {/* I prodotti sul banco, come chips (prezzo in display, niente cartellini) */}
+          <section className="border-t border-[#e0d7c1] p-5 md:p-8">
+            <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-terracotta mb-1">Sul banco</p>
+            <h2 className="font-display font-extrabold tracking-tight text-2xl text-ink mb-3">Prodotti</h2>
+            {(!products || products.length === 0) ? (
+              <p className="text-sm text-ink-muted italic">Nessun prodotto pubblicato.</p>
+            ) : (
+              <ul className="flex flex-wrap gap-2">
+                {products.map((p) => (
+                  <li key={p.id} className="inline-flex items-baseline gap-2 rounded-full bg-crema border border-[#e0d7c1] px-3.5 py-1.5">
+                    <span className="font-alt text-sm font-semibold text-ink">{p.name}</span>
+                    {p.price !== null && (
+                      <span className="font-display font-extrabold tracking-tight text-sm text-terracotta-600">
+                        {new Intl.NumberFormat('it-IT', { style: 'currency', currency: p.currency }).format(p.price)}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          {/* Riga di servizio: lingue, pagamenti, social */}
+          {(operator.languages?.length > 0 || operator.payment_methods?.length > 0 || social.instagram || social.facebook || social.website) && (
+            <div className="border-t border-[#e0d7c1] bg-crema-2/60 px-5 md:px-8 py-4 flex items-center flex-wrap gap-x-6 gap-y-2 text-sm">
+              {operator.languages?.length > 0 && (
+                <div className="text-ink-muted">Lingue: <strong className="text-ink">{operator.languages.join(', ')}</strong></div>
+              )}
+              {operator.payment_methods?.length > 0 && (
+                <div className="text-ink-muted">Pagamenti: <strong className="text-ink">{operator.payment_methods.join(', ')}</strong></div>
+              )}
+              {(social.instagram || social.facebook || social.website) && (
+                <div className="flex items-center gap-3">
+                  {social.instagram && (
+                    <a href={social.instagram.startsWith('http') ? social.instagram : `https://instagram.com/${social.instagram.replace('@', '')}`} target="_blank" rel="noreferrer" aria-label="Instagram" className="text-terracotta hover:text-terracotta-600">
+                      <Instagram className="w-5 h-5" />
                     </a>
                   )}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <div className="flex items-center flex-wrap gap-4 mb-10 text-sm">
-        {operator.languages?.length > 0 && (
-          <div className="text-ink-muted">Lingue: <strong className="text-ink">{operator.languages.join(', ')}</strong></div>
-        )}
-        {operator.payment_methods?.length > 0 && (
-          <div className="text-ink-muted">Pagamenti: <strong className="text-ink">{operator.payment_methods.join(', ')}</strong></div>
-        )}
-      </div>
-
-      {(social.instagram || social.facebook || social.website) && (
-        <div className="flex items-center space-x-3 mb-10">
-          {social.instagram && (
-            <a href={social.instagram.startsWith('http') ? social.instagram : `https://instagram.com/${social.instagram.replace('@', '')}`} target="_blank" rel="noreferrer" className="text-fiore hover:text-fiore-600">
-              <Instagram className="w-5 h-5" />
-            </a>
-          )}
-          {social.facebook && (
-            <a href={social.facebook} target="_blank" rel="noreferrer" className="text-mare hover:text-mare-600">
-              <Facebook className="w-5 h-5" />
-            </a>
-          )}
-          {social.website && (
-            <a href={social.website} target="_blank" rel="noreferrer" className="text-ink-soft hover:text-ink">
-              <Globe className="w-5 h-5" />
-            </a>
-          )}
-        </div>
-      )}
-
-      <h2 className="font-alt font-bold text-2xl text-ink mb-4">Prodotti</h2>
-      {(!products || products.length === 0) ? (
-        <p className="bg-white border-2 border-ink/10 rounded-xl p-8 text-center text-ink-muted">
-          Nessun prodotto pubblicato.
-        </p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {products.map((p) => (
-            <div key={p.id} className="imk-lift group bg-white border-2 border-ink/10 rounded-xl overflow-hidden flex flex-col">
-              {p.photos?.[0] && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={p.photos[0]} alt={p.name} className="w-full h-40 object-cover" />
+                  {social.facebook && (
+                    <a href={social.facebook} target="_blank" rel="noreferrer" aria-label="Facebook" className="text-alga hover:text-alga-600">
+                      <Facebook className="w-5 h-5" />
+                    </a>
+                  )}
+                  {social.website && (
+                    <a href={social.website} target="_blank" rel="noreferrer" aria-label="Sito web" className="text-ink-soft hover:text-ink">
+                      <Globe className="w-5 h-5" />
+                    </a>
+                  )}
+                </div>
               )}
-              <div className="p-4 flex-1 flex flex-col">
-                <h3 className="font-alt font-bold text-lg text-ink">{p.name}</h3>
-                {p.description && <p className="text-sm text-ink-soft mt-1 flex-1">{p.description}</p>}
-                {p.price !== null && (
-                  /* Il prezzo sul cartellino, scritto a mano: "prezzo onesto" */
-                  <p className="mt-3">
-                    <span className="imk-cartellino px-3 py-0.5 font-hand font-bold text-2xl leading-snug">
-                      {new Intl.NumberFormat('it-IT', { style: 'currency', currency: p.currency }).format(p.price)}
-                    </span>
-                  </p>
-                )}
-              </div>
             </div>
-          ))}
-        </div>
-      )}
+          )}
+        </article>
+      </div>
     </div>
   )
 }

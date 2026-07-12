@@ -93,17 +93,17 @@ export function categoryLabelI18n(cat: ScheduleCategory, lang: Lang): string {
  *   artigianato  → viola/creativo
  */
 export const CATEGORY_COLOR: Record<ScheduleCategory, string> = {
-  generale: '#15607C',
-  alimentare: '#4C8B3F',
-  antiquariato: '#C2502E',
+  generale: '#46683B', // alga (istituzionale Mezzogiorno)
+  alimentare: '#7C9A3B', // verde orto, distinto dall'alga
+  antiquariato: '#C4593C', // terracotta
   artigianato: '#8E5BB5',
 }
 
 /** Variante scura del colore (bordi, testo su sfondo chiaro). */
 export const CATEGORY_COLOR_DARK: Record<ScheduleCategory, string> = {
-  generale: '#0E3F52',
-  alimentare: '#36621C',
-  antiquariato: '#8F3A1E',
+  generale: '#35502C',
+  alimentare: '#5C7429',
+  antiquariato: '#9A4029',
   artigianato: '#653F86',
 }
 

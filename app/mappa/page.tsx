@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import MarketExplorer from '@/components/home/MarketExplorer'
 import { loadPins } from '@/lib/markets/loadPins'
 import PageviewTracker from '@/components/analytics/PageviewTracker'
-import DriftBackdrop from '@/components/motion/DriftBackdrop'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,20 +26,17 @@ export default async function MappaPage({
   return (
     <>
       <PageviewTracker type="view_homepage" />
-      {/* Cornice carta: silhouette liguri in ombra dietro a barra/lista, senza
-          disturbare la mappa Leaflet (che vive in un layer opaco). */}
-      <div className="relative overflow-hidden bg-carta">
-        <DriftBackdrop tone="light" variant="section" />
-        <div className="relative z-10">
-          <MarketExplorer
-            pins={pins}
-            initialQuery={searchParams.q ?? ''}
-            initialZone={searchParams.zone ?? 'all'}
-            initialToday={initialToday}
-            initialDays={initialDays}
-            initialNear={searchParams.vicino === '1'}
-          />
-        </div>
+      {/* Cornice crema, ferma: l'esperienza vive nella mappa e nella lista
+          (sistema Nodo × Mezzogiorno — niente sfondi animati). */}
+      <div className="bg-crema">
+        <MarketExplorer
+          pins={pins}
+          initialQuery={searchParams.q ?? ''}
+          initialZone={searchParams.zone ?? 'all'}
+          initialToday={initialToday}
+          initialDays={initialDays}
+          initialNear={searchParams.vicino === '1'}
+        />
       </div>
     </>
   )

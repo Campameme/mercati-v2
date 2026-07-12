@@ -131,18 +131,18 @@ export default function AdminOperatoriPage() {
   const activeAssign = activeMarket ? assigns[activeMarket] : null
 
   return (
-    <div className="min-h-screen bg-carta">
+    <div className="min-h-screen bg-crema">
       <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl">
-        <Link href="/admin" className="inline-flex items-center gap-1.5 text-xs font-alt font-semibold uppercase tracking-[0.14em] text-ink-muted hover:text-mare mb-3">
+        <Link href="/admin" className="inline-flex items-center gap-1.5 text-xs font-alt font-semibold uppercase tracking-[0.14em] text-ink-muted hover:text-alga mb-3">
           <ArrowLeft className="w-3.5 h-3.5" /> Dashboard
         </Link>
         <div className="mb-6 border-b-2 border-ink/10 pb-4 flex items-end justify-between gap-4 flex-wrap">
           <div>
-            <p className="text-xs font-alt uppercase tracking-[0.14em] text-mare-600 mb-1">I Maestri del Banco</p>
-            <h1 className="font-alt font-bold text-3xl text-ink flex items-center gap-2"><Store className="w-6 h-6 text-mare" /> Gestione operatori</h1>
+            <p className="text-xs font-alt uppercase tracking-[0.14em] text-alga-600 mb-1">I banchi di fiducia</p>
+            <h1 className="font-alt font-bold text-3xl text-ink flex items-center gap-2"><Store className="w-6 h-6 text-alga" /> Gestione operatori</h1>
             <p className="text-sm text-ink-soft mt-1">Crea un operatore, assegnalo a uno o più mercati con la posizione sulla mappa, invia il link di accesso.</p>
           </div>
-          <button onClick={startNew} className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-mare text-white rounded-full text-sm font-alt font-semibold hover:bg-mare-600">
+          <button onClick={startNew} className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-alga text-white rounded-full text-sm font-alt font-semibold hover:bg-alga-600">
             <Plus className="w-4 h-4" /> Nuovo operatore
           </button>
         </div>
@@ -152,7 +152,7 @@ export default function AdminOperatoriPage() {
           <div>
             <div className="relative mb-3">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted" />
-              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cerca operatore…" className="w-full pl-10 pr-3 py-2.5 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-mare" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cerca operatore…" className="w-full pl-10 pr-3 py-2.5 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-alga" />
             </div>
             {loading ? (
               <p className="text-sm text-ink-muted py-8 text-center">Caricamento…</p>
@@ -162,14 +162,14 @@ export default function AdminOperatoriPage() {
               <ul className="bg-white border-2 border-ink/10 rounded-xl divide-y divide-ink/10 max-h-[70vh] overflow-auto imk-scroll">
                 {filtered.map((o) => (
                   <li key={o.id}>
-                    <button onClick={() => startEdit(o)} className={`w-full text-left px-4 py-3 flex items-center justify-between gap-3 hover:bg-carta ${editing?.id === o.id ? 'bg-marel/40' : ''}`}>
+                    <button onClick={() => startEdit(o)} className={`w-full text-left px-4 py-3 flex items-center justify-between gap-3 hover:bg-crema ${editing?.id === o.id ? 'bg-crema-2/40' : ''}`}>
                       <span className="min-w-0">
                         <span className="block font-alt font-semibold text-ink truncate">{o.name}</span>
                         <span className="block text-[11px] text-ink-muted">
                           {o.markets.length} mercat{o.markets.length === 1 ? 'o' : 'i'}{o.linked ? ' · accesso attivo' : o.email ? ' · invito da mandare' : ''}
                         </span>
                       </span>
-                      {o.linked && <Check className="w-4 h-4 text-mare flex-shrink-0" />}
+                      {o.linked && <Check className="w-4 h-4 text-alga flex-shrink-0" />}
                     </button>
                   </li>
                 ))}
@@ -188,21 +188,21 @@ export default function AdminOperatoriPage() {
                 <div className="grid sm:grid-cols-2 gap-3">
                   <label className="block sm:col-span-2">
                     <span className="text-xs font-alt uppercase tracking-wider text-ink-muted">Nome del banco</span>
-                    <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Es. Da Rita — Frutta e Verdura" className="mt-1 w-full px-3 py-2 bg-carta border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-mare" />
+                    <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Es. Da Rita — Frutta e Verdura" className="mt-1 w-full px-3 py-2 bg-crema border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-alga" />
                   </label>
                   <label className="block">
                     <span className="text-xs font-alt uppercase tracking-wider text-ink-muted">Categoria</span>
-                    <select value={category} onChange={(e) => setCategory(e.target.value)} className="mt-1 w-full px-3 py-2 bg-carta border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-mare">
+                    <select value={category} onChange={(e) => setCategory(e.target.value)} className="mt-1 w-full px-3 py-2 bg-crema border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-alga">
                       {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
                     </select>
                   </label>
                   <label className="block">
                     <span className="text-xs font-alt uppercase tracking-wider text-ink-muted">Email (per l’accesso)</span>
-                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="operatore@email.it" className="mt-1 w-full px-3 py-2 bg-carta border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-mare" />
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="operatore@email.it" className="mt-1 w-full px-3 py-2 bg-crema border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-alga" />
                   </label>
                   <label className="block sm:col-span-2">
                     <span className="text-xs font-alt uppercase tracking-wider text-ink-muted">Descrizione</span>
-                    <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} placeholder="Cosa vende, da quanti anni, la sua specialità…" className="mt-1 w-full px-3 py-2 bg-carta border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-mare" />
+                    <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} placeholder="Cosa vende, da quanti anni, la sua specialità…" className="mt-1 w-full px-3 py-2 bg-crema border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-alga" />
                   </label>
                 </div>
 
@@ -213,7 +213,7 @@ export default function AdminOperatoriPage() {
                     {markets.map((m) => {
                       const on = !!assigns[m.id]
                       return (
-                        <button key={m.id} onClick={() => toggleMarket(m.id)} className={`px-3 py-1.5 rounded-full text-xs font-alt font-semibold border-2 transition-colors ${on ? 'bg-mare text-white border-mare' : 'bg-white text-ink-soft border-ink/15 hover:border-mare'}`}>
+                        <button key={m.id} onClick={() => toggleMarket(m.id)} className={`px-3 py-1.5 rounded-full text-xs font-alt font-semibold border-2 transition-colors ${on ? 'bg-alga text-white border-alga' : 'bg-white text-ink-soft border-ink/15 hover:border-alga'}`}>
                           {m.name}
                         </button>
                       )
@@ -226,10 +226,10 @@ export default function AdminOperatoriPage() {
                         const m = marketById.get(a.marketId)
                         const placed = a.lat != null && a.lng != null
                         return (
-                          <div key={a.marketId} className={`flex items-center gap-2 rounded-xl border-2 px-3 py-2 ${activeMarket === a.marketId ? 'border-mare bg-marel/30' : 'border-ink/10'}`}>
+                          <div key={a.marketId} className={`flex items-center gap-2 rounded-xl border-2 px-3 py-2 ${activeMarket === a.marketId ? 'border-alga bg-crema-2/30' : 'border-ink/10'}`}>
                             <span className="font-alt text-sm text-ink flex-1 min-w-0 truncate">{m?.name ?? '—'}</span>
-                            <input value={a.stall ?? ''} onChange={(e) => setStall(a.marketId, e.target.value)} placeholder="banco n." className="w-20 px-2 py-1 bg-carta border-2 border-ink/15 rounded-lg text-xs focus:outline-none focus:border-mare" />
-                            <button onClick={() => setActiveMarket(a.marketId)} className={`inline-flex items-center gap-1 text-xs font-alt font-semibold px-2.5 py-1 rounded-full ${placed ? 'text-mare-700 bg-mare/10' : 'text-fiore-600 bg-fiore/10'}`}>
+                            <input value={a.stall ?? ''} onChange={(e) => setStall(a.marketId, e.target.value)} placeholder="banco n." className="w-20 px-2 py-1 bg-crema border-2 border-ink/15 rounded-lg text-xs focus:outline-none focus:border-alga" />
+                            <button onClick={() => setActiveMarket(a.marketId)} className={`inline-flex items-center gap-1 text-xs font-alt font-semibold px-2.5 py-1 rounded-full ${placed ? 'text-alga-600 bg-alga/10' : 'text-terracotta-600 bg-terracotta/10'}`}>
                               <MapPin className="w-3.5 h-3.5" /> {placed ? 'posizionato' : 'posiziona'}
                             </button>
                           </div>
@@ -254,14 +254,14 @@ export default function AdminOperatoriPage() {
                   )}
                 </div>
 
-                {msg && <p className="text-sm text-mare-700 bg-marel/40 rounded-lg px-3 py-2">{msg}</p>}
+                {msg && <p className="text-sm text-alga-600 bg-crema-2/40 rounded-lg px-3 py-2">{msg}</p>}
 
                 <div className="flex flex-wrap items-center gap-2 border-t-2 border-ink/10 pt-4">
-                  <button onClick={save} disabled={busy} className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-mare text-white rounded-full text-sm font-alt font-semibold hover:bg-mare-600 disabled:opacity-50">
+                  <button onClick={save} disabled={busy} className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-alga text-white rounded-full text-sm font-alt font-semibold hover:bg-alga-600 disabled:opacity-50">
                     <Check className="w-4 h-4" /> {editing.id ? 'Salva modifiche' : 'Crea operatore'}
                   </button>
                   {editing.id && (
-                    <button onClick={sendLink} disabled={busy} className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-sole text-ink rounded-full text-sm font-alt font-semibold hover:bg-sole-600 disabled:opacity-50">
+                    <button onClick={sendLink} disabled={busy} className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-terracotta text-ink rounded-full text-sm font-alt font-semibold hover:bg-terracotta-600 disabled:opacity-50">
                       <Send className="w-4 h-4" /> Invia link di accesso
                     </button>
                   )}
@@ -270,7 +270,7 @@ export default function AdminOperatoriPage() {
                     <X className="w-4 h-4" /> Chiudi
                   </button>
                   {editing.id && (
-                    <button onClick={() => remove(editing.id!)} disabled={busy} className="inline-flex items-center gap-1.5 px-3 py-2 text-fiore-600 hover:text-fiore text-sm">
+                    <button onClick={() => remove(editing.id!)} disabled={busy} className="inline-flex items-center gap-1.5 px-3 py-2 text-terracotta-600 hover:text-terracotta text-sm">
                       <Trash2 className="w-4 h-4" /> Elimina
                     </button>
                   )}

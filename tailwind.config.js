@@ -9,29 +9,32 @@ module.exports = {
     extend: {
       colors: {
         // ============================================================
-        // BRAND "Mercati della Riviera di Ponente" (provincia di Imperia)
-        // Palette coerente: Mare (primario) · Sole (oggi/aperto) ·
-        // Fiore (accento) · Carta · Inchiostro. Niente verde generico.
+        // BRAND "I Mercati della Riviera dei Fiori" — palette MEZZOGIORNO
+        // (docs/brand-system.md): crema fondo · alga istituzionale ·
+        // terracotta azione · limone terza voce calda.
         // ============================================================
+        crema: { DEFAULT: '#FBF6EC', 2: '#F3EBDA' },
+        alga: { DEFAULT: '#46683B', 600: '#35502C', 50: '#E4EBDF' },
+        terracotta: { DEFAULT: '#C4593C', 600: '#9A4029', 50: '#F4E0D8' },
+        limone: { DEFAULT: '#EAC54F', 700: '#7A611A' },
+
+        // --- token del sistema precedente (pagine non ancora migrate) ---
         carta: '#F7EFDD',
         marel: '#DCEBEC', // mare chiaro (sfondi)
         notte: '#0E3040',
-        ink: { DEFAULT: '#1A1714', soft: '#4A4438', muted: '#8A8275' },
+        ink: { DEFAULT: '#26241E', soft: '#55503F', muted: '#8A8275' },
         mare: { DEFAULT: '#15607C', 400: '#2E84A3', 600: '#114F66', 700: '#0E3F52' },
         sole: { DEFAULT: '#F4B62C', 600: '#D69A12' },
         fiore: { DEFAULT: '#EC6A5E', 100: '#FBE0D9', 600: '#D24B3F' },
-
-        // Gli alias legacy (paper, night, cream, primary) sono stati migrati
-        // ai token canonici e rimossi il 2026-07-03. Usare SOLO i token sopra.
       },
       fontFamily: {
-        // Sistema a due caratteri + la mano: titolo = Italiana (display/serif,
-        // solo 400), tutto il resto = Figtree (sans/alt), e Caveat (hand/accent)
-        // SOLO per ciò che al banco si scrive a mano: prezzi, numeri, didascalie.
+        // Sistema a due caratteri (Nodo × Mezzogiorno): display = Bricolage
+        // Grotesque (800 sui titoli, tracking stretto), tutto il resto Figtree.
+        // Caveat resta mappato solo per le pagine non ancora migrate.
         sans: ['var(--font-alt)', 'system-ui', 'sans-serif'],
         alt: ['var(--font-alt)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-display)', 'Italiana', 'Georgia', 'serif'],
-        serif: ['var(--font-display)', 'Italiana', 'Georgia', 'serif'],
+        display: ['var(--font-display)', 'Bricolage Grotesque', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-display)', 'Bricolage Grotesque', 'system-ui', 'sans-serif'],
         accent: ['var(--font-hand)', 'cursive'],
         hand: ['var(--font-hand)', 'cursive'],
       },

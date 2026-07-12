@@ -29,10 +29,10 @@ export default function OperatorFilters({
   onSearchChange,
 }: OperatorFiltersProps) {
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+    <div className="bg-white rounded-xl border border-[#e0d7c1] shadow-[0_12px_26px_-18px_rgba(38,36,30,0.35)] p-4 mb-6">
       <div className="mb-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ink-muted w-5 h-5" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted w-5 h-5" aria-hidden="true" />
           <input
             type="text"
             id="operator-search"
@@ -40,28 +40,30 @@ export default function OperatorFilters({
             placeholder="Cerca per nome operatore o prodotto..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-ink/15 rounded-md focus:ring-2 focus:ring-mare focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#e0d7c1] rounded-xl text-sm focus:outline-none focus:border-alga"
           />
         </div>
       </div>
 
       <div>
-        <div className="flex items-center space-x-2 mb-3">
-          <Filter className="w-5 h-5 text-ink-muted" />
-          <h3 className="font-semibold text-ink">Filtra per categoria</h3>
+        <div className="flex items-center gap-2 mb-3">
+          <Filter className="w-5 h-5 text-ink-muted" aria-hidden="true" />
+          <h3 className="font-alt font-semibold text-ink">Filtra per categoria</h3>
         </div>
+        {/* Chips di categoria: bordo alga, attiva piena alga (come le chips dei giorni) */}
         <div className="flex flex-wrap gap-2">
           {categories.map((cat) => (
             <button
               key={cat.value}
               onClick={() => onCategoryChange(cat.value)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+              aria-pressed={selectedCategory === cat.value}
+              className={`inline-flex items-center gap-2 font-alt text-sm font-semibold px-4 py-2 rounded-full border-[1.5px] transition-colors ${
                 selectedCategory === cat.value
-                  ? 'bg-mare-600 text-white shadow-md'
-                  : 'bg-marel/40 text-ink-soft hover:bg-ink/10'
+                  ? 'bg-alga text-crema border-alga'
+                  : 'bg-white text-alga-600 border-alga/60 hover:bg-alga hover:text-crema hover:border-alga'
               }`}
             >
-              <span>{cat.icon}</span>
+              <span aria-hidden="true">{cat.icon}</span>
               <span>{cat.label}</span>
             </button>
           ))}
@@ -70,4 +72,3 @@ export default function OperatorFilters({
     </div>
   )
 }
-

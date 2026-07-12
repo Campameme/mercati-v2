@@ -43,7 +43,7 @@ const getWeatherIcon = (condition: string, icon: string) => {
   const iconType = icon.toLowerCase()
 
   if (cond.includes('pioggia') || cond.includes('rain') || iconType.includes('rain')) {
-    return <CloudRain className="w-6 h-6 text-mare-600" />
+    return <CloudRain className="w-6 h-6 text-alga-600" />
   }
   if (cond.includes('nuvoloso') || cond.includes('cloudy') || iconType.includes('cloud')) {
     if (cond.includes('parzialmente') || iconType.includes('partly')) {
@@ -52,7 +52,7 @@ const getWeatherIcon = (condition: string, icon: string) => {
     return <Cloud className="w-6 h-6 text-ink-muted" />
   }
   if (cond.includes('sereno') || cond.includes('clear') || cond.includes('sunny') || iconType.includes('sun')) {
-    return <Sun className="w-6 h-6 text-sole" />
+    return <Sun className="w-6 h-6 text-terracotta" />
   }
   // Default: parzialmente nuvoloso
   return <Cloud className="w-6 h-6 text-ink-muted" />
@@ -130,7 +130,7 @@ export default function WeatherWidget() {
     const iconType = icon.toLowerCase()
 
     if (cond.includes('pioggia') || cond.includes('rain') || iconType.includes('rain')) {
-      return <CloudRain className="w-5 h-5 text-mare-600" />
+      return <CloudRain className="w-5 h-5 text-alga-600" />
     }
     if (cond.includes('nuvoloso') || cond.includes('cloudy') || iconType.includes('cloud')) {
       if (cond.includes('parzialmente') || iconType.includes('partly')) {
@@ -139,7 +139,7 @@ export default function WeatherWidget() {
       return <Cloud className="w-5 h-5 text-ink-muted" />
     }
     if (cond.includes('sereno') || cond.includes('clear') || cond.includes('sunny') || iconType.includes('sun')) {
-      return <Sun className="w-5 h-5 text-sole" />
+      return <Sun className="w-5 h-5 text-terracotta" />
     }
     return <Cloud className="w-5 h-5 text-ink-muted" />
   }
@@ -164,7 +164,7 @@ export default function WeatherWidget() {
       <div className="flex items-center gap-0.5 rounded-full border-2 border-ink/10 bg-white pr-1">
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full hover:bg-marel/50 transition-colors"
+          className="flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full hover:bg-crema-2/50 transition-colors"
           title={`Meteo ${owmName || location || 'Mercato'} — previsioni indicative`}
         >
           {getWidgetIcon(weather.current.condition, weather.current.icon)}
@@ -184,17 +184,17 @@ export default function WeatherWidget() {
         <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-black bg-opacity-50">
           <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto overscroll-contain imk-scroll" data-lenis-prevent>
             {/* Header */}
-            <div className="bg-gradient-to-r from-mare to-mare-600 text-white p-6 rounded-t-xl">
+            <div className="bg-gradient-to-r from-alga to-alga-600 text-white p-6 rounded-t-xl">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold mb-2">Meteo {owmName || location || 'Mercato'}</h2>
                   {owmName && location && owmName.toLowerCase() !== location.toLowerCase() && (
-                    <p className="text-marel text-xs">(area {location})</p>
+                    <p className="text-crema-2 text-xs">(area {location})</p>
                   )}
                   {coords && (
-                    <p className="text-marel text-xs">{coords.lat.toFixed(4)}, {coords.lng.toFixed(4)}{source.startsWith('mock') ? ' · dati demo' : ''}</p>
+                    <p className="text-crema-2 text-xs">{coords.lat.toFixed(4)}, {coords.lng.toFixed(4)}{source.startsWith('mock') ? ' · dati demo' : ''}</p>
                   )}
-                  <p className="text-marel text-sm">
+                  <p className="text-crema-2 text-sm">
                     Previsioni indicative. Verifica quelle effettive su{' '}
                     <a href={forecastUrl} target="_blank" rel="noopener noreferrer" className="underline font-semibold hover:text-white">
                       open-meteo ↗
@@ -213,7 +213,7 @@ export default function WeatherWidget() {
             {/* Content */}
             <div className="p-6">
               {/* Condizioni Attuali */}
-              <div className="bg-gradient-to-br from-marel/50 to-marel rounded-lg p-6 mb-6">
+              <div className="bg-gradient-to-br from-crema-2/50 to-crema-2 rounded-lg p-6 mb-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center space-x-4 mb-2">
@@ -245,7 +245,7 @@ export default function WeatherWidget() {
                 <div className="overflow-x-auto">
                   <div className="flex space-x-4 pb-2">
                     {weather.hourly.slice(0, 12).map((hour, index) => (
-                      <div key={index} className="flex-shrink-0 text-center bg-marel/40 rounded-lg p-3 min-w-[80px]">
+                      <div key={index} className="flex-shrink-0 text-center bg-crema-2/40 rounded-lg p-3 min-w-[80px]">
                         <div className="text-xs text-ink-muted mb-2">
                           {format(hour.time, 'HH:mm')}
                         </div>
@@ -256,7 +256,7 @@ export default function WeatherWidget() {
                           {Math.round(hour.temperature)}°
                         </div>
                         {hour.precipitation > 0 && (
-                          <div className="text-xs text-mare-600">
+                          <div className="text-xs text-alga-600">
                             {hour.precipitation.toFixed(1)}mm
                           </div>
                         )}
@@ -273,7 +273,7 @@ export default function WeatherWidget() {
                   {weather.daily.map((day, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between p-4 bg-marel/40 rounded-lg hover:bg-marel/60 transition-colors"
+                      className="flex items-center justify-between p-4 bg-crema-2/40 rounded-lg hover:bg-crema-2/60 transition-colors"
                     >
                       <div className="flex items-center space-x-4">
                         <div className="w-32">
@@ -291,7 +291,7 @@ export default function WeatherWidget() {
                       </div>
                       <div className="flex items-center space-x-4">
                         {day.precipitation > 0 && (
-                          <div className="text-sm text-mare-600 flex items-center space-x-1">
+                          <div className="text-sm text-alga-600 flex items-center space-x-1">
                             <CloudRain className="w-4 h-4" />
                             <span>{day.precipitation}mm</span>
                           </div>

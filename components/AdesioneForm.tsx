@@ -42,20 +42,20 @@ export default function AdesioneForm() {
 
   if (status === 'success') {
     return (
-      <div className="bg-mare/10 border-2 border-mare/30 rounded-xl p-8 text-center">
-        <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-mare text-white flex items-center justify-center">
+      <div className="bg-white border border-[#e0d7c1] rounded-xl p-8 text-center">
+        <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-alga text-crema flex items-center justify-center">
           <Check className="w-6 h-6" />
         </div>
-        <h3 className="font-alt font-bold text-2xl text-ink mb-2">Richiesta ricevuta</h3>
+        <h3 className="font-display font-extrabold tracking-tight text-2xl text-ink mb-2">Richiesta ricevuta</h3>
         <p className="text-sm text-ink-soft max-w-md mx-auto">
-          Grazie. Vi rispondiamo entro <strong>48 ore</strong> all&apos;email che avete indicato.
-          Nel frattempo, esplorate il sito: vi può dare un&apos;idea di cosa costruiremo insieme.
+          Grazie. Ti rispondiamo entro <strong>48 ore</strong> all&apos;email che hai indicato.
+          Nel frattempo, dai un&apos;occhiata ai banchi che sono già nella rete.
         </p>
       </div>
     )
   }
 
-  const inputClass = "w-full px-3.5 py-3 bg-white border-2 border-ink/15 rounded-xl text-sm text-ink focus:outline-none focus:border-mare transition-colors"
+  const inputClass = "w-full px-3.5 py-3 bg-white border border-[#e0d7c1] rounded-xl text-sm text-ink focus:outline-none focus:border-alga transition-colors"
   const labelClass = "block font-alt text-xs uppercase tracking-[0.12em] text-ink-muted mb-1.5 font-semibold"
 
   return (
@@ -84,23 +84,23 @@ export default function AdesioneForm() {
           <input id="telefono" name="telefono" type="tel" maxLength={30} className={inputClass} />
         </div>
         <div>
-          <label htmlFor="attivita" className={labelClass}>Cosa vendete *</label>
+          <label htmlFor="attivita" className={labelClass}>Cosa vendi *</label>
           <input id="attivita" name="attivita" type="text" required minLength={2} maxLength={200} placeholder="es. Frutta e verdura, olio, pesce…" className={inputClass} />
         </div>
       </div>
 
       <div>
-        <label htmlFor="mercatiFrequentati" className={labelClass}>A quali mercati partecipate</label>
+        <label htmlFor="mercatiFrequentati" className={labelClass}>A quali mercati vai</label>
         <input id="mercatiFrequentati" name="mercatiFrequentati" type="text" maxLength={300} placeholder="es. Oneglia mer/sab, Bordighera ven…" className={inputClass} />
       </div>
 
       <div>
-        <label htmlFor="messaggio" className={labelClass}>Raccontateci qualcosa di voi</label>
-        <textarea id="messaggio" name="messaggio" rows={5} maxLength={2000} placeholder="Da quanto lavorate, cosa vi rende diversi, cosa vi aspettate dal progetto…" className={inputClass + ' resize-y'}></textarea>
+        <label htmlFor="messaggio" className={labelClass}>Raccontaci qualcosa di te</label>
+        <textarea id="messaggio" name="messaggio" rows={5} maxLength={2000} placeholder="Da quanto lavori al mercato, cosa rende diverso il tuo banco…" className={inputClass + ' resize-y'}></textarea>
       </div>
 
       {status === 'error' && error && (
-        <div className="flex items-start gap-2 px-3 py-2.5 bg-fiore/10 border-2 border-fiore/30 rounded-xl text-sm text-fiore-600">
+        <div className="flex items-start gap-2 px-3 py-2.5 bg-terracotta-50 border border-terracotta/40 rounded-xl text-sm text-terracotta-600">
           <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
           <span>{error}</span>
         </div>
@@ -110,7 +110,7 @@ export default function AdesioneForm() {
         <button
           type="submit"
           disabled={status === 'sending'}
-          className="imk-lift inline-flex items-center gap-2 px-6 py-3 rounded-full bg-ink text-carta font-alt text-sm font-semibold hover:bg-mare transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="imk-lift inline-flex items-center gap-2 px-6 py-3 rounded-full bg-terracotta text-crema font-alt text-sm font-semibold hover:bg-terracotta-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {status === 'sending' ? (
             <>
@@ -118,11 +118,11 @@ export default function AdesioneForm() {
               Invio...
             </>
           ) : (
-            'Invia richiesta'
+            'Chiedi di entrare'
           )}
         </button>
         <p className="text-xs text-ink-muted">
-          Vi rispondiamo entro 48 ore. I dati sono trattati secondo la{' '}
+          Ti rispondiamo entro 48 ore. I dati sono trattati secondo la{' '}
           <a href="/privacy" className="underline underline-offset-2 hover:text-ink">Privacy Policy</a>.
         </p>
       </div>

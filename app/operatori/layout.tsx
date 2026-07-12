@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Gli ambulanti',
+  title: 'I banchi di fiducia',
   description:
-    'Gli ambulanti dei mercati della Riviera di Ponente: categorie, specialità, in quali mercati li trovi e i loro banchi.',
+    'I banchi di fiducia dei mercati della Riviera dei Fiori: chi sono, cosa vendono, in quali mercati li trovi.',
 }
 
 export default function OperatoriLayout({ children }: { children: React.ReactNode }) {

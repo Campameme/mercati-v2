@@ -15,7 +15,6 @@ import {
   CATEGORY_LABEL as SCH_LABEL,
   type ScheduleCategory,
 } from '@/lib/schedules/classify'
-import { SunRay } from '@/components/decorations'
 import { EVT_LABEL, EVT_COLOR, ALL_EVT_CATS } from '@/lib/events/labels'
 const ALL_SCH_CATS: ScheduleCategory[] = ['generale', 'alimentare', 'antiquariato', 'artigianato']
 
@@ -147,15 +146,14 @@ export default function ZoneCalendarPage() {
       <div className="mb-8 md:mb-10 border-b-2 border-ink/10 pb-6">
         <Link
           href={slug ? `/${slug}` : '/'}
-          className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-mare-600 mb-4 transition-colors"
+          className="inline-flex items-center gap-1.5 font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted hover:text-alga-600 mb-4 transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" /> {marketName ?? 'Zona'}
         </Link>
         <div className="flex items-center gap-3 mb-2 text-ink-soft">
-          <SunRay className="w-5 h-5 text-sole" aria-hidden="true" />
           <p className="font-alt text-xs font-semibold uppercase tracking-[0.14em]">{marketName ?? 'Zona'} · calendario</p>
         </div>
-        <h1 className="font-display text-3xl md:text-5xl text-ink leading-tight">Calendario della zona</h1>
+        <h1 className="font-display font-extrabold text-3xl md:text-5xl text-ink leading-tight">Calendario della zona</h1>
         <p className="text-sm text-ink-soft mt-3 max-w-xl">
           Mercati ricorrenti ed eventi speciali di questa zona, filtrabili per tipologia e categoria.
         </p>
@@ -228,7 +226,7 @@ export default function ZoneCalendarPage() {
                       key={c}
                       onClick={() => toggleEvtCat(c)}
                       className={`font-alt font-semibold text-xs px-2.5 py-1 rounded-full border-2 transition-colors ${
-                        active ? 'text-carta' : 'bg-white text-ink-muted border-ink/15 hover:text-ink hover:border-ink/30'
+                        active ? 'text-crema' : 'bg-white text-ink-muted border-ink/15 hover:text-ink hover:border-ink/30'
                       }`}
                       style={active ? { backgroundColor: EVT_COLOR[c], borderColor: EVT_COLOR[c] } : undefined}
                     >
@@ -268,12 +266,12 @@ export default function ZoneCalendarPage() {
       </div>
 
       {selected && (
-        <div className="fixed inset-0 z-50 bg-notte/55 backdrop-blur-[2px] flex items-center justify-center p-4" onClick={() => setSelected(null)}>
+        <div className="fixed inset-0 z-50 bg-ink/55 backdrop-blur-[2px] flex items-center justify-center p-4" onClick={() => setSelected(null)}>
           <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-xl max-w-lg w-full p-6 border-2 border-ink/10 shadow-2xl">
             {selected.kind === 'event' ? (
               <>
                 <div className="flex items-center gap-2 mb-2 flex-wrap text-xs">
-                  <span className="font-alt font-semibold px-2.5 py-0.5 rounded-full text-carta" style={{ backgroundColor: EVT_COLOR[selected.e.category] ?? '#4A4F3B' }}>
+                  <span className="font-alt font-semibold px-2.5 py-0.5 rounded-full text-crema" style={{ backgroundColor: EVT_COLOR[selected.e.category] ?? '#4A4F3B' }}>
                     {EVT_LABEL[selected.e.category] ?? selected.e.category}
                   </span>
                   {selected.e.is_recurring && (
@@ -293,7 +291,7 @@ export default function ZoneCalendarPage() {
             ) : (
               <>
                 <div className="flex items-center gap-2 mb-2 flex-wrap text-xs">
-                  <span className="font-alt font-semibold px-2.5 py-0.5 rounded-full text-carta" style={{ backgroundColor: SCH_COLOR[selected.o.category] }}>
+                  <span className="font-alt font-semibold px-2.5 py-0.5 rounded-full text-crema" style={{ backgroundColor: SCH_COLOR[selected.o.category] }}>
                     {SCH_LABEL[selected.o.category]}
                   </span>
                 </div>
@@ -308,7 +306,7 @@ export default function ZoneCalendarPage() {
                 {selected.o.settori && <p className="text-xs text-ink-muted italic mt-2">{selected.o.settori}</p>}
               </>
             )}
-            <button onClick={() => setSelected(null)} className="mt-6 px-4 py-2.5 bg-carta border-2 border-ink/15 hover:border-ink rounded-full w-full font-alt text-sm font-semibold text-ink transition-colors">
+            <button onClick={() => setSelected(null)} className="mt-6 px-4 py-2.5 bg-crema border-2 border-ink/15 hover:border-ink rounded-full w-full font-alt text-sm font-semibold text-ink transition-colors">
               Chiudi
             </button>
           </div>

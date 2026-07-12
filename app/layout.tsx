@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Italiana, Figtree, Caveat } from 'next/font/google'
+import { Bricolage_Grotesque, Figtree, Caveat } from 'next/font/google'
 import './globals.css'
 import Providers from '@/components/Providers'
 import Footer from '@/components/Footer'
@@ -7,13 +7,11 @@ import CookieNotice from '@/components/CookieNotice'
 import SmoothScroll from '@/components/motion/SmoothScroll'
 import { SITE_NAME, SITE_URL } from '@/lib/site'
 
-// Tipografia "Mercati della Riviera di Ponente" — sistema a due caratteri.
-// Titolo principale: Italiana (serif display elegante, alto contrasto, un solo
-// peso 400 → NIENTE font-bold/black sui titoli, userebbe un finto-grassetto).
-// Tutto il resto (corpo, UI, accenti): Figtree con gerarchia di pesi/dimensioni.
-const italiana = Italiana({
+// Tipografia "I Mercati della Riviera dei Fiori" (Nodo × Mezzogiorno) —
+// sistema a due caratteri: display = Bricolage Grotesque (variabile, 800 sui
+// titoli con tracking stretto), corpo/UI = Figtree.
+const bricolage = Bricolage_Grotesque({
   subsets: ['latin'],
-  weight: ['400'],
   variable: '--font-display',
   display: 'swap',
 })
@@ -39,7 +37,7 @@ export const metadata: Metadata = {
     default: `${SITE_NAME} — Riviera dei Fiori, provincia di Imperia`,
     template: `%s — ${SITE_NAME}`,
   },
-  description: 'Il mercato che profuma di mare. Tutti i mercati settimanali della Riviera di Ponente — la Riviera dei Fiori, provincia di Imperia: dove e quando, cosa trovi, gli ambulanti e come arrivarci.',
+  description: 'I mercati che profumano di mare. Tutti i mercati settimanali della Riviera dei Fiori, in provincia di Imperia: dove e quando, cosa trovi, i banchi di fiducia e come arrivarci.',
   openGraph: {
     siteName: SITE_NAME,
     title: `${SITE_NAME} \u2014 il mercato che profuma di mare`,
@@ -64,8 +62,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="it" className={`${italiana.variable} ${figtree.variable} ${caveat.variable}`}>
-      <body className="font-sans bg-carta text-ink antialiased">
+    <html lang="it" className={`${bricolage.variable} ${figtree.variable} ${caveat.variable}`}>
+      <body className="font-sans bg-crema text-ink antialiased">
         <SmoothScroll />
         <Providers>
           <main className="min-h-screen">

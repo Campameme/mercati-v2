@@ -74,7 +74,7 @@ export default function Navigation() {
   return (
     <>
       <nav
-        className={`bg-carta/90 backdrop-blur-sm border-b-2 border-ink/10 z-50 ${
+        className={`bg-crema/95 backdrop-blur border-b border-ink/10 z-50 ${
           isHome
             ? `fixed inset-x-0 top-0 transition-transform duration-300 ${pastHero ? 'translate-y-0 visible' : '-translate-y-full pointer-events-none invisible'}`
             : 'sticky top-0'
@@ -83,7 +83,7 @@ export default function Navigation() {
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between h-16">
             {/* Left: logo */}
-            <Link href="/" aria-label="Mercati della Riviera di Ponente — home" className="text-ink text-[1.05rem]">
+            <Link href="/" aria-label="I Mercati della Riviera dei Fiori — home" className="text-ink text-[1.05rem]">
               <Logo inline />
             </Link>
 
@@ -94,7 +94,7 @@ export default function Navigation() {
               {(role === 'super_admin' || role === 'market_admin') && marketSlug && (
                 <Link
                   href={`/${marketSlug}/admin`}
-                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 font-alt text-sm font-semibold text-ink-soft hover:text-mare-600 transition-colors"
+                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 font-alt text-sm font-semibold text-ink-soft hover:text-alga transition-colors"
                 >
                   <Shield className="w-4 h-4" />
                   <span>Gestisci</span>
@@ -103,7 +103,7 @@ export default function Navigation() {
               {!role && (
                 <Link
                   href="/login"
-                  className="flex items-center gap-1.5 px-4 py-2 bg-ink text-carta rounded-full font-alt text-sm font-semibold hover:bg-mare transition-colors"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-ink text-crema rounded-full font-alt text-sm font-semibold hover:bg-alga transition-colors"
                 >
                   <LogIn className="w-4 h-4" />
                   <span className="hidden sm:inline">Accedi</span>
@@ -112,7 +112,7 @@ export default function Navigation() {
               <button
                 onClick={() => setMenuOpen(true)}
                 aria-label="Apri menu"
-                className="grid place-items-center w-10 h-10 rounded-full border-2 border-ink/15 bg-white hover:border-mare text-ink transition-colors"
+                className="grid place-items-center w-10 h-10 rounded-full border border-[#e0d7c1] bg-white hover:border-alga text-ink transition-colors"
               >
                 <Menu className="w-[18px] h-[18px]" />
               </button>

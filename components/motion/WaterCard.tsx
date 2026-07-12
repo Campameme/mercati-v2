@@ -1,30 +1,28 @@
 import type { ReactNode } from 'react'
 
 /**
- * Card "acqua": bordo irregolare a mano, velo di luce che scorre (caustica) e
- * increspatura su hover. Effetti via globals (.imk-water/.imk-edge/.imk-lift),
- * reduced-motion safe. Coerente su tutte le pagine.
+ * Card standard del sistema Nodo × Mezzogiorno: bianca, angoli morbidi, bordo
+ * carta chiaro, leggero sollevamento su hover (imk-lift, reduced-motion safe).
+ * (Ex "card acqua": gli effetti liquidi sono stati dismessi col rebrand; le
+ *  prop `edge`/`tilt` restano per compatibilità ma non hanno più effetto.)
  */
 export default function WaterCard({
   children,
   className = '',
-  edge = 1,
+  edge,
   tilt,
   as: Tag = 'div',
 }: {
   children: ReactNode
   className?: string
-  /** variante di bordo irregolare */
   edge?: 1 | 2
-  /** leggera rotazione imperfetta */
   tilt?: 'l' | 'r'
   as?: any
 }) {
-  const tiltCls = tilt === 'l' ? 'imk-tilt-l' : tilt === 'r' ? 'imk-tilt-r' : ''
+  void edge
+  void tilt
   return (
-    <Tag
-      className={`imk-water imk-lift ${edge === 2 ? 'imk-edge-2' : 'imk-edge'} ${tiltCls} border-2 border-ink/10 bg-white ${className}`}
-    >
+    <Tag className={`imk-lift rounded-xl border border-[#e0d7c1] bg-white ${className}`}>
       {children}
     </Tag>
   )
