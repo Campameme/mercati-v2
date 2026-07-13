@@ -12,7 +12,8 @@
 --      (default 18), DOPO il rollup. Le viste *_stats_30d guardano solo gli
 --      ultimi 30 giorni, quindi il prune non tocca le dashboard.
 --
--- Da eseguire A MANO (o via pg_cron, blocco opzionale in fondo). Idempotente.
+-- ESEGUIRE TUTTO IL FILE (crea tabella + funzioni). Solo DOPO si puo' chiamare
+-- select analytics_prune();  Idempotente: rieseguibile senza danni.
 
 -- 1) Tabella rollup -----------------------------------------------------------
 create table if not exists analytics_monthly (
@@ -26,13 +27,10 @@ create table if not exists analytics_monthly (
   rolled_at    timestamptz not null default now()
 );
 
--- Chiave logica con i NULL normalizzati (market/operator/comune sono spesso NULL).
-create unique index if not exists analytics_monthly_key on analytics_monthly (
-  month, event_type,
-  coalesce(market_id,   '00000000-0000-0000-0000-000000000000'::uuid),
-  coalesce(operator_id, '00000000-0000-0000-0000-000000000000'::uuid),
-  coalesce(comune, '')
-);
+-- Indice per il delete/query per mese (il rollup ricostruisce il mese intero,
+-- quindi l'unicita' e' garantita dal pattern DELETE+INSERT, non serve un vincolo).
+create index if not exists analytics_monthly_month_idx
+  on analytics_monthly (month, event_type);
 
 alter table analytics_monthly enable row level security;
 drop policy if exists analytics_monthly_admin_read on analytics_monthly;
@@ -42,7 +40,7 @@ for select using (
           where profiles.id = auth.uid() and profiles.role = 'super_admin')
 );
 
--- 2) Rollup di un singolo mese (idempotente) ----------------------------------
+-- 2) Rollup di un singolo mese (idempotente: DELETE del mese + INSERT fresco) --
 create or replace function analytics_rollup_month(p_month date)
 returns integer
 language plpgsql
@@ -50,27 +48,23 @@ security definer
 set search_path = public
 as $$
 declare
+  m date := date_trunc('month', p_month)::date;
   n integer;
 begin
-  insert into analytics_monthly as am
+  delete from analytics_monthly where month = m;
+
+  insert into analytics_monthly
     (month, event_type, market_id, operator_id, comune, events, uniques, rolled_at)
   select
-    date_trunc('month', e.created_at)::date,
-    e.event_type, e.market_id, e.operator_id, e.comune,
+    m, e.event_type, e.market_id, e.operator_id, e.comune,
     count(*),
     count(distinct e.visitor_hash),
     now()
   from analytics_events e
-  where e.created_at >= date_trunc('month', p_month)
-    and e.created_at <  date_trunc('month', p_month) + interval '1 month'
-  group by 1, e.event_type, e.market_id, e.operator_id, e.comune
-  on conflict (month, event_type,
-               coalesce(market_id,   '00000000-0000-0000-0000-000000000000'::uuid),
-               coalesce(operator_id, '00000000-0000-0000-0000-000000000000'::uuid),
-               coalesce(comune, ''))
-  do update set events    = excluded.events,
-                uniques   = excluded.uniques,
-                rolled_at = now();
+  where e.created_at >= m
+    and e.created_at <  m + interval '1 month'
+  group by e.event_type, e.market_id, e.operator_id, e.comune;
+
   get diagnostics n = row_count;
   return n;
 end;
