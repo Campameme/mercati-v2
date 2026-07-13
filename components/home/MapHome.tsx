@@ -283,7 +283,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
               <div className="relative overflow-hidden rounded-2xl border border-[#e0d7c1] shadow-xl aspect-[4/5]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/zone/vita-mercato-ventimiglia.jpg"
+                  src="/zone/vita-mercato-ventimiglia.webp"
                   alt="Il mercato del venerdì a Ventimiglia"
                   data-plx
                   className="absolute inset-0 w-full h-full object-cover scale-110 will-change-transform"
@@ -291,12 +291,12 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
               </div>
               <figure className="absolute -top-2 -right-2 w-[42%] rotate-2 bg-white border border-[#e0d7c1] rounded-md p-1.5 pb-2 shadow-lg">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/zone/vita-fiori-sanremo-1962.jpg" alt="Il mercato dei fiori di Sanremo nel 1962" loading="lazy" className="w-full aspect-[4/3] object-cover rounded-sm" />
+                <img src="/zone/vita-fiori-sanremo-1962.webp" alt="Il mercato dei fiori di Sanremo nel 1962" loading="lazy" className="w-full aspect-[4/3] object-cover rounded-sm" />
                 <figcaption className="mt-1 px-1 font-alt italic text-xs text-ink-soft leading-tight">Sanremo, 1962</figcaption>
               </figure>
               <figure className="absolute -bottom-5 -left-5 w-[46%] -rotate-3 bg-white border border-[#e0d7c1] rounded-md p-1.5 pb-2 shadow-xl">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/zone/vita-mercato-coperto-ventimiglia.jpg" alt="L’interno del mercato coperto di Ventimiglia" loading="lazy" className="w-full aspect-[4/3] object-cover rounded-sm" />
+                <img src="/zone/vita-mercato-coperto-ventimiglia.webp" alt="L’interno del mercato coperto di Ventimiglia" loading="lazy" className="w-full aspect-[4/3] object-cover rounded-sm" />
                 <figcaption className="mt-1 px-1 font-alt italic text-xs text-ink-soft leading-tight">Il mercato coperto, Ventimiglia</figcaption>
               </figure>
             </div>
@@ -321,7 +321,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 data-plx
-                src="/zone/vita-piazza-mercato-sanremo-1880.jpg"
+                src="/zone/vita-piazza-mercato-sanremo-1880.webp"
                 alt="Sanremo, la piazza del mercato a fine Ottocento"
                 loading="lazy"
                 className="absolute inset-0 w-full h-full object-cover scale-110 will-change-transform"
@@ -419,7 +419,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   data-plx
-                  src="/zone/vita-banco-verdure.jpg"
+                  src="/zone/vita-banco-verdure.webp"
                   alt="Un banco di verdure al mercato, tra venditore e clienti"
                   loading="lazy"
                   className="absolute inset-0 w-full h-full object-cover scale-110 will-change-transform"
@@ -427,7 +427,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
               </div>
               <figure className="absolute -bottom-6 -left-4 w-[46%] -rotate-2 bg-white border border-[#e0d7c1] rounded-md p-1.5 pb-2 shadow-xl">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/zone/vita-sapori.jpg" alt="Sapori e prodotti sul banco del mercato" loading="lazy" className="w-full aspect-[4/3] object-cover rounded-sm" />
+                <img src="/zone/vita-sapori.webp" alt="Sapori e prodotti sul banco del mercato" loading="lazy" className="w-full aspect-[4/3] object-cover rounded-sm" />
                 <figcaption className="mt-1 px-1 font-alt italic text-xs text-ink-soft leading-tight">I sapori del banco</figcaption>
               </figure>
             </div>

@@ -19,7 +19,7 @@ export interface CuratedPhoto {
 
 const PHOTOS: Record<string, CuratedPhoto> = {
   'sanremo': {
-    src: '/zone/sanremo.jpg',
+    src: '/zone/sanremo.webp',
     alt: 'Sanremo dalla Madonna della Costa: i tetti, il porto e il mare',
     file: 'Sanremmu-Panuràmma daa Madònna da Còsta 01.jpg',
     artist: 'Arbenganese',
@@ -27,7 +27,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Sanremmu-Panur%C3%A0mma_daa_Mad%C3%B2nna_da_C%C3%B2sta_01.jpg',
   },
   'imperia': {
-    src: '/zone/imperia.jpg',
+    src: '/zone/imperia.webp',
     alt: 'Calata Cuneo, il porto di Oneglia a Imperia',
     file: 'Calata Cuneo, porto di Oneglia, Imperia.jpg',
     artist: 'Tony Frisina at Italian Wikipedia',
@@ -35,7 +35,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Calata_Cuneo,_porto_di_Oneglia,_Imperia.jpg',
   },
   'porto-maurizio': {
-    src: '/zone/porto-maurizio.jpg',
+    src: '/zone/porto-maurizio.webp',
     alt: 'Il Borgo Marina di Porto Maurizio, Imperia',
     file: 'Imperia Porto Maurizio-Borgo Marina-IMG 2565.JPG',
     artist: 'Twice25 &amp; Rinina25',
@@ -43,7 +43,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Imperia_Porto_Maurizio-Borgo_Marina-IMG_2565.JPG',
   },
   'oneglia': {
-    src: '/zone/oneglia.jpg',
+    src: '/zone/oneglia.webp',
     alt: 'Calata Cuneo, il porto di Oneglia a Imperia',
     file: 'Calata Cuneo, porto di Oneglia, Imperia.jpg',
     artist: 'Tony Frisina at Italian Wikipedia',
@@ -51,7 +51,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Calata_Cuneo,_porto_di_Oneglia,_Imperia.jpg',
   },
   'ventimiglia': {
-    src: '/zone/ventimiglia.jpg',
+    src: '/zone/ventimiglia.webp',
     alt: 'Un carruggio di Ventimiglia Alta',
     file: '2024-09-22 Ventimiglia Alta 04.jpg',
     artist: 'Alexkom000',
@@ -59,7 +59,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:2024-09-22_Ventimiglia_Alta_04.jpg',
   },
   'bordighera': {
-    src: '/zone/bordighera.jpg',
+    src: '/zone/bordighera.webp',
     alt: 'Il chiosco della musica sul lungomare di Bordighera',
     file: 'Bordighera Chiosco musica.jpg',
     artist: 'Al*from*Lig',
@@ -67,7 +67,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Bordighera_Chiosco_musica.jpg',
   },
   'ospedaletti': {
-    src: '/zone/ospedaletti.jpg',
+    src: '/zone/ospedaletti.webp',
     alt: 'Ospedaletti vista dal mare',
     file: 'Ospedaletti-panorama.jpg',
     artist: 'Davide Papalini',
@@ -75,7 +75,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Ospedaletti-panorama.jpg',
   },
   'taggia': {
-    src: '/zone/taggia.jpg',
+    src: '/zone/taggia.webp',
     alt: 'Il ponte antico di Taggia sul torrente Argentina',
     file: 'Taggia Ponte Romano 01.JPG',
     artist: 'Laurom',
@@ -83,7 +83,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Taggia_Ponte_Romano_01.JPG',
   },
   'arma-di-taggia': {
-    src: '/zone/arma-di-taggia.jpg',
+    src: '/zone/arma-di-taggia.webp',
     alt: 'La passeggiata a mare di Arma di Taggia',
     file: 'Arma di taggia IMG 8397a.jpg',
     artist: 'Evelyscher',
@@ -91,7 +91,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Arma_di_taggia_IMG_8397a.jpg',
   },
   'riva-ligure': {
-    src: '/zone/riva-ligure.jpg',
+    src: '/zone/riva-ligure.webp',
     alt: 'La costa di Riva Ligure',
     file: 'Riva Ligure-panorama.jpg',
     artist: 'Davide Papalini',
@@ -99,7 +99,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Riva_Ligure-panorama.jpg',
   },
   'san-lorenzo-al-mare': {
-    src: '/zone/san-lorenzo-al-mare.jpg',
+    src: '/zone/san-lorenzo-al-mare.webp',
     alt: 'San Lorenzo al Mare visto dal mare',
     file: 'Vista di San Lorenzo al mare - panoramio.jpg',
     artist: 'Agenzia Tecnocasa St…',
@@ -107,7 +107,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Vista_di_San_Lorenzo_al_mare_-_panoramio.jpg',
   },
   'santo-stefano-al-mare': {
-    src: '/zone/santo-stefano-al-mare.jpg',
+    src: '/zone/santo-stefano-al-mare.webp',
     alt: 'La chiesa parrocchiale di Santo Stefano al Mare',
     file: 'Santo Stefano al Mare-chiesa santo stefano.jpg',
     artist: 'Davide Papalini',
@@ -115,7 +115,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Santo_Stefano_al_Mare-chiesa_santo_stefano.jpg',
   },
   'cervo': {
-    src: '/zone/cervo.jpg',
+    src: '/zone/cervo.webp',
     alt: 'Il borgo di Cervo illuminato la sera, sul mare',
     file: 'Cervo - Comune di Cervo - il borgo.jpg',
     artist: 'Twentydays',
@@ -123,7 +123,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Cervo_-_Comune_di_Cervo_-_il_borgo.jpg',
   },
   'diano-marina': {
-    src: '/zone/diano-marina.jpg',
+    src: '/zone/diano-marina.webp',
     alt: 'La spiaggia di Diano Marina',
     file: 'Diano-marina-italy.jpg',
     artist: 'User Wx8',
@@ -131,7 +131,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Diano-marina-italy.jpg',
   },
   'san-bartolomeo-al-mare': {
-    src: '/zone/san-bartolomeo-al-mare.jpg',
+    src: '/zone/san-bartolomeo-al-mare.webp',
     alt: 'La spiaggia di San Bartolomeo al Mare',
     file: 'San Bartolomeo Al Mare.jpg',
     artist: 'Stijnsation',
@@ -139,7 +139,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:San_Bartolomeo_Al_Mare.jpg',
   },
   'camporosso': {
-    src: '/zone/camporosso.jpg',
+    src: '/zone/camporosso.webp',
     alt: 'La spiaggia di Camporosso Mare, alla foce del Nervia',
     file: 'E5955-Camporosso-Vallecrosia.jpg',
     artist: 'User:Vmenkov',
@@ -147,7 +147,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:E5955-Camporosso-Vallecrosia.jpg',
   },
   'vallecrosia': {
-    src: '/zone/vallecrosia.jpg',
+    src: '/zone/vallecrosia.webp',
     alt: 'Vallecrosia Alta tra gli orti della Val Nervia',
     file: 'Vallecrosia Alta 2016 abc3.jpg',
     artist: 'Patafisik',
@@ -155,7 +155,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Vallecrosia_Alta_2016_abc3.jpg',
   },
   'perinaldo': {
-    src: '/zone/perinaldo.jpg',
+    src: '/zone/perinaldo.webp',
     alt: 'Perinaldo, il borgo di Cassini, sul crinale',
     file: 'Perinaldo-panorama.JPG',
     artist: 'Davide Papalini',
@@ -163,7 +163,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Perinaldo-panorama.JPG',
   },
   'pieve-di-teco': {
-    src: '/zone/pieve-di-teco.jpg',
+    src: '/zone/pieve-di-teco.webp',
     alt: 'I portici medievali di Pieve di Teco',
     file: 'Pieve di Teco-IMG 0812.JPG',
     artist: 'Davide Papalini',
@@ -171,7 +171,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Pieve_di_Teco-IMG_0812.JPG',
   },
   'pontedassio': {
-    src: '/zone/pontedassio.jpg',
+    src: '/zone/pontedassio.webp',
     alt: 'Pontedassio, nella valle Impero',
     file: 'Pontedassio-IMG 0772.JPG',
     artist: 'Davide Papalini',
@@ -179,7 +179,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Pontedassio-IMG_0772.JPG',
   },
   'colle-di-nava': {
-    src: '/zone/colle-di-nava.jpg',
+    src: '/zone/colle-di-nava.webp',
     alt: 'Il Forte Centrale al Colle di Nava',
     file: 'Pornassio - Forte Centrale.jpeg',
     artist: 'Doppiavu2v',
@@ -187,7 +187,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Pornassio_-_Forte_Centrale.jpeg',
   },
   'vita-mercato-ventimiglia': {
-    src: '/zone/vita-mercato-ventimiglia.jpg',
+    src: '/zone/vita-mercato-ventimiglia.webp',
     alt: 'Il mercato del venerdì a Ventimiglia, con la città alta alle spalle',
     file: 'Market of Vintimiglia.jpg',
     artist: 'Tangopaso',
@@ -195,7 +195,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Market_of_Vintimiglia.jpg',
   },
   'vita-banco-verdure': {
-    src: '/zone/vita-banco-verdure.jpg',
+    src: '/zone/vita-banco-verdure.webp',
     alt: 'Un banco di verdure al mercato, tra venditore e clienti',
     file: '--quanti skei?-- (41167411811).jpg',
     artist: 'istolethetv',
@@ -203,7 +203,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:--quanti_skei%3F--_(41167411811).jpg',
   },
   'vita-fiori-sanremo-1962': {
-    src: '/zone/vita-fiori-sanremo-1962.jpg',
+    src: '/zone/vita-fiori-sanremo-1962.webp',
     alt: 'Il mercato dei fiori di Sanremo nel 1962',
     file: 'Photo Flower market in Sanremo 1962 - Touring Club Italiano 1.3390.jpg',
     artist: 'Autore sconosciuto (Touring Club Italiano)',
@@ -211,7 +211,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Photo_Flower_market_in_Sanremo_1962_-_Touring_Club_Italiano_1.3390.jpg',
   },
   'vita-sapori': {
-    src: '/zone/vita-sapori.jpg',
+    src: '/zone/vita-sapori.webp',
     alt: 'Cestini di sapori su un banco di mercato',
     file: 'Fruit at Mercato Centrale.jpg',
     artist: 'Brian & Jaclyn Drum',
@@ -219,7 +219,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Fruit_at_Mercato_Centrale.jpg',
   },
   'vita-piazza-mercato-sanremo-1880': {
-    src: '/zone/vita-piazza-mercato-sanremo-1880.jpg',
+    src: '/zone/vita-piazza-mercato-sanremo-1880.webp',
     alt: 'Sanremo, la piazza del mercato a fine Ottocento',
     file: 'Brogi, Carlo (1850-1925) - n. 8735 - Sanremo - Piazza del Mercato.png',
     artist: 'Carlo Brogi (Edizioni Brogi)',
@@ -227,7 +227,7 @@ const PHOTOS: Record<string, CuratedPhoto> = {
     url: 'https://commons.wikimedia.org/wiki/File:Brogi,_Carlo_(1850-1925)_-_n._8735_-_Sanremo_-_Piazza_del_Mercato.png',
   },
   'vita-mercato-coperto-ventimiglia': {
-    src: '/zone/vita-mercato-coperto-ventimiglia.jpg',
+    src: '/zone/vita-mercato-coperto-ventimiglia.webp',
     alt: 'L’interno del mercato coperto di Ventimiglia',
     file: 'Interno del mercato di XXmiglia.jpg',
     artist: 'Flickr (via Wikimedia Commons)',
