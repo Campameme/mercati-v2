@@ -62,15 +62,21 @@ function pinIcon(pin: UnifiedMapPin, selected: boolean): L.DivIcon {
     const html = `<div style="width:13px;height:13px;border-radius:50%;background:#46683B;border:2px solid #FBF6EC;box-shadow:0 1px 4px rgba(0,0,0,0.3)"></div>`
     return L.divIcon({ className: '', html, iconSize: [13, 13], iconAnchor: [7, 7] })
   }
-  // market → punto colorato per tipologia (selezionato: più grande + anello)
+  // market → punto colorato per tipologia. I mercati PRINCIPALI (settimanali,
+  // 'generale') hanno il pin più grande e il bordo più marcato; i tematici
+  // (antiquariato/alimentare/artigianato) restano più piccoli e discreti.
+  // Il selezionato cresce ancora e prende l'anello.
   const cat = pin.category ?? 'generale'
   const color = CATEGORY_COLOR[cat]
   const dark = CATEGORY_COLOR_DARK[cat]
-  const size = selected ? 26 : 17
+  const principale = cat === 'generale'
+  const base = principale ? 23 : 15
+  const size = selected ? base + 9 : base
+  const border = principale ? 3 : 2.5
   const ring = selected ? `<span class="imk-pin-ring" style="color:${color};position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)"></span>` : ''
   const html =
     `<div style="position:relative;width:${size}px;height:${size}px">${ring}` +
-    `<div style="width:100%;height:100%;border-radius:50%;background:${color};border:2.5px solid #FBF6EC;box-shadow:0 0 0 1px ${dark}40, 0 2px 6px rgba(0,0,0,0.3)"></div></div>`
+    `<div style="width:100%;height:100%;border-radius:50%;background:${color};border:${border}px solid #FBF6EC;box-shadow:0 0 0 1px ${dark}40, 0 2px 6px rgba(0,0,0,0.3)"></div></div>`
   return L.divIcon({ className: '', html, iconSize: [size, size], iconAnchor: [size / 2, size / 2] })
 }
 

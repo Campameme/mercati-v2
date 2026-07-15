@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Power, Settings, MapPin, ArrowRight, BarChart3, Mail, TrendingUp, Eye, Users, Store, Ticket } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import Logo from '@/components/Logo'
+import MarketToggles from '@/components/admin/MarketToggles'
 
 export const dynamic = 'force-dynamic'
 
@@ -110,12 +111,6 @@ export default async function AdminRoot() {
             desc="Crea i banchi di fiducia, assegnali ai mercati con la posizione, invia i link di accesso."
           />
           <ActionCard
-            href="/admin/sessions"
-            icon={Power}
-            title="Accendi / Spegni"
-            desc="Toggle zone e singole sessioni. Cascade automatica zona → sessioni."
-          />
-          <ActionCard
             href="/admin/tessera"
             icon={Ticket}
             title="Punti e coupon"
@@ -135,6 +130,15 @@ export default async function AdminRoot() {
             badge={adesioniNuove ?? 0}
           />
         </div>
+
+        {/* Accendi / Spegni — incorporato nel pannello (era la pagina /admin/sessions) */}
+        <section className="mb-12" id="accendi-spegni">
+          <div className="flex items-baseline gap-2 mb-4 border-b-2 border-ink/10 pb-2">
+            <Power className="w-4 h-4 text-alga" />
+            <h2 className="font-alt font-bold text-lg text-ink">Accendi / Spegni mercati</h2>
+          </div>
+          <MarketToggles />
+        </section>
 
         {/* Analytics: zone piu viste */}
         <section className="mb-10">

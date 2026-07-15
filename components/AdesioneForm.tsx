@@ -110,7 +110,7 @@ export default function AdesioneForm() {
         <button
           type="submit"
           disabled={status === 'sending'}
-          className="imk-lift inline-flex items-center gap-2 px-6 py-3 rounded-full bg-terracotta text-crema font-alt text-sm font-semibold hover:bg-terracotta-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="imk-lift inline-flex items-center gap-2 px-6 py-3 rounded-full bg-alga text-crema font-alt text-sm font-semibold hover:bg-alga-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {status === 'sending' ? (
             <>

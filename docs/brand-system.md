@@ -82,8 +82,9 @@
   tipici** (card bianche con mz-band e data nel colore della tipologia) →
   **Ti aspettano al banco** (racconto + 2 foto operatori + card banchi di
   fiducia) → **striscia rete** (alga: titolo + 3 requisiti + Bollino + CTA) →
-  **Notizie** (scuro, ink) → footer. Le zone NON hanno sezione in home; niente
-  Savona in tutto il sito (filtri in loadPins/tipici/sitemap).
+  **Notizie** (scuro, ink) → footer. Le zone NON hanno sezione in home; la
+  provincia di Savona è stata rimossa del tutto (dati e codice, migrazione
+  0024_remove_savona): esistono solo le 8 zone di Imperia.
 - **Card mercato**: band crosshatch alga, badge "Mercato", titolo `Comune —
   giorni`, piazza · orario · numero banchi, chips giorni + "N banchi di
   fiducia qui", stella preferito.

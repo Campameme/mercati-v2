@@ -4,7 +4,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
-  X, Map as MapIcon, Store, Newspaper, Search, Shield, LogIn, ShoppingBasket, Ticket, ArrowRight,
+  X, Map as MapIcon, Store, Newspaper, Search, Shield, LogIn, Ticket, ArrowRight,
 } from 'lucide-react'
 import Logo from '@/components/Logo'
 import { createClient } from '@/lib/supabase/client'
@@ -68,7 +68,6 @@ export default function NavMenu({ open, onClose }: Props) {
   const ui = UI_I18N[lang]
   const links = [
     { href: '/mappa',     label: ui.navMap,       icon: MapIcon },
-    { href: '/tipici',    label: ui.navTipici,    icon: ShoppingBasket },
     { href: '/operatori', label: ui.navOperators, icon: Store },
     { href: '/notizie',   label: ui.footerNews,   icon: Newspaper },
   ]
@@ -114,15 +113,15 @@ export default function NavMenu({ open, onClose }: Props) {
 
         {/* Search → /mappa?q= */}
         <div className="px-5 md:px-7 pt-5 flex-shrink-0">
-          <form onSubmit={submitSearch} className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted" aria-hidden="true" />
+          <form onSubmit={submitSearch} className="group relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted transition-colors group-focus-within:text-terracotta" aria-hidden="true" />
             <input
               autoFocus
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder={HOME_I18N[lang].searchPlaceholder}
               aria-label={HOME_I18N[lang].searchPlaceholder}
-              className="w-full pl-10 pr-3 py-3 bg-white border border-[#e0d7c1] rounded-xl text-[15px] focus:outline-none focus:border-alga"
+              className="w-full pl-11 pr-4 py-3 bg-white border border-[#e0d7c1] rounded-full text-[15px] focus:outline-none focus:border-terracotta transition-all duration-300 focus:shadow-[0_14px_28px_-16px_rgba(196,89,60,0.45)]"
             />
           </form>
         </div>

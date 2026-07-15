@@ -533,6 +533,13 @@ body {
 }
 @keyframes imk-knot-draw { to { stroke-dashoffset: 0; } }
 
+/* Nodo dei 3 box "cosa" (home): visibile di default, si ri-annoda entrando in
+   vista via .imk-drawin (aggiunta da IntersectionObserver). Reduced-motion:
+   niente JS → resta semplicemente visibile. */
+@keyframes imk-cosa-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.imk-cosa-nodo path { stroke-dasharray: 1; }
+.imk-cosa-nodo.imk-drawin path { animation: imk-cosa-draw 0.9s ease both; }
+
 /* Tratteggio incrociato — l'unica texture ammessa, sempre tenue.
    Velo per hero e post (alga) o momenti caldi (terracotta). */
 .mz-hatch {

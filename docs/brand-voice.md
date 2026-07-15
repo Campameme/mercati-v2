@@ -9,8 +9,8 @@
   Ponente" = naming precedente, in dismissione; "Riviera dei Fiori" torna a
   essere il cuore del nome, non solo descrittore).
 - Perimetro: **provincia di Imperia, da Ventimiglia a Diano/Cervo** — 8 zone
-  (`lib/markets/zones.ts`, IMPERIA_ZONE_SLUGS). Le zone di Savona restano nei
-  dati ma FUORI dalla comunicazione, per ora.
+  (`lib/markets/zones.ts`, IMPERIA_ZONE_SLUGS). Le zone di Savona sono state
+  rimosse del tutto, dati e codice (migrazione 0024_remove_savona).
 - Posizionamento: il mercato come **esperienza** — perché venirci (o tornarci),
   raccontato con storytelling, mai in modo funzionale. Valori: qualità vera,
   **sostenibilità, seconda mano, vicinanza al territorio**; per tutti — clienti

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import MarketExplorer from '@/components/home/MarketExplorer'
+import MappaExperience from '@/components/mappa/MappaExperience'
 import { loadPins } from '@/lib/markets/loadPins'
 import PageviewTracker from '@/components/analytics/PageviewTracker'
 
@@ -28,16 +28,14 @@ export default async function MappaPage({
       <PageviewTracker type="view_homepage" />
       {/* Cornice crema, ferma: l'esperienza vive nella mappa e nella lista
           (sistema Nodo × Mezzogiorno — niente sfondi animati). */}
-      <div className="bg-crema">
-        <MarketExplorer
-          pins={pins}
-          initialQuery={searchParams.q ?? ''}
-          initialZone={searchParams.zone ?? 'all'}
-          initialToday={initialToday}
-          initialDays={initialDays}
-          initialNear={searchParams.vicino === '1'}
-        />
-      </div>
+      <MappaExperience
+        pins={pins}
+        initialQuery={searchParams.q ?? ''}
+        initialZone={searchParams.zone ?? 'all'}
+        initialToday={initialToday}
+        initialDays={initialDays}
+        initialNear={searchParams.vicino === '1'}
+      />
     </>
   )
 }

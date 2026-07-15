@@ -80,7 +80,7 @@ export default function AderisciPage() {
               <div className="mt-7">
                 <a
                   href="#richiesta"
-                  className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-terracotta text-crema px-6 py-3.5 rounded-full hover:bg-terracotta-600 transition-colors"
+                  className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-alga text-crema px-6 py-3.5 rounded-full hover:bg-alga-600 transition-colors"
                 >
                   Chiedi di entrare <ArrowRight className="imk-march w-4 h-4" />
                 </a>

@@ -1,5 +1,5 @@
-// Selezione fotografica curata delle zone e dei borghi del Ponente
-// (province di Imperia e Savona). Ogni foto è stata scelta e verificata
+// Selezione fotografica curata delle zone e dei borghi della Riviera dei
+// Fiori (provincia di Imperia). Ogni foto è stata scelta e verificata
 // una per una perché rappresenti DAVVERO quel borgo o quel tratto di
 // costa — niente immagini a caso da API. File locali in public/zone/,
 // provenienza Wikimedia Commons con licenze libere: i crediti completi

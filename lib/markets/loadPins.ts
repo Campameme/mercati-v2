@@ -6,8 +6,8 @@ import type { MarketPin } from '@/components/home/types'
 /**
  * Carica i mercati attivi + le sessioni e li raggruppa in MarketPin (uno per
  * LUOGO fisico: mercato + comune + luogo). Condiviso tra la home e /mappa.
- * PERIMETRO: solo la Riviera dei Fiori (provincia di Imperia) — le zone di
- * Savona restano nel DB ma fuori da ogni interfaccia.
+ * PERIMETRO: solo la Riviera dei Fiori (provincia di Imperia). Il filtro
+ * IMPERIA_ZONE_SLUGS resta come guardia esplicita del perimetro.
  */
 export async function loadPins(): Promise<MarketPin[]> {
   const supabase = createClient()

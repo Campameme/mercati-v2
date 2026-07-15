@@ -9,7 +9,7 @@ import type { MarketPin, MarketSession } from './types'
 import { HOME_I18N, LANGS, type Lang } from '@/lib/i18n/home'
 import { useLang } from '@/lib/i18n/useLang'
 import { marketStatus, weekdaysOf, occursOn, fmtHour, type MarketStatus } from '@/lib/markets/hours'
-import { classifyMany, CATEGORY_COLOR, type ScheduleCategory } from '@/lib/schedules/classify'
+import { classifyMany, categoryLabelI18n, CATEGORY_COLOR, CATEGORY_ORDER, type ScheduleCategory } from '@/lib/schedules/classify'
 import { ZONES, ZONE_BY_SLUG, IMPERIA_ZONE_SLUGS } from '@/lib/markets/zones'
 import { haversineMeters } from '@/lib/markets/geo'
 import { HOME_COPY } from '@/lib/i18n/homeCopy'
@@ -24,6 +24,7 @@ const WD_FULL: Record<Lang, string[]> = {
 }
 const WD_ORDER = [1, 2, 3, 4, 5, 6, 0]
 const DAYS_LABEL: Record<Lang, string> = { it: 'Giorni', fr: 'Jours', de: 'Tage', en: 'Days' }
+const TIPO_LABEL: Record<Lang, string> = { it: 'Tipologie', fr: 'Types', de: 'Arten', en: 'Types' }
 const RESET_LABEL: Record<Lang, string> = { it: 'Azzera', fr: 'Effacer', de: 'Zurücksetzen', en: 'Clear' }
 // Striscia legenda: cosa indicano il pin e i due stati d'orario della lista.
 const LEGEND_I18N: Record<Lang, { pin: string; open: string; opens: string }> = {
@@ -129,13 +130,16 @@ interface Props {
   initialDays?: number[]
   /** dai chip della home: chiede subito la posizione e ordina per distanza */
   initialNear?: boolean
+  /** altezza del blocco mappa+lista; ridotta quando è incorporata in una pagina con contenuti sopra/sotto */
+  heightClass?: string
 }
 
-export default function MarketExplorer({ pins: allPins, initialQuery = '', initialZone = 'all', initialToday = false, initialDays = [], initialNear = false }: Props) {
+export default function MarketExplorer({ pins: allPins, initialQuery = '', initialZone = 'all', initialToday = false, initialDays = [], initialNear = false, heightClass = 'md:h-[calc(100svh-4rem)]' }: Props) {
   const [lang, setLang] = useLang()
   const [days, setDays] = useState<number[]>(initialDays)
   const [today, setToday] = useState(initialToday)
   const [openNow, setOpenNow] = useState(false)
+  const [cats, setCats] = useState<ScheduleCategory[]>([])
   const [recents, setRecents] = useState<string[]>([])
   const [zone, setZone] = useState<string>(initialZone && ZONE_BY_SLUG[initialZone] ? initialZone : 'all')
   const [sort, setSort] = useState<'az' | 'near'>('az')
@@ -175,12 +179,10 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
     return m
   }, [allPins])
 
-  // La mappa generale mostra SOLO i mercati settimanali (merci varie):
-  // antiquariato/produttori/artigianato vivono sulla mappa dei Mercati tipici.
-  const pins = useMemo(
-    () => allPins.filter((p) => meta.get(p.id)?.category === 'generale'),
-    [allPins, meta],
-  )
+  // Pagina unica "mercati + tematici": la mappa mostra TUTTE le tipologie.
+  // I principali (settimanali, 'generale') si distinguono per il pin più grande;
+  // il filtro Tipologie e i colori separano antiquariato/produttori/artigianato.
+  const pins = allPins
 
   const statuses = useMemo(() => {
     const map = new Map<string, MarketStatus>()
@@ -194,6 +196,7 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
   const filteredPins = useMemo(() => {
     return pins.filter((p) => {
       if (zone !== 'all' && p.marketSlug !== zone) return false
+      if (cats.length > 0 && !cats.includes(meta.get(p.id)?.category ?? 'generale')) return false
       if (openNow && statuses.get(p.id)?.state !== 'open') return false
       if (today || days.length > 0) {
         const okToday = today && now ? p.sessions.some((s) => occursOn(s.giorno, now)) : false
@@ -202,7 +205,7 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
       }
       return true
     })
-  }, [pins, zone, days, today, now, meta, openNow, statuses])
+  }, [pins, zone, cats, days, today, now, meta, openNow, statuses])
 
   const sortedPins = useMemo(() => {
     const arr = [...filteredPins]
@@ -297,9 +300,12 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
   function toggleDay(d: number) {
     setDays((s) => (s.includes(d) ? s.filter((x) => x !== d) : [...s, d]))
   }
+  function toggleCat(c: ScheduleCategory) {
+    setCats((s) => (s.includes(c) ? s.filter((x) => x !== c) : [...s, c]))
+  }
 
   return (
-    <div className="flex flex-col md:h-[calc(100svh-4rem)]">
+    <div className={`flex flex-col ${heightClass}`}>
       {/* band di testa: filo di brand in cima (crosshatch alga) */}
       <div className="mz-band" aria-hidden="true" />
       {/* ===== Barra controlli: NON sticky (prima, scorrendo, copriva le prime
@@ -433,6 +439,17 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
               {ZONES.filter((z) => (IMPERIA_ZONE_SLUGS as readonly string[]).includes(z.slug)).map((z) => <option key={z.slug} value={z.slug}>{z.name}</option>)}
             </select>
 
+            {/* Tipologie: principali (generale) + tematici (antiquariato/produttori/artigianato) */}
+            <FilterDropdown label={TIPO_LABEL[lang]} count={cats.length}>
+              {CATEGORY_ORDER.map((c) => (
+                <CheckRow key={c} checked={cats.includes(c)} onClick={() => toggleCat(c)} label={categoryLabelI18n(c, lang)} color={CATEGORY_COLOR[c]} />
+              ))}
+              {cats.length > 0 && (
+                <button onClick={() => setCats([])} className="w-full mt-1 px-2.5 py-1.5 text-left font-alt text-xs font-semibold text-ink-muted hover:text-ink">
+                  ✕ {RESET_LABEL[lang]}
+                </button>
+              )}
+            </FilterDropdown>
 
             <FilterDropdown label={DAYS_LABEL[lang]} count={dayCount}>
               <CheckRow checked={today} onClick={() => setToday((t) => !t)} label={dict.filters.today} />
@@ -462,9 +479,9 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
               </button>
             )}
 
-            {(zone !== 'all' || dayCount > 0 || openNow) && (
+            {(zone !== 'all' || dayCount > 0 || openNow || cats.length > 0) && (
               <button
-                onClick={() => { setZone('all'); setDays([]); setToday(false); setOpenNow(false) }}
+                onClick={() => { setZone('all'); setDays([]); setToday(false); setOpenNow(false); setCats([]) }}
                 className="font-alt text-xs font-semibold text-ink-muted hover:text-ink underline underline-offset-2"
               >
                 {RESET_LABEL[lang]}
@@ -474,10 +491,13 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
 
           {/* riga 3: striscia legenda — pin e stati d'orario, a colpo d'occhio */}
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pb-1 font-alt text-[11px] text-ink-soft">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: CATEGORY_COLOR.generale }} aria-hidden="true" />
-              {LEGEND_I18N[lang].pin}
-            </span>
+            {CATEGORY_ORDER.map((c) => (
+              <span key={c} className="inline-flex items-center gap-1.5">
+                <span className={`rounded-full flex-shrink-0 ${c === 'generale' ? 'w-3.5 h-3.5' : 'w-2.5 h-2.5'}`} style={{ background: CATEGORY_COLOR[c] }} aria-hidden="true" />
+                {categoryLabelI18n(c, lang)}
+              </span>
+            ))}
+            <span className="mx-0.5 w-px h-3 bg-ink/15 self-center" aria-hidden="true" />
             <span className="inline-flex items-center gap-1.5">
               <span className="w-4 h-2.5 rounded-full bg-alga flex-shrink-0" aria-hidden="true" />
               {LEGEND_I18N[lang].open}

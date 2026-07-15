@@ -9,13 +9,15 @@ import Logo, { LogoMark } from '@/components/Logo'
 import Bollino from '@/components/Bollino'
 import WaterCard from '@/components/motion/WaterCard'
 import BancoAvatar from '@/components/BancoAvatar'
-import { occursOn, isNonWeekly } from '@/lib/markets/hours'
+import { type StackPhoto } from '@/components/motion/PhotoStack'
+import PostItCollage from '@/components/motion/PostItCollage'
+import { occursOn, isNonWeekly, isOpenNow } from '@/lib/markets/hours'
 import { categoryLabel } from '@/lib/i18n/home'
 import { UI_I18N } from '@/lib/i18n/ui'
 import { classifySchedule, categoryLabelI18n, CATEGORY_COLOR, CATEGORY_COLOR_DARK } from '@/lib/schedules/classify'
 import type { MarketPin } from './types'
 import type { NewsItem } from '@/types/news'
-import type { LiveNewsItem } from '@/lib/news/live'
+import { IMPERIA_ZONE_SLUGS } from '@/lib/markets/zones'
 import { HOME_I18N, LANGS, type Lang } from '@/lib/i18n/home'
 import { HOME_COPY } from '@/lib/i18n/homeCopy'
 import { useLang } from '@/lib/i18n/useLang'
@@ -44,7 +46,7 @@ const DAYS_I18N: Record<Lang, string[]> = {
 }
 const DAY_PARAM = ['lun', 'mar', 'mer', 'gio', 'ven', 'sab', 'dom']
 const TODAY_SHORT: Record<Lang, string> = { it: 'oggi', fr: 'auj.', de: 'heute', en: 'today' }
-const TIPICI_TITLE: Record<Lang, string> = { it: 'Un’altra famiglia di mercati.', fr: 'Une autre famille de marchés.', de: 'Eine andere Familie von Märkten.', en: 'Another family of markets.' }
+const TIPICI_TITLE: Record<Lang, string> = { it: 'Non solo ogni settimana.', fr: 'Pas seulement chaque semaine.', de: 'Nicht nur jede Woche.', en: 'Not only every week.' }
 const TIPICI_LEAD: Record<Lang, string> = {
   it: 'C’è il mercato di ogni settimana, e poi ci sono i giorni speciali: l’antiquariato sotto i portici, i produttori in piazza, l’artigianato nelle sere d’estate. Sono le ricorrenze che scandiscono l’anno della Riviera — ognuna col suo colore.',
   fr: 'Il y a le marché de chaque semaine, et puis il y a les jours spéciaux : les antiquités sous les arcades, les producteurs sur la place, l’artisanat les soirs d’été. Ce sont les rendez-vous qui rythment l’année de la Riviera — chacun avec sa couleur.',
@@ -75,7 +77,17 @@ const WHAT_I18N: Record<Lang, { t: string; d: string }[]> = {
     { t: 'Extra services', d: 'The loyalty card, stall offers and perks reserved for those who live the market with us.' },
   ],
 }
-const APERTI: Record<Lang, string> = { it: 'aperti', fr: 'ouverts', de: 'geöffnet', en: 'open' }
+const APERTI_ORA: Record<Lang, string> = { it: 'Aperti ora', fr: 'Ouverts maintenant', de: 'Jetzt geöffnet', en: 'Open now' }
+// I 3 box "cosa" del progetto sono cliccabili verso sezioni diverse.
+const WHAT_HREFS = ['/operatori', '/mappa', '/tessera']
+// Foto per la pila trascinabile della sezione "Il progetto"
+const PROJECT_PHOTOS: StackPhoto[] = [
+  { src: '/zone/vita-piazza-mercato-sanremo-1880.webp', alt: 'Sanremo, la piazza del mercato a fine Ottocento', caption: 'Sanremo · 1880' },
+  { src: '/zone/vita-fiori-sanremo-1962.webp', alt: 'Il mercato dei fiori di Sanremo nel 1962', caption: 'Mercato dei fiori · 1962' },
+  { src: '/zone/vita-mercato-ventimiglia.webp', alt: 'Il mercato del venerdì a Ventimiglia', caption: 'Ventimiglia · il venerdì' },
+  { src: '/zone/vita-mercato-coperto-ventimiglia.webp', alt: 'L’interno del mercato coperto di Ventimiglia', caption: 'Il mercato coperto' },
+  { src: '/zone/vita-banco-verdure.webp', alt: 'Un banco di verdure al mercato, tra venditore e clienti', caption: 'Al banco' },
+]
 const RETE_I18N: Record<Lang, { pill: string; title: string; req: string[]; cta: string }> = {
   it: {
     pill: 'La rete', title: 'Hai un banco? Entra nella rete.',
@@ -105,7 +117,6 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
   const [query, setQuery] = useState('')
   const [operators, setOperators] = useState<HubOperator[]>([])
   const [news, setNews] = useState<NewsItem[]>([])
-  const [liveNews, setLiveNews] = useState<LiveNewsItem[]>([])
   const heroRef = useRef<HTMLDivElement>(null)
   const oggiRef = useRef<HTMLSpanElement>(null)
 
@@ -139,12 +150,22 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
     return out.filter((t) => (seen.has(t.id) ? false : (seen.add(t.id), true))).slice(0, 3)
   }, [pins])
 
-  // I comuni dove OGGI c'è davvero mercato (contatore dell'hero).
-  const todayComuni = useMemo(() => {
+  // I mercati di OGGI e quelli APERTI ORA. Il contatore dell'hero deve dire il
+  // vero: se ci sono banchi aperti adesso mostra quelli (time-aware), altrimenti
+  // ripiega sui mercati che si tengono oggi.
+  const live = useMemo(() => {
     const now = new Date()
-    const set = new Set<string>()
-    for (const p of pins) if (p.sessions.some((s) => occursOn(s.giorno, now))) set.add(p.comune)
-    return Array.from(set).sort((a, b) => a.localeCompare(b, 'it'))
+    const today = new Set<string>()
+    const openNow = new Set<string>()
+    for (const p of pins) {
+      for (const s of p.sessions) {
+        if (!occursOn(s.giorno, now)) continue
+        today.add(p.comune)
+        if (isOpenNow(now, s.giorno, s.orario)) openNow.add(p.comune)
+      }
+    }
+    const isOpen = openNow.size > 0
+    return { isOpen, count: isOpen ? openNow.size : today.size }
   }, [pins])
 
   // Indice del giorno di oggi (0 = lunedì) per le chips dei giorni.
@@ -153,7 +174,6 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
   useEffect(() => {
     fetch('/api/operators?all=1').then((r) => r.json()).then((j) => setOperators(Array.isArray(j?.data) ? j.data : [])).catch(() => {})
     fetch('/api/news?all=1').then((r) => r.json()).then((j) => setNews(Array.isArray(j?.data) ? j.data : [])).catch(() => {})
-    fetch('/api/news/live').then((r) => r.json()).then((j) => setLiveNews(Array.isArray(j?.data) ? j.data : [])).catch(() => {})
   }, [])
 
   // Hero: ingresso cinetico del contenuto (transform-only → sempre leggibile).
@@ -170,15 +190,15 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
     return () => ctx.revert()
   }, [])
 
-  // Conta-su del numero "Oggi al mercato".
+  // Conta-su del numero dell'hero.
   useEffect(() => {
     const el = oggiRef.current
-    if (!el || !todayComuni.length) return
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) { el.textContent = String(todayComuni.length); return }
+    if (!el || !live.count) return
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) { el.textContent = String(live.count); return }
     const obj = { v: 0 }
-    const tw = gsap.to(obj, { v: todayComuni.length, duration: 1, ease: 'power2.out', onUpdate: () => { el.textContent = String(Math.round(obj.v)) } })
+    const tw = gsap.to(obj, { v: live.count, duration: 1, ease: 'power2.out', onUpdate: () => { el.textContent = String(Math.round(obj.v)) } })
     return () => { tw.kill() }
-  }, [todayComuni.length])
+  }, [live.count])
 
   // Reveal d'ingresso delle sezioni + parallasse leggera sulle foto.
   useEffect(() => {
@@ -199,6 +219,27 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
   }, [])
 
   const headlineWords = copy.heroHeadline.split(' ')
+
+  // Notizie: SOLO quelle interne dei comuni della provincia di Imperia (più le
+  // globali). Niente più stampa esterna: gli articoli arrivano dalle pagine dei
+  // singoli comuni.
+  const imperiaNews = useMemo(
+    () => news.filter((n) => !n.markets?.slug || (IMPERIA_ZONE_SLUGS as readonly string[]).includes(n.markets.slug)),
+    [news],
+  )
+
+  // Il nodo dei 3 box "cosa" si annoda quando il box entra in vista (scroll).
+  useEffect(() => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+    const nodi = Array.from(document.querySelectorAll('.imk-cosa-nodo'))
+    if (!nodi.length) return
+    const io = new IntersectionObserver(
+      (entries) => { for (const e of entries) if (e.isIntersecting) { e.target.classList.add('imk-drawin'); io.unobserve(e.target) } },
+      { threshold: 0.5 },
+    )
+    nodi.forEach((n) => io.observe(n))
+    return () => io.disconnect()
+  }, [])
 
   function submitSearch(e: FormEvent) {
     e.preventDefault()
@@ -244,12 +285,12 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
               </h1>
               <p data-anim className="mt-6 max-w-xl text-lg text-ink-soft leading-relaxed">{copy.heroSubtitle}</p>
               <form data-anim onSubmit={submitSearch} className="mt-8 flex flex-col sm:flex-row gap-2.5 max-w-xl">
-                <div className="relative flex-1 min-w-0 bg-white text-ink border border-[#e0d7c1] rounded-xl shadow-[0_12px_26px_-18px_rgba(38,36,30,0.5)] focus-within:border-alga">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-muted z-10" aria-hidden="true" />
+                <div className="group relative flex-1 min-w-0 bg-white text-ink border border-[#e0d7c1] rounded-full shadow-[0_12px_26px_-18px_rgba(38,36,30,0.5)] transition-all duration-300 focus-within:border-terracotta focus-within:shadow-[0_18px_36px_-18px_rgba(196,89,60,0.5)] focus-within:-translate-y-0.5">
+                  <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-muted z-10 transition-colors group-focus-within:text-terracotta" aria-hidden="true" />
                   <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={typed} aria-label={dict.searchPlaceholder}
-                    className="w-full pl-12 pr-4 py-4 bg-transparent rounded-xl text-[16px] focus:outline-none" />
+                    className="w-full pl-[3.25rem] pr-5 py-4 bg-transparent rounded-full text-[16px] focus:outline-none" />
                 </div>
-                <button type="submit" className="group imk-lift inline-flex items-center justify-center gap-2 font-alt font-semibold text-sm bg-terracotta text-crema px-6 py-4 rounded-xl hover:bg-terracotta-600 transition-colors flex-shrink-0">
+                <button type="submit" className="group imk-lift inline-flex items-center justify-center gap-2 font-alt font-semibold text-sm bg-terracotta text-crema px-7 py-4 rounded-full hover:bg-terracotta-600 transition-all duration-200 active:scale-95 flex-shrink-0">
                   {copy.searchCta} <ArrowRight className="imk-march w-4 h-4" />
                 </button>
               </form>
@@ -270,9 +311,9 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
                   </Link>
                 ))}
               </div>
-              {todayComuni.length > 0 && (
+              {live.count > 0 && (
                 <Link data-anim href="/mappa?d=oggi" className="group mt-5 inline-flex items-baseline gap-2 font-alt text-sm font-semibold text-terracotta-600 hover:text-terracotta">
-                  <span>{copy.heroChips.today}: <span ref={oggiRef} className="font-display font-extrabold text-xl text-ink">{todayComuni.length}</span> {APERTI[lang]}</span>
+                  <span>{live.isOpen ? APERTI_ORA[lang] : copy.heroChips.today}: <span ref={oggiRef} className="font-display font-extrabold text-xl text-ink">{live.count}</span></span>
                   <ArrowRight className="w-4 h-4 self-center group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
                 </Link>
               )}
@@ -316,46 +357,39 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
       <section id="perche" className="relative overflow-hidden bg-crema-2">
         <div aria-hidden="true" className="mz-band absolute top-0 inset-x-0" />
         <div className="relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-6xl">
-          <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-16 items-center">
-            <div className="home-reveal relative overflow-hidden rounded-2xl border border-[#e0d7c1] shadow-lg aspect-[4/5] hidden sm:block">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                data-plx
-                src="/zone/vita-piazza-mercato-sanremo-1880.webp"
-                alt="Sanremo, la piazza del mercato a fine Ottocento"
-                loading="lazy"
-                className="absolute inset-0 w-full h-full object-cover scale-110 will-change-transform"
-              />
-              <span className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink/70 to-transparent pointer-events-none" aria-hidden="true" />
-              <span className="absolute left-4 bottom-3 font-alt italic text-sm text-crema/90">Sanremo, piazza del mercato — fine Ottocento</span>
-            </div>
+          <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-16 items-center">
             <div className="home-reveal">
-              <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-terracotta mb-2">{copy.liguria.eyebrow}</p>
-              <h2 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">{copy.liguria.title}</h2>
-              <div className="mt-7 space-y-5 max-w-xl">
-                {copy.liguria.beats.map((b) => (
-                  <p key={b.t} className="text-base md:text-lg text-ink-soft leading-relaxed">
-                    <span className="font-alt italic font-semibold text-terracotta">{b.t}.</span> {b.d}
-                  </p>
-                ))}
+              <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-terracotta mb-3">{copy.liguria.eyebrow}</p>
+              <h2 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl lg:text-[3.4rem] leading-[1.04] text-ink">
+                {copy.liguria.title.split(', ')[0]},{' '}
+                <span className="text-terracotta">{copy.liguria.title.split(', ').slice(1).join(', ')}</span>
+              </h2>
+              <p className="mt-6 max-w-xl text-lg text-ink-soft leading-relaxed">{copy.liguria.beats[0].d}</p>
+              <div className="mt-8">
+                <Link href="/mappa?vicino=1" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-terracotta text-crema px-6 py-3.5 rounded-full hover:bg-terracotta-600 transition-colors">
+                  {copy.heroChips.near} <ArrowRight className="imk-march w-4 h-4" />
+                </Link>
               </div>
+            </div>
+            <div className="home-reveal mb-6 lg:mb-0">
+              <PostItCollage photos={PROJECT_PHOTOS} />
             </div>
           </div>
 
           {/* Il "cosa" del progetto: percorso di qualità, operatori a portata, servizi in più */}
-          <div className="home-reveal mt-12 md:mt-14 grid sm:grid-cols-3 gap-5 md:gap-6">
-            {WHAT_I18N[lang].map((w) => (
-              <div key={w.t} className="flex flex-col gap-2 bg-crema rounded-2xl border border-[#e0d7c1] p-5 md:p-6 shadow-[0_16px_30px_-24px_rgba(38,36,30,0.45)]">
-                <LogoMark className="w-8 h-7 text-terracotta" capo={false} />
-                <h3 className="font-display font-extrabold tracking-tight text-lg md:text-xl leading-tight text-ink">{w.t}</h3>
+          <div className="home-reveal mt-14 md:mt-16 grid sm:grid-cols-3 gap-5 md:gap-6">
+            {WHAT_I18N[lang].map((w, i) => (
+              <Link
+                key={w.t}
+                href={WHAT_HREFS[i] ?? '/mappa'}
+                className="imk-cosa group imk-lift flex flex-col gap-2 bg-crema rounded-2xl border border-[#e0d7c1] p-5 md:p-6 shadow-[0_16px_30px_-24px_rgba(38,36,30,0.45)] hover:border-terracotta/50 transition-colors"
+              >
+                <LogoMark className="w-8 h-7 text-terracotta imk-cosa-nodo" capo={false} />
+                <h3 className="font-display font-extrabold tracking-tight text-lg md:text-xl leading-tight text-ink group-hover:text-terracotta transition-colors">{w.t}</h3>
                 <p className="text-[15px] text-ink-soft leading-relaxed">{w.d}</p>
-              </div>
+                <ArrowRight className="w-4 h-4 text-terracotta mt-1 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" aria-hidden="true" />
+              </Link>
             ))}
-          </div>
-          <div className="home-reveal mt-8">
-            <Link href="/mappa?vicino=1" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-alga text-crema px-6 py-3.5 rounded-full hover:bg-alga-600 transition-colors">
-              {copy.heroChips.near} <ArrowRight className="imk-march w-4 h-4" />
-            </Link>
           </div>
         </div>
       </section>
@@ -371,7 +405,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
           {prossimiTipici.length > 0 && (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {prossimiTipici.map((t) => (
-                <Link key={t.id} href="/tipici" className="imk-lift group flex flex-col bg-white rounded-xl border border-[#e0d7c1] overflow-hidden">
+                <Link key={t.id} href="/mappa" className="imk-lift group flex flex-col bg-white rounded-xl border border-[#e0d7c1] overflow-hidden">
                   <span aria-hidden="true" className="mz-band" style={{ ['--band' as string]: CATEGORY_COLOR[t.cat] }} />
                   <span className="p-5">
                     <span className="block font-display font-extrabold tracking-tight text-2xl leading-none" style={{ color: CATEGORY_COLOR_DARK[t.cat] }}>
@@ -388,7 +422,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
             </div>
           )}
           <div className="mt-8">
-            <Link href="/tipici" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-terracotta text-crema px-6 py-3.5 rounded-full hover:bg-terracotta-600 transition-colors">
+            <Link href="/mappa" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-terracotta text-crema px-6 py-3.5 rounded-full hover:bg-terracotta-600 transition-colors">
               <CalendarDays className="w-4 h-4" /> {TIPICI_CTA[lang]} <ArrowRight className="imk-march w-4 h-4" />
             </Link>
           </div>
@@ -408,7 +442,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
               </h2>
               <p className="mt-4 text-base md:text-lg text-ink-soft leading-relaxed">{copy.operatorsLead}</p>
               <div className="mt-7">
-                <Link href="/operatori" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-terracotta text-crema px-6 py-3.5 rounded-full hover:bg-terracotta-600 transition-colors">
+                <Link href="/operatori" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-alga text-crema px-6 py-3.5 rounded-full hover:bg-alga-600 transition-colors">
                   <Store className="w-4 h-4" /> {copy.operatorsCta} <ArrowRight className="imk-march w-4 h-4" />
                 </Link>
               </div>
@@ -493,14 +527,14 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
           <p className="inline-flex items-center gap-2 font-alt text-xs font-bold uppercase tracking-[0.16em] text-crema/70 mb-4">
             <Newspaper className="w-4 h-4" aria-hidden="true" /> {copy.newsColTitle}
           </p>
-          {news.length === 0 && liveNews.length === 0 ? (
+          {imperiaNews.length === 0 ? (
             <WaterCard className="px-6 py-9 text-center max-w-xl">
               <p className="font-display font-extrabold text-xl text-alga">{copy.newsEmpty}</p>
               <p className="mt-2 text-sm text-ink-soft">{copy.newsEmptyLead}</p>
             </WaterCard>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-              {news.slice(0, 4).map((n) => (
+              {imperiaNews.slice(0, 4).map((n) => (
                 <WaterCard key={n.id} className="p-5">
                   <span className="font-alt text-xs font-semibold uppercase tracking-[0.1em] text-alga">
                     {fmtDate(n.publish_from)}{n.markets?.name ? ` · ${n.markets.name}` : ''}
@@ -508,16 +542,6 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
                   <h3 className="font-display font-extrabold tracking-tight text-lg text-ink leading-tight mt-1.5">{n.title}</h3>
                   {n.content && <p className="mt-1.5 text-sm text-ink-soft leading-snug line-clamp-2">{n.content}</p>}
                 </WaterCard>
-              ))}
-              {liveNews.slice(0, Math.max(0, 4 - news.length)).map((n) => (
-                <a key={n.link} href={n.link} target="_blank" rel="noopener noreferrer" className="block">
-                  <WaterCard className="p-5 hover:border-alga/60 transition-colors">
-                    <span className="font-alt text-xs font-semibold uppercase tracking-[0.1em] text-alga">
-                      {n.publishedAt ? fmtDate(n.publishedAt) : ''}{n.source ? ` · ${n.source}` : ''} ↗
-                    </span>
-                    <h3 className="font-display font-extrabold tracking-tight text-lg text-ink leading-tight mt-1.5 line-clamp-2">{n.title}</h3>
-                  </WaterCard>
-                </a>
               ))}
             </div>
           )}

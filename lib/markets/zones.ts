@@ -103,85 +103,13 @@ export const ZONES: ZoneMeta[] = [
       'Da qui saliva la Via del Sale, e i mercati restano il cuore dei paesi della Valle Arroscia: il martedì a Pieve di Teco — borgo fondato nel 1233 proprio per il commercio — i banchi stanno sotto i portici medievali; il venerdì tocca a Pontedassio, la domenica si sale al Colle di Nava, tra i campi di lavanda.',
     accent: '#8E5BB5',
   },
-
-  // ---- Provincia di Savona (da Andora a Varazze) ---------------------------
-  {
-    slug: 'baia-del-sole',
-    name: 'Baia del Sole',
-    borghi: ['Andora', 'Laigueglia', 'Alassio'],
-    carattere:
-      'Il sabato i banchi arrivano a due passi dal “budello” di Alassio, la via del passeggio dietro la spiaggia; a Laigueglia si vendeva il corallo, oggi il venerdì si fa il mercato.',
-    story:
-      'La baia della sabbia fine ha i suoi riti: il sabato il mercato di Alassio accanto al budello e al Muretto delle firme, il venerdì i banchi nel centro storico di Laigueglia, il lunedì Andora lungo via Cavour. E il primo sabato del mese, sotto i portici di piazza Santa Maria ad Andora, tornano antiquari e artigiani.',
-    accent: '#C2502E',
-  },
-  {
-    slug: 'albenganese',
-    name: 'Piana di Albenga',
-    borghi: ['Albenga', 'Ceriale', 'Borghetto Santo Spirito', 'Toirano'],
-    carattere:
-      'La città delle cento torri e la piana degli ortaggi: asparago violetto, carciofo e trombette riempiono ogni mattina i banchi dei produttori in piazza del Popolo.',
-    story:
-      'Qui il mercato nasce nei campi: la piana di Albenga coltiva gli ortaggi di mezza Liguria, e i produttori vendono ogni mattina in piazza del Popolo, sotto le torri medievali. Il mercoledì il grande mercato ingauno, il lunedì i banchi sul lungomare di Ceriale, il martedì Borghetto, il giovedì Toirano, il paese delle grotte preistoriche.',
-    accent: '#4C8B3F',
-  },
-  {
-    slug: 'loano-pietra',
-    name: 'Loano e Pietra',
-    borghi: ['Loano', 'Pietra Ligure', 'Borgio Verezzi'],
-    carattere:
-      'Mercati quasi ogni giorno tra il porto doriano di Loano e la piazza della basilica di Pietra; l’ultima domenica del mese, l’antiquariato invade il centro storico pietrese.',
-    story:
-      'Tra il porto turistico di Loano e la grande piazza di San Nicolò a Pietra Ligure c’è un mercato quasi ogni giorno: il venerdì a Loano, il sabato a Pietra, il martedì a Borgio Verezzi sotto le borgate saracene di pietra rosa. L’ultima domenica del mese l’antiquariato riempie piazze e carruggi di Pietra; d’estate, a Loano, spunta perfino il mercatino dei libri.',
-    accent: '#15607C',
-  },
-  {
-    slug: 'finalese',
-    name: 'Finalese',
-    borghi: ['Finale Ligure', 'Noli', 'Spotorno'],
-    carattere:
-      'Il lunedì il mercato entra tra le mura di Finalborgo, capitale dei Del Carretto; a Noli, repubblica marinara per cinque secoli, le domeniche si alternano artigiani e antiquari.',
-    story:
-      'Ogni rione ha il suo giorno: il lunedì il mercato tra le mura quattrocentesche di Finalborgo, il giovedì alla Marina e a Noli — che fu repubblica marinara indipendente per cinque secoli — il martedì a Spotorno davanti all’isola di Bergeggi. Il primo weekend del mese Finalborgo si riempie di antiquariato; a Noli le domeniche si dividono tra artigiani e antiquari.',
-    accent: '#8E5BB5',
-  },
-  {
-    slug: 'savonese',
-    name: 'Savona e le Albisole',
-    borghi: ['Savona', 'Vado Ligure', 'Albissola Marina', 'Albisola Superiore', 'Celle Ligure', 'Varazze'],
-    carattere:
-      'Il lunedì le vie del centro di Savona diventano un mercato lungo un chilometro, all’ombra del Priamar; nelle Albisole, patria della ceramica, i banchi stanno accanto alle fornaci.',
-    story:
-      'Il lunedì Savona chiude le vie del centro e le consegna ai banchi, dal Priamar alla torretta del Brandale: è il mercato più lungo del Ponente. Nelle Albisole — dove la ceramica si cuoce dal Cinquecento e il lungomare è un mosaico d’artista — si va il martedì e il mercoledì, il venerdì a Celle Ligure. Il primo weekend del mese, l’antiquariato in via Paleocapa, sotto i portici.',
-    accent: '#15607C',
-  },
-  {
-    slug: 'val-bormida',
-    name: 'Val Bormida',
-    borghi: ['Cairo Montenotte', 'Millesimo', 'Carcare', 'Altare', 'Cengio', 'Dego', 'Mallare', 'Murialdo', 'Calizzano', 'Bardineto', 'Giusvalla'],
-    carattere:
-      'Oltre il colle del Melogno l’aria sa di Langa: mercati di valle a Cairo e Millesimo, il paese del ponte-torre della Gaietta e del tartufo.',
-    story:
-      'Qui la Liguria guarda al Piemonte: boschi di castagne, porcini e tartufi, e mercati che servono le valli. Il giovedì a Cairo Montenotte, il borgo murato della prima vittoria di Napoleone; il sabato a Millesimo, sotto il ponte-torre della Gaietta; il mercoledì a Carcare. Il secondo sabato del mese, a Cairo, i Mercati della Terra dei produttori di valle; ad Altare, il paese dei vetrai, si va il venerdì.',
-    accent: '#C2502E',
-  },
-  {
-    slug: 'beigua',
-    name: 'Beigua e valle Orba',
-    borghi: ['Sassello', 'Urbe', 'Pontinvrea'],
-    carattere:
-      'Il paese degli amaretti e le frazioni del parco del Beigua: mercati d’altura tra faggete e aria fina.',
-    story:
-      'Dentro il parco del Beigua i mercati sono un presidio di montagna: il mercoledì a Sassello — il borgo degli amaretti morbidi, prima Bandiera Arancione d’Italia — il giovedì tra le frazioni di Urbe, nell’alta valle dell’Orba. Le ultime domeniche del mese i banchi tornano in piazza San Rocco, e a Ferragosto l’antiquariato sale a Pontinvrea.',
-    accent: '#4C8B3F',
-  },
 ]
 
 export const ZONE_BY_SLUG: Record<string, ZoneMeta> = Object.fromEntries(ZONES.map((z) => [z.slug, z]))
 
-// Le zone della provincia di IMPERIA (le prime, seed 0007). La gestione
-// operatori lavora per ora solo su queste; le zone di Savona (0019) restano
-// fuori dall'assegnazione finché non le riattiviamo.
+// Le 8 zone della provincia di IMPERIA (seed 0007): sono le uniche esistenti.
+// Le zone della provincia di Savona (ex seed 0019) sono state rimosse del tutto,
+// sia dai dati sia dal codice (migrazione 0024_remove_savona).
 export const IMPERIA_ZONE_SLUGS = [
   'ventimiglia', 'val-nervia', 'bordighera-ospedaletti', 'sanremo',
   'taggia-e-costa', 'imperia', 'golfo-dianese', 'entroterra',

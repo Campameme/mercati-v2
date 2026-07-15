@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Store, Newspaper, Calendar, Cloud, ArrowRight, ChevronLeft } from 'lucide-react'
+import { Store, Newspaper, Cloud, ArrowRight, ChevronLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { formatMarketDays } from '@/lib/markets/days'
 import { slugifyName } from '@/lib/markets/slug'
@@ -110,7 +110,6 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
 
   const features = [
     { href: `/${marketFull.slug}/operators`, label: ui.featBanchi,   icon: Store },
-    { href: `/${marketFull.slug}/calendar`,  label: ui.featCalendar, icon: Calendar },
     { href: `/${marketFull.slug}/news`,      label: ui.featNews,     icon: Newspaper },
     { href: `/${marketFull.slug}/weather`,   label: ui.featWeather,  icon: Cloud },
   ]
@@ -244,9 +243,6 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                 <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-1">{ui.zoneLocalCalendar}</p>
                 <h2 className="font-display font-extrabold tracking-tight text-3xl md:text-4xl text-ink">{ui.zoneMarketsTitle}</h2>
               </div>
-              <Link href={`/${marketFull.slug}/calendar`} className="font-alt text-xs font-semibold text-alga-600 hover:text-terracotta underline underline-offset-2">
-                {ui.zoneFullCalendar}
-              </Link>
             </Reveal>
 
             <ul>

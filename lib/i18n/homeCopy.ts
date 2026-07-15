@@ -70,11 +70,9 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     exploreMapCta: 'Apri la mappa',
     liguria: {
       eyebrow: 'Il progetto',
-      title: 'Riportare la gente al mercato.',
+      title: 'Ogni settimana, vicino a casa.',
       beats: [
-        { stat: '', statLabel: '', t: 'Un’eredità', d: 'Il venerdì di Ventimiglia, i fiori di Sanremo, i portici di Pieve di Teco: qui il mercato non è un’abitudine, è un’eredità che passa di mano ogni settimana, da secoli. Eppure ogni anno qualche banco non riapre, e la piazza fa un po’ più di eco.' },
-        { stat: '', statLabel: '', t: 'Una promessa', d: 'Noi non ci stiamo. Abbiamo messo tutta la Riviera dei Fiori in un posto solo — i giorni, le piazze, le persone — perché tornare al mercato sia semplice come chiedersi: dov’è il banco, oggi? Il più vicino te lo dice la mappa.' },
-        { stat: '', statLabel: '', t: 'Una stretta di mano', d: 'E per chi il banco lo monta all’alba c’è una porta aperta: la tua storia raccontata a chi arriva apposta per te, e una rete che dà valore a chi lavora bene.' },
+        { stat: '', statLabel: '', t: '', d: 'Il mercato torna in piazza in ogni comune, nel suo giorno di sempre: la spesa di stagione a due passi da casa, dal banco di chi la porta. Il più vicino te lo dice la mappa.' },
       ],
     },
     valueProject: {
@@ -126,11 +124,9 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     exploreMapCta: 'Ouvrir la carte',
     liguria: {
       eyebrow: 'Le projet',
-      title: 'Ramener les gens au marché.',
+      title: 'Chaque semaine, près de chez soi.',
       beats: [
-        { stat: '', statLabel: '', t: 'Un héritage', d: 'Le vendredi de Vintimille, les fleurs de Sanremo, les arcades de Pieve di Teco : ici le marché n’est pas une habitude, c’est un héritage qui passe de main en main chaque semaine, depuis des siècles. Pourtant, chaque année, un étal ne rouvre pas, et la place résonne un peu plus.' },
-        { stat: '', statLabel: '', t: 'Une promesse', d: 'Nous ne nous y résignons pas. Nous avons réuni toute la Riviera dei Fiori en un seul endroit — les jours, les places, les gens — pour que revenir au marché soit aussi simple que se demander : où est l’étal, aujourd’hui ? Le plus proche, la carte te le dit.' },
-        { stat: '', statLabel: '', t: 'Une poignée de main', d: 'Et pour qui monte l’étal à l’aube, une porte est ouverte : ton histoire racontée à qui vient exprès pour toi, et un réseau qui donne de la valeur à qui travaille bien.' },
+        { stat: '', statLabel: '', t: '', d: 'Le marché revient sur la place dans chaque commune, à son jour de toujours : les courses de saison à deux pas de chez soi, à l’étal de qui les apporte. Le plus proche, la carte te le dit.' },
       ],
     },
     valueProject: {
@@ -182,11 +178,9 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     exploreMapCta: 'Karte öffnen',
     liguria: {
       eyebrow: 'Das Projekt',
-      title: 'Die Leute zurück auf den Markt bringen.',
+      title: 'Jede Woche, gleich um die Ecke.',
       beats: [
-        { stat: '', statLabel: '', t: 'Ein Erbe', d: 'Der Freitag von Ventimiglia, die Blumen von Sanremo, die Arkaden von Pieve di Teco: Hier ist der Markt keine Gewohnheit, sondern ein Erbe, das seit Jahrhunderten jede Woche weitergegeben wird. Und doch öffnet jedes Jahr ein Stand nicht mehr, und der Platz hallt ein wenig mehr.' },
-        { stat: '', statLabel: '', t: 'Ein Versprechen', d: 'Wir finden uns damit nicht ab. Wir haben die ganze Riviera dei Fiori an einen Ort gebracht — die Tage, die Plätze, die Menschen — damit der Weg zurück zum Markt so einfach ist wie die Frage: Wo ist heute der Stand? Den nächsten zeigt dir die Karte.' },
-        { stat: '', statLabel: '', t: 'Ein Handschlag', d: 'Und für alle, die den Stand im Morgengrauen aufbauen, steht eine Tür offen: deine Geschichte, erzählt denen, die eigens für dich kommen, und ein Netz, das gute Arbeit belohnt.' },
+        { stat: '', statLabel: '', t: '', d: 'Der Markt kehrt in jeder Gemeinde auf den Platz zurück, an seinem gewohnten Tag: der saisonale Einkauf gleich um die Ecke, am Stand derer, die ihn bringen. Den nächsten zeigt dir die Karte.' },
       ],
     },
     valueProject: {
@@ -238,11 +232,9 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     exploreMapCta: 'Open the map',
     liguria: {
       eyebrow: 'The project',
-      title: 'Bringing people back to the market.',
+      title: 'Every week, close to home.',
       beats: [
-        { stat: '', statLabel: '', t: 'An inheritance', d: 'Ventimiglia’s Friday, Sanremo’s flowers, the arcades of Pieve di Teco: here the market isn’t a habit, it’s an inheritance handed down every week, for centuries. And yet every year a stall doesn’t reopen, and the square echoes a little more.' },
-        { stat: '', statLabel: '', t: 'A promise', d: 'We won’t accept that. We’ve gathered the whole Riviera dei Fiori in one place — the days, the squares, the people — so that coming back to the market is as simple as asking: where’s the stall today? The map tells you the nearest one.' },
-        { stat: '', statLabel: '', t: 'A handshake', d: 'And for those who set up at dawn, there’s an open door: your story told to people who come on purpose for you, and a network that rewards those who work well.' },
+        { stat: '', statLabel: '', t: '', d: 'The market returns to the square in every town, on its usual day: seasonal shopping a stone’s throw from home, at the stall of the people who bring it. The map tells you the nearest one.' },
       ],
     },
     valueProject: {

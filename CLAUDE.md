@@ -11,8 +11,8 @@ Next.js 14 App Router + Supabase + Tailwind + GSAP/Lenis + Leaflet. Produzione =
 branch `main` → **deploy automatico su Vercel** (mercatidiponente.it); Netlify
 (mercati-fiere.netlify.app) collegato ma legacy. Rebrand "Nodo × Mezzogiorno" in
 corso su `redesign/esperienza-riviera-fiori` (nome precedente "Mercati della
-Riviera di Ponente" ancora presente dove non migrato; le zone di Savona restano
-nei dati ma fuori dalla comunicazione).
+Riviera di Ponente" ancora presente dove non migrato; la provincia di Savona è
+stata rimossa del tutto, dati e codice, con la migrazione 0024_remove_savona).
 
 ## Regole di copy (del proprietario — non negoziabili)
 - MAI slogan da agenzia, mai il brief come testo di pagina ("gli ambulanti sono il

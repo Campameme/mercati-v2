@@ -69,7 +69,7 @@ export async function fetchLiveNews(query: string, limit = 6): Promise<LiveNewsI
 
 /** Bacheca generale della Riviera di Ponente. */
 export function generalNewsQuery(): string {
-  return 'mercato settimanale (Liguria OR Imperia OR Savona)'
+  return 'mercato settimanale (Imperia OR "Riviera dei Fiori" OR Ponente ligure)'
 }
 
 /** Query per le notizie di UNA zona: i suoi comuni in OR. */

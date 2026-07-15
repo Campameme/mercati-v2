@@ -13,7 +13,6 @@ export default function Footer() {
         <span className="text-ink-muted/70">{ui.footerTagline}</span>
         <span className="flex-1" />
         <Link href="/mappa" className="hover:text-alga transition-colors">{ui.navMap}</Link>
-        <Link href="/tipici" className="hover:text-alga transition-colors">{ui.navTipici}</Link>
         <Link href="/operatori" className="hover:text-alga transition-colors">{ui.navOperators}</Link>
         <Link href="/notizie" className="hover:text-alga transition-colors">{ui.footerNews}</Link>
         <Link href="/aderisci" className="hover:text-alga transition-colors">{ui.footerJoin}</Link>
