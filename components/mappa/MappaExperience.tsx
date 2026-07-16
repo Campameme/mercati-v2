@@ -55,7 +55,6 @@ interface Copy {
   famEyebrow: string
   famTitle: string
   famLead: string
-  seeOnMap: string
   principali: Omit<FamilyCard, 'color'>
   tematici: Omit<FamilyCard, 'color'>
 }
@@ -73,7 +72,6 @@ const COPY: Record<Lang, Copy> = {
     famEyebrow: 'Tutti sulla stessa mappa',
     famTitle: 'Principali e tematici.',
     famLead: 'Il grande mercato settimanale di merci varie, e i giorni speciali con la loro ricorrenza — sulla stessa mappa.',
-    seeOnMap: 'Vedi sulla mappa',
     principali: { photo: '/zone/vita-mercato-sanremo-banchi.webp', alt: 'I banchi del mercato settimanale, pieni di gente sotto i tendoni', label: 'Mercati principali', desc: 'Ogni settimana, in piazza: alimentari, abbigliamento, casa. Il mercato di sempre, comune per comune.' },
     tematici: { photo: '/zone/vita-antiquariato-piazza.webp', alt: 'Il mercatino dell’antiquariato in piazza', label: 'Mercati tematici', desc: 'Antiquariato, produttori a km0, artigianato: ricorrenze mensili e stagionali, ognuna col suo giorno.' },
   },
@@ -89,7 +87,6 @@ const COPY: Record<Lang, Copy> = {
     famEyebrow: 'Tous sur la même carte',
     famTitle: 'Principaux et thématiques.',
     famLead: 'Le grand marché hebdomadaire tout-venant, et les jours spéciaux avec leur rendez-vous — sur la même carte.',
-    seeOnMap: 'Voir sur la carte',
     principali: { photo: '/zone/vita-mercato-sanremo-banchi.webp', alt: 'Les étals du marché hebdomadaire, pleins de monde sous les parasols', label: 'Marchés principaux', desc: 'Chaque semaine, sur la place : alimentation, vêtements, maison. Le marché de toujours, commune par commune.' },
     tematici: { photo: '/zone/vita-antiquariato-piazza.webp', alt: 'La brocante sur la place', label: 'Marchés thématiques', desc: 'Antiquités, producteurs locaux, artisanat : rendez-vous mensuels et saisonniers, chacun son jour.' },
   },
@@ -105,7 +102,6 @@ const COPY: Record<Lang, Copy> = {
     famEyebrow: 'Alle auf einer Karte',
     famTitle: 'Haupt- und Themenmärkte.',
     famLead: 'Der große Wochenmarkt mit Allerlei und die besonderen Tage mit ihrem Termin — auf derselben Karte.',
-    seeOnMap: 'Auf der Karte zeigen',
     principali: { photo: '/zone/vita-mercato-sanremo-banchi.webp', alt: 'Die Stände des Wochenmarkts, voller Leute unter den Planen', label: 'Hauptmärkte', desc: 'Jede Woche auf dem Platz: Lebensmittel, Kleidung, Haushalt. Der Markt wie immer, Gemeinde für Gemeinde.' },
     tematici: { photo: '/zone/vita-antiquariato-piazza.webp', alt: 'Der Antiquitätenmarkt auf dem Platz', label: 'Themenmärkte', desc: 'Antiquitäten, Erzeuger, Handwerk: monatliche und saisonale Termine, jeder an seinem Tag.' },
   },
@@ -121,7 +117,6 @@ const COPY: Record<Lang, Copy> = {
     famEyebrow: 'All on one map',
     famTitle: 'Main and themed.',
     famLead: 'The big weekly general market, and the special days with their recurrence — on the same map.',
-    seeOnMap: 'See on the map',
     principali: { photo: '/zone/vita-mercato-sanremo-banchi.webp', alt: 'The weekly market stalls, crowded under the awnings', label: 'Main markets', desc: 'Every week, in the square: food, clothing, home. The market as always, town by town.' },
     tematici: { photo: '/zone/vita-antiquariato-piazza.webp', alt: 'The antiques market in the square', label: 'Themed markets', desc: 'Antiques, local growers, crafts: monthly and seasonal dates, each on its own day.' },
   },
@@ -154,18 +149,16 @@ export default function MappaExperience(props: Props) {
       {/* 1. Concept — impersonale, a beneficio di chi cerca il mercato */}
       <section className="relative overflow-hidden bg-crema-2">
         <div aria-hidden="true" className="mz-band absolute top-0 inset-x-0" />
-        <div className="relative z-10 container mx-auto px-4 md:px-6 py-12 md:py-16 max-w-6xl grid lg:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-14 items-center">
+        <div className="relative z-10 container mx-auto px-4 md:px-6 py-10 md:py-12 max-w-6xl grid lg:grid-cols-[1.25fr_0.75fr] gap-10 lg:gap-16 items-center">
           <div>
             <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-3">{c.eyebrow}</p>
             <h1 className="font-display font-extrabold tracking-[-0.02em] text-ink text-[8.5vw] leading-[1.05] md:text-5xl lg:text-[3.4rem]">
               {c.title} <span className="text-alga">{c.titleAccent}</span>
             </h1>
             <p className="mt-5 max-w-xl text-base md:text-lg text-ink-soft leading-relaxed">{c.lead}</p>
-            <a href="#mappa" className="group imk-lift mt-7 inline-flex items-center gap-2 font-alt font-semibold text-sm bg-terracotta text-crema px-6 py-3.5 rounded-full hover:bg-terracotta-600 transition-colors">
-              {c.seeOnMap} <ArrowRight className="imk-march w-4 h-4" />
-            </a>
           </div>
-          <div className="mx-auto w-full max-w-sm lg:max-w-none mb-10 lg:mb-0">
+          {/* La pila di foto respira piccola sul lato: la mappa è subito sotto. */}
+          <div className="mx-auto w-full max-w-[15rem] md:max-w-[17rem] mb-8 lg:mb-0">
             <PhotoStack photos={INTRO_PHOTOS} aspect="aspect-[4/5]" />
           </div>
         </div>

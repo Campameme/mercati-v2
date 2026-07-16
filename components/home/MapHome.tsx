@@ -191,6 +191,14 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
       gsap.from(root.querySelectorAll('[data-word]'), { yPercent: 120, rotate: 4, stagger: 0.06, duration: 0.85, ease: 'back.out(1.4)', clearProps: 'transform' })
       gsap.from(root.querySelectorAll('[data-anim]'), { y: 16, duration: 0.6, stagger: 0.08, delay: 0.2, ease: 'power3.out', clearProps: 'transform' })
       gsap.from(root.querySelectorAll('[data-chip]'), { y: 14, scale: 0.9, stagger: 0.05, delay: 0.55, duration: 0.5, ease: 'back.out(1.6)', clearProps: 'transform' })
+      // Il nodo del logo: la CSS lo disegna al primo paint (spesso prima che
+      // l'occhio arrivi lì). Lo riavviamo qui, insieme all'ingresso dell'hero,
+      // così lo si vede davvero annodarsi.
+      root.querySelectorAll<SVGPathElement>('.imk-hero-knot path').forEach((p) => {
+        p.style.animation = 'none'
+        void p.getBoundingClientRect()
+        p.style.animation = ''
+      })
     }, heroRef)
     return () => ctx.revert()
   }, [])
@@ -260,20 +268,17 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
       {/* ===== HERO (proposta B "L'Intreccio") — crema + tratteggio tenue,
            contenuto a sinistra, collage fotografico a destra. ===== */}
       <section ref={heroRef} className="relative min-h-[92svh] flex flex-col overflow-hidden bg-crema text-ink">
+        {/* Header dell'hero: solo il logo (che si annoda) e le lingue.
+            Niente altre voci: il menu completo arriva con la barra allo scroll. */}
         <div className="relative z-10 container mx-auto px-4 md:px-6 pt-7 flex items-center justify-between gap-3 flex-wrap">
-          <div data-anim><Logo inline className="text-ink" /></div>
-          <div data-anim className="flex items-center gap-3">
-            <div className="flex gap-1">
-              {LANGS.map((l) => (
-                <button key={l} onClick={() => setLang(l)} aria-pressed={lang === l}
-                  className={`text-xs font-bold uppercase px-2.5 py-1 rounded-md border-2 transition-colors ${lang === l ? 'bg-ink text-crema border-ink' : 'text-ink border-ink/20 hover:border-ink'}`}>
-                  {l}
-                </button>
-              ))}
-            </div>
-            <Link href="/aderisci" className="hidden sm:inline-flex font-alt font-semibold text-sm bg-alga text-crema px-4 py-1.5 rounded-full hover:bg-alga-600 transition-colors">
-              {rete.pill}
-            </Link>
+          <div data-anim><Logo inline className="text-ink text-[1.15rem]" markClassName="imk-hero-knot !w-10 !h-8" /></div>
+          <div data-anim className="flex gap-1">
+            {LANGS.map((l) => (
+              <button key={l} onClick={() => setLang(l)} aria-pressed={lang === l}
+                className={`text-xs font-bold uppercase px-2.5 py-1 rounded-md border-2 transition-colors ${lang === l ? 'bg-ink text-crema border-ink' : 'text-ink border-ink/20 hover:border-ink'}`}>
+                {l}
+              </button>
+            ))}
           </div>
         </div>
 

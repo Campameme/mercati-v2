@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Store, Newspaper, Cloud, ArrowRight, ChevronLeft } from 'lucide-react'
+import { Store, Newspaper, Cloud, ArrowRight, ChevronLeft, ParkingSquare, Navigation2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { formatMarketDays } from '@/lib/markets/days'
 import { slugifyName } from '@/lib/markets/slug'
@@ -10,6 +10,8 @@ import { ZONE_BY_SLUG } from '@/lib/markets/zones'
 import { ZONES_I18N } from '@/lib/markets/zones.i18n'
 import { getLang } from '@/lib/i18n/getLang'
 import { UI_I18N } from '@/lib/i18n/ui'
+import { HOME_I18N } from '@/lib/i18n/home'
+import { nearestParkings } from '@/lib/markets/parkings'
 import ZoneImage from '@/components/ZoneImage'
 import Reveal from '@/components/Reveal'
 import MarketViewer from '@/components/MarketViewer'
@@ -85,7 +87,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
   if (!marketFull) notFound()
 
   // Sulla mappa di zona solo i mercati settimanali (i tipici hanno la loro
-  // mappa su /tipici); l'elenco sotto resta completo.
+  // mappa dedicata su /mappa); l'elenco sotto resta completo.
   const mapPins = (schedules ?? [])
     .filter((s) => s.lat != null && s.lng != null && classifySchedule(s.settori) === 'generale')
     .map((s: any) => ({
@@ -113,6 +115,17 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
     { href: `/${marketFull.slug}/news`,      label: ui.featNews,     icon: Newspaper },
     { href: `/${marketFull.slug}/weather`,   label: ui.featWeather,  icon: Cloud },
   ]
+
+  // Parcheggi vicini, comune per comune (dati OSM statici in lib/markets/parkings).
+  const home = HOME_I18N[lang]
+  const parkingByComune = (schedules ?? [])
+    .filter((s) => s.lat != null && s.lng != null)
+    .reduce<Array<{ comune: string; spots: ReturnType<typeof nearestParkings> }>>((acc, s) => {
+      if (acc.some((x) => x.comune === s.comune)) return acc
+      const spots = nearestParkings(s.lat as number, s.lng as number, s.comune, 3)
+      if (spots.length > 0) acc.push({ comune: s.comune, spots })
+      return acc
+    }, [])
 
   return (
     <div>
@@ -275,6 +288,51 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                 )
               })}
             </ul>
+          </section>
+        )}
+
+        {/* Parcheggi — sotto i banchi: dove lasciare l'auto, comune per comune */}
+        {parkingByComune.length > 0 && (
+          <section className="py-12 md:py-16 border-t border-[#e0d7c1]">
+            <Reveal className="mb-8">
+              <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-1">{ui.zoneParkingNote}</p>
+              <h2 className="font-display font-extrabold tracking-tight text-3xl md:text-4xl text-ink">{home.parking}</h2>
+            </Reveal>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {parkingByComune.map(({ comune, spots }, i) => (
+                <Reveal key={comune} delayMs={Math.min(i, 5) * 60}>
+                  <div className="bg-white rounded-xl border border-[#e0d7c1] overflow-hidden h-full">
+                    <span aria-hidden="true" className="mz-band block" />
+                    <div className="p-4">
+                      <h3 className="flex items-center gap-2 font-display font-extrabold tracking-tight text-lg text-ink leading-tight mb-2.5">
+                        <ParkingSquare className="w-5 h-5 text-alga flex-shrink-0" aria-hidden="true" /> {comune}
+                      </h3>
+                      <ul className="divide-y divide-ink/10">
+                        {spots.map((p, j) => (
+                          <li key={j}>
+                            <a
+                              href={`https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="group flex items-center justify-between gap-3 py-2.5"
+                            >
+                              <span className="min-w-0">
+                                <span className="block font-alt font-semibold text-sm text-ink leading-snug group-hover:text-alga-600 transition-colors">{p.name}</span>
+                                <span className="block text-xs text-ink-muted mt-0.5">
+                                  {p.distance} m
+                                  {p.fee != null && <> · {p.fee ? home.paidParking : home.freeParking}</>}
+                                </span>
+                              </span>
+                              <Navigation2 className="w-4 h-4 text-ink-muted group-hover:text-terracotta flex-shrink-0 transition-colors" aria-hidden="true" />
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
           </section>
         )}
 

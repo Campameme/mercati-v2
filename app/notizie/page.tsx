@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, Newspaper } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
-import { fetchLiveNews, generalNewsQuery } from '@/lib/news/live'
 import { PostItNote } from '@/components/motion/PostItCollage'
 import WaveDivider from '@/components/motion/WaveDivider'
 
@@ -42,7 +41,6 @@ export default async function NotiziePage() {
     .order('publish_from', { ascending: false })
     .limit(60)
   const news = (data ?? []) as unknown as NewsRow[]
-  const live = await fetchLiveNews(generalNewsQuery(), 8)
 
   return (
     <div className="bg-crema min-h-[70vh]">
@@ -54,7 +52,7 @@ export default async function NotiziePage() {
               Notizie dalla Riviera
             </h1>
             <p className="mt-3 text-base text-ink-soft">
-              La bacheca della Riviera dei Fiori: le ultime dalla stampa e dai comuni, più gli avvisi ufficiali dei mercati.
+              Gli avvisi ufficiali dei mercati e dei comuni della provincia di Imperia: spostamenti, orari straordinari, comunicazioni.
             </p>
           </div>
           <div aria-hidden="true" className="hidden md:block absolute right-2 -top-2 w-36 pointer-events-none">
@@ -62,32 +60,6 @@ export default async function NotiziePage() {
           </div>
           <WaveDivider className="mt-8 text-alga/25" />
         </div>
-
-        {/* Bacheca generale: notizie vive dalla stampa e dai siti dei comuni */}
-        {live.length > 0 && (
-          <section className="mb-12">
-            <h2 className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-ink-muted mb-4">La bacheca della Riviera</h2>
-            <div className="bg-white rounded-xl border border-[#e0d7c1] overflow-hidden">
-              <span aria-hidden="true" className="mz-band block" style={{ ['--band' as string]: '#46683B' }} />
-              <ul className="divide-y divide-ink/10">
-                {live.map((n) => (
-                  <li key={n.link}>
-                    <a href={n.link} target="_blank" rel="noopener noreferrer" className="group flex items-baseline justify-between gap-4 py-3.5 px-4 md:px-5 hover:bg-crema transition-colors">
-                      <span className="min-w-0">
-                        <span className="block font-alt font-semibold text-[15px] text-ink leading-snug group-hover:text-alga-600 transition-colors">{n.title}</span>
-                        <span className="block text-xs text-ink-muted mt-1">
-                          {n.source ?? ''}
-                          {n.publishedAt ? ` · ${fmtDate(n.publishedAt)}` : ''}
-                        </span>
-                      </span>
-                      <span className="text-ink-muted group-hover:text-alga-600 flex-shrink-0">↗</span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-        )}
 
         <h2 className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-ink-muted mb-4">Avvisi ufficiali dei mercati</h2>
 

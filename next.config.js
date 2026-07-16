@@ -16,8 +16,9 @@ const nextConfig = {
   // piattaforma: i parcheggi vivono sulla mappa (dati statici OSM, niente Google).
   async redirects() {
     return [
-      { source: '/eventi', destination: '/tipici', permanent: true },
-      { source: '/calendar', destination: '/tipici', permanent: true },
+      { source: '/eventi', destination: '/mappa', permanent: true },
+      { source: '/calendar', destination: '/mappa', permanent: true },
+      { source: '/tipici', destination: '/mappa', permanent: true },
       { source: '/parcheggi', destination: '/mappa', permanent: true },
       { source: '/:marketSlug/parking', destination: '/:marketSlug', permanent: true },
     ]

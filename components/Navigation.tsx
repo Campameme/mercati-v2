@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Menu, Shield, LogIn } from 'lucide-react'
-import WeatherWidget from './WeatherWidget'
 import Logo from './Logo'
 import NavMenu from './NavMenu'
 import LangSwitcher from './LangSwitcher'
@@ -61,11 +60,11 @@ export default function Navigation() {
     return () => { active = false }
   }, [pathname])
 
-  // Sulla home la barra è nascosta sopra l'hero (che ha il suo logo) e
-  // ricompare scivolando quando si scrolla oltre: la "bussola di ritorno".
+  // Sulla home la barra è nascosta finché si sta fermi sull'hero (che ha il
+  // suo logo) e scivola dentro appena si scrolla: la "bussola di ritorno".
   useEffect(() => {
     if (!isHome) { setPastHero(false); return }
-    const onScroll = () => setPastHero(window.scrollY > window.innerHeight * 0.7)
+    const onScroll = () => setPastHero(window.scrollY > 80)
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
@@ -90,7 +89,6 @@ export default function Navigation() {
             {/* Right: lingua + weather + quick admin + auth + menu (icona, ultima a destra) */}
             <div className="flex items-center gap-2">
               <LangSwitcher />
-              <div className="hidden sm:block"><WeatherWidget /></div>
               {(role === 'super_admin' || role === 'market_admin') && marketSlug && (
                 <Link
                   href={`/${marketSlug}/admin`}

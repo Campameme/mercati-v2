@@ -144,35 +144,29 @@ export default function WeatherWidget() {
     return <Cloud className="w-5 h-5 text-ink-muted" />
   }
 
-  if (dismissed) return null
-
-  if (loading || !weather) {
-    return (
-      <div className="flex items-center gap-1 rounded-full border-2 border-ink/10 bg-white pl-2.5 pr-1 py-1">
-        <Cloud className="w-4 h-4 text-ink-muted animate-pulse" />
-        <span className="text-xs text-ink-muted tabular-nums">--°</span>
-        <button onClick={dismiss} aria-label="Nascondi meteo" className="grid place-items-center w-5 h-5 rounded-full text-ink-muted hover:bg-ink/5 hover:text-ink">
-          <X className="w-3.5 h-3.5" />
-        </button>
-      </div>
-    )
-  }
+  // Niente segnaposto: l'icona compare in basso a sinistra quando i dati
+  // ci sono. Si aggiorna da sola cambiando pagina/mercato e ogni 30 minuti.
+  if (dismissed || loading || !weather) return null
 
   return (
     <>
-      {/* Widget Icona */}
-      <div className="flex items-center gap-0.5 rounded-full border-2 border-ink/10 bg-white pr-1">
+      {/* Icona meteo flottante, in basso a sinistra su tutte le pagine */}
+      <div className="group fixed bottom-4 left-4 z-40 flex items-center rounded-full border border-[#e0d7c1] bg-white/95 backdrop-blur shadow-[0_14px_30px_-18px_rgba(38,36,30,0.55)]">
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full hover:bg-crema-2/50 transition-colors"
-          title={`Meteo ${owmName || location || 'Mercato'} — previsioni indicative`}
+          className="flex items-center gap-1.5 pl-3 pr-2.5 py-2 rounded-full hover:bg-crema-2/60 transition-colors"
+          title={`Meteo ${owmName || location || 'Riviera dei Fiori'} — previsioni indicative`}
+          aria-label={`Meteo ${owmName || location || 'Riviera dei Fiori'}: ${Math.round(weather.current.temperature)} gradi, ${weather.current.condition}`}
         >
           {getWidgetIcon(weather.current.condition, weather.current.icon)}
           <span className="text-sm font-semibold text-ink tabular-nums">
             {Math.round(weather.current.temperature)}°
           </span>
+          <span className="hidden md:block max-w-0 overflow-hidden whitespace-nowrap font-alt text-xs text-ink-muted transition-all duration-300 group-hover:max-w-[10rem] group-hover:pl-0.5">
+            {owmName || location || 'Riviera'}
+          </span>
         </button>
-        <button onClick={dismiss} aria-label="Nascondi meteo" className="grid place-items-center w-6 h-6 rounded-full text-ink-muted hover:bg-ink/5 hover:text-ink">
+        <button onClick={dismiss} aria-label="Nascondi meteo" className="hidden group-hover:grid place-items-center w-6 h-6 mr-1 rounded-full text-ink-muted hover:bg-ink/5 hover:text-ink">
           <X className="w-3.5 h-3.5" />
         </button>
       </div>

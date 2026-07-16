@@ -1,7 +1,8 @@
-# Setup Mercati della Riviera di Ponente
+# Setup — I Mercati della Riviera dei Fiori
 
-Guida ai mercati da **Ventimiglia a Varazze** (province di Imperia e Savona): 15 zone,
-pagine comune con descrizioni curate, mercati tipici con ricorrenze, mappa unificata.
+Guida ai mercati settimanali della **provincia di Imperia, da Ventimiglia a
+Diano/Cervo**: 8 zone, pagine comune con descrizioni curate, mercati tematici
+con ricorrenze, mappa unificata con calendario.
 
 ## 1. Installazione
 ```
@@ -19,10 +20,11 @@ npm install
    - `SUPABASE_DB_URL` (*Project Settings → Database → Connection string → URI*)
 3. Copia `.env.local.example` → `.env.local` e riempi i valori.
 4. Applica le migrazioni: `npm run migrate` (idempotente: applica in ordine
-   `supabase/migrations/0001…0019` e poi `supabase/seed.sql`).
+   `supabase/migrations/0001…` e poi `supabase/seed.sql`).
    - `0007` seeda le 8 zone della provincia di Imperia (41 sessioni).
-   - `0019` seeda le 7 zone della provincia di Savona (83 sessioni, generate da
-     `mercatini_della_provincia_di_savona.xls`).
+   - `0024` rimuove la provincia di Savona (presente solo storicamente).
+   - `0025` aggiunge il ruolo `news_editor` (la redazione) e lo stato
+     bozza/pubblicata delle notizie.
 5. (Opzionale) Affina le coordinate dei luoghi: `node scripts/geocode-schedules.mjs --dry`
    e poi senza `--dry`. Richiede una chiave Google con **Geocoding API** abilitata
    (`GOOGLE_PLACES_API_KEY` o `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`).
@@ -38,10 +40,13 @@ npm install
    ```
 4. Rientra da `/login` → verrai reindirizzato a `/admin/markets`.
 
-## 4. Deploy su Netlify
-- Aggiungi le stesse env vars nel dashboard Netlify (*Site settings → Environment variables*),
-  anche per il contesto **branch deploy** se usi i branch.
-- Push su `main`: il plugin `@netlify/plugin-nextjs` costruisce automaticamente.
+Per un **redattore notizie** (accesso solo alla redazione `/redazione`):
+stesso giro, ma `role = 'news_editor'`.
+
+## 4. Deploy
+- **Produzione = Vercel** (mercatidiponente.it): push su `main` → deploy
+  automatico. Env vars nel dashboard Vercel.
+- Netlify (mercati-fiere.netlify.app) è collegato ma **legacy**.
 
 ## 5. Contenuti curati (dove si modificano)
 - **Zone** (nome, borghi, carattere, racconto): `lib/markets/zones.ts`
@@ -51,7 +56,10 @@ npm install
 - **Regole operative**: `CLAUDE.md` · **voce**: `docs/brand-voice.md` · **grafica**: `docs/brand-system.md`
 
 ## 6. Sezioni del sito
-- `/` home · `/mappa` esplora (solo merci varie) · `/tipici` mercati tipici con
-  mappa e calendario propri (`/eventi` e `/calendar` reindirizzano qui)
-- `/{zona}` pagina zona · `/{zona}/c/{comune}` pagina comune ("Scegli un giorno" + vicini)
-- `/notizie` bacheca (DB + stampa live) · `/operatori` i Maestri · `/crediti` crediti foto
+- `/` home · `/mappa` tutti i mercati (principali + tematici) con toggle
+  Mappa ⇄ Calendario (`/eventi`, `/calendar` e il vecchio `/tipici`
+  reindirizzano qui)
+- `/{zona}` pagina zona (con parcheggi) · `/{zona}/c/{comune}` pagina comune
+- `/notizie` avvisi ufficiali dei mercati e dei comuni (dal DB, via la redazione)
+- `/operatori` i banchi di fiducia · `/aderisci` entra nella rete · `/crediti` crediti foto
+- `/redazione` gestione notizie (news_editor / super_admin)

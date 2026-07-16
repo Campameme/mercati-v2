@@ -2,6 +2,7 @@
 
 import Navigation from '@/components/Navigation'
 import NotificationProvider from '@/components/NotificationProvider'
+import WeatherWidget from '@/components/WeatherWidget'
 import { ReactNode } from 'react'
 
 interface ProvidersProps {
@@ -13,6 +14,8 @@ export default function Providers({ children }: ProvidersProps) {
     <NotificationProvider>
       <Navigation />
       {children}
+      {/* Il meteo vive in basso a sinistra, su tutte le pagine */}
+      <WeatherWidget />
     </NotificationProvider>
   )
 }

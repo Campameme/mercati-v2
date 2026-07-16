@@ -208,6 +208,17 @@ export default function UnifiedMap({
     [allPins, selectedId],
   )
 
+  // Icone dei pin MEMOIZZATE per riferimento: react-leaflet confronta
+  // `props.icon` per identità e a ogni riferimento nuovo rifà `setIcon` →
+  // Leaflet riscrive l'innerHTML del marker. Con i re-render continui del
+  // typewriter della ricerca, il nodo premuto spariva tra mousedown e mouseup
+  // e il primo click sui pin si perdeva (serviva "cliccare due volte").
+  const iconById = useMemo(() => {
+    const m = new Map<string, ReturnType<typeof pinIcon>>()
+    for (const pin of allPins) m.set(pin.id, pinIcon(pin, pin.id === selectedId))
+    return m
+  }, [allPins, selectedId])
+
   const wrapperClass = bare
     ? 'h-full w-full overflow-hidden imk-map'
     : 'rounded-sm overflow-hidden border border-ink/15 bg-white'
@@ -254,7 +265,7 @@ export default function UnifiedMap({
 
         {/* Markers — icona banco unica */}
         {allPins.map((pin) => {
-          const icon = pinIcon(pin, pin.id === selectedId)
+          const icon = iconById.get(pin.id)!
           return (
             <Marker
               key={`pin-${pin.kind}-${pin.id}`}
