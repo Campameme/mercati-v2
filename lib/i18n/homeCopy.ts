@@ -66,7 +66,7 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     heroSubtitle: 'Da Ventimiglia a Diano c’è un mercato quasi ogni giorno. Cose buone di stagione, gente che conosci per nome, la spesa che torna a essere un piacere: la Riviera dei Fiori, banco per banco.',
     heroScrollCue: 'Il progetto',
     heroChips: { today: 'Oggi al mercato', near: 'Vicino a me', saturday: 'Sabato' },
-    searchExamples: ['Cerca un prodotto…', 'Cerca un ambulante…', 'Cerca una zona…', 'Cerca un mercato di oggi…', 'Cerca l’artigianato…'],
+    searchExamples: ['le zucchine più buone', 'tendaggi per la casa di qualità', 'pantaloni da lavoro', 'mercati vicino Bordighera', 'mercati tipici', 'Claudia, abbigliamento'],
     exploreMapCta: 'Apri la mappa',
     liguria: {
       eyebrow: 'Il progetto',
@@ -120,7 +120,7 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     heroSubtitle: 'De Vintimille à Diano, il y a un marché presque chaque jour. De bonnes choses de saison, des gens qu’on connaît par leur nom, des courses qui redeviennent un plaisir : la Riviera dei Fiori, étal par étal.',
     heroScrollCue: 'Le projet',
     heroChips: { today: 'Aujourd’hui au marché', near: 'Près de moi', saturday: 'Samedi' },
-    searchExamples: ['Cherche un produit…', 'Cherche un marchand…', 'Cherche une zone…', 'Cherche un marché d’aujourd’hui…', 'Cherche l’artisanat…'],
+    searchExamples: ['les meilleures courgettes', 'des rideaux pour la maison', 'pantalons de travail', 'marchés près de Bordighera', 'marchés typiques', 'Claudia, vêtements'],
     exploreMapCta: 'Ouvrir la carte',
     liguria: {
       eyebrow: 'Le projet',
@@ -174,7 +174,7 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     heroSubtitle: 'Von Ventimiglia bis Diano ist fast jeden Tag irgendwo Markt. Gutes der Saison, Menschen, die man beim Namen kennt, Einkaufen, das wieder Freude macht: die Riviera dei Fiori, Stand für Stand.',
     heroScrollCue: 'Das Projekt',
     heroChips: { today: 'Heute am Markt', near: 'In meiner Nähe', saturday: 'Samstag' },
-    searchExamples: ['Suche ein Produkt…', 'Suche einen Händler…', 'Suche eine Zone…', 'Suche einen Markt heute…', 'Suche Handwerk…'],
+    searchExamples: ['die besten Zucchini', 'Vorhänge für zu Hause', 'Arbeitshosen', 'Märkte bei Bordighera', 'typische Märkte', 'Claudia, Kleidung'],
     exploreMapCta: 'Karte öffnen',
     liguria: {
       eyebrow: 'Das Projekt',
@@ -228,7 +228,7 @@ export const HOME_COPY: Record<Lang, HomeCopy> = {
     heroSubtitle: 'From Ventimiglia to Diano there’s a market almost every day. Good things in season, people you know by name, shopping that becomes a pleasure again: the Riviera dei Fiori, stall by stall.',
     heroScrollCue: 'The project',
     heroChips: { today: 'Today at the market', near: 'Near me', saturday: 'Saturday' },
-    searchExamples: ['Search a product…', 'Search a vendor…', 'Search an area…', 'Search a market today…', 'Search the crafts…'],
+    searchExamples: ['the best courgettes', 'curtains for the home', 'work trousers', 'markets near Bordighera', 'typical markets', 'Claudia, clothing'],
     exploreMapCta: 'Open the map',
     liguria: {
       eyebrow: 'The project',

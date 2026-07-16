@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
   if (wantsAll) {
     let q = supabase
       .from('operators')
-      .select('id, name, category, description, stall_number, location_lat, location_lng, photos, languages, payment_methods, social_links, rating, market_id, schedule_id, markets(slug, name, city), operator_schedules(schedule_id, location_lat, location_lng, stall_number, market_schedules(id, comune, giorno, luogo, market_id))')
+      .select('id, name, category, description, stall_number, location_lat, location_lng, photos, languages, payment_methods, social_links, rating, market_id, schedule_id, markets(slug, name, city), operator_schedules(schedule_id, location_lat, location_lng, stall_number, market_schedules(id, comune, giorno, luogo, market_id)), products(name)')
     if (category && category !== 'all') q = q.eq('category', category)
     const s = search ? cleanSearch(search) : ''
     if (s) q = q.or(`name.ilike.%${s}%,description.ilike.%${s}%,stall_number.ilike.%${s}%`)
@@ -81,6 +81,7 @@ export async function GET(request: NextRequest) {
         stallNumber: op.stall_number ?? '',
       },
       rating: op.rating ?? undefined,
+      products: (op.products ?? []).map((p: any) => p.name).filter(Boolean),
       market: op.markets ? { id: op.market_id, slug: op.markets.slug, name: op.markets.name, city: op.markets.city } : null,
       schedules: (op.operator_schedules ?? []).map((os: any) => ({
         scheduleId: os.schedule_id,

@@ -39,6 +39,7 @@ interface HubOperator {
   name: string
   category: string
   description?: string
+  products?: string[]
   market: { slug: string; name: string } | null
   schedules: Array<{ comune: string | null }>
 }
@@ -221,6 +222,7 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
         name: o.name,
         category: o.category,
         description: o.description,
+        products: o.products ?? [],
         marketSlug: o.market?.slug ?? null,
         comuni: (o.schedules ?? []).map((s) => s.comune).filter((c): c is string => !!c),
       })),
