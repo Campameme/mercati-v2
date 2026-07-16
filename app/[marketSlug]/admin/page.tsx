@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Store, Newspaper, CalendarDays, ArrowRight, MapPin, Map as MapPinIcon } from 'lucide-react'
+import { Store, Newspaper, ArrowRight, MapPin, Map as MapPinIcon } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { classifySchedule, CATEGORY_COLOR } from '@/lib/schedules/classify'
 
@@ -57,7 +57,6 @@ export default async function MarketAdminHome({ params }: { params: { marketSlug
   const cards: Array<{ href: string; icon: any; title: string; desc: string }> = [
     { href: `/${market.slug}/admin/operators`, icon: Store,        title: 'Tutti i banchi',    desc: `${operatorsCount ?? 0} totali — gestisci l'elenco della zona.` },
     { href: `/${market.slug}/admin/news`,      icon: Newspaper,    title: 'News e avvisi',     desc: 'Pubblica notizie con finestra temporale.' },
-    { href: `/${market.slug}/admin/events`,    icon: CalendarDays, title: 'Eventi',            desc: 'Crea eventi con categoria e orario.' },
   ]
 
   const placeRows: PlaceRow[] = (places ?? []) as any

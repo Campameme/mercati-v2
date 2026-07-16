@@ -19,7 +19,7 @@ import { classifySchedule, categoryLabelI18n, CATEGORY_COLOR, CATEGORY_COLOR_DAR
 import type { MarketPin } from './types'
 import type { NewsItem } from '@/types/news'
 import { IMPERIA_ZONE_SLUGS } from '@/lib/markets/zones'
-import { HOME_I18N, LANGS, type Lang } from '@/lib/i18n/home'
+import { HOME_I18N, type Lang } from '@/lib/i18n/home'
 import { HOME_COPY } from '@/lib/i18n/homeCopy'
 import { useLang } from '@/lib/i18n/useLang'
 import { useTypewriter } from '@/lib/useTypewriter'
@@ -118,7 +118,7 @@ const RETE_I18N: Record<Lang, { pill: string; title: string; req: string[]; cta:
 
 export default function MapHome({ pins }: { pins: MarketPin[] }) {
   const router = useRouter()
-  const [lang, setLang] = useLang()
+  const [lang] = useLang()
   const [query, setQuery] = useState('')
   const [operators, setOperators] = useState<HubOperator[]>([])
   const [news, setNews] = useState<NewsItem[]>([])
@@ -268,18 +268,10 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
       {/* ===== HERO (proposta B "L'Intreccio") — crema + tratteggio tenue,
            contenuto a sinistra, collage fotografico a destra. ===== */}
       <section ref={heroRef} className="relative min-h-[92svh] flex flex-col overflow-hidden bg-crema text-ink">
-        {/* Header dell'hero: solo il logo (che si annoda) e le lingue.
-            Niente altre voci: il menu completo arriva con la barra allo scroll. */}
-        <div className="relative z-10 container mx-auto px-4 md:px-6 pt-7 flex items-center justify-between gap-3 flex-wrap">
-          <div data-anim><Logo inline className="text-ink text-[1.15rem]" markClassName="imk-hero-knot !w-10 !h-8" /></div>
-          <div data-anim className="flex gap-1">
-            {LANGS.map((l) => (
-              <button key={l} onClick={() => setLang(l)} aria-pressed={lang === l}
-                className={`text-xs font-bold uppercase px-2.5 py-1 rounded-md border-2 transition-colors ${lang === l ? 'bg-ink text-crema border-ink' : 'text-ink border-ink/20 hover:border-ink'}`}>
-                {l}
-              </button>
-            ))}
-          </div>
+        {/* Header dell'hero: solo il logo, che si annoda al load. Nient'altro —
+            la lingua e il menu completo arrivano con la barra allo scroll. */}
+        <div className="relative z-10 container mx-auto px-4 md:px-6 pt-7">
+          <div data-anim className="inline-block"><Logo inline className="text-ink text-[1.15rem]" markClassName="imk-hero-knot !w-10 !h-8" /></div>
         </div>
 
         <div className="relative z-10 flex-1 flex items-center">

@@ -149,16 +149,16 @@ export default function MappaExperience(props: Props) {
       {/* 1. Concept — impersonale, a beneficio di chi cerca il mercato */}
       <section className="relative overflow-hidden bg-crema-2">
         <div aria-hidden="true" className="mz-band absolute top-0 inset-x-0" />
-        <div className="relative z-10 container mx-auto px-4 md:px-6 py-10 md:py-12 max-w-6xl grid lg:grid-cols-[1.25fr_0.75fr] gap-10 lg:gap-16 items-center">
-          <div>
+        <div className="relative z-10 container mx-auto px-4 md:px-6 py-8 md:py-10 max-w-6xl flex flex-col sm:flex-row items-center gap-6 sm:gap-10">
+          <div className="flex-1">
             <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-3">{c.eyebrow}</p>
             <h1 className="font-display font-extrabold tracking-[-0.02em] text-ink text-[8.5vw] leading-[1.05] md:text-5xl lg:text-[3.4rem]">
               {c.title} <span className="text-alga">{c.titleAccent}</span>
             </h1>
-            <p className="mt-5 max-w-xl text-base md:text-lg text-ink-soft leading-relaxed">{c.lead}</p>
+            <p className="mt-4 max-w-xl text-base md:text-lg text-ink-soft leading-relaxed">{c.lead}</p>
           </div>
-          {/* La pila di foto respira piccola sul lato: la mappa è subito sotto. */}
-          <div className="mx-auto w-full max-w-[15rem] md:max-w-[17rem] mb-8 lg:mb-0">
+          {/* Una piccola pila di foto come accento: la mappa è subito sotto. */}
+          <div className="w-[8.5rem] sm:w-[9.5rem] flex-shrink-0">
             <PhotoStack photos={INTRO_PHOTOS} aspect="aspect-[4/5]" />
           </div>
         </div>
