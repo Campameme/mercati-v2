@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { ArrowRight, Newspaper } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { fetchLiveNews, generalNewsQuery } from '@/lib/news/live'
+import { PostItNote } from '@/components/motion/PostItCollage'
+import WaveDivider from '@/components/motion/WaveDivider'
 
 export const dynamic = 'force-dynamic'
 
@@ -45,14 +47,20 @@ export default async function NotiziePage() {
   return (
     <div className="bg-crema min-h-[70vh]">
       <div className="container mx-auto px-4 md:px-6 py-12 md:py-16 max-w-5xl">
-        <div className="max-w-2xl mb-10">
-          <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-2">Dai comuni</p>
-          <h1 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">
-            Notizie dalla Riviera
-          </h1>
-          <p className="mt-3 text-base text-ink-soft">
-            La bacheca della Riviera dei Fiori: le ultime dalla stampa e dai comuni, più gli avvisi ufficiali dei mercati.
-          </p>
+        <div className="relative mb-10">
+          <div className="max-w-2xl">
+            <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-2">Dai comuni</p>
+            <h1 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">
+              Notizie dalla Riviera
+            </h1>
+            <p className="mt-3 text-base text-ink-soft">
+              La bacheca della Riviera dei Fiori: le ultime dalla stampa e dai comuni, più gli avvisi ufficiali dei mercati.
+            </p>
+          </div>
+          <div aria-hidden="true" className="hidden md:block absolute right-2 -top-2 w-36 pointer-events-none">
+            <PostItNote photo={{ src: '/zone/vita-piazza-mercato-sanremo-1880.webp', alt: '' }} tilt={3} aspect="aspect-[4/3]" />
+          </div>
+          <WaveDivider className="mt-8 text-alga/25" />
         </div>
 
         {/* Bacheca generale: notizie vive dalla stampa e dai siti dei comuni */}

@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Search, CalendarDays, BadgeCheck, MessageCircle, ArrowRight } from 'lucide-react'
 import BancoAvatar from '@/components/BancoAvatar'
+import { PostItNote } from '@/components/motion/PostItCollage'
+import WaveDivider from '@/components/motion/WaveDivider'
 
 interface HubOperator {
   id: string
@@ -102,9 +104,10 @@ export default function OperatoriHubPage() {
       {/* Filo di brand in testa: la band terracotta dei banchi */}
       <div aria-hidden="true" className="mz-band" style={{ ['--band' as string]: '#C4593C' }} />
 
-      {/* Header racconto: eyebrow alga, titolo display, il conto dei banchi */}
-      <section className="bg-crema-2 border-b border-[#e0d7c1]">
-        <div className="container mx-auto px-4 md:px-6 pt-12 pb-10 md:pt-16 md:pb-12 max-w-6xl">
+      {/* Header racconto: eyebrow alga, titolo display, il conto dei banchi.
+          Sul lato, un post-it che galleggia: il banco com'è dal vivo. */}
+      <section className="relative bg-crema-2 border-b border-[#e0d7c1] overflow-hidden">
+        <div className="relative z-10 container mx-auto px-4 md:px-6 pt-12 pb-10 md:pt-16 md:pb-12 max-w-6xl">
           <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-2">La Riviera dei Fiori · la rete dei banchi</p>
           <div className="flex items-end justify-between gap-4 flex-wrap">
             <h1 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">
@@ -122,6 +125,10 @@ export default function OperatoriHubPage() {
             che frequenta ogni settimana. Filtra per zona, comune o categoria per trovare subito quello che cerchi.
           </p>
         </div>
+        <div aria-hidden="true" className="hidden lg:block absolute right-10 -bottom-9 w-44 z-0 pointer-events-none">
+          <PostItNote photo={{ src: '/zone/vita-banco-ortofrutta-ombrelloni.webp', alt: '' }} tilt={4} aspect="aspect-[4/3]" />
+        </div>
+        <WaveDivider className="relative z-10 text-terracotta/30" />
       </section>
 
       <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl">

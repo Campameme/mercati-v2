@@ -10,7 +10,7 @@ import Bollino from '@/components/Bollino'
 import WaterCard from '@/components/motion/WaterCard'
 import BancoAvatar from '@/components/BancoAvatar'
 import { type StackPhoto } from '@/components/motion/PhotoStack'
-import PostItCollage from '@/components/motion/PostItCollage'
+import PostItCollage, { PostItNote } from '@/components/motion/PostItCollage'
 import WaveDivider from '@/components/motion/WaveDivider'
 import { occursOn, isNonWeekly, isOpenNow } from '@/lib/markets/hours'
 import { categoryLabel } from '@/lib/i18n/home'
@@ -87,10 +87,11 @@ const PROJECT_PHOTOS: StackPhoto[] = [
   { src: '/zone/vita-piazza-mercato-sanremo-1880.webp', alt: 'Sanremo, la piazza del mercato a fine Ottocento', caption: 'Sanremo · 1880' },
   { src: '/zone/vita-banco-ortofrutta-ombrelloni.webp', alt: 'Pomodori e carciofi sui banchi, sotto gli ombrelloni verdi', caption: 'La spesa di stagione' },
 ]
-// Video dell'hero: quando il proprietario carica il file (es. /zone/hero-mercato.mp4),
-// basta mettere qui il percorso e il riquadro grande diventa un video (muted loop,
-// poster = la foto attuale, reduced-motion safe).
-const HERO_VIDEO: string | null = null
+// Video dell'hero: la passeggiata tra i banchi (dal mare alla piazza), già
+// ritagliato 4:5 e compresso. Poster = il suo primo fotogramma; per rimetterci
+// una foto basta azzerare HERO_VIDEO.
+const HERO_VIDEO: string | null = '/zone/hero-mercato.mp4'
+const HERO_POSTER = '/zone/hero-mercato-poster.webp'
 const HERO_PHOTO = { src: '/zone/vita-mercato-lungomare.webp', alt: 'Il mercato settimanale sul lungomare, tra i banchi e le palme' }
 const RETE_I18N: Record<Lang, { pill: string; title: string; req: string[]; cta: string }> = {
   it: {
@@ -329,13 +330,15 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
                 {HERO_VIDEO ? (
                   <video
                     src={HERO_VIDEO}
-                    poster={HERO_PHOTO.src}
+                    poster={HERO_POSTER}
                     autoPlay
                     muted
                     loop
                     playsInline
                     preload="metadata"
-                    aria-label={HERO_PHOTO.alt}
+                    // Chi preferisce meno movimento resta sul poster.
+                    ref={(el) => { if (el && typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) el.pause() }}
+                    aria-label="La passeggiata tra i banchi del mercato, dal mare alla piazza"
                     className="imk-hero-video absolute inset-0 w-full h-full object-cover"
                   />
                 ) : (
@@ -415,6 +418,9 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
 
       {/* ===== MERCATI TIPICI — dentro il racconto: un'altra famiglia di mercati ===== */}
       <section id="tipici" className="relative overflow-hidden bg-crema">
+        <div aria-hidden="true" className="hidden xl:block absolute right-14 top-10 w-40 z-0 pointer-events-none">
+          <PostItNote photo={{ src: '/zone/vita-antiquariato-banco.webp', alt: '' }} tilt={5} aspect="aspect-[4/3]" />
+        </div>
         <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-20 max-w-6xl">
           <div className="max-w-2xl mb-8">
             <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-terracotta mb-2">{ui.navTipici}</p>
@@ -536,6 +542,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
 
       {/* ===== GLI ARTICOLI — le notizie dei comuni, al posto delle zone ===== */}
       <section id="settimana" className="relative overflow-hidden bg-ink text-crema">
+        <WaveDivider className="relative z-10 mt-2 text-crema/25" />
         <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-5xl">
           <div className="max-w-2xl mb-9">
             <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-limone mb-2">{copy.weekEyebrow}</p>

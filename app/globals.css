@@ -219,10 +219,22 @@ body {
   to { stroke-dashoffset: 0; }
 }
 
+/* --- Post-it che galleggia piano (contenuto, non sfondo): un respiro
+   verticale di pochi px, con la rotazione del bigliettino conservata
+   via --tilt. Da abbinare a .imk-float sull'elemento. --- */
+.imk-float {
+  animation: imk-float-bob 7s ease-in-out infinite alternate;
+}
+@keyframes imk-float-bob {
+  from { transform: translateY(0) rotate(var(--tilt, 0deg)); }
+  to   { transform: translateY(-8px) rotate(var(--tilt, 0deg)); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .imk-lift { transition: none !important; }
   .imk-lift:hover { transform: none !important; }
   .imk-sun { animation: none !important; }
+  .imk-float { animation: none !important; transform: rotate(var(--tilt, 0deg)); }
   .imk-wave-divider svg { animation: none !important; }
   .imk-draw path {
     animation: none !important;

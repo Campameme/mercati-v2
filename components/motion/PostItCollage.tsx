@@ -26,6 +26,39 @@ function Note({
   )
 }
 
+/**
+ * Un post-it singolo da appoggiare dove serve (bordo di una sezione, angolo
+ * di un header). Con `float` galleggia piano (.imk-float, reduced-motion
+ * safe); `tilt` è l'inclinazione in gradi, conservata anche mentre fluttua.
+ */
+export function PostItNote({
+  photo,
+  className = '',
+  tilt = -3,
+  float = true,
+  aspect = 'aspect-[4/5]',
+}: {
+  photo: StackPhoto
+  className?: string
+  tilt?: number
+  float?: boolean
+  aspect?: string
+}) {
+  return (
+    <figure
+      className={`m-0 relative bg-white p-2 pb-2.5 rounded-[2px] shadow-[0_16px_32px_-16px_rgba(38,36,30,0.6)] ${float ? 'imk-float' : ''} ${className}`}
+      style={{ ['--tilt' as string]: `${tilt}deg`, transform: float ? undefined : `rotate(${tilt}deg)` }}
+    >
+      <span aria-hidden="true" className="absolute -top-2.5 left-1/2 -translate-x-1/2 h-5 w-14 rounded-[1px] bg-limone/55 shadow-sm" />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={photo.src} alt={photo.alt} loading="lazy" className={`w-full ${aspect} object-cover`} />
+      {photo.caption && (
+        <figcaption className="mt-1.5 px-0.5 font-alt italic text-[13px] text-ink-soft leading-tight">{photo.caption}</figcaption>
+      )}
+    </figure>
+  )
+}
+
 export default function PostItCollage({
   photos,
   className = '',

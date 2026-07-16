@@ -3,6 +3,8 @@ import { ChevronLeft, ArrowRight } from 'lucide-react'
 import AdesioneForm from '@/components/AdesioneForm'
 import Reveal from '@/components/Reveal'
 import Bollino from '@/components/Bollino'
+import { PostItNote } from '@/components/motion/PostItCollage'
+import WaveDivider from '@/components/motion/WaveDivider'
 import { LogoMark } from '@/components/Logo'
 
 export const metadata = {
@@ -88,10 +90,16 @@ export default function AderisciPage() {
             </Reveal>
 
             <Reveal delayMs={80} className="hidden md:block">
-              <Bollino className="w-44 lg:w-52" />
+              <div className="relative">
+                <Bollino className="w-44 lg:w-52" />
+                <div aria-hidden="true" className="absolute -left-24 -bottom-14 w-32 pointer-events-none">
+                  <PostItNote photo={{ src: '/zone/vita-artigianato-borse.webp', alt: '' }} tilt={-5} aspect="aspect-[4/3]" />
+                </div>
+              </div>
             </Reveal>
           </div>
         </div>
+        <WaveDivider className="relative z-10 text-alga/30" />
       </section>
 
       {/* I TRE REQUISITI: card bianche con band alga piena e nodo-bullet */}
