@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { ArrowRight, Map as MapIcon, CalendarDays } from 'lucide-react'
 import MarketExplorer from '@/components/home/MarketExplorer'
 import PhotoStack, { type StackPhoto } from '@/components/motion/PhotoStack'
+import WaveDivider from '@/components/motion/WaveDivider'
 import Bollino from '@/components/Bollino'
 import { LogoMark } from '@/components/Logo'
 import { CATEGORY_COLOR } from '@/lib/schedules/classify'
@@ -27,10 +28,11 @@ const VIEW_LABEL: Record<Lang, { map: string; cal: string }> = {
 }
 
 const INTRO_PHOTOS: StackPhoto[] = [
-  { src: '/zone/vita-mercato-ventimiglia.webp', alt: 'Il mercato del venerdì a Ventimiglia', caption: 'Ventimiglia · il venerdì' },
-  { src: '/zone/vita-fiori-sanremo-1962.webp', alt: 'Il mercato dei fiori di Sanremo nel 1962', caption: 'Mercato dei fiori · 1962' },
-  { src: '/zone/vita-sapori.webp', alt: 'Cestini di sapori su un banco di mercato', caption: 'Al banco' },
-  { src: '/zone/vita-mercato-coperto-ventimiglia.webp', alt: 'L’interno del mercato coperto di Ventimiglia', caption: 'Il mercato coperto' },
+  { src: '/zone/vita-mercato-lungomare.webp', alt: 'Il mercato settimanale sul lungomare, tra i banchi e le palme', caption: 'Sul lungomare' },
+  { src: '/zone/vita-banchi-piazza.webp', alt: 'I banchi del mercato stretti tra le case della piazza', caption: 'In piazza' },
+  { src: '/zone/vita-artigianato-borse.webp', alt: 'Borse e ceste artigianali appese ai banchi, sotto l’ulivo', caption: 'L’artigianato' },
+  { src: '/zone/vita-antiquariato-cornici.webp', alt: 'Cornici dorate accatastate al banco del rigattiere', caption: 'L’antiquariato' },
+  { src: '/zone/vita-banco-ortofrutta-ombrelloni.webp', alt: 'Pomodori e carciofi sui banchi, sotto gli ombrelloni verdi', caption: 'La spesa di stagione' },
 ]
 
 interface FamilyCard {
@@ -72,8 +74,8 @@ const COPY: Record<Lang, Copy> = {
     famTitle: 'Principali e tematici.',
     famLead: 'Il grande mercato settimanale di merci varie, e i giorni speciali con la loro ricorrenza — sulla stessa mappa.',
     seeOnMap: 'Vedi sulla mappa',
-    principali: { photo: '/zone/vita-mercato-ventimiglia.webp', alt: 'Il mercato settimanale a Ventimiglia', label: 'Mercati principali', desc: 'Ogni settimana, in piazza: alimentari, abbigliamento, casa. Il mercato di sempre, comune per comune.' },
-    tematici: { photo: '/zone/vita-fiori-sanremo-1962.webp', alt: 'Il mercato dei fiori di Sanremo', label: 'Mercati tematici', desc: 'Antiquariato, produttori a km0, artigianato: ricorrenze mensili e stagionali, ognuna col suo giorno.' },
+    principali: { photo: '/zone/vita-mercato-sanremo-banchi.webp', alt: 'I banchi del mercato settimanale, pieni di gente sotto i tendoni', label: 'Mercati principali', desc: 'Ogni settimana, in piazza: alimentari, abbigliamento, casa. Il mercato di sempre, comune per comune.' },
+    tematici: { photo: '/zone/vita-antiquariato-piazza.webp', alt: 'Il mercatino dell’antiquariato in piazza', label: 'Mercati tematici', desc: 'Antiquariato, produttori a km0, artigianato: ricorrenze mensili e stagionali, ognuna col suo giorno.' },
   },
   fr: {
     eyebrow: 'Chaque semaine, dans chaque commune',
@@ -88,8 +90,8 @@ const COPY: Record<Lang, Copy> = {
     famTitle: 'Principaux et thématiques.',
     famLead: 'Le grand marché hebdomadaire tout-venant, et les jours spéciaux avec leur rendez-vous — sur la même carte.',
     seeOnMap: 'Voir sur la carte',
-    principali: { photo: '/zone/vita-mercato-ventimiglia.webp', alt: 'Le marché hebdomadaire à Vintimille', label: 'Marchés principaux', desc: 'Chaque semaine, sur la place : alimentation, vêtements, maison. Le marché de toujours, commune par commune.' },
-    tematici: { photo: '/zone/vita-fiori-sanremo-1962.webp', alt: 'Le marché aux fleurs de Sanremo', label: 'Marchés thématiques', desc: 'Antiquités, producteurs locaux, artisanat : rendez-vous mensuels et saisonniers, chacun son jour.' },
+    principali: { photo: '/zone/vita-mercato-sanremo-banchi.webp', alt: 'Les étals du marché hebdomadaire, pleins de monde sous les parasols', label: 'Marchés principaux', desc: 'Chaque semaine, sur la place : alimentation, vêtements, maison. Le marché de toujours, commune par commune.' },
+    tematici: { photo: '/zone/vita-antiquariato-piazza.webp', alt: 'La brocante sur la place', label: 'Marchés thématiques', desc: 'Antiquités, producteurs locaux, artisanat : rendez-vous mensuels et saisonniers, chacun son jour.' },
   },
   de: {
     eyebrow: 'Jede Woche, in jeder Gemeinde',
@@ -104,8 +106,8 @@ const COPY: Record<Lang, Copy> = {
     famTitle: 'Haupt- und Themenmärkte.',
     famLead: 'Der große Wochenmarkt mit Allerlei und die besonderen Tage mit ihrem Termin — auf derselben Karte.',
     seeOnMap: 'Auf der Karte zeigen',
-    principali: { photo: '/zone/vita-mercato-ventimiglia.webp', alt: 'Der Wochenmarkt in Ventimiglia', label: 'Hauptmärkte', desc: 'Jede Woche auf dem Platz: Lebensmittel, Kleidung, Haushalt. Der Markt wie immer, Gemeinde für Gemeinde.' },
-    tematici: { photo: '/zone/vita-fiori-sanremo-1962.webp', alt: 'Der Blumenmarkt von Sanremo', label: 'Themenmärkte', desc: 'Antiquitäten, Erzeuger, Handwerk: monatliche und saisonale Termine, jeder an seinem Tag.' },
+    principali: { photo: '/zone/vita-mercato-sanremo-banchi.webp', alt: 'Die Stände des Wochenmarkts, voller Leute unter den Planen', label: 'Hauptmärkte', desc: 'Jede Woche auf dem Platz: Lebensmittel, Kleidung, Haushalt. Der Markt wie immer, Gemeinde für Gemeinde.' },
+    tematici: { photo: '/zone/vita-antiquariato-piazza.webp', alt: 'Der Antiquitätenmarkt auf dem Platz', label: 'Themenmärkte', desc: 'Antiquitäten, Erzeuger, Handwerk: monatliche und saisonale Termine, jeder an seinem Tag.' },
   },
   en: {
     eyebrow: 'Every week, in every town',
@@ -120,8 +122,8 @@ const COPY: Record<Lang, Copy> = {
     famTitle: 'Main and themed.',
     famLead: 'The big weekly general market, and the special days with their recurrence — on the same map.',
     seeOnMap: 'See on the map',
-    principali: { photo: '/zone/vita-mercato-ventimiglia.webp', alt: 'The weekly market in Ventimiglia', label: 'Main markets', desc: 'Every week, in the square: food, clothing, home. The market as always, town by town.' },
-    tematici: { photo: '/zone/vita-fiori-sanremo-1962.webp', alt: 'The Sanremo flower market', label: 'Themed markets', desc: 'Antiques, local growers, crafts: monthly and seasonal dates, each on its own day.' },
+    principali: { photo: '/zone/vita-mercato-sanremo-banchi.webp', alt: 'The weekly market stalls, crowded under the awnings', label: 'Main markets', desc: 'Every week, in the square: food, clothing, home. The market as always, town by town.' },
+    tematici: { photo: '/zone/vita-antiquariato-piazza.webp', alt: 'The antiques market in the square', label: 'Themed markets', desc: 'Antiques, local growers, crafts: monthly and seasonal dates, each on its own day.' },
   },
 }
 
@@ -167,6 +169,7 @@ export default function MappaExperience(props: Props) {
             <PhotoStack photos={INTRO_PHOTOS} aspect="aspect-[4/5]" />
           </div>
         </div>
+        <WaveDivider className="relative z-10 text-alga/35" />
       </section>
 
       {/* 2. Vista unica: Mappa ⇄ Calendario */}

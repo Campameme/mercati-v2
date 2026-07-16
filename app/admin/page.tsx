@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Power, Settings, MapPin, ArrowRight, BarChart3, Mail, TrendingUp, Eye, Users, Store, Ticket } from 'lucide-react'
+import { Power, Settings, MapPin, ArrowRight, BarChart3, Mail, TrendingUp, Eye, Users, Store, Ticket, Newspaper } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import Logo from '@/components/Logo'
 import MarketToggles from '@/components/admin/MarketToggles'
@@ -128,6 +128,12 @@ export default async function AdminRoot() {
             title="Adesioni operatori"
             desc={`${adesioniNuove ?? 0} richieste da gestire. Risposte entro 48h.`}
             badge={adesioniNuove ?? 0}
+          />
+          <ActionCard
+            href="/redazione"
+            icon={Newspaper}
+            title="Redazione notizie"
+            desc="Bozze, anteprima e pubblicazione delle notizie, per mercato o per tutta la rete."
           />
         </div>
 

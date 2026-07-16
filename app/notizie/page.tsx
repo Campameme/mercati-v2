@@ -34,6 +34,7 @@ export default async function NotiziePage() {
   const { data } = await supabase
     .from('news')
     .select('id, title, content, publish_from, markets(slug, name, city)')
+    .eq('status', 'published')
     .lte('publish_from', now)
     .or(`publish_until.is.null,publish_until.gte.${now}`)
     .order('publish_from', { ascending: false })

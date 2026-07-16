@@ -35,6 +35,7 @@ export async function updateSession(request: NextRequest) {
   const needsAuth =
     !pathname.startsWith('/api') && (
       pathname.startsWith('/admin') ||
+      pathname.startsWith('/redazione') || // la redazione notizie
       pathname === '/operator' ||
       pathname.startsWith('/operator/') || // dashboard operatore (NON la pubblica /operatori)
       pathname === '/tessera' || // la tessera personale del cittadino
@@ -54,6 +55,20 @@ export async function updateSession(request: NextRequest) {
       .eq('id', user.id)
       .single()
     if (profile?.role !== 'super_admin') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/'
+      return NextResponse.redirect(url)
+    }
+  }
+
+  // La redazione notizie: news_editor e super_admin.
+  if (pathname.startsWith('/redazione') && user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+    if (profile?.role !== 'news_editor' && profile?.role !== 'super_admin') {
       const url = request.nextUrl.clone()
       url.pathname = '/'
       return NextResponse.redirect(url)

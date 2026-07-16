@@ -80,6 +80,7 @@ function LoginPageInner() {
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle()
     const role = profile?.role ?? 'citizen'
     if (role === 'super_admin') router.replace('/admin/markets')
+    else if (role === 'news_editor') router.replace('/redazione')
     else if (role === 'market_admin') {
       const { data: assigns } = await supabase.from('market_admins').select('markets!inner(slug)').limit(1)
       const slug = (assigns?.[0] as any)?.markets?.slug

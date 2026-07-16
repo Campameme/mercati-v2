@@ -11,6 +11,7 @@ import WaterCard from '@/components/motion/WaterCard'
 import BancoAvatar from '@/components/BancoAvatar'
 import { type StackPhoto } from '@/components/motion/PhotoStack'
 import PostItCollage from '@/components/motion/PostItCollage'
+import WaveDivider from '@/components/motion/WaveDivider'
 import { occursOn, isNonWeekly, isOpenNow } from '@/lib/markets/hours'
 import { categoryLabel } from '@/lib/i18n/home'
 import { UI_I18N } from '@/lib/i18n/ui'
@@ -82,12 +83,15 @@ const APERTI_ORA: Record<Lang, string> = { it: 'Aperti ora', fr: 'Ouverts mainte
 const WHAT_HREFS = ['/operatori', '/mappa', '/tessera']
 // Foto per la pila trascinabile della sezione "Il progetto"
 const PROJECT_PHOTOS: StackPhoto[] = [
+  { src: '/zone/vita-mercato-ventimiglia-borgo.webp', alt: 'Il mercato ai piedi della città vecchia di Ventimiglia', caption: 'Ventimiglia · il venerdì' },
   { src: '/zone/vita-piazza-mercato-sanremo-1880.webp', alt: 'Sanremo, la piazza del mercato a fine Ottocento', caption: 'Sanremo · 1880' },
-  { src: '/zone/vita-fiori-sanremo-1962.webp', alt: 'Il mercato dei fiori di Sanremo nel 1962', caption: 'Mercato dei fiori · 1962' },
-  { src: '/zone/vita-mercato-ventimiglia.webp', alt: 'Il mercato del venerdì a Ventimiglia', caption: 'Ventimiglia · il venerdì' },
-  { src: '/zone/vita-mercato-coperto-ventimiglia.webp', alt: 'L’interno del mercato coperto di Ventimiglia', caption: 'Il mercato coperto' },
-  { src: '/zone/vita-banco-verdure.webp', alt: 'Un banco di verdure al mercato, tra venditore e clienti', caption: 'Al banco' },
+  { src: '/zone/vita-banco-ortofrutta-ombrelloni.webp', alt: 'Pomodori e carciofi sui banchi, sotto gli ombrelloni verdi', caption: 'La spesa di stagione' },
 ]
+// Video dell'hero: quando il proprietario carica il file (es. /zone/hero-mercato.mp4),
+// basta mettere qui il percorso e il riquadro grande diventa un video (muted loop,
+// poster = la foto attuale, reduced-motion safe).
+const HERO_VIDEO: string | null = null
+const HERO_PHOTO = { src: '/zone/vita-mercato-lungomare.webp', alt: 'Il mercato settimanale sul lungomare, tra i banchi e le palme' }
 const RETE_I18N: Record<Lang, { pill: string; title: string; req: string[]; cta: string }> = {
   it: {
     pill: 'La rete', title: 'Hai un banco? Entra nella rete.',
@@ -322,13 +326,27 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
             {/* Collage fotografico: i mercati, uno sopra l'altro, sparsi sul lato destro. */}
             <div data-anim className="relative hidden md:block pr-4 pt-6 pb-10">
               <div className="relative overflow-hidden rounded-2xl border border-[#e0d7c1] shadow-xl aspect-[4/5]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/zone/vita-mercato-ventimiglia.webp"
-                  alt="Il mercato del venerdì a Ventimiglia"
-                  data-plx
-                  className="absolute inset-0 w-full h-full object-cover scale-110 will-change-transform"
-                />
+                {HERO_VIDEO ? (
+                  <video
+                    src={HERO_VIDEO}
+                    poster={HERO_PHOTO.src}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                    aria-label={HERO_PHOTO.alt}
+                    className="imk-hero-video absolute inset-0 w-full h-full object-cover"
+                  />
+                ) : (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={HERO_PHOTO.src}
+                    alt={HERO_PHOTO.alt}
+                    data-plx
+                    className="absolute inset-0 w-full h-full object-cover scale-110 will-change-transform"
+                  />
+                )}
               </div>
               <figure className="absolute -top-2 -right-2 w-[42%] rotate-2 bg-white border border-[#e0d7c1] rounded-md p-1.5 pb-2 shadow-lg">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -337,8 +355,8 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
               </figure>
               <figure className="absolute -bottom-5 -left-5 w-[46%] -rotate-3 bg-white border border-[#e0d7c1] rounded-md p-1.5 pb-2 shadow-xl">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/zone/vita-mercato-coperto-ventimiglia.webp" alt="L’interno del mercato coperto di Ventimiglia" loading="lazy" className="w-full aspect-[4/3] object-cover rounded-sm" />
-                <figcaption className="mt-1 px-1 font-alt italic text-xs text-ink-soft leading-tight">Il mercato coperto, Ventimiglia</figcaption>
+                <img src="/zone/vita-mercato-sanremo-banchi.webp" alt="I banchi del mercato di Sanremo, pieni di gente sotto i tendoni" loading="lazy" className="w-full aspect-[4/3] object-cover rounded-sm" />
+                <figcaption className="mt-1 px-1 font-alt italic text-xs text-ink-soft leading-tight">Sanremo, il martedì e il sabato</figcaption>
               </figure>
             </div>
           </div>
@@ -350,6 +368,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
             <ChevronDown className="imk-chev w-4 h-4" /><ChevronDown className="imk-chev w-4 h-4" /><ChevronDown className="imk-chev w-4 h-4" />
           </span>
         </a>
+        <WaveDivider className="relative z-10 text-alga/35" />
       </section>
 
       {/* ===== IL PROGETTO — storytelling emotivo: le informazioni si intendono,

@@ -1,5 +1,6 @@
 export type NewsType = 'schedule' | 'notice' | 'event' | 'emergency'
 export type NewsPriority = 'low' | 'medium' | 'high'
+export type NewsStatus = 'draft' | 'published'
 
 export interface NewsItem {
   id: string
@@ -9,6 +10,7 @@ export interface NewsItem {
   content: string
   type: NewsType
   priority: NewsPriority
+  status: NewsStatus
   publish_from: string
   publish_until: string | null
   created_at: string

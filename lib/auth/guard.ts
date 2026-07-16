@@ -71,6 +71,34 @@ export async function requireAdmin(
 }
 
 /**
+ * Accesso alla gestione NOTIZIE: super_admin e news_editor (la redazione)
+ * gestiscono tutto, anche le globali; market_admin solo il proprio mercato
+ * (e mai le globali). Il redattore non ha altri poteri fuori dalle news.
+ */
+export async function requireNewsAccess(
+  opts: { marketId?: string | null; isGlobal?: boolean } = {},
+): Promise<Guard> {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return deny(401, 'Non autenticato')
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle()
+  const role = profile?.role ?? 'citizen'
+
+  if (role === 'super_admin' || role === 'news_editor') return { ok: true, supabase, user, role }
+  if (role !== 'market_admin') return deny(403, 'Permessi insufficienti')
+  if (opts.isGlobal) return deny(403, 'Le notizie globali sono della redazione')
+  if (opts.marketId && !(await isMarketAdminOf(supabase, user.id, opts.marketId))) {
+    return deny(403, 'Non sei amministratore di questo mercato')
+  }
+  return { ok: true, supabase, user, role }
+}
+
+/**
  * Accesso a un operatore: ammessi il proprietario della scheda
  * (operators.user_id) e gli admin (super, o market_admin del mercato
  * dell'operatore). Ritorna anche la riga operatore per evitare doppie query.

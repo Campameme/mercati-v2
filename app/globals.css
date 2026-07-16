@@ -189,12 +189,12 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* --- Divisore a ONDA animato (mare / Riviera) --- */
+/* --- Divisore a ONDA animato (mare / Riviera) — vedi WaveDivider.tsx --- */
 .imk-wave-divider {
   display: block;
   width: 100%;
   height: 18px;
-  color: #15607C; /* override via text-* */
+  color: #46683B; /* alga; override via text-* */
   overflow: hidden;
 }
 .imk-wave-divider svg {

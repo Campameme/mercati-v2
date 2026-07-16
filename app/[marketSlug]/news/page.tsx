@@ -32,6 +32,7 @@ export default async function NewsPage({ params }: { params: { marketSlug: strin
     .from('news')
     .select('*')
     .or(`market_id.eq.${market.id},is_global.eq.true`)
+    .eq('status', 'published')
     .lte('publish_from', nowIso)
     .or(`publish_until.is.null,publish_until.gte.${nowIso}`)
     .order('priority', { ascending: false })
