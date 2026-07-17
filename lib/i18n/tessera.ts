@@ -93,6 +93,19 @@ export interface TesseraDict {
   couponUsed: string
   couponVoid: string
   logout: string
+  qrTitle: string
+  qrHint: string
+  joinTitle: string
+  joinLead: string
+  joinConsent: string
+  joinCta: string
+  shopTitle: string
+  shopLead: string
+  shopCta: string
+  gdprTitle: string
+  gdprExport: string
+  gdprDelete: string
+  gdprDeleteConfirm: string
 }
 
 export const TESSERA_I18N: Record<Lang, TesseraDict> = {
@@ -108,6 +121,19 @@ export const TESSERA_I18N: Record<Lang, TesseraDict> = {
     couponUsed: 'usato',
     couponVoid: 'annullato',
     logout: 'Esci',
+    qrTitle: 'Il tuo QR',
+    qrHint: 'Mostralo al banco per ricevere o usare i punti.',
+    joinTitle: 'Attiva la tessera',
+    joinLead: 'Un QR personale per accumulare punti al mercato e usarli quando vuoi.',
+    joinConsent: 'Attivandola acconsenti al trattamento dei tuoi dati per la tessera punti (vedi Privacy).',
+    joinCta: 'Attiva ora',
+    shopTitle: 'Lo shop dei punti',
+    shopLead: 'Trasforma i tuoi punti in buoni regalo.',
+    shopCta: 'Vai allo shop',
+    gdprTitle: 'I tuoi dati',
+    gdprExport: 'Scarica i miei dati',
+    gdprDelete: 'Cancella la tessera',
+    gdprDeleteConfirm: 'Cancellare tutta la tessera (punti e coupon)? L’azione è definitiva.',
   },
   fr: {
     eyebrow: 'La carte du marché',
@@ -121,6 +147,19 @@ export const TESSERA_I18N: Record<Lang, TesseraDict> = {
     couponUsed: 'utilisé',
     couponVoid: 'annulé',
     logout: 'Se déconnecter',
+    qrTitle: 'Votre QR',
+    qrHint: 'Montrez-le à l’étal pour recevoir ou utiliser les points.',
+    joinTitle: 'Activez la carte',
+    joinLead: 'Un QR personnel pour cumuler des points au marché et les utiliser quand vous voulez.',
+    joinConsent: 'En l’activant, vous consentez au traitement de vos données pour la carte de points (voir Confidentialité).',
+    joinCta: 'Activer',
+    shopTitle: 'La boutique des points',
+    shopLead: 'Transformez vos points en bons cadeaux.',
+    shopCta: 'Voir la boutique',
+    gdprTitle: 'Vos données',
+    gdprExport: 'Télécharger mes données',
+    gdprDelete: 'Supprimer la carte',
+    gdprDeleteConfirm: 'Supprimer toute la carte (points et coupons) ? L’action est définitive.',
   },
   de: {
     eyebrow: 'Die Marktkarte',
@@ -134,6 +173,19 @@ export const TESSERA_I18N: Record<Lang, TesseraDict> = {
     couponUsed: 'eingelöst',
     couponVoid: 'storniert',
     logout: 'Abmelden',
+    qrTitle: 'Dein QR',
+    qrHint: 'Zeig ihn am Stand, um Punkte zu erhalten oder einzulösen.',
+    joinTitle: 'Karte aktivieren',
+    joinLead: 'Ein persönlicher QR, um auf dem Markt Punkte zu sammeln und jederzeit zu nutzen.',
+    joinConsent: 'Mit der Aktivierung stimmst du der Verarbeitung deiner Daten für die Punktekarte zu (siehe Datenschutz).',
+    joinCta: 'Aktivieren',
+    shopTitle: 'Der Punkte-Shop',
+    shopLead: 'Verwandle deine Punkte in Gutscheine.',
+    shopCta: 'Zum Shop',
+    gdprTitle: 'Deine Daten',
+    gdprExport: 'Meine Daten laden',
+    gdprDelete: 'Karte löschen',
+    gdprDeleteConfirm: 'Die ganze Karte (Punkte und Coupons) löschen? Die Aktion ist endgültig.',
   },
   en: {
     eyebrow: 'The market card',
@@ -147,6 +199,19 @@ export const TESSERA_I18N: Record<Lang, TesseraDict> = {
     couponUsed: 'used',
     couponVoid: 'voided',
     logout: 'Sign out',
+    qrTitle: 'Your QR',
+    qrHint: 'Show it at the stall to get or spend points.',
+    joinTitle: 'Activate the card',
+    joinLead: 'A personal QR to collect points at the market and use them whenever you like.',
+    joinConsent: 'By activating it you consent to the processing of your data for the points card (see Privacy).',
+    joinCta: 'Activate',
+    shopTitle: 'The points shop',
+    shopLead: 'Turn your points into gift vouchers.',
+    shopCta: 'Go to shop',
+    gdprTitle: 'Your data',
+    gdprExport: 'Download my data',
+    gdprDelete: 'Delete card',
+    gdprDeleteConfirm: 'Delete the whole card (points and coupons)? This cannot be undone.',
   },
 }
 

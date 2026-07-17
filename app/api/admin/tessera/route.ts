@@ -37,7 +37,19 @@ export async function GET() {
     }))
     .sort((a, b) => b.balance - a.balance)
 
-  return NextResponse.json({ data: { users, coupons: coupons ?? [] } })
+  // Budget punti degli operatori (per ricaricarli) + catalogo premi dello shop.
+  const [{ data: operators }, { data: budgets }, { data: rewards }] = await Promise.all([
+    service.from('operators').select('id, name, market_id, markets(name)').order('name'),
+    service.from('operator_point_budgets').select('operator_id, balance'),
+    service.from('shop_rewards').select('id, label, description, cost_points, stock, market_id, is_active').order('created_at', { ascending: false }),
+  ])
+  const budgetByOp = new Map<string, number>()
+  for (const b of budgets ?? []) budgetByOp.set(b.operator_id, b.balance)
+  const ops = (operators ?? []).map((o: any) => ({
+    id: o.id, name: o.name, market: o.markets?.name ?? null, budget: budgetByOp.get(o.id) ?? 0,
+  }))
+
+  return NextResponse.json({ data: { users, coupons: coupons ?? [], operators: ops, rewards: rewards ?? [] } })
 }
 
 export async function POST(request: NextRequest) {
@@ -55,7 +67,40 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'userId e points (≠0) richiesti' }, { status: 400 })
     }
     const { error } = await service.from('point_events').insert({
-      user_id: userId, points: Math.round(points), reason, created_by: guard.user.id,
+      user_id: userId, points: Math.round(points), reason, kind: 'adjust', created_by: guard.user.id,
+    })
+    if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+    return NextResponse.json({ ok: true })
+  }
+
+  // Ricarica il budget punti di un operatore (i punti che potrà distribuire).
+  if (action === 'recharge') {
+    const operatorId = String(body?.operatorId ?? '')
+    const points = Math.round(Number(body?.points))
+    if (!operatorId || !Number.isFinite(points) || points <= 0) {
+      return NextResponse.json({ error: 'operatorId e points (>0) richiesti' }, { status: 400 })
+    }
+    const { data: cur } = await service.from('operator_point_budgets').select('balance').eq('operator_id', operatorId).maybeSingle()
+    const next = (cur?.balance ?? 0) + points
+    const { error } = await service.from('operator_point_budgets').upsert({ operator_id: operatorId, balance: next, updated_at: new Date().toISOString() })
+    if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+    return NextResponse.json({ ok: true, budget: next })
+  }
+
+  // Crea un premio nello shop (riscattabile a punti).
+  if (action === 'reward') {
+    const label = String(body?.label ?? '').trim()
+    const cost = Math.round(Number(body?.cost_points))
+    if (!label || !Number.isFinite(cost) || cost <= 0) {
+      return NextResponse.json({ error: 'label e cost_points (>0) richiesti' }, { status: 400 })
+    }
+    const stock = body?.stock === null || body?.stock === undefined || body?.stock === '' ? null : Math.round(Number(body.stock))
+    const { error } = await service.from('shop_rewards').insert({
+      label,
+      description: String(body?.description ?? '').trim() || null,
+      cost_points: cost,
+      stock,
+      market_id: body?.market_id || null,
     })
     if (error) return NextResponse.json({ error: error.message }, { status: 400 })
     return NextResponse.json({ ok: true })
@@ -81,6 +126,14 @@ export async function PATCH(request: NextRequest) {
   if (!guard.ok) return guard.res
   const service = createServiceClient()
   const body = await request.json().catch(() => ({}))
+
+  // Attiva/disattiva un premio dello shop.
+  if (body?.rewardId) {
+    const { error } = await service.from('shop_rewards').update({ is_active: !!body.is_active }).eq('id', String(body.rewardId))
+    if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+    return NextResponse.json({ ok: true })
+  }
+
   const couponId = String(body?.couponId ?? '')
   const status = String(body?.status ?? '')
   if (!couponId || !['used', 'void', 'active'].includes(status)) {

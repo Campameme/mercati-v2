@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import { Save, Package, ArrowLeft, LogOut } from 'lucide-react'
+import { Save, Package, ArrowLeft, LogOut, Wallet } from 'lucide-react'
 import PhotoUploader from '@/components/PhotoUploader'
 import { createClient } from '@/lib/supabase/client'
 
@@ -100,6 +100,9 @@ export default function OperatorMarketDashboard() {
             <h1 className="font-alt font-bold text-3xl text-ink">{operator.name}</h1>
           </div>
           <div className="flex items-center gap-2">
+            <Link href={`/operator/${operator.id}/tessera`} className="flex items-center gap-2 px-3 py-2 bg-alga text-crema hover:bg-alga-600 rounded-full text-sm transition-colors">
+              <Wallet className="w-4 h-4" /> <span>Tessera</span>
+            </Link>
             <Link href={`/operator/${operator.id}/products`} className="flex items-center gap-2 px-3 py-2 bg-white border-2 border-ink/15 hover:border-alga text-ink rounded-full text-sm transition-colors">
               <Package className="w-4 h-4" /> <span>Prodotti</span>
             </Link>

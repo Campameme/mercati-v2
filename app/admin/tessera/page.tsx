@@ -2,14 +2,18 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Ticket, Plus, Search, Check, X } from 'lucide-react'
+import { ArrowLeft, Ticket, Plus, Search, Check, X, Wallet, Gift } from 'lucide-react'
 
 interface UserRow { id: string; email: string; balance: number; activeCoupons: number; createdAt: string }
 interface Coupon { id: string; user_id: string; code: string; label: string; status: string; created_at: string }
+interface OperatorRow { id: string; name: string; market: string | null; budget: number }
+interface RewardRow { id: string; label: string; description: string | null; cost_points: number; stock: number | null; is_active: boolean }
 
 export default function AdminTesseraPage() {
   const [users, setUsers] = useState<UserRow[]>([])
   const [coupons, setCoupons] = useState<Coupon[]>([])
+  const [operators, setOperators] = useState<OperatorRow[]>([])
+  const [rewards, setRewards] = useState<RewardRow[]>([])
   const [loading, setLoading] = useState(true)
   const [q, setQ] = useState('')
   const [selected, setSelected] = useState<UserRow | null>(null)
@@ -20,6 +24,9 @@ export default function AdminTesseraPage() {
   const [points, setPoints] = useState('')
   const [reason, setReason] = useState('')
   const [couponLabel, setCouponLabel] = useState('')
+  const [opQ, setOpQ] = useState('')
+  const [rechargeById, setRechargeById] = useState<Record<string, string>>({})
+  const [rw, setRw] = useState({ label: '', description: '', cost_points: '', stock: '' })
 
   async function load() {
     setLoading(true)
@@ -27,9 +34,46 @@ export default function AdminTesseraPage() {
     const { data } = await res.json()
     setUsers(data?.users ?? [])
     setCoupons(data?.coupons ?? [])
+    setOperators(data?.operators ?? [])
+    setRewards(data?.rewards ?? [])
     setLoading(false)
   }
   useEffect(() => { load() }, [])
+
+  const filteredOps = useMemo(() => {
+    const n = opQ.trim().toLowerCase()
+    return n ? operators.filter((o) => o.name.toLowerCase().includes(n) || (o.market ?? '').toLowerCase().includes(n)) : operators
+  }, [operators, opQ])
+
+  async function recharge(operatorId: string) {
+    const val = rechargeById[operatorId]
+    if (!val) return
+    setBusy(true)
+    const res = await fetch('/api/admin/tessera', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'recharge', operatorId, points: Number(val) }),
+    })
+    setBusy(false)
+    if (res.ok) { setRechargeById((m) => ({ ...m, [operatorId]: '' })); load() }
+  }
+
+  async function createReward() {
+    if (!rw.label.trim() || !rw.cost_points) return
+    setBusy(true)
+    const res = await fetch('/api/admin/tessera', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'reward', label: rw.label, description: rw.description, cost_points: Number(rw.cost_points), stock: rw.stock === '' ? null : Number(rw.stock) }),
+    })
+    setBusy(false)
+    if (res.ok) { setRw({ label: '', description: '', cost_points: '', stock: '' }); load() }
+  }
+
+  async function toggleReward(rewardId: string, is_active: boolean) {
+    setBusy(true)
+    await fetch('/api/admin/tessera', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rewardId, is_active }) })
+    setBusy(false)
+    load()
+  }
 
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase()
@@ -182,6 +226,68 @@ export default function AdminTesseraPage() {
                 )}
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Budget punti degli operatori + catalogo premi dello shop */}
+        <div className="grid lg:grid-cols-2 gap-6 mt-10 pt-8 border-t-2 border-ink/10">
+          {/* Ricarica budget operatori */}
+          <div>
+            <h2 className="font-alt font-bold text-xl text-ink flex items-center gap-2 mb-1"><Wallet className="w-5 h-5 text-alga" /> Budget punti dei banchi</h2>
+            <p className="text-sm text-ink-soft mb-3">I punti che ogni banco può distribuire ai clienti. Ricaricali qui.</p>
+            <div className="relative mb-3">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted" />
+              <input value={opQ} onChange={(e) => setOpQ(e.target.value)} placeholder="Cerca banco…" className="w-full pl-10 pr-3 py-2.5 bg-white border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-alga" />
+            </div>
+            <ul className="bg-white border-2 border-ink/10 rounded-xl divide-y divide-ink/10 max-h-[60vh] overflow-auto imk-scroll">
+              {filteredOps.length === 0 ? (
+                <li className="px-4 py-6 text-sm text-ink-muted italic text-center">Nessun banco.</li>
+              ) : filteredOps.map((o) => (
+                <li key={o.id} className="px-4 py-3 flex items-center justify-between gap-3">
+                  <span className="min-w-0">
+                    <span className="block text-sm text-ink truncate">{o.name}</span>
+                    {o.market && <span className="block text-[11px] text-ink-muted">{o.market}</span>}
+                  </span>
+                  <span className="flex items-center gap-2 flex-shrink-0">
+                    <span className="font-alt font-bold text-lg text-alga-600 leading-none tabular-nums w-10 text-right">{o.budget}</span>
+                    <input type="number" min="1" value={rechargeById[o.id] ?? ''} onChange={(e) => setRechargeById((m) => ({ ...m, [o.id]: e.target.value }))} placeholder="+" className="w-16 px-2 py-1.5 bg-crema border-2 border-ink/15 rounded-lg text-sm focus:outline-none focus:border-alga" />
+                    <button onClick={() => recharge(o.id)} disabled={busy || !rechargeById[o.id]} className="p-1.5 rounded-full bg-alga/10 text-alga-600 hover:bg-alga/20 disabled:opacity-40"><Plus className="w-4 h-4" /></button>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Premi dello shop */}
+          <div>
+            <h2 className="font-alt font-bold text-xl text-ink flex items-center gap-2 mb-1"><Gift className="w-5 h-5 text-alga" /> Premi dello shop</h2>
+            <p className="text-sm text-ink-soft mb-3">I buoni regalo che i clienti riscattano con i punti.</p>
+            <div className="bg-white border-2 border-ink/10 rounded-xl p-4 space-y-2 mb-3">
+              <input value={rw.label} onChange={(e) => setRw({ ...rw, label: e.target.value })} placeholder="Nome del premio (es. Buono 5€)" className="w-full px-3 py-2 bg-crema border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-alga" />
+              <input value={rw.description} onChange={(e) => setRw({ ...rw, description: e.target.value })} placeholder="Descrizione (opz.)" className="w-full px-3 py-2 bg-crema border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-alga" />
+              <div className="flex gap-2">
+                <input type="number" min="1" value={rw.cost_points} onChange={(e) => setRw({ ...rw, cost_points: e.target.value })} placeholder="Costo in punti" className="flex-1 px-3 py-2 bg-crema border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-alga" />
+                <input type="number" min="0" value={rw.stock} onChange={(e) => setRw({ ...rw, stock: e.target.value })} placeholder="Stock (∞)" className="w-24 px-3 py-2 bg-crema border-2 border-ink/15 rounded-xl text-sm focus:outline-none focus:border-alga" />
+              </div>
+              <button onClick={createReward} disabled={busy || !rw.label.trim() || !rw.cost_points} className="inline-flex items-center gap-1.5 px-4 py-2 bg-terracotta text-crema rounded-full text-sm font-alt font-semibold hover:bg-terracotta-600 disabled:opacity-50">
+                <Plus className="w-4 h-4" /> Aggiungi premio
+              </button>
+            </div>
+            <ul className="bg-white border-2 border-ink/10 rounded-xl divide-y divide-ink/10">
+              {rewards.length === 0 ? (
+                <li className="px-4 py-6 text-sm text-ink-muted italic text-center">Nessun premio ancora.</li>
+              ) : rewards.map((r) => (
+                <li key={r.id} className="px-4 py-3 flex items-center justify-between gap-3">
+                  <span className="min-w-0">
+                    <span className="block text-sm text-ink truncate">{r.label}</span>
+                    <span className="block text-[11px] text-ink-muted">{r.cost_points} punti{r.stock != null ? ` · ${r.stock} pezzi` : ''}</span>
+                  </span>
+                  <button onClick={() => toggleReward(r.id, !r.is_active)} className={`text-[11px] font-alt uppercase tracking-wider px-2.5 py-1 rounded-full flex-shrink-0 ${r.is_active ? 'bg-alga/15 text-alga-600' : 'bg-ink/10 text-ink-muted'}`}>
+                    {r.is_active ? 'attivo' : 'sospeso'}
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>

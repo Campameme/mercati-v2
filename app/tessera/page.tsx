@@ -2,14 +2,16 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { Ticket, LogOut, Sparkles } from 'lucide-react'
+import { Ticket, LogOut, Sparkles, QrCode, Store, ArrowRight, Download, Trash2, ShieldCheck } from 'lucide-react'
 import { useLang } from '@/lib/i18n/useLang'
 import { TESSERA_I18N, reasonLabel } from '@/lib/i18n/tessera'
 
 interface PointEvent { id: string; points: number; reason: string; created_at: string }
 interface Coupon { id: string; code: string; label: string; status: string; created_at: string; used_at: string | null }
-interface TesseraData { email: string; balance: number; events: PointEvent[]; coupons: Coupon[] }
+interface TesseraCard { token: string; qrSvg: string }
+interface TesseraData { email: string; balance: number; events: PointEvent[]; coupons: Coupon[]; card: TesseraCard | null }
 
 export default function TesseraPage() {
   const router = useRouter()
@@ -17,14 +19,31 @@ export default function TesseraPage() {
   const t = TESSERA_I18N[lang]
   const [data, setData] = useState<TesseraData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [busy, setBusy] = useState(false)
 
-  useEffect(() => {
+  function load() {
     fetch('/api/tessera', { cache: 'no-store' })
       .then((r) => (r.status === 401 ? (router.replace('/login?next=/tessera'), null) : r.json()))
       .then((j) => { if (j?.data) setData(j.data) })
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [router])
+  }
+  useEffect(() => { load() }, [router]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function join() {
+    setBusy(true)
+    await fetch('/api/tessera/join', { method: 'POST' })
+    setBusy(false)
+    load()
+  }
+
+  async function eraseTessera() {
+    if (!confirm(t.gdprDeleteConfirm)) return
+    setBusy(true)
+    await fetch('/api/tessera', { method: 'DELETE' })
+    setBusy(false)
+    load()
+  }
 
   async function logout() {
     await createClient().auth.signOut()
@@ -68,6 +87,50 @@ export default function TesseraPage() {
             </div>
           </div>
         </div>
+
+        {/* QR della carta — oppure adesione (consenso GDPR) se non attiva */}
+        <section className="mt-6">
+          {data?.card ? (
+            <div className="bg-white border border-[#e0d7c1] rounded-xl p-6 flex flex-col sm:flex-row items-center gap-6">
+              <div
+                className="w-40 h-40 flex-shrink-0 [&_svg]:w-full [&_svg]:h-full"
+                aria-label={t.qrTitle}
+                dangerouslySetInnerHTML={{ __html: data.card.qrSvg }}
+              />
+              <div className="text-center sm:text-left min-w-0">
+                <p className="inline-flex items-center gap-2 font-display font-extrabold tracking-tight text-xl text-ink">
+                  <QrCode className="w-5 h-5 text-alga" /> {t.qrTitle}
+                </p>
+                <p className="text-sm text-ink-soft mt-1 max-w-xs">{t.qrHint}</p>
+                <p className="mt-2 font-mono text-[11px] text-ink-muted break-all select-all">{data.card.token}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white border border-[#e0d7c1] rounded-xl p-6">
+              <p className="inline-flex items-center gap-2 font-display font-extrabold tracking-tight text-xl text-ink">
+                <QrCode className="w-5 h-5 text-alga" /> {t.joinTitle}
+              </p>
+              <p className="text-sm text-ink-soft mt-1.5 max-w-md">{t.joinLead}</p>
+              <p className="text-xs text-ink-muted mt-3 max-w-md">{t.joinConsent}</p>
+              <button
+                onClick={join}
+                disabled={busy}
+                className="mt-4 inline-flex items-center gap-2 bg-terracotta text-crema font-alt font-semibold text-sm px-6 py-3 rounded-full hover:bg-terracotta-600 disabled:opacity-50 transition-colors"
+              >
+                {t.joinCta} <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+        </section>
+
+        {/* Shop dei punti */}
+        <Link href="/tessera/shop" className="imk-lift group mt-4 flex items-center justify-between gap-4 bg-alga text-crema rounded-xl px-6 py-5 hover:bg-alga-600 transition-colors">
+          <span className="min-w-0">
+            <span className="inline-flex items-center gap-2 font-display font-extrabold tracking-tight text-xl"><Store className="w-5 h-5" /> {t.shopTitle}</span>
+            <span className="block text-sm text-crema/85 mt-0.5">{t.shopLead}</span>
+          </span>
+          <span className="inline-flex items-center gap-1.5 font-alt font-semibold text-sm flex-shrink-0">{t.shopCta} <ArrowRight className="imk-march w-4 h-4" /></span>
+        </Link>
 
         {/* Coupon */}
         <section className="mt-8">
@@ -114,6 +177,30 @@ export default function TesseraPage() {
               ))}
             </ul>
           )}
+        </section>
+
+        {/* GDPR — i tuoi dati: esporta o cancella la tessera */}
+        <section className="mt-8 border-t border-[#e0d7c1] pt-6">
+          <p className="inline-flex items-center gap-2 font-alt text-xs font-bold uppercase tracking-[0.14em] text-ink-muted mb-3">
+            <ShieldCheck className="w-4 h-4" /> {t.gdprTitle}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <a
+              href="/api/tessera/export"
+              className="inline-flex items-center gap-1.5 bg-white border border-[#e0d7c1] hover:border-alga text-ink-soft font-alt text-sm font-semibold px-4 py-2 rounded-full transition-colors"
+            >
+              <Download className="w-4 h-4" /> {t.gdprExport}
+            </a>
+            {data?.card && (
+              <button
+                onClick={eraseTessera}
+                disabled={busy}
+                className="inline-flex items-center gap-1.5 bg-white border border-terracotta/40 hover:border-terracotta text-terracotta-600 font-alt text-sm font-semibold px-4 py-2 rounded-full disabled:opacity-50 transition-colors"
+              >
+                <Trash2 className="w-4 h-4" /> {t.gdprDelete}
+              </button>
+            )}
+          </div>
         </section>
       </div>
     </div>
