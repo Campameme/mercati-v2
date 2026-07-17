@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { MapPin, CalendarClock, Repeat, Sun } from 'lucide-react'
+import { MapPin, CalendarClock, Repeat, Sun, ChevronDown } from 'lucide-react'
 import {
   CATEGORY_COLOR,
   CATEGORY_ORDER,
@@ -51,12 +51,6 @@ const WEEKDAY_LONG: Record<Lang, string[]> = {
   fr: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
   de: ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
   en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-}
-const WEEKDAY_SHORT: Record<Lang, string[]> = {
-  it: ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'],
-  fr: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
-  de: ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'],
-  en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
 }
 
 const T: Record<Lang, {
@@ -212,33 +206,29 @@ export default function MarketCalendar() {
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-5 md:py-6">
-      {/* Selettore giorno della settimana */}
-      <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-2.5">{t.pick}</p>
-      <div className="flex flex-wrap gap-2 mb-4">
-        {WEEK_ORDER.map((wd) => {
-          const active = wd === weekday
-          const n = totalForWeekday(wd)
-          const isToday = wd === todayWd
-          return (
-            <button
-              key={wd}
-              type="button"
-              onClick={() => setWeekday(wd)}
-              aria-pressed={active}
-              disabled={n === 0}
-              className={`font-alt text-sm font-semibold px-3.5 py-2 rounded-full border-[1.5px] transition-colors disabled:opacity-40 disabled:cursor-default ${
-                active
-                  ? 'bg-alga text-crema border-alga'
-                  : 'bg-white text-ink-soft border-ink/15 hover:border-alga hover:text-alga-600'
-              }`}
-            >
-              {WEEKDAY_SHORT[lang][wd]}
-              {isToday ? ` · ${t.today}` : ''}
-              {n > 0 && <span className={`ml-1.5 text-[11px] ${active ? 'text-crema/80' : 'text-ink-muted'}`}>{n}</span>}
-            </button>
-          )
-        })}
-      </div>
+      {/* Selettore giorno: UN grande menu a tendina, ben evidente — l'unica
+          interazione insieme al filtro tipologie. Il giorno corrente è marcato. */}
+      <label className="block mb-5">
+        <span className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-2 block">{t.pick}</span>
+        <div className="relative max-w-xl">
+          <select
+            value={weekday}
+            onChange={(e) => setWeekday(Number(e.target.value))}
+            className="imk-day-select w-full appearance-none bg-alga text-crema font-display font-extrabold tracking-tight text-2xl md:text-3xl leading-none pl-6 pr-14 py-4 md:py-5 rounded-2xl border-0 shadow-[0_20px_40px_-24px_rgba(53,80,44,0.8)] cursor-pointer focus:outline-none focus:ring-4 focus:ring-limone/60"
+          >
+            {WEEK_ORDER.map((wd) => {
+              const n = totalForWeekday(wd)
+              const isToday = wd === todayWd
+              return (
+                <option key={wd} value={wd} disabled={n === 0} className="font-sans text-base bg-white text-ink">
+                  {WEEKDAY_LONG[lang][wd]}{isToday ? ` — ${t.today}` : ''}{n > 0 ? ` · ${t.count(n)}` : ''}
+                </option>
+              )
+            })}
+          </select>
+          <ChevronDown className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 w-7 h-7 text-limone" aria-hidden="true" />
+        </div>
+      </label>
 
       {/* Filtro tipologie */}
       <div className="flex flex-wrap gap-2 mb-6">

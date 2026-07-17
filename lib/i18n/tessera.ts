@@ -16,6 +16,13 @@ export interface LoginDict {
   staffLink: string
   backCitizen: string
   genericError: string
+  choiceTitle: string
+  choiceLead: string
+  choiceClient: string
+  choiceClientDesc: string
+  choiceVendor: string
+  choiceVendorDesc: string
+  vendorJoin: string
 }
 
 export const LOGIN_I18N: Record<Lang, LoginDict> = {
@@ -33,6 +40,13 @@ export const LOGIN_I18N: Record<Lang, LoginDict> = {
     staffLink: 'Sei un operatore o un admin? Accedi con la password',
     backCitizen: '← Torna all’accesso con codice email',
     genericError: 'Qualcosa è andato storto. Riprova tra un momento.',
+    choiceTitle: 'Chi sei al mercato?',
+    choiceLead: 'Dimmelo e ti porto dalla parte giusta.',
+    choiceClient: 'Sono un cliente',
+    choiceClientDesc: 'La tessera punti, i preferiti, lo shop dei buoni.',
+    choiceVendor: 'Ho un banco',
+    choiceVendorDesc: 'La tua vetrina, i prodotti, la tessera al banco.',
+    vendorJoin: 'Non sei ancora nella rete? Chiedi di entrare',
   },
   fr: {
     title: 'Entrez au marché',
@@ -48,6 +62,13 @@ export const LOGIN_I18N: Record<Lang, LoginDict> = {
     staffLink: 'Marchand ou admin ? Connexion avec mot de passe',
     backCitizen: '← Retour à l’accès par code email',
     genericError: 'Un problème est survenu. Réessayez dans un instant.',
+    choiceTitle: 'Qui êtes-vous au marché ?',
+    choiceLead: 'Dites-le-nous et on vous emmène au bon endroit.',
+    choiceClient: 'Je suis client',
+    choiceClientDesc: 'La carte de points, les favoris, la boutique des bons.',
+    choiceVendor: 'J’ai un étal',
+    choiceVendorDesc: 'Votre vitrine, vos produits, la carte à l’étal.',
+    vendorJoin: 'Pas encore dans le réseau ? Demandez d’entrer',
   },
   de: {
     title: 'Rein in den Markt',
@@ -63,6 +84,13 @@ export const LOGIN_I18N: Record<Lang, LoginDict> = {
     staffLink: 'Händler oder Admin? Anmeldung mit Passwort',
     backCitizen: '← Zurück zum Code-Login',
     genericError: 'Etwas ist schiefgelaufen. Bitte gleich noch einmal versuchen.',
+    choiceTitle: 'Wer bist du auf dem Markt?',
+    choiceLead: 'Sag es uns und wir bringen dich zur richtigen Tür.',
+    choiceClient: 'Ich bin Kunde',
+    choiceClientDesc: 'Die Punktekarte, die Favoriten, der Gutschein-Shop.',
+    choiceVendor: 'Ich habe einen Stand',
+    choiceVendorDesc: 'Deine Vitrine, deine Produkte, die Karte am Stand.',
+    vendorJoin: 'Noch nicht im Netz? Frag an',
   },
   en: {
     title: 'Come on in',
@@ -78,6 +106,13 @@ export const LOGIN_I18N: Record<Lang, LoginDict> = {
     staffLink: 'Vendor or admin? Sign in with password',
     backCitizen: '← Back to email-code sign in',
     genericError: 'Something went wrong. Please try again in a moment.',
+    choiceTitle: 'Who are you at the market?',
+    choiceLead: 'Tell us and we’ll take you to the right door.',
+    choiceClient: 'I’m a customer',
+    choiceClientDesc: 'The points card, favourites, the voucher shop.',
+    choiceVendor: 'I have a stall',
+    choiceVendorDesc: 'Your showcase, your products, the card at the stall.',
+    vendorJoin: 'Not in the network yet? Ask to join',
   },
 }
 

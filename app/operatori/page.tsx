@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { Search, CalendarDays, BadgeCheck, MessageCircle, ArrowRight } from 'lucide-react'
 import BancoAvatar from '@/components/BancoAvatar'
 import { PostItNote } from '@/components/motion/PostItCollage'
-import WaveDivider from '@/components/motion/WaveDivider'
 import { useLang } from '@/lib/i18n/useLang'
 import { UI_I18N } from '@/lib/i18n/ui'
 import { categoryLabel } from '@/lib/i18n/home'
@@ -114,10 +113,10 @@ export default function OperatoriHubPage() {
             {ui.operatoriLead}
           </p>
         </div>
+        {/* La trama di questa pagina è la tenda in testa: niente ondina insieme. */}
         <div aria-hidden="true" className="hidden lg:block absolute right-10 -bottom-9 w-44 z-0 pointer-events-none">
           <PostItNote photo={{ src: '/zone/vita-banco-ortofrutta-ombrelloni.webp', alt: '' }} tilt={4} aspect="aspect-[4/3]" />
         </div>
-        <WaveDivider className="relative z-10 text-terracotta/30" />
       </section>
 
       <div className="container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl">

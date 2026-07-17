@@ -6,10 +6,8 @@ import Link from 'next/link'
 import { ArrowRight, Map as MapIcon, CalendarDays } from 'lucide-react'
 import MarketExplorer from '@/components/home/MarketExplorer'
 import PhotoStack, { type StackPhoto } from '@/components/motion/PhotoStack'
-import WaveDivider from '@/components/motion/WaveDivider'
 import Bollino from '@/components/Bollino'
 import { LogoMark } from '@/components/Logo'
-import { CATEGORY_COLOR } from '@/lib/schedules/classify'
 import type { MarketPin } from '@/components/home/types'
 import { useLang } from '@/lib/i18n/useLang'
 import type { Lang } from '@/lib/i18n/home'
@@ -35,14 +33,6 @@ const INTRO_PHOTOS: StackPhoto[] = [
   { src: '/zone/vita-banco-ortofrutta-ombrelloni.webp', alt: 'Pomodori e carciofi sui banchi, sotto gli ombrelloni verdi', caption: 'La spesa di stagione' },
 ]
 
-interface FamilyCard {
-  photo: string
-  alt: string
-  label: string
-  desc: string
-  color: string
-}
-
 interface Copy {
   eyebrow: string
   title: string
@@ -52,11 +42,6 @@ interface Copy {
   bannerTitle: string
   bannerReqs: string[]
   bannerCta: string
-  famEyebrow: string
-  famTitle: string
-  famLead: string
-  principali: Omit<FamilyCard, 'color'>
-  tematici: Omit<FamilyCard, 'color'>
 }
 
 const COPY: Record<Lang, Copy> = {
@@ -69,11 +54,6 @@ const COPY: Record<Lang, Copy> = {
     bannerTitle: 'Hai un banco? Entra nella rete.',
     bannerReqs: ['Banco pulito e curato', 'Prodotti di qualità', 'Serietà con colleghi e clienti'],
     bannerCta: 'Chiedi di entrare',
-    famEyebrow: 'Tutti sulla stessa mappa',
-    famTitle: 'Principali e tematici.',
-    famLead: 'Il grande mercato settimanale di merci varie, e i giorni speciali con la loro ricorrenza — sulla stessa mappa.',
-    principali: { photo: '/zone/vita-mercato-sanremo-banchi.webp', alt: 'I banchi del mercato settimanale, pieni di gente sotto i tendoni', label: 'Mercati principali', desc: 'Ogni settimana, in piazza: alimentari, abbigliamento, casa. Il mercato di sempre, comune per comune.' },
-    tematici: { photo: '/zone/vita-antiquariato-piazza.webp', alt: 'Il mercatino dell’antiquariato in piazza', label: 'Mercati tematici', desc: 'Antiquariato, produttori a km0, artigianato: ricorrenze mensili e stagionali, ognuna col suo giorno.' },
   },
   fr: {
     eyebrow: 'Chaque semaine, dans chaque commune',
@@ -84,11 +64,6 @@ const COPY: Record<Lang, Copy> = {
     bannerTitle: 'Tu as un étal ? Rejoins le réseau.',
     bannerReqs: ['Étal propre et soigné', 'Produits de qualité', 'Sérieux avec collègues et clients'],
     bannerCta: 'Demande d’entrer',
-    famEyebrow: 'Tous sur la même carte',
-    famTitle: 'Principaux et thématiques.',
-    famLead: 'Le grand marché hebdomadaire tout-venant, et les jours spéciaux avec leur rendez-vous — sur la même carte.',
-    principali: { photo: '/zone/vita-mercato-sanremo-banchi.webp', alt: 'Les étals du marché hebdomadaire, pleins de monde sous les parasols', label: 'Marchés principaux', desc: 'Chaque semaine, sur la place : alimentation, vêtements, maison. Le marché de toujours, commune par commune.' },
-    tematici: { photo: '/zone/vita-antiquariato-piazza.webp', alt: 'La brocante sur la place', label: 'Marchés thématiques', desc: 'Antiquités, producteurs locaux, artisanat : rendez-vous mensuels et saisonniers, chacun son jour.' },
   },
   de: {
     eyebrow: 'Jede Woche, in jeder Gemeinde',
@@ -99,11 +74,6 @@ const COPY: Record<Lang, Copy> = {
     bannerTitle: 'Hast du einen Stand? Mach mit.',
     bannerReqs: ['Sauberer, gepflegter Stand', 'Qualitätsprodukte', 'Verlässlichkeit'],
     bannerCta: 'Frag an, dabei zu sein',
-    famEyebrow: 'Alle auf einer Karte',
-    famTitle: 'Haupt- und Themenmärkte.',
-    famLead: 'Der große Wochenmarkt mit Allerlei und die besonderen Tage mit ihrem Termin — auf derselben Karte.',
-    principali: { photo: '/zone/vita-mercato-sanremo-banchi.webp', alt: 'Die Stände des Wochenmarkts, voller Leute unter den Planen', label: 'Hauptmärkte', desc: 'Jede Woche auf dem Platz: Lebensmittel, Kleidung, Haushalt. Der Markt wie immer, Gemeinde für Gemeinde.' },
-    tematici: { photo: '/zone/vita-antiquariato-piazza.webp', alt: 'Der Antiquitätenmarkt auf dem Platz', label: 'Themenmärkte', desc: 'Antiquitäten, Erzeuger, Handwerk: monatliche und saisonale Termine, jeder an seinem Tag.' },
   },
   en: {
     eyebrow: 'Every week, in every town',
@@ -114,11 +84,6 @@ const COPY: Record<Lang, Copy> = {
     bannerTitle: 'Got a stall? Join the network.',
     bannerReqs: ['A clean, well-kept stall', 'Quality products', 'Reliability'],
     bannerCta: 'Ask to join',
-    famEyebrow: 'All on one map',
-    famTitle: 'Main and themed.',
-    famLead: 'The big weekly general market, and the special days with their recurrence — on the same map.',
-    principali: { photo: '/zone/vita-mercato-sanremo-banchi.webp', alt: 'The weekly market stalls, crowded under the awnings', label: 'Main markets', desc: 'Every week, in the square: food, clothing, home. The market as always, town by town.' },
-    tematici: { photo: '/zone/vita-antiquariato-piazza.webp', alt: 'The antiques market in the square', label: 'Themed markets', desc: 'Antiques, local growers, crafts: monthly and seasonal dates, each on its own day.' },
   },
 }
 
@@ -139,10 +104,6 @@ export default function MappaExperience(props: Props) {
   const tabCls = (active: boolean) =>
     `inline-flex items-center gap-2 font-alt text-sm font-semibold px-4 py-2 rounded-full transition-colors ${active ? 'bg-alga text-crema' : 'text-ink-soft hover:text-ink'}`
 
-  const families: FamilyCard[] = [
-    { ...c.principali, color: CATEGORY_COLOR.generale },
-    { ...c.tematici, color: CATEGORY_COLOR.antiquariato },
-  ]
 
   return (
     <div className="bg-crema">
@@ -157,12 +118,12 @@ export default function MappaExperience(props: Props) {
             </h1>
             <p className="mt-4 max-w-xl text-base md:text-lg text-ink-soft leading-relaxed">{c.lead}</p>
           </div>
-          {/* Una piccola pila di foto come accento: la mappa è subito sotto. */}
+          {/* Una piccola pila di foto come accento: la mappa è subito sotto.
+              (Qui la trama è la tenda in testa: niente ondina nella stessa pagina.) */}
           <div className="w-[8.5rem] sm:w-[9.5rem] flex-shrink-0">
             <PhotoStack photos={INTRO_PHOTOS} aspect="aspect-[4/5]" />
           </div>
         </div>
-        <WaveDivider className="relative z-10 text-alga/35" />
       </section>
 
       {/* 2. Vista unica: Mappa ⇄ Calendario */}
@@ -205,35 +166,6 @@ export default function MappaExperience(props: Props) {
         </div>
       </section>
 
-      {/* 4. Due famiglie di mercati, con foto */}
-      <section className="relative overflow-hidden bg-crema">
-        <div className="container mx-auto px-4 md:px-6 py-16 md:py-20 max-w-6xl">
-          <div className="max-w-2xl mb-9">
-            <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-terracotta mb-2">{c.famEyebrow}</p>
-            <h2 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">{c.famTitle}</h2>
-            <p className="mt-3 text-ink-soft">{c.famLead}</p>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-5 md:gap-6">
-            {families.map((f) => (
-              <a key={f.label} href="#mappa" className="imk-lift group flex flex-col bg-white rounded-2xl border border-[#e0d7c1] overflow-hidden">
-                <span aria-hidden="true" className="mz-band" style={{ ['--band' as string]: f.color }} />
-                <div className="relative aspect-[16/9] overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={f.photo} alt={f.alt} loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                  <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-ink/70 to-transparent" />
-                  <span className="absolute left-4 bottom-3 font-display font-extrabold tracking-tight text-xl text-crema">{f.label}</span>
-                </div>
-                <div className="p-5 flex items-start justify-between gap-3">
-                  <p className="text-[15px] text-ink-soft leading-relaxed">{f.desc}</p>
-                  <span className="mt-0.5 inline-flex items-center gap-1 font-alt text-xs font-bold uppercase tracking-wider flex-shrink-0" style={{ color: f.color }}>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
-                  </span>
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
     </div>
   )
 }

@@ -372,9 +372,9 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
       </section>
 
       {/* ===== IL PROGETTO — storytelling emotivo: le informazioni si intendono,
-           non si elencano. Una foto che parla + tre passaggi di racconto. ===== */}
+           non si elencano. Una foto che parla + tre passaggi di racconto.
+           (Niente banda qui: l'ondina dell'hero è appena sopra.) ===== */}
       <section id="perche" className="relative overflow-hidden bg-crema-2">
-        <div aria-hidden="true" className="mz-band absolute top-0 inset-x-0" />
         <div className="relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-6xl">
           <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-16 items-center">
             <div className="home-reveal">
@@ -395,20 +395,28 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
             </div>
           </div>
 
-          {/* Il "cosa" del progetto: percorso di qualità, operatori a portata, servizi in più */}
+          {/* Il "cosa" del progetto: tre blocchi, tre colori pieni della palette
+              (alga / terracotta / limone) — niente beige. */}
           <div className="home-reveal mt-14 md:mt-16 grid sm:grid-cols-3 gap-5 md:gap-6">
-            {WHAT_I18N[lang].map((w, i) => (
-              <Link
-                key={w.t}
-                href={WHAT_HREFS[i] ?? '/mappa'}
-                className="imk-cosa group imk-lift flex flex-col gap-2 bg-crema rounded-2xl border border-[#e0d7c1] p-5 md:p-6 shadow-[0_16px_30px_-24px_rgba(38,36,30,0.45)] hover:border-terracotta/50 transition-colors"
-              >
-                <LogoMark className="w-8 h-7 text-terracotta imk-cosa-nodo" capo={false} />
-                <h3 className="font-display font-extrabold tracking-tight text-lg md:text-xl leading-tight text-ink group-hover:text-terracotta transition-colors">{w.t}</h3>
-                <p className="text-[15px] text-ink-soft leading-relaxed">{w.d}</p>
-                <ArrowRight className="w-4 h-4 text-terracotta mt-1 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" aria-hidden="true" />
-              </Link>
-            ))}
+            {WHAT_I18N[lang].map((w, i) => {
+              const look = [
+                { card: 'bg-alga text-crema', knot: 'text-limone', body: 'text-crema/85', arrow: 'text-limone' },
+                { card: 'bg-terracotta text-crema', knot: 'text-crema', body: 'text-crema/85', arrow: 'text-crema' },
+                { card: 'bg-limone text-ink', knot: 'text-terracotta', body: 'text-ink/75', arrow: 'text-terracotta' },
+              ][i % 3]
+              return (
+                <Link
+                  key={w.t}
+                  href={WHAT_HREFS[i] ?? '/mappa'}
+                  className={`imk-cosa group imk-lift flex flex-col gap-2 rounded-2xl p-5 md:p-6 shadow-[0_18px_34px_-24px_rgba(38,36,30,0.55)] transition-transform ${look.card}`}
+                >
+                  <LogoMark className={`w-8 h-7 imk-cosa-nodo ${look.knot}`} capo={false} />
+                  <h3 className="font-display font-extrabold tracking-tight text-lg md:text-xl leading-tight">{w.t}</h3>
+                  <p className={`text-[15px] leading-relaxed ${look.body}`}>{w.d}</p>
+                  <ArrowRight className={`w-4 h-4 mt-1 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all ${look.arrow}`} aria-hidden="true" />
+                </Link>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -517,21 +525,13 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
         </div>
       </section>
 
-      {/* ===== LA RETE — striscia compatta per chi tiene banco (il resto vive su /aderisci) ===== */}
+      {/* ===== LA RETE — un invito leggero per chi tiene banco: i requisiti
+           vivono su /aderisci, qui solo una riga e la porta d'ingresso. ===== */}
       <section id="rete" className="relative overflow-hidden bg-alga text-crema">
-        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-9 md:py-11 max-w-5xl flex flex-wrap items-center gap-x-8 gap-y-5">
-          <Bollino className="w-20 md:w-24 flex-shrink-0" />
-          <div className="flex-1 min-w-[240px]">
-            <h2 className="font-display font-extrabold tracking-tight text-xl md:text-2xl leading-tight text-crema">{rete.title}</h2>
-            <p className="mt-2 flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-crema/90">
-              {rete.req.map((r) => (
-                <span key={r} className="inline-flex items-center gap-1.5 font-alt font-semibold">
-                  <LogoMark className="w-5 h-4 flex-shrink-0 text-limone" capo={false} /> {r}
-                </span>
-              ))}
-            </p>
-          </div>
-          <Link href="/aderisci" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-terracotta text-crema px-6 py-3.5 rounded-full hover:bg-terracotta-600 transition-colors flex-shrink-0">
+        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-7 md:py-8 max-w-5xl flex flex-wrap items-center gap-x-6 gap-y-4">
+          <Bollino className="w-16 md:w-20 flex-shrink-0" />
+          <h2 className="flex-1 min-w-[240px] font-display font-extrabold tracking-tight text-xl md:text-2xl leading-tight text-crema">{rete.title}</h2>
+          <Link href="/aderisci" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-terracotta text-crema px-6 py-3 rounded-full hover:bg-terracotta-600 transition-colors flex-shrink-0">
             {rete.cta} <ArrowRight className="imk-march w-4 h-4" />
           </Link>
         </div>

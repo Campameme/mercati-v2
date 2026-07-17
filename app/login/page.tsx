@@ -1,6 +1,7 @@
 'use client'
 
 import { Suspense, useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Mail, Lock, KeyRound, ArrowRight, ArrowLeft } from 'lucide-react'
@@ -18,8 +19,9 @@ export default function LoginPage() {
 
 // Due mondi: "citizen" entra con un CODICE via email (OTP, nessuna password);
 // "staff" (admin e operatori) entra con la password. Il recupero/aggiornamento
-// password vive nel mondo staff.
-type World = 'citizen' | 'staff'
+// password vive nel mondo staff. Prima di tutto si sceglie CHI si è:
+// cliente o banco (world = null → schermata di scelta).
+type World = 'citizen' | 'staff' | null
 type StaffMode = 'signin' | 'reset' | 'update'
 
 function LoginPageInner() {
@@ -31,7 +33,7 @@ function LoginPageInner() {
 
   const recovery = !!search.get('recovery')
   const autherror = search.get('autherror')
-  const [world, setWorld] = useState<World>(recovery || autherror ? 'staff' : 'citizen')
+  const [world, setWorld] = useState<World>(recovery || autherror ? 'staff' : null)
   const [staffMode, setStaffMode] = useState<StaffMode>(recovery ? 'update' : autherror ? 'reset' : 'signin')
 
   // OTP
@@ -161,7 +163,40 @@ function LoginPageInner() {
             <Logo inline className="text-sm" />
           </div>
 
-          {world === 'citizen' ? (
+          {world === null ? (
+            <>
+              {/* Prima scelta: cliente o banco. Poi ognuno alla sua porta. */}
+              <h1 className="font-display font-extrabold text-3xl text-ink mb-1 text-center">{t.choiceTitle}</h1>
+              <p className="text-sm text-ink-soft text-center mb-6">{t.choiceLead}</p>
+              <div className="space-y-3">
+                <button
+                  type="button"
+                  onClick={() => { setWorld('citizen'); setError(null); setNotice(null) }}
+                  className="imk-lift group w-full text-left bg-alga text-crema rounded-2xl p-5 hover:bg-alga-600 transition-colors"
+                >
+                  <span className="flex items-center justify-between gap-3">
+                    <span className="font-display font-extrabold tracking-tight text-xl">{t.choiceClient}</span>
+                    <ArrowRight className="w-5 h-5 flex-shrink-0 group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
+                  </span>
+                  <span className="block text-sm text-crema/85 mt-1">{t.choiceClientDesc}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setWorld('staff'); setStaffMode('signin'); setError(null); setNotice(null) }}
+                  className="imk-lift group w-full text-left bg-terracotta text-crema rounded-2xl p-5 hover:bg-terracotta-600 transition-colors"
+                >
+                  <span className="flex items-center justify-between gap-3">
+                    <span className="font-display font-extrabold tracking-tight text-xl">{t.choiceVendor}</span>
+                    <ArrowRight className="w-5 h-5 flex-shrink-0 group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
+                  </span>
+                  <span className="block text-sm text-crema/85 mt-1">{t.choiceVendorDesc}</span>
+                </button>
+              </div>
+              <Link href="/aderisci" className="mt-6 block w-full text-center text-sm text-ink-muted hover:text-alga-600 transition-colors">
+                {t.vendorJoin}
+              </Link>
+            </>
+          ) : world === 'citizen' ? (
             <>
               <h1 className="font-display font-extrabold text-3xl text-ink mb-1 text-center">{t.title}</h1>
               <p className="text-sm text-ink-soft text-center mb-5">{t.lead}</p>
@@ -259,13 +294,18 @@ function LoginPageInner() {
                 </button>
               )}
               {staffMode !== 'update' && (
-                <button
-                  type="button"
-                  onClick={() => { setWorld('citizen'); setStaffMode('signin'); setOtpStep('email'); setError(null); setNotice(null) }}
-                  className="mt-4 w-full inline-flex items-center justify-center gap-1.5 text-sm text-ink-muted hover:text-alga-600 transition-colors"
-                >
-                  <ArrowLeft className="w-3.5 h-3.5" /> {t.backCitizen}
-                </button>
+                <>
+                  <Link href="/aderisci" className="mt-4 block w-full text-center text-sm text-ink-muted hover:text-alga-600 transition-colors">
+                    {t.vendorJoin}
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => { setWorld(null); setStaffMode('signin'); setOtpStep('email'); setError(null); setNotice(null) }}
+                    className="mt-3 w-full inline-flex items-center justify-center gap-1.5 text-sm text-ink-muted hover:text-alga-600 transition-colors"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" /> {t.choiceTitle}
+                  </button>
+                </>
               )}
             </>
           )}

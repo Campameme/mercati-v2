@@ -4,6 +4,7 @@ import { ArrowRight, Newspaper } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { PostItNote } from '@/components/motion/PostItCollage'
 import WaveDivider from '@/components/motion/WaveDivider'
+import { COMUNI_NEWS } from '@/lib/markets/comuniNews'
 
 export const dynamic = 'force-dynamic'
 
@@ -94,6 +95,32 @@ export default async function NotiziePage() {
             ))}
           </div>
         )}
+
+        {/* Le bacheche ufficiali dei comuni: è lì che escono gli avvisi sul
+            "mercato cittadino". Link diretti ai siti istituzionali (verificati). */}
+        <section className="mt-14">
+          <h2 className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-ink-muted mb-2">Dai siti dei comuni</h2>
+          <p className="text-sm text-ink-soft mb-5 max-w-xl">
+            Ogni comune pubblica gli avvisi sul proprio mercato nella bacheca del sito istituzionale: qui trovi le porte d’ingresso ufficiali.
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
+            {COMUNI_NEWS.map((c) => (
+              <a
+                key={c.comune}
+                href={c.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="imk-lift group flex items-center justify-between gap-2 bg-white border border-[#e0d7c1] hover:border-alga rounded-xl px-4 py-3 transition-colors"
+              >
+                <span className="min-w-0">
+                  <span className="block font-alt font-semibold text-sm text-ink leading-tight truncate group-hover:text-alga-600 transition-colors">{c.comune}</span>
+                  <span className="block text-[11px] text-ink-muted mt-0.5">Bacheca del Comune</span>
+                </span>
+                <span className="text-ink-muted group-hover:text-alga-600 flex-shrink-0 transition-colors">↗</span>
+              </a>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   )
