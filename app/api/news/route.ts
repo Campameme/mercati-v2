@@ -51,7 +51,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
-  const { title, content } = body
+  const title = typeof body.title === 'string' ? body.title.trim().slice(0, 300) : ''
+  const content = typeof body.content === 'string' ? body.content.slice(0, 20000) : ''
   const isGlobal = !!body.is_global
   const marketId = body.market_id ?? null
   if (!title || !content) {

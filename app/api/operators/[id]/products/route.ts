@@ -22,17 +22,24 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
   if (!guard.ok) return guard.res
   const supabase = guard.supabase
   const body = await request.json()
-  const { name } = body
+  const name = typeof body.name === 'string' ? body.name.trim().slice(0, 200) : ''
   if (!name) return NextResponse.json({ error: 'name obbligatorio' }, { status: 400 })
+  // Prezzo: numero finito e non negativo, altrimenti null (campo opzionale).
+  const price =
+    body.price == null || body.price === ''
+      ? null
+      : Number.isFinite(Number(body.price)) && Number(body.price) >= 0 && Number(body.price) <= 1_000_000
+        ? Number(body.price)
+        : null
   const insert = {
     operator_id: params.id,
     name,
-    description: body.description ?? null,
-    price: body.price ?? null,
-    currency: body.currency ?? 'EUR',
-    photos: body.photos ?? [],
+    description: typeof body.description === 'string' ? body.description.slice(0, 2000) : null,
+    price,
+    currency: typeof body.currency === 'string' ? body.currency.slice(0, 8) : 'EUR',
+    photos: Array.isArray(body.photos) ? body.photos.slice(0, 20) : [],
     is_available: body.is_available ?? true,
-    sort_order: body.sort_order ?? 0,
+    sort_order: Number.isFinite(Number(body.sort_order)) ? Number(body.sort_order) : 0,
   }
   const { data, error } = await supabase.from('products').insert(insert).select().single()
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })

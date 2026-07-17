@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 
   let opQuery = supabase
     .from('operators')
-    .select('id, code, market_id, name, category, description, stall_number, languages, payment_methods, markets(slug), operator_schedules(schedule_id, location_lat, location_lng, stall_number, market_schedules(id, comune, giorno, luogo, market_id, place_id, markets(slug)))')
+    .select('id, code, market_id, name, category, description, stall_number, languages, payment_methods, markets!operators_market_id_fkey(slug), operator_schedules(schedule_id, location_lat, location_lng, stall_number, market_schedules(id, comune, giorno, luogo, market_id, place_id, markets(slug)))')
   if (marketId) {
     // Includi sia operators del market sia operators con presenze in questo market
     const { data: presenceOps } = await supabase

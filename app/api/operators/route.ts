@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
   if (wantsAll) {
     let q = supabase
       .from('operators')
-      .select('id, name, category, description, stall_number, location_lat, location_lng, photos, languages, payment_methods, social_links, rating, market_id, schedule_id, markets(slug, name, city), operator_schedules(schedule_id, location_lat, location_lng, stall_number, market_schedules(id, comune, giorno, luogo, market_id)), products(name)')
+      .select('id, name, category, description, stall_number, location_lat, location_lng, photos, languages, payment_methods, social_links, rating, market_id, schedule_id, markets!operators_market_id_fkey(slug, name, city), operator_schedules(schedule_id, location_lat, location_lng, stall_number, market_schedules(id, comune, giorno, luogo, market_id)), products(name)')
     if (category && category !== 'all') q = q.eq('category', category)
     const s = search ? cleanSearch(search) : ''
     if (s) q = q.or(`name.ilike.%${s}%,description.ilike.%${s}%,stall_number.ilike.%${s}%`)

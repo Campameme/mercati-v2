@@ -23,6 +23,20 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   const allowed = ['name', 'description', 'price', 'currency', 'photos', 'is_available', 'sort_order']
   const update: Record<string, unknown> = {}
   for (const k of allowed) if (k in body) update[k] = body[k]
+  // Clamp/validazione dei campi liberi (l'operatore modifica la propria scheda).
+  if (typeof update.name === 'string') update.name = update.name.trim().slice(0, 200)
+  if (typeof update.description === 'string') update.description = update.description.slice(0, 2000)
+  if (typeof update.currency === 'string') update.currency = update.currency.slice(0, 8)
+  if (Array.isArray(update.photos)) update.photos = (update.photos as unknown[]).slice(0, 20)
+  if ('price' in update) {
+    const p = update.price
+    update.price =
+      p == null || p === ''
+        ? null
+        : Number.isFinite(Number(p)) && Number(p) >= 0 && Number(p) <= 1_000_000
+          ? Number(p)
+          : null
+  }
   update.updated_at = new Date().toISOString()
   const { data, error } = await supabase
     .from('products')

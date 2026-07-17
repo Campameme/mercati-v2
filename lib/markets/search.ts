@@ -26,10 +26,10 @@ const TOMORROW_RE = /\b(domani|demain|morgen|tomorrow)\b/
 
 /** sinonimi/parole-chiave → macro-tipologia (ricerca "pesce", "brocante"…) */
 const CATEGORY_SYNONYMS: Record<ScheduleCategory, RegExp> = {
-  alimentare: /\b(pesce|poisson|fisch|fish|frutta|verdura|legumes?|gemuse|vegetables?|formagg|fromage|kase|cheese|km\s*0|bio|contadin|producteur|erzeuger|farmer|sapori|gastronom)\w*/,
+  alimentare: /\b(pesce|poisson|fisch|fish|frutta|verdura|zucchin|pomodor|carciof|melanzan|insalat|stoccafiss|baccal|legumes?|gemuse|vegetables?|courgette|zucchini|formagg|fromage|kase|cheese|km\s*0|bio|contadin|producteur|erzeuger|farmer|sapori|gastronom|spezie|aromatic)\w*/,
   antiquariato: /\b(brocante|vintage|usato|antiquit|antiques?|collezion|collection|sammler|modernariato|rigattier|flohmarkt)\w*/,
   artigianato: /\b(artigian|artisan|handwerk|crafts?|ceramic|keramik|creativ|opere|handmade)\w*/,
-  generale: /\b(abbigliament|vetements?|kleidung|clothing|scarpe|chaussures|schuhe|shoes|casaling)\w*/,
+  generale: /\b(abbigliament|vetements?|kleidung|clothing|scarpe|chaussures|schuhe|shoes|casaling|pantalon|jeans|camici|maglie|intimo|sciarp|borse|tendagg|lenzuol|tovagli|rideau|vorhang|curtain|trousers|hose)\w*/,
 }
 
 /** Il giorno richiesto dalla query, se c'è (data concreta per l'occorrenza). */

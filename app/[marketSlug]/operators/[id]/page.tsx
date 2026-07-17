@@ -27,7 +27,7 @@ export default async function OperatorDetailPage({ params }: { params: { marketS
   const supabase = createClient()
   const { data: operator } = await supabase
     .from('operators')
-    .select('*, markets!inner(slug, name)')
+    .select('*, markets!operators_market_id_fkey!inner(slug, name)')
     .eq('id', params.id)
     .maybeSingle()
   if (!operator || operator.markets?.slug !== params.marketSlug) notFound()

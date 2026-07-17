@@ -56,9 +56,11 @@ export async function POST(request: NextRequest) {
   }
 
   const points = Math.round(Number(body?.points))
-  const reason = String(body?.reason ?? '')
-  if (!Number.isFinite(points) || points <= 0) {
-    return NextResponse.json({ error: 'Numero di punti non valido' }, { status: 400 })
+  const reason = String(body?.reason ?? '').slice(0, 200)
+  // Cap per singola operazione: evita errori di battitura o abusi (l'operatore è
+  // meno affidabile del super admin). Le RPC verificano comunque budget/saldo.
+  if (!Number.isFinite(points) || points <= 0 || points > 10000) {
+    return NextResponse.json({ error: 'Numero di punti non valido (1–10000)' }, { status: 400 })
   }
 
   const fn = action === 'give' ? 'tessera_give' : action === 'redeem' ? 'tessera_redeem' : null

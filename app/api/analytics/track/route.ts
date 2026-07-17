@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     market_id: body.marketId ?? null,
     operator_id: body.operatorId ?? null,
     schedule_id: body.scheduleId ?? null,
-    comune: body.comune ?? null,
+    comune: typeof body.comune === 'string' ? body.comune.slice(0, 120) : null,
     path: typeof body.path === 'string' ? body.path.slice(0, 500) : null,
     visitor_hash: vh,
     referrer_host: extractHost(referrer),

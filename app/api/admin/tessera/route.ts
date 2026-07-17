@@ -39,7 +39,7 @@ export async function GET() {
 
   // Budget punti degli operatori (per ricaricarli) + catalogo premi dello shop.
   const [{ data: operators }, { data: budgets }, { data: rewards }] = await Promise.all([
-    service.from('operators').select('id, name, market_id, markets(name)').order('name'),
+    service.from('operators').select('id, name, market_id, markets!operators_market_id_fkey(name)').order('name'),
     service.from('operator_point_budgets').select('operator_id, balance'),
     service.from('shop_rewards').select('id, label, description, cost_points, stock, market_id, is_active').order('created_at', { ascending: false }),
   ])
@@ -62,9 +62,10 @@ export async function POST(request: NextRequest) {
   if (action === 'points') {
     const userId = String(body?.userId ?? '')
     const points = Number(body?.points)
-    const reason = String(body?.reason ?? '').trim() || 'Punti dal mercato'
-    if (!userId || !Number.isFinite(points) || points === 0) {
-      return NextResponse.json({ error: 'userId e points (≠0) richiesti' }, { status: 400 })
+    const reason = (String(body?.reason ?? '').trim() || 'Punti dal mercato').slice(0, 200)
+    // Cap di sicurezza contro typo (es. uno zero di troppo): ±1.000.000 per operazione.
+    if (!userId || !Number.isFinite(points) || points === 0 || Math.abs(points) > 1_000_000) {
+      return NextResponse.json({ error: 'userId e points (≠0, max ±1.000.000) richiesti' }, { status: 400 })
     }
     const { error } = await service.from('point_events').insert({
       user_id: userId, points: Math.round(points), reason, kind: 'adjust', created_by: guard.user.id,
@@ -77,8 +78,8 @@ export async function POST(request: NextRequest) {
   if (action === 'recharge') {
     const operatorId = String(body?.operatorId ?? '')
     const points = Math.round(Number(body?.points))
-    if (!operatorId || !Number.isFinite(points) || points <= 0) {
-      return NextResponse.json({ error: 'operatorId e points (>0) richiesti' }, { status: 400 })
+    if (!operatorId || !Number.isFinite(points) || points <= 0 || points > 1_000_000) {
+      return NextResponse.json({ error: 'operatorId e points (1–1.000.000) richiesti' }, { status: 400 })
     }
     const { data: cur } = await service.from('operator_point_budgets').select('balance').eq('operator_id', operatorId).maybeSingle()
     const next = (cur?.balance ?? 0) + points
@@ -89,15 +90,18 @@ export async function POST(request: NextRequest) {
 
   // Crea un premio nello shop (riscattabile a punti).
   if (action === 'reward') {
-    const label = String(body?.label ?? '').trim()
+    const label = String(body?.label ?? '').trim().slice(0, 200)
     const cost = Math.round(Number(body?.cost_points))
-    if (!label || !Number.isFinite(cost) || cost <= 0) {
-      return NextResponse.json({ error: 'label e cost_points (>0) richiesti' }, { status: 400 })
+    if (!label || !Number.isFinite(cost) || cost <= 0 || cost > 1_000_000) {
+      return NextResponse.json({ error: 'label e cost_points (1–1.000.000) richiesti' }, { status: 400 })
     }
-    const stock = body?.stock === null || body?.stock === undefined || body?.stock === '' ? null : Math.round(Number(body.stock))
+    let stock = body?.stock === null || body?.stock === undefined || body?.stock === '' ? null : Math.round(Number(body.stock))
+    if (stock !== null && (!Number.isFinite(stock) || stock < 0 || stock > 1_000_000)) {
+      return NextResponse.json({ error: 'stock non valido (0–1.000.000 o vuoto)' }, { status: 400 })
+    }
     const { error } = await service.from('shop_rewards').insert({
       label,
-      description: String(body?.description ?? '').trim() || null,
+      description: String(body?.description ?? '').trim().slice(0, 1000) || null,
       cost_points: cost,
       stock,
       market_id: body?.market_id || null,
@@ -108,9 +112,9 @@ export async function POST(request: NextRequest) {
 
   if (action === 'coupon') {
     const userId = String(body?.userId ?? '')
-    const label = String(body?.label ?? '').trim()
+    const label = String(body?.label ?? '').trim().slice(0, 200)
     if (!userId || !label) return NextResponse.json({ error: 'userId e label richiesti' }, { status: 400 })
-    const code = (String(body?.code ?? '').trim() || randomCode()).toUpperCase()
+    const code = (String(body?.code ?? '').trim().slice(0, 40) || randomCode()).toUpperCase()
     const { error } = await service.from('coupons').insert({
       user_id: userId, code, label, kind: 'manual',
     })

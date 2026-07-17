@@ -27,7 +27,11 @@ type StaffMode = 'signin' | 'reset' | 'update'
 function LoginPageInner() {
   const router = useRouter()
   const search = useSearchParams()
-  const next = search.get('next') ?? '/'
+  // Open-redirect guard: si accettano SOLO path interni relativi (un solo '/'
+  // iniziale, niente '//host', niente 'https://…', niente backslash). Un valore
+  // esterno viene ignorato e si torna alla home.
+  const rawNext = search.get('next') ?? '/'
+  const next = /^\/($|[^/\\])/.test(rawNext) ? rawNext : '/'
   const [lang] = useLang()
   const t = LOGIN_I18N[lang]
 

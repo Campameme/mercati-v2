@@ -24,6 +24,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   const allowed = ['title', 'content', 'type', 'priority', 'status', 'publish_from', 'publish_until', 'is_global', 'market_id']
   const update: Record<string, unknown> = {}
   for (const k of allowed) if (k in body) update[k] = body[k]
+  // Clamp lunghezze sui campi testuali liberi (coerente con la POST).
+  if (typeof update.title === 'string') update.title = update.title.trim().slice(0, 300)
+  if (typeof update.content === 'string') update.content = update.content.slice(0, 20000)
   if (update.status && update.status !== 'draft' && update.status !== 'published') {
     return NextResponse.json({ error: 'status non valido' }, { status: 400 })
   }

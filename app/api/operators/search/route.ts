@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
   let query = supabase
     .from('operators')
-    .select('id, code, name, category, description, stall_number, market_id, markets(slug, name)')
+    .select('id, code, name, category, description, stall_number, market_id, markets!operators_market_id_fkey(slug, name)')
     .limit(limit)
 
   if (q) {

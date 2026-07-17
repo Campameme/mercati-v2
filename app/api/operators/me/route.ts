@@ -46,7 +46,7 @@ export async function GET() {
 
   const { data: operators, error } = await supabase
     .from('operators')
-    .select('*, markets!inner(slug, name)')
+    .select('*, markets!operators_market_id_fkey!inner(slug, name)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: true })
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
