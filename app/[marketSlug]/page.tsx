@@ -177,7 +177,7 @@ export default async function MarketHomePage({ params }: { params: { marketSlug:
                 {marketFull.market_days && marketFull.market_days.length > 0 && (
                   <p className="mt-3 text-sm text-ink-soft">
                     <span className="font-alt font-semibold uppercase tracking-[0.12em] text-xs text-ink-muted mr-2">{ui.zoneDays}</span>
-                    <span className="text-ink">{formatMarketDays(marketFull.market_days)}</span>
+                    <span className="text-ink">{formatMarketDays(marketFull.market_days, lang)}</span>
                   </p>
                 )}
               </Reveal>

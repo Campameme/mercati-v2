@@ -6,6 +6,9 @@ import { Search, CalendarDays, BadgeCheck, MessageCircle, ArrowRight } from 'luc
 import BancoAvatar from '@/components/BancoAvatar'
 import { PostItNote } from '@/components/motion/PostItCollage'
 import WaveDivider from '@/components/motion/WaveDivider'
+import { useLang } from '@/lib/i18n/useLang'
+import { UI_I18N } from '@/lib/i18n/ui'
+import { categoryLabel } from '@/lib/i18n/home'
 
 interface HubOperator {
   id: string
@@ -29,27 +32,14 @@ interface HubOperator {
   }>
 }
 
-const CAT_LABEL: Record<string, string> = {
-  food: 'Alimentare',
-  clothing: 'Abbigliamento',
-  accessories: 'Accessori',
-  electronics: 'Elettronica',
-  home: 'Casa',
-  books: 'Libri',
-  flowers: 'Fiori',
-  other: 'Altro',
-  fruit_vegetables: 'Frutta e verdura',
-  bakery: 'Panificio',
-  meat_fish: 'Carne e pesce',
-  dairy: 'Latticini',
-}
-
 function waHref(value: string): string {
   if (/^https?:\/\//i.test(value)) return value
   return `https://wa.me/${value.replace(/[^0-9]/g, '')}`
 }
 
 export default function OperatoriHubPage() {
+  const [lang] = useLang()
+  const ui = UI_I18N[lang]
   const [operators, setOperators] = useState<HubOperator[]>([])
   const [loading, setLoading] = useState(true)
   const [marketFilter, setMarketFilter] = useState<string>('all')
@@ -108,21 +98,20 @@ export default function OperatoriHubPage() {
           Sul lato, un post-it che galleggia: il banco com'è dal vivo. */}
       <section className="relative bg-crema-2 border-b border-[#e0d7c1] overflow-hidden">
         <div className="relative z-10 container mx-auto px-4 md:px-6 pt-12 pb-10 md:pt-16 md:pb-12 max-w-6xl">
-          <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-2">La Riviera dei Fiori · la rete dei banchi</p>
+          <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-2">{ui.operatoriEyebrow}</p>
           <div className="flex items-end justify-between gap-4 flex-wrap">
             <h1 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">
-              I banchi di <span className="text-terracotta">fiducia.</span>
+              {ui.operatoriTitleLead} <span className="text-terracotta">{ui.operatoriTitleAccent}</span>
             </h1>
             {!loading && operators.length > 0 && (
               <p className="font-alt text-sm font-semibold text-ink-soft">
                 <span className="font-display font-extrabold tracking-tight text-2xl text-ink">{operators.length}</span>{' '}
-                banc{operators.length === 1 ? 'o' : 'hi'} nella rete
+                {operators.length === 1 ? ui.operatoriCount.one : ui.operatoriCount.many}
               </p>
             )}
           </div>
           <p className="text-base text-ink-soft mt-4 max-w-xl leading-relaxed">
-            Banco curato, prodotti di qualità, serietà: qui c&apos;è chi ci mette la faccia, con i mercati
-            che frequenta ogni settimana. Filtra per zona, comune o categoria per trovare subito quello che cerchi.
+            {ui.operatoriLead}
           </p>
         </div>
         <div aria-hidden="true" className="hidden lg:block absolute right-10 -bottom-9 w-44 z-0 pointer-events-none">
@@ -139,49 +128,49 @@ export default function OperatoriHubPage() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Cerca banco, comune…"
-            aria-label="Cerca banco o comune"
+            placeholder={ui.operatoriSearchPlaceholder}
+            aria-label={ui.operatoriSearchAria}
             className="w-full pl-10 pr-3 py-3 bg-white border border-[#e0d7c1] rounded-xl text-sm focus:outline-none focus:border-alga"
           />
         </div>
         <select
           value={marketFilter}
           onChange={(e) => setMarketFilter(e.target.value)}
-          aria-label="Filtra per zona"
+          aria-label={ui.operatoriFilterZoneAria}
           className="py-3 px-3 bg-white border border-[#e0d7c1] rounded-xl text-sm focus:outline-none focus:border-alga"
         >
-          <option value="all">Tutte le zone</option>
+          <option value="all">{ui.operatoriAllZones}</option>
           {markets.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
         </select>
         <select
           value={comuneFilter}
           onChange={(e) => setComuneFilter(e.target.value)}
-          aria-label="Filtra per comune"
+          aria-label={ui.operatoriFilterComuneAria}
           className="py-3 px-3 bg-white border border-[#e0d7c1] rounded-xl text-sm focus:outline-none focus:border-alga"
         >
-          <option value="all">Tutti i comuni</option>
+          <option value="all">{ui.operatoriAllComuni}</option>
           {comuni.map((c) => <option key={c} value={c}>{c}</option>)}
         </select>
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          aria-label="Filtra per categoria"
+          aria-label={ui.operatoriFilterCategoryAria}
           className="py-3 px-3 bg-white border border-[#e0d7c1] rounded-xl text-sm focus:outline-none focus:border-alga"
         >
-          <option value="all">Tutte le categorie</option>
-          {categories.map((c) => <option key={c} value={c}>{CAT_LABEL[c] ?? c}</option>)}
+          <option value="all">{ui.operatoriAllCategories}</option>
+          {categories.map((c) => <option key={c} value={c}>{categoryLabel(c, lang)}</option>)}
         </select>
       </div>
 
       {/* Le card dei banchi: bianche, band terracotta in testa (come in home) */}
       {loading ? (
-        <p className="text-center py-12 text-ink-muted text-sm">Caricamento…</p>
+        <p className="text-center py-12 text-ink-muted text-sm">{ui.operatoriLoading}</p>
       ) : filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-[#e0d7c1] shadow-[0_16px_30px_-24px_rgba(38,36,30,0.45)] p-10 text-center text-ink-muted max-w-lg mx-auto">
-          <p className="font-display font-extrabold tracking-tight text-xl text-alga">Nessun banco, per ora</p>
-          <p className="mt-1 text-sm">Nessun operatore coi filtri correnti.</p>
+          <p className="font-display font-extrabold tracking-tight text-xl text-alga">{ui.operatoriEmptyTitle}</p>
+          <p className="mt-1 text-sm">{ui.operatoriEmptyBody}</p>
           {operators.length === 0 && (
-            <p className="text-xs mt-2">Gli admin di zona possono aggiungere banchi dall&apos;area di gestione.</p>
+            <p className="text-xs mt-2">{ui.operatoriEmptyAdmin}</p>
           )}
         </div>
       ) : (
@@ -207,11 +196,11 @@ export default function OperatoriHubPage() {
                       </h3>
                       <div className="mt-1 flex flex-wrap items-center gap-1.5">
                         <span className="inline-block font-alt text-[11px] font-bold uppercase tracking-wide text-terracotta-600 bg-terracotta-50 rounded-full px-2 py-0.5">
-                          {CAT_LABEL[op.category] ?? op.category}
+                          {categoryLabel(op.category, lang)}
                         </span>
                         {op.verified && (
                           <span className="inline-flex items-center gap-1 font-alt text-[11px] font-bold uppercase tracking-wide text-alga-600 bg-alga-50 rounded-full px-2 py-0.5">
-                            <BadgeCheck className="w-3 h-3" aria-hidden="true" /> Verificato
+                            <BadgeCheck className="w-3 h-3" aria-hidden="true" /> {ui.operatoriVerified}
                           </span>
                         )}
                       </div>
@@ -225,7 +214,7 @@ export default function OperatoriHubPage() {
                   {/* I mercati che frequenta ogni settimana */}
                   <div className="mt-auto pt-3 space-y-1.5">
                     {preview.length === 0 ? (
-                      <p className="text-xs text-ink-muted italic">Nessun mercato configurato</p>
+                      <p className="text-xs text-ink-muted italic">{ui.operatoriNoMarkets}</p>
                     ) : (
                       preview.map((s) => (
                         <div key={s.scheduleId} className="flex items-center gap-1.5 text-xs text-ink-soft">
@@ -238,7 +227,9 @@ export default function OperatoriHubPage() {
                       ))
                     )}
                     {more > 0 && (
-                      <p className="text-xs text-ink-muted italic">+ altri {more} mercat{more === 1 ? 'o' : 'i'}</p>
+                      <p className="text-xs text-ink-muted italic">
+                        {(more === 1 ? ui.operatoriMoreMarkets.one : ui.operatoriMoreMarkets.many).replace('{n}', String(more))}
+                      </p>
                     )}
                   </div>
                   {op.socialLinks?.whatsapp && (

@@ -5,9 +5,10 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { MapPin, Store, Navigation2, ChevronDown } from 'lucide-react'
 import MarketViewer from '@/components/MarketViewer'
-import { classifySchedule, CATEGORY_COLOR, CATEGORY_LABEL } from '@/lib/schedules/classify'
+import { classifySchedule, categoryLabelI18n, CATEGORY_COLOR } from '@/lib/schedules/classify'
 import { useLang } from '@/lib/i18n/useLang'
-import { UI_I18N } from '@/lib/i18n/ui'
+import { UI_I18N, type UiDict } from '@/lib/i18n/ui'
+import { categoryLabel } from '@/lib/i18n/home'
 
 interface SessionLite {
   id: string
@@ -43,28 +44,19 @@ interface Props {
   operators: OperatorLite[]
 }
 
-const CAT_LABEL: Record<string, string> = {
-  fruit_vegetables: 'Frutta e verdura',
-  bakery: 'Panificio',
-  meat_fish: 'Carne e pesce',
-  dairy: 'Latticini',
-  flowers: 'Fiori',
-  clothing: 'Abbigliamento',
-  food: 'Alimentare',
-  other: 'Altro',
-}
-
-function shortLabel(giorno: string): string {
+// Normalizza il giorno (testo libero dal DB, in italiano) in un'etichetta breve
+// nella lingua dell'utente. weekdaysLong: indice 0=domenica … 6=sabato.
+function shortLabel(giorno: string, ui: UiDict): string {
   const lower = giorno.toLowerCase()
-  if (/\bluned[iì]\b/.test(lower))    return 'Lunedì'
-  if (/\bmarted[iì]\b/.test(lower))   return 'Martedì'
-  if (/\bmercoled[iì]\b/.test(lower)) return 'Mercoledì'
-  if (/\bgioved[iì]\b/.test(lower))   return 'Giovedì'
-  if (/\bvenerd[iì]\b/.test(lower))   return 'Venerdì'
-  if (/\bsabato\b/.test(lower))       return 'Sabato'
-  if (/\bdomenica\b/.test(lower))     return 'Domenica'
-  if (/\bdomeniche\b/.test(lower))    return 'Domeniche'
-  if (/\bsabati\b/.test(lower))       return 'Sabati'
+  if (/\bluned[iì]\b/.test(lower))    return ui.weekdaysLong[1]
+  if (/\bmarted[iì]\b/.test(lower))   return ui.weekdaysLong[2]
+  if (/\bmercoled[iì]\b/.test(lower)) return ui.weekdaysLong[3]
+  if (/\bgioved[iì]\b/.test(lower))   return ui.weekdaysLong[4]
+  if (/\bvenerd[iì]\b/.test(lower))   return ui.weekdaysLong[5]
+  if (/\bsabato\b/.test(lower))       return ui.weekdaysLong[6]
+  if (/\bdomenica\b/.test(lower))     return ui.weekdaysLong[0]
+  if (/\bdomeniche\b/.test(lower))    return ui.sundaysPlural
+  if (/\bsabati\b/.test(lower))       return ui.saturdaysPlural
   return giorno.length > 22 ? giorno.slice(0, 20) + '…' : giorno
 }
 
@@ -134,7 +126,7 @@ export default function ComuneSessionsExplorer({
         lng: op.location_lng,
         kind: 'operator' as const,
         title: op.name,
-        subtitle: op.stall_number ? `${ui.comuneBanchi} ${op.stall_number}` : undefined,
+        subtitle: op.stall_number ? `${ui.comuneBancoSingolare} ${op.stall_number}` : undefined,
         href: `/${marketSlug}/operators/${op.id}`,
       })
     }
@@ -166,7 +158,7 @@ export default function ComuneSessionsExplorer({
             >
               {sessions.map((s) => (
                 <option key={s.id} value={s.id}>
-                  {shortLabel(s.giorno)}
+                  {shortLabel(s.giorno, ui)}
                   {s.luogo ? ` — ${s.luogo.length > 40 ? s.luogo.slice(0, 38) + '…' : s.luogo}` : ''}
                 </option>
               ))}
@@ -189,7 +181,7 @@ export default function ComuneSessionsExplorer({
                   className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-alt font-bold uppercase tracking-wider text-crema"
                   style={{ background: CATEGORY_COLOR[cat] }}
                 >
-                  {CATEGORY_LABEL[cat]}
+                  {categoryLabelI18n(cat, lang)}
                 </span>
               </div>
               {active.luogo && (
@@ -244,11 +236,11 @@ export default function ComuneSessionsExplorer({
                     <h4 className="font-display font-extrabold tracking-tight text-base text-ink leading-tight group-hover:text-terracotta transition-colors">{op.name}</h4>
                     {op.description && <p className="text-sm text-ink-soft line-clamp-1 mt-0.5">{op.description}</p>}
                     <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-ink-muted mt-1">
-                      <span className="font-alt font-semibold uppercase tracking-wider text-terracotta-600 bg-terracotta-50 rounded-full px-2 py-0.5">{CAT_LABEL[op.category] ?? op.category}</span>
-                      {op.stall_number && <span>· Banco {op.stall_number}</span>}
+                      <span className="font-alt font-semibold uppercase tracking-wider text-terracotta-600 bg-terracotta-50 rounded-full px-2 py-0.5">{categoryLabel(op.category, lang)}</span>
+                      {op.stall_number && <span>· {ui.comuneBancoSingolare} {op.stall_number}</span>}
                       {sessions.length > 1 && op.schedule_id && sessionById.get(op.schedule_id) && (
                         <span className={`font-alt font-semibold ${op.schedule_id === active.id ? 'text-alga-600' : ''}`}>
-                          · {shortLabel(sessionById.get(op.schedule_id)!.giorno)}
+                          · {shortLabel(sessionById.get(op.schedule_id)!.giorno, ui)}
                         </span>
                       )}
                     </div>
