@@ -212,7 +212,7 @@ export default function MarketPanel({ pin, session, status, lang, dict, onClose 
           <ul className="space-y-2 mb-5">
             {operators.map((op) => (
               <li key={op.id} className="imk-op imk-lift flex items-center gap-3 rounded-xl border border-[#e0d7c1] bg-white px-3 py-2.5 hover:border-terracotta transition-colors">
-                <Link href={`/${pin.marketSlug}/operators/${op.id}`} className="flex items-center gap-3 flex-1 min-w-0 group">
+                <Link href={`/operatori/${op.id}`} className="flex items-center gap-3 flex-1 min-w-0 group">
                   <BancoAvatar name={op.name} size={36} />
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-[15px] leading-tight truncate group-hover:text-terracotta transition-colors">{op.name}</div>

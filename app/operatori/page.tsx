@@ -178,7 +178,7 @@ export default function OperatoriHubPage() {
             const sessions = op.schedules ?? []
             const preview = sessions.slice(0, 3)
             const more = sessions.length - preview.length
-            const href = op.market ? `/${op.market.slug}/operators/${op.id}` : '#'
+            const href = `/operatori/${op.id}`
             return (
               <Link
                 key={op.id}

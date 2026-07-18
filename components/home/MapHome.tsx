@@ -503,7 +503,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
               {operators.slice(0, 8).map((op) => (
                 <Link
                   key={op.id}
-                  href={op.market ? `/${op.market.slug}/operators/${op.id}` : '/operatori'}
+                  href={`/operatori/${op.id}`}
                   aria-label={`Scopri ${op.name}`}
                   className="imk-lift group flex flex-col bg-white border border-[#e0d7c1] rounded-xl overflow-hidden hover:border-terracotta transition-colors"
                 >

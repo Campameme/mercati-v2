@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { ArrowLeft, Save, Mail, CheckCircle2, Plus, Trash2, MapPin, CalendarDays } from 'lucide-react'
+import { ArrowLeft, Save, Mail, CheckCircle2, Plus, Trash2, MapPin, CalendarDays, MessageCircle } from 'lucide-react'
 import LocationFields from '@/components/LocationFields'
 
 const CATEGORIES = ['food', 'clothing', 'accessories', 'electronics', 'home', 'books', 'flowers', 'other']
@@ -223,6 +223,16 @@ export default function AdminEditOperatorPage() {
             value={operator.description ?? ''}
             onChange={(e) => setOperator({ ...operator, description: e.target.value })}
             rows={3}
+            className="w-full mt-1 px-3 py-2 border-2 border-ink/15 rounded-xl bg-crema text-ink focus:outline-none focus:border-alga transition-colors"
+          />
+        </label>
+
+        <label className="block">
+          <span className="flex items-center gap-1.5 text-xs font-alt uppercase tracking-wider text-ink-soft"><MessageCircle className="w-3.5 h-3.5 text-alga" /> WhatsApp</span>
+          <input
+            value={operator.social_links?.whatsapp ?? ''}
+            onChange={(e) => setOperator({ ...operator, social_links: { ...operator.social_links, whatsapp: e.target.value } })}
+            placeholder="es. 348 1234567"
             className="w-full mt-1 px-3 py-2 border-2 border-ink/15 rounded-xl bg-crema text-ink focus:outline-none focus:border-alga transition-colors"
           />
         </label>

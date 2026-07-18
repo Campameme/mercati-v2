@@ -127,7 +127,7 @@ export default function ComuneSessionsExplorer({
         kind: 'operator' as const,
         title: op.name,
         subtitle: op.stall_number ? `${ui.comuneBancoSingolare} ${op.stall_number}` : undefined,
-        href: `/${marketSlug}/operators/${op.id}`,
+        href: `/operatori/${op.id}`,
       })
     }
     return pins
@@ -229,7 +229,7 @@ export default function ComuneSessionsExplorer({
             {comuneOperators.map((op) => (
               <li key={op.id}>
                 <Link
-                  href={`/${marketSlug}/operators/${op.id}`}
+                  href={`/operatori/${op.id}`}
                   className="group flex items-baseline justify-between gap-4 py-3.5 hover:bg-white -mx-3 px-3 transition-colors"
                 >
                   <div className="min-w-0 flex-1">

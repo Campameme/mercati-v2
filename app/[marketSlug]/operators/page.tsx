@@ -107,7 +107,7 @@ export default function OperatorsPage() {
         kind: 'operator',
         title: op.name,
         subtitle: CAT_LABEL[op.category] ?? op.category,
-        href: `/${slug}/operators/${op.id}`,
+        href: `/operatori/${op.id}`,
       }))
   }, [filteredOperators, pinned, slug])
 
@@ -226,7 +226,7 @@ export default function OperatorsPage() {
                       <div className="flex items-start gap-3">
                         <BancoAvatar name={op.name} size={48} />
                         <Link
-                          href={`/${slug}/operators/${op.id}`}
+                          href={`/operatori/${op.id}`}
                           className="min-w-0 flex-1 group"
                         >
                           <div className="flex items-center gap-1.5 flex-wrap">

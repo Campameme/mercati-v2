@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import { Save, Package, ArrowLeft, LogOut, Wallet } from 'lucide-react'
+import { Save, Package, ArrowLeft, LogOut, Wallet, MessageCircle } from 'lucide-react'
 import PhotoUploader from '@/components/PhotoUploader'
 import { createClient } from '@/lib/supabase/client'
 
@@ -158,6 +158,17 @@ export default function OperatorMarketDashboard() {
               ))}
             </div>
           </div>
+
+          <label className="block">
+            <span className="flex items-center gap-1.5 text-xs font-alt uppercase tracking-wider text-ink-soft"><MessageCircle className="w-3.5 h-3.5 text-alga" /> WhatsApp</span>
+            <input
+              value={operator.social_links?.whatsapp ?? ''}
+              onChange={(e) => setOperator({ ...operator, social_links: { ...operator.social_links, whatsapp: e.target.value } })}
+              placeholder="es. 348 1234567"
+              className="w-full mt-1 px-3 py-2 bg-crema border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-alga transition-colors"
+            />
+            <span className="block text-[11px] text-ink-muted mt-1">Il numero (o il link wa.me) per farti contattare dai clienti. Mostrato sul tuo banco pubblico.</span>
+          </label>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <label className="block">
