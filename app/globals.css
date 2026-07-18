@@ -207,6 +207,46 @@ body {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
+/* Onda PIENA (merge col blocco successivo): più alta e ferma (niente scorrimento,
+   il path pieno non è un tile perfetto). La tinta è quella della prossima sezione. */
+.imk-wave-divider.is-fill { height: 34px; margin-bottom: -1px; }
+.imk-wave-divider.is-fill svg { width: 100%; animation: none; }
+
+/* --- Evidenziatore limone del titolo hero (stile V2 "mercato centrale"):
+   una pennellata dietro le parole chiave, con angoli morbidi. --- */
+.imk-mark {
+  background: #EAC54F;
+  padding: 0 0.12em;
+  border-radius: 6px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* --- Cornice a ONDA del video hero: due nastri d'onda (sopra alga, sotto
+   terracotta) che scorrono lungo i bordi lunghi del riquadro. Reduced-motion
+   safe (lo scorrimento si ferma, l'onda resta come cornice ferma). --- */
+.imk-videoframe { position: relative; }
+.imk-videoframe .imk-vwave {
+  position: absolute;
+  left: -2%;
+  width: 104%;
+  height: 22px;
+  color: #46683B;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+.imk-videoframe .imk-vwave svg {
+  display: block;
+  width: 200%;
+  height: 100%;
+  animation: imk-wave-slide 11s linear infinite;
+}
+.imk-videoframe .imk-vwave.bottom { transform: scaleY(-1); }
+.imk-videoframe .imk-vwave.bottom svg { animation-duration: 13s; animation-direction: reverse; }
+@media (prefers-reduced-motion: reduce) {
+  .imk-videoframe .imk-vwave svg { animation: none !important; }
+}
 
 /* --- Line-draw per accenti SVG (es. WaveTaglia, Arco): il tratto si
    "disegna" una volta all'ingresso. Da abbinare a .imk-draw sull'<svg>. --- */
