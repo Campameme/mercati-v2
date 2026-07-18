@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Logo from '@/components/Logo'
 import { getLang } from '@/lib/i18n/getLang'
 import { UI_I18N } from '@/lib/i18n/ui'
+import { CookiePreferencesLink } from '@/components/CookieNotice'
 
 // Footer condiviso: identico su tutte le pagine, nella lingua scelta (cookie).
 export default function Footer() {
@@ -18,6 +19,7 @@ export default function Footer() {
         <Link href="/aderisci" className="hover:text-alga transition-colors">{ui.footerJoin}</Link>
         <Link href="/privacy" className="hover:text-alga transition-colors">Privacy</Link>
         <Link href="/cookie" className="hover:text-alga transition-colors">Cookie</Link>
+        <CookiePreferencesLink className="hover:text-alga transition-colors" />
         <Link href="/crediti" className="hover:text-alga transition-colors">{ui.footerCredits}</Link>
         <a href="mailto:emanueleecampanini@gmail.com" className="hover:text-alga transition-colors">{ui.footerContacts}</a>
       </div>

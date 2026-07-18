@@ -23,6 +23,8 @@ export interface LoginDict {
   choiceVendor: string
   choiceVendorDesc: string
   vendorJoin: string
+  marketingConsent: string
+  marketingConsentSee: string
 }
 
 export const LOGIN_I18N: Record<Lang, LoginDict> = {
@@ -47,6 +49,8 @@ export const LOGIN_I18N: Record<Lang, LoginDict> = {
     choiceVendor: 'Ho un banco',
     choiceVendorDesc: 'La tua vetrina, i prodotti, la tessera al banco.',
     vendorJoin: 'Non sei ancora nella rete? Chiedi di entrare',
+    marketingConsent: 'Acconsento al trattamento dei miei dati per finalità di marketing (offerte e novità dei mercati). Facoltativo.',
+    marketingConsentSee: 'Vedi la',
   },
   fr: {
     title: 'Entrez au marché',
@@ -69,6 +73,8 @@ export const LOGIN_I18N: Record<Lang, LoginDict> = {
     choiceVendor: 'J’ai un étal',
     choiceVendorDesc: 'Votre vitrine, vos produits, la carte à l’étal.',
     vendorJoin: 'Pas encore dans le réseau ? Demandez d’entrer',
+    marketingConsent: 'J’accepte le traitement de mes données à des fins de marketing (offres et nouveautés des marchés). Facultatif.',
+    marketingConsentSee: 'Voir la',
   },
   de: {
     title: 'Rein in den Markt',
@@ -91,6 +97,8 @@ export const LOGIN_I18N: Record<Lang, LoginDict> = {
     choiceVendor: 'Ich habe einen Stand',
     choiceVendorDesc: 'Deine Vitrine, deine Produkte, die Karte am Stand.',
     vendorJoin: 'Noch nicht im Netz? Frag an',
+    marketingConsent: 'Ich willige in die Verarbeitung meiner Daten zu Marketingzwecken ein (Angebote und Neuigkeiten der Märkte). Freiwillig.',
+    marketingConsentSee: 'Siehe die',
   },
   en: {
     title: 'Come on in',
@@ -113,6 +121,8 @@ export const LOGIN_I18N: Record<Lang, LoginDict> = {
     choiceVendor: 'I have a stall',
     choiceVendorDesc: 'Your showcase, your products, the card at the stall.',
     vendorJoin: 'Not in the network yet? Ask to join',
+    marketingConsent: 'I consent to the processing of my data for marketing purposes (market offers and news). Optional.',
+    marketingConsentSee: 'See the',
   },
 }
 

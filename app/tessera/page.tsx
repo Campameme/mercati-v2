@@ -4,9 +4,18 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { Ticket, LogOut, Sparkles, QrCode, Store, ArrowRight, Download, Trash2, ShieldCheck } from 'lucide-react'
+import { Ticket, LogOut, Sparkles, QrCode, Store, ArrowRight, Download, Trash2, ShieldCheck, BadgePercent } from 'lucide-react'
 import { useLang } from '@/lib/i18n/useLang'
 import { TESSERA_I18N, reasonLabel } from '@/lib/i18n/tessera'
+import { discountFor } from '@/lib/tessera/discount'
+
+// Stringhe dello sconto tessera (locali, per non incrociare lib/i18n/tessera.ts)
+const DISC_I18N: Record<string, { label: string; max: string; toNext: (n: number, p: number) => string }> = {
+  it: { label: 'Sconto al banco', max: 'Hai raggiunto lo sconto massimo. 🎉', toNext: (n, p) => `Mancano ${n.toLocaleString('it-IT')} punti per lo sconto del ${p}%.` },
+  fr: { label: 'Remise à l’étal', max: 'Tu as atteint la remise maximale. 🎉', toNext: (n, p) => `Encore ${n.toLocaleString('fr-FR')} points pour la remise de ${p}%.` },
+  de: { label: 'Rabatt am Stand', max: 'Du hast den maximalen Rabatt erreicht. 🎉', toNext: (n, p) => `Noch ${n.toLocaleString('de-DE')} Punkte bis ${p}% Rabatt.` },
+  en: { label: 'Discount at the stall', max: 'You’ve reached the top discount. 🎉', toNext: (n, p) => `${n.toLocaleString('en-GB')} points to go for ${p}% off.` },
+}
 
 interface PointEvent { id: string; points: number; reason: string; created_at: string }
 interface Coupon { id: string; code: string; label: string; status: string; created_at: string; used_at: string | null }
@@ -85,6 +94,34 @@ export default function TesseraPage() {
               </span>
               <span className="font-alt uppercase tracking-[0.14em] text-crema/70 text-sm mb-3">{t.pointsLabel}</span>
             </div>
+
+            {/* Sconto della tessera: cresce coi punti (1 € speso = 10 punti) */}
+            {data && (() => {
+              const d = discountFor(data.balance)
+              const dl = DISC_I18N[lang] ?? DISC_I18N.it
+              return (
+                <div className="mt-5 pt-4 border-t border-crema/15">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="inline-flex items-center gap-1.5 font-alt text-sm text-crema/80">
+                      <BadgePercent className="w-4 h-4 text-limone" /> {dl.label}
+                    </span>
+                    <span className="font-display font-extrabold tracking-tight text-2xl text-crema leading-none">
+                      {d.percent > 0 ? `−${d.percent}%` : '—'}
+                    </span>
+                  </div>
+                  {d.next ? (
+                    <div className="mt-2.5">
+                      <div className="h-1.5 rounded-full bg-crema/15 overflow-hidden">
+                        <div className="h-full bg-limone rounded-full" style={{ width: `${Math.round(d.progress * 100)}%` }} />
+                      </div>
+                      <p className="text-xs text-crema/60 mt-1.5">{dl.toNext(d.toNext, d.next.percent)}</p>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-limone/90 mt-2">{dl.max}</p>
+                  )}
+                </div>
+              )
+            })()}
           </div>
         </div>
 

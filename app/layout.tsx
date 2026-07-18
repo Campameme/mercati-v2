@@ -4,6 +4,7 @@ import './globals.css'
 import Providers from '@/components/Providers'
 import Footer from '@/components/Footer'
 import CookieNotice from '@/components/CookieNotice'
+import ConsentScripts from '@/components/consent/ConsentScripts'
 import SmoothScroll from '@/components/motion/SmoothScroll'
 import { SITE_NAME, SITE_URL } from '@/lib/site'
 
@@ -72,6 +73,7 @@ export default function RootLayout({
           <Footer />
           <CookieNotice />
         </Providers>
+        <ConsentScripts />
       </body>
     </html>
   )

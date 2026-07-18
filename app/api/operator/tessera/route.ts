@@ -8,18 +8,23 @@ export const dynamic = 'force-dynamic'
 // o admin del suo mercato). Le mutazioni passano dalle funzioni atomiche del DB
 // (0026): dare scala dal budget dell'operatore, riscuotere solo se il saldo c'è.
 //
-//  GET  ?operatorId=..            → budget punti dell'operatore
-//  POST { action:'lookup', operatorId, token }            → utente + saldo dal QR
-//  POST { action:'give',   operatorId, token, points, reason }  → dà punti
-//  POST { action:'redeem', operatorId, token, points, reason }  → scala punti
+//  GET  ?operatorId=..            → budget punti + ultime richieste scontrino
+//  POST { action:'lookup',  operatorId, token }                   → utente + saldo dal QR
+//  POST { action:'request', operatorId, token, amountCents, note } → RICHIESTA punti da scontrino (in attesa di approvazione super admin)
+//  POST { action:'give',    operatorId, token, points, reason }   → dà punti dal budget (promozionale)
+//  POST { action:'redeem',  operatorId, token, points, reason }   → scala punti
 
 export async function GET(request: NextRequest) {
   const operatorId = new URL(request.url).searchParams.get('operatorId') ?? ''
   const guard = await requireOperatorAccess(operatorId)
   if (!guard.ok) return guard.res
   const service = createServiceClient()
-  const { data } = await service.from('operator_point_budgets').select('balance').eq('operator_id', operatorId).maybeSingle()
-  return NextResponse.json({ data: { budget: data?.balance ?? 0 } })
+  const [{ data: bud }, { data: reqs }] = await Promise.all([
+    service.from('operator_point_budgets').select('balance').eq('operator_id', operatorId).maybeSingle(),
+    service.from('point_requests').select('id, amount_cents, points, status, created_at')
+      .eq('operator_id', operatorId).order('created_at', { ascending: false }).limit(10),
+  ])
+  return NextResponse.json({ data: { budget: bud?.balance ?? 0, requests: reqs ?? [] } })
 }
 
 async function resolveToken(service: ReturnType<typeof createServiceClient>, token: string) {
@@ -53,6 +58,22 @@ export async function POST(request: NextRequest) {
 
   if (action === 'lookup') {
     return NextResponse.json({ data: { balance: card.balance } })
+  }
+
+  // Punti da SCONTRINO: l'operatore registra l'importo, nasce una richiesta in
+  // attesa dell'approvazione del super admin (1 € = 10 punti, calcolo nel DB).
+  if (action === 'request') {
+    const amountCents = Math.round(Number(body?.amountCents))
+    if (!Number.isFinite(amountCents) || amountCents <= 0 || amountCents > 10_000_00) {
+      return NextResponse.json({ error: 'Importo scontrino non valido' }, { status: 400 })
+    }
+    const note = String(body?.note ?? '').slice(0, 200)
+    const { data, error } = await service.rpc('points_request_create', {
+      p_operator: operatorId, p_token: token, p_amount_cents: amountCents, p_note: note,
+    })
+    if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+    const row = Array.isArray(data) ? data[0] : data
+    return NextResponse.json({ ok: true, request: row })
   }
 
   const points = Math.round(Number(body?.points))

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Power, Settings, MapPin, ArrowRight, BarChart3, Mail, TrendingUp, Eye, Users, Store, Ticket, Newspaper } from 'lucide-react'
+import { Power, Settings, MapPin, ArrowRight, BarChart3, Mail, TrendingUp, Eye, Users, Store, Ticket, Newspaper, UserCog, Receipt } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import Logo from '@/components/Logo'
 import MarketToggles from '@/components/admin/MarketToggles'
@@ -134,6 +134,18 @@ export default async function AdminRoot() {
             icon={Newspaper}
             title="Redazione notizie"
             desc="Bozze, anteprima e pubblicazione delle notizie, per mercato o per tutta la rete."
+          />
+          <ActionCard
+            href="/admin/utenti"
+            icon={UserCog}
+            title="Ruoli e persone"
+            desc="Chi è chi nella rete: assegna i ruoli, i mercati dei redattori, collega o scollega i banchi."
+          />
+          <ActionCard
+            href="/admin/richieste-punti"
+            icon={Receipt}
+            title="Richieste punti"
+            desc="Gli scontrini registrati dai banchi (1 € = 10 punti): approva per accreditare i punti."
           />
         </div>
 

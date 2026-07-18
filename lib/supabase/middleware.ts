@@ -75,5 +75,24 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
+  // Area operatore (dashboard dei banchi): riservata a chi è del mestiere —
+  // operator, market_admin o super_admin. Un citizen puro (solo tessera) NON deve
+  // vederla → lo si porta alla sua tessera. La promozione citizen → operator
+  // avviene al login (routeByRole → /api/operators/me) PRIMA del redirect a
+  // /operator, quindi qui basta il gate sul ruolo. La /tessera resta libera.
+  if ((pathname === '/operator' || pathname.startsWith('/operator/')) && user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+    const role = profile?.role ?? 'citizen'
+    if (role !== 'operator' && role !== 'market_admin' && role !== 'super_admin') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/tessera'
+      return NextResponse.redirect(url)
+    }
+  }
+
   return response
 }

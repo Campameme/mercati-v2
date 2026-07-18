@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Plus, Trash2, Save, Pencil, X, Globe2, Eye, Send, FileText } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { NewsItem, NewsType, NewsPriority } from '@/types/news'
+import { COMUNI_NEWS } from '@/lib/markets/comuniNews'
 
 const TYPES: NewsType[] = ['schedule', 'notice', 'event', 'emergency']
 const PRIORITIES: NewsPriority[] = ['low', 'medium', 'high']
@@ -62,6 +63,10 @@ export default function RedazionePage() {
   const [preview, setPreview] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Ambito: il super_admin vede tutto + globali (scopeIds = null = "tutti"); il
+  // news_editor SOLO i mercati assegnati e mai le globali.
+  const [role, setRole] = useState<string>('')
+  const [scopeIds, setScopeIds] = useState<string[] | null>(null)
 
   async function load() {
     setLoading(true)
@@ -75,6 +80,13 @@ export default function RedazionePage() {
     load()
     const supabase = createClient()
     supabase.from('markets').select('id, name, city').order('city').then(({ data }) => setMarkets((data ?? []) as MarketOpt[]))
+    fetch('/api/redazione/scope')
+      .then((r) => r.json())
+      .then((s) => {
+        setRole(s?.role ?? '')
+        setScopeIds(s?.role === 'news_editor' ? (s?.marketIds ?? []) : null)
+      })
+      .catch(() => {})
   }, [])
 
   const marketLabel = (id: string | null | undefined) => {
@@ -82,14 +94,29 @@ export default function RedazionePage() {
     return m ? `${m.city}` : '—'
   }
 
+  // I mercati selezionabili: tutti per il super admin, solo gli assegnati per il
+  // redattore. Le globali ("Tutta la rete") restano solo al super admin.
+  const canGlobal = role === 'super_admin'
+  const editableMarkets = useMemo(() => {
+    if (scopeIds === null) return markets
+    const set = new Set(scopeIds)
+    return markets.filter((m) => set.has(m.id))
+  }, [markets, scopeIds])
+
   const visible = useMemo(() => {
     let list = items
     if (tab === 'bozze') list = list.filter((n) => n.status === 'draft')
     if (tab === 'pubblicate') list = list.filter((n) => n.status !== 'draft')
+    // Il redattore vede solo le notizie dei suoi mercati (mai le globali), anche
+    // se la RLS gli lasciasse leggere pubblicate altrui.
+    if (scopeIds !== null) {
+      const set = new Set(scopeIds)
+      list = list.filter((n) => !n.is_global && !!n.market_id && set.has(n.market_id))
+    }
     if (marketFilter === 'global') list = list.filter((n) => n.is_global)
     else if (marketFilter) list = list.filter((n) => n.market_id === marketFilter)
     return list
-  }, [items, tab, marketFilter])
+  }, [items, tab, marketFilter, scopeIds])
 
   const nBozze = items.filter((n) => n.status === 'draft').length
 
@@ -100,7 +127,7 @@ export default function RedazionePage() {
       title: '', content: '',
       type: 'notice', priority: 'medium',
       is_global: false,
-      market_id: marketFilter && marketFilter !== 'global' ? marketFilter : markets[0]?.id ?? null,
+      market_id: marketFilter && marketFilter !== 'global' ? marketFilter : editableMarkets[0]?.id ?? null,
       status: 'draft',
       publish_from: new Date().toISOString(),
       publish_until: null,
@@ -158,7 +185,7 @@ export default function RedazionePage() {
             <h1 className="font-display font-extrabold tracking-tight text-3xl text-ink mt-1">Notizie dei mercati</h1>
             <p className="text-sm text-ink-soft mt-1">Scrivi in bozza, prova l’anteprima, pubblica — per mercato o per tutta la rete.</p>
           </div>
-          <button onClick={openNew} className="flex items-center gap-2 px-5 py-2.5 bg-terracotta text-crema font-alt uppercase tracking-wider text-sm rounded-full hover:bg-terracotta-600 transition-colors">
+          <button onClick={openNew} disabled={role === 'news_editor' && editableMarkets.length === 0} className="flex items-center gap-2 px-5 py-2.5 bg-terracotta text-crema font-alt uppercase tracking-wider text-sm rounded-full hover:bg-terracotta-600 disabled:opacity-50 transition-colors">
             <Plus className="w-4 h-4" /> <span>Nuova notizia</span>
           </button>
         </div>
@@ -171,10 +198,33 @@ export default function RedazionePage() {
           </div>
           <select value={marketFilter} onChange={(e) => setMarketFilter(e.target.value)} className="px-3 py-2 bg-white border-2 border-ink/15 rounded-full text-sm text-ink focus:outline-none focus:border-alga transition-colors">
             <option value="">Tutti i mercati</option>
-            <option value="global">Tutta la rete</option>
-            {markets.map((m) => <option key={m.id} value={m.id}>{m.city} — {m.name}</option>)}
+            {canGlobal && <option value="global">Tutta la rete</option>}
+            {editableMarkets.map((m) => <option key={m.id} value={m.id}>{m.city} — {m.name}</option>)}
           </select>
         </div>
+
+        {role === 'news_editor' && editableMarkets.length === 0 && (
+          <div className="mb-4 flex items-center gap-2 text-sm text-terracotta-600 bg-terracotta/10 border-2 border-terracotta/30 rounded-xl px-4 py-3">
+            <FileText className="w-4 h-4 flex-shrink-0" />
+            <span>Nessun mercato assegnato: chiedi all’amministratore di darti i mercati di cui ti occupi.</span>
+          </div>
+        )}
+
+        {/* Le fonti: le bacheche ufficiali dei comuni ("mercato cittadino") da
+            cui pescare gli avvisi da riportare qui. */}
+        <details className="mb-5 bg-white border border-[#e0d7c1] rounded-xl overflow-hidden">
+          <summary className="cursor-pointer select-none px-4 py-3 font-alt text-sm font-semibold text-ink-soft hover:text-ink transition-colors">
+            Fonti · le bacheche dei comuni ({COMUNI_NEWS.length})
+          </summary>
+          <div className="px-4 pb-4 grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+            {COMUNI_NEWS.map((c) => (
+              <a key={c.comune} href={c.url} target="_blank" rel="noopener noreferrer"
+                 className="text-sm text-alga-600 hover:text-alga underline underline-offset-2 truncate">
+                {c.comune} ↗
+              </a>
+            ))}
+          </div>
+        </details>
 
         {loading ? (
           <p className="text-ink-soft">Caricamento…</p>
@@ -252,13 +302,15 @@ export default function RedazionePage() {
                         onChange={(e) => setEditing({ ...editing, market_id: e.target.value || null })}
                         className="w-full mt-1 px-3 py-2 bg-crema border-2 border-ink/15 rounded-xl text-ink focus:outline-none focus:border-alga transition-colors disabled:opacity-50"
                       >
-                        {markets.map((m) => <option key={m.id} value={m.id}>{m.city} — {m.name}</option>)}
+                        {editableMarkets.map((m) => <option key={m.id} value={m.id}>{m.city} — {m.name}</option>)}
                       </select>
                     </label>
-                    <label className="flex items-center gap-2 cursor-pointer pb-2.5">
-                      <input type="checkbox" checked={!!editing.is_global} onChange={(e) => setEditing({ ...editing, is_global: e.target.checked })} className="accent-alga w-4 h-4" />
-                      <span className="text-sm font-alt uppercase tracking-wider text-ink flex items-center gap-1"><Globe2 className="w-4 h-4" /> Tutta la rete</span>
-                    </label>
+                    {canGlobal && (
+                      <label className="flex items-center gap-2 cursor-pointer pb-2.5">
+                        <input type="checkbox" checked={!!editing.is_global} onChange={(e) => setEditing({ ...editing, is_global: e.target.checked })} className="accent-alga w-4 h-4" />
+                        <span className="text-sm font-alt uppercase tracking-wider text-ink flex items-center gap-1"><Globe2 className="w-4 h-4" /> Tutta la rete</span>
+                      </label>
+                    )}
                   </div>
                   <label className="block">
                     <span className="text-xs font-alt uppercase tracking-wider text-ink-soft">Titolo</span>

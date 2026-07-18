@@ -47,6 +47,8 @@ function LoginPageInner() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [password2, setPassword2] = useState('')
+  // Consenso marketing, opt-in esplicito NON pre-selezionato (GDPR).
+  const [marketingConsent, setMarketingConsent] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -104,7 +106,13 @@ function LoginPageInner() {
       const supabase = createClient()
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: { shouldCreateUser: true, emailRedirectTo: `${window.location.origin}/tessera` },
+        options: {
+          shouldCreateUser: true,
+          emailRedirectTo: `${window.location.origin}/tessera`,
+          // Finisce in raw_user_meta_data; il valore autorevole viene poi
+          // scritto su profiles via POST /api/consent dopo la verifica.
+          data: { marketing_consent: marketingConsent },
+        },
       })
       if (error) throw error
       setOtpStep('code')
@@ -121,6 +129,14 @@ function LoginPageInner() {
       const supabase = createClient()
       const { error } = await supabase.auth.verifyOtp({ email, token: code.trim(), type: 'email' })
       if (error) throw error
+      // Registra su profiles il consenso marketing scelto in registrazione.
+      try {
+        await fetch('/api/consent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ marketing: marketingConsent }),
+        })
+      } catch { /* non blocca l'accesso */ }
       // Assicura il bonus di benvenuto (idempotente) prima di entrare.
       try { await fetch('/api/tessera', { cache: 'no-store' }) } catch { /* ignore */ }
       await routeByRole()
@@ -212,6 +228,18 @@ function LoginPageInner() {
                       <Mail className="w-4 h-4 mr-1.5 text-alga" /> {t.emailLabel}
                     </span>
                     <input type="email" required autoFocus value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} />
+                  </label>
+                  <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={marketingConsent}
+                      onChange={(e) => setMarketingConsent(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 flex-shrink-0 rounded border-ink/30 accent-alga"
+                    />
+                    <span className="text-xs text-ink-soft leading-relaxed">
+                      {t.marketingConsent} {t.marketingConsentSee}{' '}
+                      <Link href="/privacy" className="text-alga-600 underline underline-offset-2 hover:text-alga">Privacy Policy</Link>.
+                    </span>
                   </label>
                   {error && <p className="text-sm text-terracotta-600">{error}</p>}
                   {notice && <p className="text-sm text-alga-600">{notice}</p>}
