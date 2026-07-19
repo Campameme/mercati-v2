@@ -8,8 +8,9 @@ type Variant = 'loop' | 'arrow' | 'underline' | 'spiral' | 'star' | 'scribble'
 const PATHS: Record<Variant, { vb: string; d: string; extra?: string }> = {
   // cerchio storto, aperto (per cerchiare una parola)
   loop: { vb: '0 0 120 90', d: 'M96 20 C 60 2, 14 10, 10 44 C 7 74, 52 84, 82 78 C 108 72, 118 44, 100 26 C 92 18, 80 16, 74 20' },
-  // freccia curva a mano
-  arrow: { vb: '0 0 110 80', d: 'M6 20 C 40 8, 84 18, 96 54', extra: 'M84 40 L98 58 L74 62' },
+  // freccia curva a mano: la punta parte ESATTAMENTE dalla fine dell'asta
+  // (98,54), due tratti che tornano indietro — mai più "rotta" o staccata.
+  arrow: { vb: '0 0 110 80', d: 'M8 18 C 44 6, 84 16, 98 54', extra: 'M98 54 L78 47 M98 54 L91 32' },
   // sottolineatura mossa (doppio passaggio)
   underline: { vb: '0 0 200 34', d: 'M6 16 C 60 6, 140 6, 194 14 M10 24 C 70 16, 150 18, 190 24' },
   // spirale
@@ -36,7 +37,8 @@ export default function Scribble({
   const p = PATHS[variant]
   return (
     <span aria-hidden="true" className={`pointer-events-none inline-block ${color} ${className}`}>
-      <svg viewBox={p.vb} fill="none" className={`w-full h-full ${draw ? 'imk-draw' : ''}`} preserveAspectRatio="xMidYMid meet">
+      {/* overflow-visible: il tratto spesso non viene mai tagliato ai bordi del viewBox */}
+      <svg viewBox={p.vb} fill="none" className={`w-full h-full overflow-visible ${draw ? 'imk-draw' : ''}`} preserveAspectRatio="xMidYMid meet">
         {variant === 'star' ? (
           <path d={p.d} pathLength={240} stroke="currentColor" strokeWidth={strokeWidth} strokeLinejoin="round" strokeLinecap="round" />
         ) : (

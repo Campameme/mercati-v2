@@ -243,6 +243,28 @@ body {
   30%      { d: path('M0,76 C140,42 300,22 470,44 C620,64 760,88 930,72 C1070,58 1170,28 1290,26 C1360,24 1410,52 1440,66 L1440,120 L0,120 Z'); }
   65%      { d: path('M0,52 C150,82 310,62 480,34 C630,14 780,30 940,60 C1080,84 1180,76 1300,48 C1370,32 1410,42 1440,50 L1440,120 L0,120 Z'); }
 }
+/* Onda fluida VERTICALE (bordo sinistro, es. lato del video hero): stessa
+   logica del merge orizzontale, ruotata di concetto — la tinta riempie a
+   sinistra della curva. Stessa struttura comandi (M + 4C + curva finale) in
+   tutte le forme, altrimenti il morph non interpola. */
+.imk-wave-divider.is-fill.is-v { width: 44px; height: auto; margin: 0; }
+.imk-wave-fluid-v {
+  animation: imk-wave-morph-v 13s ease-in-out infinite;
+  will-change: d;
+}
+.imk-wave-fluid-v-back {
+  animation: imk-wave-morph-v-back 19s ease-in-out infinite;
+  will-change: d;
+}
+@keyframes imk-wave-morph-v {
+  0%, 100% { d: path('M32,0 C16,90 12,180 28,280 C44,380 46,470 30,560 C16,650 14,740 26,820 C32,860 36,880 32,900 L0,900 L0,0 Z'); }
+  33%      { d: path('M24,0 C40,110 44,210 30,310 C16,400 12,490 26,590 C40,680 42,760 30,830 C24,858 20,882 26,900 L0,900 L0,0 Z'); }
+  66%      { d: path('M30,0 C14,80 18,190 34,290 C48,370 40,480 24,570 C12,660 20,750 34,825 C40,858 34,884 28,900 L0,900 L0,0 Z'); }
+}
+@keyframes imk-wave-morph-v-back {
+  0%, 100% { d: path('M20,0 C36,100 40,200 26,300 C14,390 12,480 28,580 C42,670 44,760 30,840 C26,865 22,885 24,900 L0,900 L0,0 Z'); }
+  45%      { d: path('M30,0 C14,90 12,190 28,290 C44,390 46,480 30,570 C16,660 18,760 32,835 C36,862 30,884 26,900 L0,900 L0,0 Z'); }
+}
 
 /* --- Evidenziatore limone del titolo hero (stile V2 "mercato centrale"):
    una pennellata dietro le parole chiave, con angoli morbidi. --- */
@@ -274,6 +296,17 @@ body {
    bordi non respirano all'unisono (sempre transform/opacity/d — ok motion). */
 .imk-vframe-wave.top .imk-wave-fluid { animation-duration: 14s; animation-delay: -6s; }
 .imk-vframe-wave.top .imk-wave-fluid-back { animation-delay: -9s; }
+/* Bordo SINISTRO fluido del video (onda verticale): il video non ha più box
+   né angoli — vive appoggiato al margine destro della pagina, la crema lo
+   lambisce su alto, basso e fianco sinistro. */
+.imk-wave-divider.is-fill.is-v.imk-vframe-wave-left {
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  left: -1px;
+  pointer-events: none;
+  z-index: 2;
+}
 
 /* --- Line-draw per accenti SVG (es. WaveTaglia, Arco): il tratto si
    "disegna" una volta all'ingresso. Da abbinare a .imk-draw sull'<svg>. --- */
@@ -304,7 +337,9 @@ body {
   .imk-float { animation: none !important; transform: rotate(var(--tilt, 0deg)); }
   .imk-wave-divider svg { animation: none !important; }
   .imk-wave-fluid,
-  .imk-wave-fluid-back { animation: none !important; }
+  .imk-wave-fluid-back,
+  .imk-wave-fluid-v,
+  .imk-wave-fluid-v-back { animation: none !important; }
   .imk-draw path {
     animation: none !important;
     stroke-dashoffset: 0 !important;

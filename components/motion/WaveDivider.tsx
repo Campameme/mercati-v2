@@ -21,8 +21,32 @@ const WAVE_FILL_BASE =
 // Forma-base dell'onda retrostante (keyframe 0% di imk-wave-morph-back).
 const WAVE_FILL_BACK =
   'M0,40 C160,74 320,90 480,64 C640,38 760,18 920,40 C1060,58 1160,82 1280,66 C1360,54 1400,36 1440,32 L1440,120 L0,120 Z'
+// Variante VERTICALE (bordo sinistro fluido, es. lato del video hero): la
+// tinta riempie a SINISTRA della curva. Keyframe in imk-wave-morph-v/-v-back.
+const WAVE_VFILL_BASE =
+  'M32,0 C16,90 12,180 28,280 C44,380 46,470 30,560 C16,650 14,740 26,820 C32,860 36,880 32,900 L0,900 L0,0 Z'
+const WAVE_VFILL_BACK =
+  'M20,0 C36,100 40,200 26,300 C14,390 12,480 28,580 C42,670 44,760 30,840 C26,865 22,885 24,900 L0,900 L0,0 Z'
 
-export default function WaveDivider({ className = '', fill = false }: { className?: string; fill?: boolean }) {
+export default function WaveDivider({
+  className = '',
+  fill = false,
+  vertical = false,
+}: {
+  className?: string
+  fill?: boolean
+  vertical?: boolean
+}) {
+  if (fill && vertical) {
+    return (
+      <span aria-hidden="true" className={`imk-wave-divider is-fill is-v ${className}`}>
+        <svg viewBox="0 0 120 900" preserveAspectRatio="none" fill="none">
+          <path className="imk-wave-fluid-v-back" d={WAVE_VFILL_BACK} fill="currentColor" opacity="0.45" />
+          <path className="imk-wave-fluid-v" d={WAVE_VFILL_BASE} fill="currentColor" />
+        </svg>
+      </span>
+    )
+  }
   if (fill) {
     return (
       <span aria-hidden="true" className={`imk-wave-divider is-fill ${className}`}>

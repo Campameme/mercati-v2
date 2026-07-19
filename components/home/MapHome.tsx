@@ -11,7 +11,7 @@ import BancoAvatar from '@/components/BancoAvatar'
 import WaveDivider from '@/components/motion/WaveDivider'
 import VideoWaveFrame from '@/components/motion/VideoWaveFrame'
 import Scribble from '@/components/motion/Scribble'
-import { PostItNote } from '@/components/motion/PostItCollage'
+import PostItCollage, { PostItNote } from '@/components/motion/PostItCollage'
 import { occursOn, isNonWeekly } from '@/lib/markets/hours'
 import { categoryLabel } from '@/lib/i18n/home'
 import { UI_I18N } from '@/lib/i18n/ui'
@@ -38,6 +38,19 @@ function waHref(value: string): string {
   return /^https?:\/\//i.test(value) ? value : `https://wa.me/${value.replace(/[^0-9]/g, '')}`
 }
 
+// "val-nervia" → "Val Nervia" (la "e" resta minuscola: "Taggia e Costa").
+function zoneName(slug: string): string {
+  return slug.split('-').map((w) => (w === 'e' ? 'e' : w.charAt(0).toUpperCase() + w.slice(1))).join(' ')
+}
+
+// Le tre polaroid del collage "A due passi da casa" (layout pre-V2 ripreso
+// su richiesta 2026-07-19): la piazza di ieri e la spesa di oggi.
+const PROJECT_PHOTOS = [
+  { src: '/zone/vita-mercato-ventimiglia-borgo.webp', alt: 'Il mercato ai piedi della città vecchia di Ventimiglia', caption: 'Ventimiglia · il venerdì' },
+  { src: '/zone/vita-piazza-mercato-sanremo-1880.webp', alt: 'Sanremo, la piazza del mercato a fine Ottocento', caption: 'Sanremo · 1880' },
+  { src: '/zone/vita-banco-ortofrutta-ombrelloni.webp', alt: 'Pomodori e carciofi sui banchi, sotto gli ombrelloni verdi', caption: 'La spesa di stagione' },
+]
+
 
 const TIPICI_CTA: Record<Lang, string> = { it: 'Tutti i mercati tipici', fr: 'Tous les marchés typiques', de: 'Alle typischen Märkte', en: 'All the special markets' }
 // Video dell'hero: la passeggiata tra i banchi (dal mare alla piazza), già
@@ -55,7 +68,8 @@ const HERO2: Record<Lang, { eyebrow: string; tPre: string; tEm: string; tMid: st
   de: { eyebrow: 'Riviera dei Fiori · von Ventimiglia bis Diano', tPre: 'Der echte', tEm: 'Einkauf', tMid: 'ist noch', tMark: 'auf dem Platz.', sub: 'Fast jeden Tag ein Markt, Leute, die man beim Namen kennt, gute Sachen der Saison. Schön, wieder auf den Markt zu gehen.', ctaFind: 'Markt finden', ctaBanchi: 'Die Stände kennenlernen', zone: 'Zonen', comuni: 'Orte mit Markt', quasi: 'fast jeden Tag' },
   en: { eyebrow: 'Riviera dei Fiori · from Ventimiglia to Diano', tPre: 'Real', tEm: 'shopping', tMid: 'still happens', tMark: 'in the square.', sub: 'A market almost every day, people you know by name, good things in season. So good to be back at the market.', ctaFind: 'Find the market', ctaBanchi: 'Meet the stalls', zone: 'zones', comuni: 'towns with a market', quasi: 'almost every day' },
 }
-// I due blocchi colorati sotto l'hero (mercati principali = esperienza/autenticità)
+// Il copy di "A due passi da casa" [0] e "Le otto zone" [1]: dal 2026-07-19
+// non più due card affiancate ma due SEZIONI piene, in quest'ordine.
 const PBLOCKS: Record<Lang, Array<{ eyebrow: string; title: string; body: string; cta: string; href: string }>> = {
   it: [
     { eyebrow: 'Il mercato in piazza', title: 'A due passi da casa, dal banco di chi la porta.', body: 'La spesa di stagione vicino a te, dalle mani di chi la coltiva e la sceglie. Il mercato più vicino te lo mostra la mappa — niente più elenchi di date da decifrare.', cta: 'Apri la mappa', href: '/mappa' },
@@ -232,8 +246,8 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
         {/* Il logo qui non serve più: la barra di navigazione è sempre visibile
             al load (con logo, menu e Accedi), un secondo lockup sarebbe doppio. */}
         <div className="relative z-10 flex-1 flex items-center">
-          <div className="container mx-auto px-4 md:px-6 py-12 grid md:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-14 items-center">
-            <div className="max-w-2xl">
+          <div className="container mx-auto px-4 md:px-6 py-12 w-full">
+            <div className="max-w-2xl md:max-w-[50vw]">
               <p data-anim className="font-alt text-xs font-bold uppercase tracking-[0.2em] text-terracotta mb-6">{HERO2[lang].eyebrow}</p>
               {/* Titolo V2: "vera" in corsivo terracotta, "in piazza." evidenziato limone */}
               <h1 className="font-display font-extrabold tracking-[-0.03em] text-ink text-[12vw] leading-[1.02] md:text-[4.6rem]">
@@ -273,82 +287,52 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
               </div>
             </div>
 
-            {/* Video dell'hero: bordi liquidi crema che morphano (VideoWaveFrame) */}
-            <div data-anim className="relative hidden md:block px-4 pt-8 pb-10">
-              <VideoWaveFrame>
-                {HERO_VIDEO ? (
-                  <video
-                    src={HERO_VIDEO}
-                    poster={HERO_POSTER}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    preload="metadata"
-                    ref={(el) => { if (el && typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) el.pause() }}
-                    aria-label="La passeggiata tra i banchi del mercato, dal mare alla piazza"
-                    className="imk-hero-video absolute inset-0 w-full h-full object-cover"
-                  />
-                ) : (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={HERO_PHOTO.src} alt={HERO_PHOTO.alt} className="absolute inset-0 w-full h-full object-cover" />
-                )}
-              </VideoWaveFrame>
-              {/* Polaroid appoggiata sull'angolo del video: primo bigliettino della bacheca */}
-              <div aria-hidden="true" className="absolute bottom-2 -left-3 w-44 lg:w-52 z-20 pointer-events-none">
-                <PostItNote photo={{ src: '/zone/vita-mercato-lungomare.webp', alt: '', caption: 'Il mercato sul lungomare' }} tilt={-5} aspect="aspect-[4/3]" />
-              </div>
-            </div>
           </div>
         </div>
 
-        <a href="#perche" aria-label={copy.heroScrollCue} className="relative z-10 mx-auto mb-7 mt-2 flex flex-col items-center text-ink/50 hover:text-ink">
+        {/* Video dell'hero: SENZA box, appoggiato al margine destro della pagina
+            (ne "esce"), la crema lo lambisce con onde fluide su alto, basso e
+            fianco sinistro (VideoWaveFrame). Su mobile non c'è: polaroid inline. */}
+        <div data-anim className="hidden md:block absolute inset-y-0 right-0 w-[45vw] lg:w-[42vw] z-0">
+          <VideoWaveFrame>
+            {HERO_VIDEO ? (
+              <video
+                src={HERO_VIDEO}
+                poster={HERO_POSTER}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                ref={(el) => { if (el && typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) el.pause() }}
+                aria-label="La passeggiata tra i banchi del mercato, dal mare alla piazza"
+                className="imk-hero-video absolute inset-0 w-full h-full object-cover"
+              />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={HERO_PHOTO.src} alt={HERO_PHOTO.alt} className="absolute inset-0 w-full h-full object-cover" />
+            )}
+          </VideoWaveFrame>
+          {/* Polaroid appoggiata sul fianco del video: primo bigliettino della bacheca */}
+          <div aria-hidden="true" className="absolute bottom-16 -left-8 w-44 lg:w-52 z-20 pointer-events-none">
+            <PostItNote photo={{ src: '/zone/vita-mercato-lungomare.webp', alt: '', caption: 'Il mercato sul lungomare' }} tilt={-5} aspect="aspect-[4/3]" />
+          </div>
+        </div>
+
+        <a href="#tipici" aria-label={copy.heroScrollCue} className="relative z-10 mx-auto mb-7 mt-2 flex flex-col items-center text-ink/50 hover:text-ink">
           <span className="font-alt text-[11px] font-semibold uppercase tracking-[0.14em] mb-1">{copy.heroScrollCue}</span>
           <span className="flex flex-col -space-y-1.5">
             <ChevronDown className="imk-chev w-4 h-4" /><ChevronDown className="imk-chev w-4 h-4" /><ChevronDown className="imk-chev w-4 h-4" />
           </span>
         </a>
-      </section>
-
-      {/* ===== I DUE BLOCCHI (mercati principali = esperienza, autenticità):
-           niente titolo, appena sotto l'hero. Alga + terracotta, foto a lato. ===== */}
-      <section id="perche" className="relative overflow-hidden bg-crema">
-        {/* Un ghirigoro d'aria in alto e, in basso, una polaroid storica appoggiata
-            sull'onda limone (z-20: sta SOPRA il divisore, spunta tra i due blocchi) */}
-        <Scribble variant="scribble" color="text-terracotta" draw={false} className="hidden md:block absolute top-5 right-[7%] w-28 z-0 rotate-3" />
-        <div aria-hidden="true" className="absolute bottom-0 left-[4%] w-40 md:w-56 z-20 pointer-events-none">
-          <PostItNote photo={{ src: '/zone/vita-piazza-mercato-sanremo-1880.webp', alt: '', caption: 'Sanremo, la piazza del mercato — 1880' }} tilt={-6} aspect="aspect-[4/3]" />
-        </div>
-        <div className="relative z-10 container mx-auto px-4 md:px-6 py-12 md:py-16 max-w-6xl grid gap-5 md:gap-6">
-          {PBLOCKS[lang].map((b, i) => {
-            const look = i === 0
-              ? { card: 'bg-alga text-crema', photo: '/zone/vita-banco-ortofrutta-ombrelloni.webp', alt: 'Pomodori e carciofi sui banchi, sotto gli ombrelloni' }
-              : { card: 'bg-terracotta text-crema', photo: '/zone/vita-mercato-ventimiglia-borgo.webp', alt: 'Il mercato ai piedi della città vecchia di Ventimiglia' }
-            return (
-              <div key={b.eyebrow} className={`home-reveal grid md:grid-cols-2 rounded-[22px] overflow-hidden shadow-[0_24px_54px_-32px_rgba(38,36,30,0.6)] ${look.card}`}>
-                <div className={`p-8 md:p-11 flex flex-col justify-center ${i === 1 ? 'md:order-2' : ''}`}>
-                  <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-limone mb-2">{b.eyebrow}</p>
-                  <h3 className="font-display font-extrabold tracking-tight text-2xl md:text-[2.1rem] leading-[1.08]">{b.title}</h3>
-                  <p className="mt-3 text-[15px] md:text-base leading-relaxed text-crema/90">{b.body}</p>
-                  <Link href={b.href} className="imk-lift mt-6 self-start inline-flex items-center gap-2 font-alt font-semibold text-sm bg-crema text-ink px-5 py-3 rounded-full hover:bg-white transition-colors">
-                    {b.cta} <ArrowRight className="imk-march w-4 h-4" />
-                  </Link>
-                </div>
-                <div className={`relative min-h-[240px] md:min-h-0 ${i === 1 ? 'md:order-1' : ''}`}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={look.photo} alt={look.alt} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
-                </div>
-              </div>
-            )
-          })}
-        </div>
-        {/* onda piena: la prossima sezione (limone) sale in questa (merge) */}
-        <WaveDivider fill className="relative z-10 text-limone" />
+        {/* onda piena di chiusura: la sezione dopo (limone, "Belin") sale nell'hero */}
+        <WaveDivider fill className="relative z-20 text-limone" />
       </section>
 
       {/* ===== BELIN, C'È IL MERCATO — i giorni speciali come mercati d'autore,
-           piccoli e di nicchia. Band limone (l'onda sopra l'ha annunciata). ===== */}
-      <section id="tipici" className="relative overflow-hidden bg-limone">
+           piccoli e di nicchia. SUBITO sotto l'hero (ordine 2026-07-19).
+           Niente overflow-hidden: polaroid e ghirigori non si tagliano. ===== */}
+      <section id="tipici" className="relative bg-limone">
         {/* La bacheca: polaroid media appoggiata in alto a destra (con didascalia
             vera) + spirale grande, tratto pieno — devono vedersi */}
         <div aria-hidden="true" className="hidden md:block absolute top-8 right-[3%] w-48 lg:w-60 z-0 pointer-events-none">
@@ -403,8 +387,74 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
         <WaveDivider fill className="relative z-10 text-crema" />
       </section>
 
+      {/* ===== A DUE PASSI DA CASA — il mercato in piazza, col layout della
+           vecchia prima sezione (racconto a sinistra + collage di polaroid a
+           destra) e il copy dei blocchi. ===== */}
+      <section id="perche" className="relative bg-crema">
+        <Scribble variant="scribble" color="text-terracotta" draw={false} className="hidden md:block absolute top-6 right-[6%] w-28 z-0 rotate-3" />
+        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-6xl">
+          <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-16 items-center">
+            <div>
+              <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-terracotta mb-3">{PBLOCKS[lang][0].eyebrow}</p>
+              <h2 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl lg:text-[3.4rem] leading-[1.04] text-ink">
+                {PBLOCKS[lang][0].title.split(', ')[0]},{' '}
+                <span className="text-terracotta">{PBLOCKS[lang][0].title.split(', ').slice(1).join(', ')}</span>
+              </h2>
+              <p className="mt-6 max-w-xl text-lg text-ink-soft leading-relaxed">{PBLOCKS[lang][0].body}</p>
+              <div className="mt-8 relative inline-block">
+                <Link href={PBLOCKS[lang][0].href} className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-terracotta text-crema px-6 py-3.5 rounded-full hover:bg-terracotta-600 transition-colors">
+                  {PBLOCKS[lang][0].cta} <ArrowRight className="imk-march w-4 h-4" />
+                </Link>
+                {/* Freccia a mano che scende sulla CTA */}
+                <Scribble variant="arrow" color="text-alga" draw={false} className="hidden md:block absolute -top-12 -right-20 w-20 h-14 -scale-x-100 rotate-6" />
+              </div>
+            </div>
+            <div className="home-reveal mb-6 lg:mb-0">
+              <PostItCollage photos={PROJECT_PHOTOS} />
+            </div>
+          </div>
+        </div>
+        {/* Polaroid che spunta TRA le sezioni (niente overflow-hidden: non si taglia) */}
+        <div aria-hidden="true" className="absolute -bottom-10 left-[5%] w-40 md:w-52 z-20 pointer-events-none">
+          <PostItNote photo={{ src: '/zone/vita-banco-verdure.webp', alt: '', caption: 'Il banco delle verdure' }} tilt={-6} aspect="aspect-[4/3]" />
+        </div>
+        <WaveDivider fill className="relative z-10 text-crema-2" />
+      </section>
+
+      {/* ===== LE OTTO ZONE — da Ventimiglia a Diano, ognuna col suo carattere ===== */}
+      <section id="zone" className="relative bg-crema-2">
+        <Scribble variant="star" color="text-terracotta" draw={false} className="hidden md:block absolute top-10 left-[4%] w-12 h-12 z-0 rotate-12" />
+        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-14 md:py-20 max-w-6xl grid lg:grid-cols-[0.95fr_1.05fr] gap-10 lg:gap-14 items-center">
+          <div className="relative order-last lg:order-first">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/zone/vita-mercato-ventimiglia-borgo.webp" alt="Il mercato ai piedi della città vecchia di Ventimiglia" loading="lazy" className="w-full aspect-[4/3] object-cover rounded-[22px] shadow-[0_24px_54px_-32px_rgba(38,36,30,0.6)]" />
+            <Scribble variant="loop" color="text-limone" draw={false} className="hidden md:block absolute -top-5 -left-4 w-24 h-16 -rotate-6" />
+          </div>
+          <div>
+            <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-3">{PBLOCKS[lang][1].eyebrow}</p>
+            <h2 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">
+              {PBLOCKS[lang][1].title.split(', ')[0]},{' '}
+              <span className="text-terracotta">{PBLOCKS[lang][1].title.split(', ').slice(1).join(', ')}</span>
+            </h2>
+            <p className="mt-5 max-w-xl text-lg text-ink-soft leading-relaxed">{PBLOCKS[lang][1].body}</p>
+            {/* Le otto zone, una per una: pill cliccabili */}
+            <div className="mt-6 flex flex-wrap gap-2">
+              {IMPERIA_ZONE_SLUGS.map((s) => (
+                <Link key={s} href="/zone" className="font-alt text-[13px] font-semibold rounded-full px-3.5 py-1.5 border-[1.5px] text-alga-600 border-alga/50 bg-crema/70 hover:bg-alga hover:text-crema hover:border-alga transition-colors">
+                  {zoneName(s)}
+                </Link>
+              ))}
+            </div>
+            <Link href={PBLOCKS[lang][1].href} className="group imk-lift mt-7 inline-flex items-center gap-2 font-alt font-semibold text-sm bg-alga text-crema px-6 py-3.5 rounded-full hover:bg-alga-600 transition-colors">
+              {PBLOCKS[lang][1].cta} <ArrowRight className="imk-march w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+        <WaveDivider fill className="relative z-10 text-crema" />
+      </section>
+
       {/* ===== LE PERSONE DEL MERCATO — il box bianco besugo + le card in riga ===== */}
-      <section id="banchi" className="relative overflow-hidden bg-crema">
+      <section id="banchi" className="relative bg-crema">
         {/* Polaroid media appoggiata accanto al titolo: aria di bacheca */}
         <div aria-hidden="true" className="hidden md:block absolute top-10 right-[2%] w-52 xl:w-64 z-0 pointer-events-none">
           <PostItNote photo={{ src: '/zone/vita-mercato-sanremo-banchi.webp', alt: '', caption: 'Sanremo, i banchi del martedì' }} tilt={-4} aspect="aspect-[4/3]" />
@@ -484,15 +534,15 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
             </Link>
           </div>
         </div>
-        <WaveDivider fill className="relative z-10 text-alga" />
+        <WaveDivider fill className="relative z-10 text-terracotta" />
       </section>
 
       {/* ===== LA RETE — "Hai un banco? Entra nella rete." a TUTTO SCHERMO:
-           stanza alga piena, bollino grande, i 3 requisiti numerati ben
-           leggibili (target 40–80) e la CTA terracotta. ===== */}
-      <section id="rete" className="relative overflow-hidden bg-alga text-crema flex flex-col min-h-[85svh]">
-        {/* Polaroid storica appoggiata sull'onda in basso: da dove si viene */}
-        <div aria-hidden="true" className="absolute bottom-0 left-[4%] w-32 md:w-48 z-20 pointer-events-none">
+           stanza TERRACOTTA piena (richiesta 2026-07-19), bollino verde grande
+           senza piatto, i 3 requisiti numerati e la CTA in crema. ===== */}
+      <section id="rete" className="relative bg-terracotta text-crema flex flex-col min-h-[85svh]">
+        {/* Polaroid storica che spunta tra questa sezione e le notizie */}
+        <div aria-hidden="true" className="absolute -bottom-10 left-[4%] w-32 md:w-48 z-20 pointer-events-none">
           <PostItNote photo={{ src: '/zone/vita-fiori-sanremo-1962.webp', alt: '', caption: 'Sanremo, il mercato dei fiori — 1962' }} tilt={-5} aspect="aspect-[4/3]" />
         </div>
         <div className="home-reveal relative z-10 flex-1 flex items-center container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-6xl">
@@ -511,19 +561,19 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
                 ))}
               </ul>
               <div className="mt-10 relative inline-block">
-                <Link href="/aderisci" className="group imk-lift inline-flex items-center gap-2.5 font-alt font-bold text-base md:text-lg bg-terracotta text-crema px-8 py-4 md:px-10 md:py-5 rounded-full hover:bg-terracotta-600 transition-colors">
+                <Link href="/aderisci" className="group imk-lift inline-flex items-center gap-2.5 font-alt font-bold text-base md:text-lg bg-crema text-ink px-8 py-4 md:px-10 md:py-5 rounded-full hover:bg-white transition-colors">
                   {RETE2[lang].cta} <ArrowRight className="imk-march w-5 h-5" />
                 </Link>
                 {/* Freccia a mano (specchiata) che scende sulla CTA */}
                 <Scribble variant="arrow" color="text-limone" draw={false} className="hidden md:block absolute -top-14 -right-24 w-24 h-16 -scale-x-100 rotate-6" />
               </div>
             </div>
-            {/* Il bollino grande su piatto crema: visibile anche su mobile */}
+            {/* Il bollino verde, grande, senza piatto: il logo respira da solo
+                sulla terracotta (via il cerchio bianco/crema — richiesta 2026-07-19) */}
             <div className="flex justify-center lg:justify-end">
-              <div className="relative -rotate-6 grid place-items-center w-56 h-56 md:w-72 md:h-72 lg:w-80 lg:h-80 rounded-full bg-crema shadow-[0_30px_70px_-28px_rgba(0,0,0,0.55)]">
-                <span aria-hidden="true" className="absolute inset-4 rounded-full border-2 border-dashed border-alga/40" />
-                <Bollino className="w-28 md:w-36 lg:w-40" />
-                <Scribble variant="star" color="text-limone" draw={false} className="absolute -top-4 -right-2 w-12 h-12 rotate-12" />
+              <div className="relative -rotate-6">
+                <Bollino className="w-56 md:w-72 lg:w-80 drop-shadow-[0_30px_45px_rgba(0,0,0,0.35)]" />
+                <Scribble variant="star" color="text-limone" draw={false} className="absolute -top-5 -right-3 w-14 h-14 rotate-12" />
                 <span className="sr-only">{RETE2[lang].bollino}</span>
               </div>
             </div>
@@ -534,7 +584,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
 
       {/* ===== GLI ARTICOLI — le notizie dei comuni, al posto delle zone.
            (L'onda piena della sezione rete introduce già questo blocco ink.) ===== */}
-      <section id="settimana" className="relative overflow-hidden bg-ink text-crema">
+      <section id="settimana" className="relative bg-ink text-crema">
         {/* La bacheca continua anche sull'ink: polaroid chiara + ghirigoro limone */}
         <div aria-hidden="true" className="hidden lg:block absolute top-14 right-[4%] w-52 z-0 pointer-events-none">
           <PostItNote photo={{ src: '/zone/vita-mercato-coperto-ventimiglia.webp', alt: '', caption: 'Il mercato coperto di Ventimiglia' }} tilt={4} aspect="aspect-[4/3]" />
