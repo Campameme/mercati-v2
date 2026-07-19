@@ -321,6 +321,103 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
   },
 }
 
+// ---------------------------------------------------------------------------
+// Etichette della pagina /mappa in variante "colonna filtri + risultati"
+// (stile portale di prenotazione): la mappa si apre solo su richiesta.
+// Concetto di copy: i settimanali = l'esperienza autentica della Riviera;
+// antiquariato/artigianato = i "mercati d'autore" (il pezzo unico, la nicchia).
+// ---------------------------------------------------------------------------
+
+export interface MappaDict {
+  /** titolo della colonna filtri */
+  refine: string
+  /** etichetta del selettore giorno */
+  dayLabel: string
+  /** opzione "tutti i giorni" del selettore */
+  allDays: string
+  /** titolo del gruppo tipologie */
+  typesTitle: string
+  /** gruppo: mercati di ogni settimana (generale + alimentare) */
+  weeklyGroup: string
+  weeklyHint: string
+  /** gruppo: mercati d'autore (antiquariato + artigianato) */
+  autoreGroup: string
+  autoreHint: string
+  /** accesso al calendario dalla colonna filtri */
+  openCalendar: string
+  /** chiusura del pannello mappa a tutta altezza */
+  backToList: string
+  /** CTA delle card risultato */
+  discover: string
+  /** bottone che apre/chiude i filtri secondari su mobile */
+  filtersBtn: string
+  /** contatore risultati ("12 mercati trovati") */
+  found: (n: number) => string
+}
+
+export const MAPPA_I18N: Record<Lang, MappaDict> = {
+  it: {
+    refine: 'Affina la ricerca',
+    dayLabel: 'Il giorno',
+    allDays: 'Tutti i giorni',
+    typesTitle: 'Che mercato cerchi?',
+    weeklyGroup: 'Ogni settimana',
+    weeklyHint: 'L’esperienza vera della Riviera: la spesa, i banchi, le piazze.',
+    autoreGroup: 'Mercati d’autore',
+    autoreHint: 'Antiquariato e artigianato: il pezzo unico, non la spesa.',
+    openCalendar: 'Vedi il calendario',
+    backToList: 'Torna alla lista',
+    discover: 'Scopri',
+    filtersBtn: 'Filtri',
+    found: (n) => `${n} mercat${n === 1 ? 'o' : 'i'} trovat${n === 1 ? 'o' : 'i'}`,
+  },
+  fr: {
+    refine: 'Affinez la recherche',
+    dayLabel: 'Le jour',
+    allDays: 'Tous les jours',
+    typesTitle: 'Quel marché cherchez-vous ?',
+    weeklyGroup: 'Chaque semaine',
+    weeklyHint: 'L’expérience vraie de la Riviera : les courses, les étals, les places.',
+    autoreGroup: 'Marchés d’auteur',
+    autoreHint: 'Antiquités et artisanat : la pièce unique, pas les courses.',
+    openCalendar: 'Voir le calendrier',
+    backToList: 'Retour à la liste',
+    discover: 'Découvrir',
+    filtersBtn: 'Filtres',
+    found: (n) => `${n} marché${n === 1 ? '' : 's'} trouvé${n === 1 ? '' : 's'}`,
+  },
+  de: {
+    refine: 'Suche verfeinern',
+    dayLabel: 'Der Tag',
+    allDays: 'Alle Tage',
+    typesTitle: 'Welchen Markt suchst du?',
+    weeklyGroup: 'Jede Woche',
+    weeklyHint: 'Das echte Riviera-Erlebnis: Einkauf, Stände, Plätze.',
+    autoreGroup: 'Besondere Märkte',
+    autoreHint: 'Antiquitäten und Handwerk: das einzelne Stück, nicht der Einkauf.',
+    openCalendar: 'Kalender ansehen',
+    backToList: 'Zurück zur Liste',
+    discover: 'Entdecken',
+    filtersBtn: 'Filter',
+    found: (n) => `${n} ${n === 1 ? 'Markt' : 'Märkte'} gefunden`,
+  },
+  en: {
+    refine: 'Refine your search',
+    dayLabel: 'The day',
+    allDays: 'Any day',
+    typesTitle: 'What market are you after?',
+    weeklyGroup: 'Every week',
+    weeklyHint: 'The real Riviera experience: the shopping, the stalls, the squares.',
+    autoreGroup: 'Curated markets',
+    autoreHint: 'Antiques and crafts: the one-off find, not the groceries.',
+    openCalendar: 'See the calendar',
+    backToList: 'Back to the list',
+    discover: 'Discover',
+    filtersBtn: 'Filters',
+    found: (n) => `${n} market${n === 1 ? '' : 's'} found`,
+  },
+}
+
 const CATEGORY_I18N: Record<string, Record<Lang, string>> = {
   food: { it: 'Alimentari', fr: 'Alimentation', de: 'Lebensmittel', en: 'Food' },
   fruit_vegetables: { it: 'Frutta e verdura', fr: 'Fruits et légumes', de: 'Obst & Gemüse', en: 'Fruit & veg' },

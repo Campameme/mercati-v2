@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { gsap } from '@/lib/motion/gsap'
 import { Search, ArrowRight, CalendarDays, ChevronDown, Newspaper, MessageCircle } from 'lucide-react'
-import Logo from '@/components/Logo'
 import Bollino from '@/components/Bollino'
 import WaterCard from '@/components/motion/WaterCard'
 import BancoAvatar from '@/components/BancoAvatar'
@@ -230,12 +229,8 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
       {/* ===== HERO (proposta B "L'Intreccio") — crema + tratteggio tenue,
            contenuto a sinistra, collage fotografico a destra. ===== */}
       <section ref={heroRef} className="relative min-h-[92svh] flex flex-col overflow-hidden bg-crema text-ink">
-        {/* Header dell'hero: solo il logo, che si annoda al load. Nient'altro —
-            la lingua e il menu completo arrivano con la barra allo scroll. */}
-        <div className="relative z-10 container mx-auto px-4 md:px-6 pt-7">
-          <div data-anim className="inline-block"><Logo inline className="text-ink text-[1.15rem]" markClassName="imk-hero-knot !w-10 !h-8" /></div>
-        </div>
-
+        {/* Il logo qui non serve più: la barra di navigazione è sempre visibile
+            al load (con logo, menu e Accedi), un secondo lockup sarebbe doppio. */}
         <div className="relative z-10 flex-1 flex items-center">
           <div className="container mx-auto px-4 md:px-6 py-12 grid md:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-14 items-center">
             <div className="max-w-2xl">
@@ -266,11 +261,19 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
                 {heroStats.comuni > 0 && (
                   <div className="font-alt text-sm text-ink-soft"><b className="font-display font-extrabold text-2xl text-terracotta mr-2">{heroStats.comuni}</b>{HERO2[lang].comuni}</div>
                 )}
-                <div className="font-alt text-sm text-ink-soft"><b className="font-display font-extrabold text-2xl text-terracotta mr-2">7/7</b>{HERO2[lang].quasi}</div>
+                <div className="relative font-alt text-sm text-ink-soft">
+                  {/* Cerchio a mano attorno al 7/7: si disegna al load, insieme all'hero */}
+                  <Scribble variant="loop" color="text-alga" className="absolute -left-3 -top-2 w-[4.2rem] h-10" />
+                  <b className="font-display font-extrabold text-2xl text-terracotta mr-2">7/7</b>{HERO2[lang].quasi}
+                </div>
+              </div>
+              {/* Su mobile il video non c'è: una polaroid vera sotto i numeri, per dare vita */}
+              <div aria-hidden="true" className="md:hidden mt-7 w-44 pointer-events-none">
+                <PostItNote photo={{ src: '/zone/vita-banchi-piazza.webp', alt: '', caption: 'I banchi in piazza, la mattina' }} tilt={3} aspect="aspect-[4/3]" />
               </div>
             </div>
 
-            {/* Video dell'hero, incorniciato da due onde animate (sopra alga, sotto terracotta) */}
+            {/* Video dell'hero: bordi liquidi crema che morphano (VideoWaveFrame) */}
             <div data-anim className="relative hidden md:block px-4 pt-8 pb-10">
               <VideoWaveFrame>
                 {HERO_VIDEO ? (
@@ -291,6 +294,10 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
                   <img src={HERO_PHOTO.src} alt={HERO_PHOTO.alt} className="absolute inset-0 w-full h-full object-cover" />
                 )}
               </VideoWaveFrame>
+              {/* Polaroid appoggiata sull'angolo del video: primo bigliettino della bacheca */}
+              <div aria-hidden="true" className="absolute bottom-2 -left-3 w-44 lg:w-52 z-20 pointer-events-none">
+                <PostItNote photo={{ src: '/zone/vita-mercato-lungomare.webp', alt: '', caption: 'Il mercato sul lungomare' }} tilt={-5} aspect="aspect-[4/3]" />
+              </div>
             </div>
           </div>
         </div>
@@ -306,6 +313,12 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
       {/* ===== I DUE BLOCCHI (mercati principali = esperienza, autenticità):
            niente titolo, appena sotto l'hero. Alga + terracotta, foto a lato. ===== */}
       <section id="perche" className="relative overflow-hidden bg-crema">
+        {/* Un ghirigoro d'aria in alto e, in basso, una polaroid storica appoggiata
+            sull'onda limone (z-20: sta SOPRA il divisore, spunta tra i due blocchi) */}
+        <Scribble variant="scribble" color="text-terracotta" draw={false} className="hidden md:block absolute top-5 right-[7%] w-28 z-0 rotate-3" />
+        <div aria-hidden="true" className="absolute bottom-0 left-[4%] w-40 md:w-56 z-20 pointer-events-none">
+          <PostItNote photo={{ src: '/zone/vita-piazza-mercato-sanremo-1880.webp', alt: '', caption: 'Sanremo, la piazza del mercato — 1880' }} tilt={-6} aspect="aspect-[4/3]" />
+        </div>
         <div className="relative z-10 container mx-auto px-4 md:px-6 py-12 md:py-16 max-w-6xl grid gap-5 md:gap-6">
           {PBLOCKS[lang].map((b, i) => {
             const look = i === 0
@@ -336,15 +349,18 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
       {/* ===== BELIN, C'È IL MERCATO — i giorni speciali come mercati d'autore,
            piccoli e di nicchia. Band limone (l'onda sopra l'ha annunciata). ===== */}
       <section id="tipici" className="relative overflow-hidden bg-limone">
-        {/* Decori sparsi: un post-it che galleggia e uno scarabocchio, per dare movimento */}
-        <div aria-hidden="true" className="hidden lg:block absolute -top-6 right-[7%] w-36 rotate-6 z-0 pointer-events-none">
-          <PostItNote photo={{ src: '/zone/vita-antiquariato-cornici.webp', alt: '' }} tilt={6} aspect="aspect-[4/3]" />
+        {/* La bacheca: polaroid media appoggiata in alto a destra (con didascalia
+            vera) + spirale grande, tratto pieno — devono vedersi */}
+        <div aria-hidden="true" className="hidden md:block absolute top-8 right-[3%] w-48 lg:w-60 z-0 pointer-events-none">
+          <PostItNote photo={{ src: '/zone/vita-antiquariato-banco.webp', alt: '', caption: 'L’antiquariato sotto i portici' }} tilt={6} aspect="aspect-[4/3]" />
         </div>
-        <Scribble variant="spiral" color="text-terracotta/60" draw={false} className="hidden md:block absolute bottom-8 right-[10%] w-16 h-16 z-0 -rotate-12" />
+        <Scribble variant="spiral" color="text-alga" draw={false} className="hidden md:block absolute bottom-10 right-[8%] w-24 h-24 z-0 -rotate-12" />
         <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-14 md:py-20 max-w-6xl">
           <div className="max-w-2xl mb-9">
             <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-terracotta-600 mb-2">{TIPICI2[lang].eyebrow}</p>
-            <h2 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">
+            <h2 className="relative font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">
+              {/* Cerchio a mano attorno alla prima parola del titolo */}
+              <Scribble variant="loop" color="text-terracotta" draw={false} className="hidden md:block absolute -left-4 -top-3 w-40 h-[4.6rem]" />
               {TIPICI2[lang].title}<span className="text-terracotta">{TIPICI2[lang].star}</span>
             </h2>
             <p className="mt-3 text-ink/80 leading-relaxed">{TIPICI2[lang].lead}</p>
@@ -389,22 +405,24 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
 
       {/* ===== LE PERSONE DEL MERCATO — il box bianco besugo + le card in riga ===== */}
       <section id="banchi" className="relative overflow-hidden bg-crema">
-        {/* Un post-it appoggiato e uno scarabocchio: aria di bacheca */}
-        <div aria-hidden="true" className="hidden xl:block absolute top-16 right-6 w-40 -rotate-3 z-0 pointer-events-none">
-          <PostItNote photo={{ src: '/zone/vita-mercato-sanremo-banchi.webp', alt: '' }} tilt={-4} aspect="aspect-[4/3]" />
+        {/* Polaroid media appoggiata accanto al titolo: aria di bacheca */}
+        <div aria-hidden="true" className="hidden md:block absolute top-10 right-[2%] w-52 xl:w-64 z-0 pointer-events-none">
+          <PostItNote photo={{ src: '/zone/vita-mercato-sanremo-banchi.webp', alt: '', caption: 'Sanremo, i banchi del martedì' }} tilt={-4} aspect="aspect-[4/3]" />
         </div>
         <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-14 md:py-20 max-w-6xl">
           <div className="max-w-2xl mb-8">
             <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-terracotta mb-2">{BANCHI2[lang].eyebrow}</p>
             <h2 className="relative inline-block font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">
               {BANCHI2[lang].title}
-              <Scribble variant="underline" color="text-limone" draw={false} className="absolute -bottom-3 left-0 w-full h-4" />
+              <Scribble variant="underline" color="text-limone" draw={false} className="absolute -bottom-3.5 left-0 w-full h-5" />
             </h2>
             <p className="mt-3 text-ink-soft">{BANCHI2[lang].sub}</p>
           </div>
 
           {/* Il box bianco grande: la battuta del besugo (col footnote che traduce) */}
-          <div className="bg-white border-2 border-ink rounded-[22px] p-7 md:p-9 flex flex-wrap items-center justify-between gap-6">
+          <div className="relative bg-white border-2 border-ink rounded-[22px] p-7 md:p-9 flex flex-wrap items-center justify-between gap-6">
+            {/* Freccia a mano che scende sulla CTA */}
+            <Scribble variant="arrow" color="text-terracotta" draw={false} className="hidden lg:block absolute -top-9 right-40 w-24 h-16 rotate-[18deg]" />
             <p className="font-display font-extrabold tracking-tight text-2xl md:text-[2.1rem] leading-[1.12] max-w-[26ch] text-ink">
               {BANCHI2[lang].q1}<em className="italic text-terracotta">{BANCHI2[lang].em}</em>{BANCHI2[lang].q2}<u className="decoration-limone decoration-[5px] underline-offset-2">{BANCHI2[lang].u}</u>{BANCHI2[lang].q3}
               <small className="block font-alt text-[13px] font-medium italic text-ink-soft mt-2.5">{BANCHI2[lang].foot}</small>
@@ -466,33 +484,48 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
             </Link>
           </div>
         </div>
-        <WaveDivider fill className="relative z-10 text-terracotta" />
+        <WaveDivider fill className="relative z-10 text-alga" />
       </section>
 
-      {/* ===== LA RETE — "Hai un banco? Entra nella rete." stile V2 (band terracotta,
-           bollino, requisiti a pill, i primi banchi gratis). ===== */}
-      <section id="rete" className="relative overflow-hidden bg-terracotta text-crema">
-        <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-14 md:py-20 max-w-6xl grid lg:grid-cols-[1.2fr_1fr] gap-10 lg:gap-14 items-center">
-          <div>
-            <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-crema/90 mb-3">{RETE2[lang].eyebrow}</p>
-            <h2 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl lg:text-[3.4rem] leading-[1.04] text-crema">{RETE2[lang].title}</h2>
-            <p className="mt-4 max-w-[44ch] text-lg text-crema/90 leading-relaxed">{RETE2[lang].lead}</p>
-            <ul className="mt-6 flex flex-wrap gap-2.5">
-              {RETE2[lang].req.map((r) => (
-                <li key={r} className="font-alt font-semibold text-sm bg-crema/15 border border-crema/40 rounded-full px-4 py-2">{r}</li>
-              ))}
-            </ul>
-            <div className="mt-7">
-              <Link href="/aderisci" className="group imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-crema text-ink px-6 py-3.5 rounded-full hover:bg-white transition-colors">
-                {RETE2[lang].cta} <ArrowRight className="imk-march w-4 h-4" />
-              </Link>
+      {/* ===== LA RETE — "Hai un banco? Entra nella rete." a TUTTO SCHERMO:
+           stanza alga piena, bollino grande, i 3 requisiti numerati ben
+           leggibili (target 40–80) e la CTA terracotta. ===== */}
+      <section id="rete" className="relative overflow-hidden bg-alga text-crema flex flex-col min-h-[85svh]">
+        {/* Polaroid storica appoggiata sull'onda in basso: da dove si viene */}
+        <div aria-hidden="true" className="absolute bottom-0 left-[4%] w-32 md:w-48 z-20 pointer-events-none">
+          <PostItNote photo={{ src: '/zone/vita-fiori-sanremo-1962.webp', alt: '', caption: 'Sanremo, il mercato dei fiori — 1962' }} tilt={-5} aspect="aspect-[4/3]" />
+        </div>
+        <div className="home-reveal relative z-10 flex-1 flex items-center container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-6xl">
+          <div className="w-full grid lg:grid-cols-[1.15fr_1fr] gap-12 lg:gap-16 items-center">
+            <div>
+              <p className="font-alt text-sm font-bold uppercase tracking-[0.16em] text-limone mb-4">{RETE2[lang].eyebrow}</p>
+              <h2 className="font-display font-extrabold tracking-tight text-[11vw] md:text-6xl lg:text-[4.4rem] leading-[1.02] text-crema">{RETE2[lang].title}</h2>
+              <p className="mt-6 max-w-[40ch] text-xl md:text-2xl text-crema/90 leading-relaxed">{RETE2[lang].lead}</p>
+              {/* I 3 requisiti della rete: numerati, corpo grande, una riga ciascuno */}
+              <ul className="mt-9 grid gap-4">
+                {RETE2[lang].req.map((r, i) => (
+                  <li key={r} className="flex items-center gap-4">
+                    <span aria-hidden="true" className="grid place-items-center flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full bg-limone text-ink font-display font-extrabold text-xl md:text-2xl">{i + 1}</span>
+                    <span className="font-alt font-semibold text-xl md:text-2xl">{r}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-10 relative inline-block">
+                <Link href="/aderisci" className="group imk-lift inline-flex items-center gap-2.5 font-alt font-bold text-base md:text-lg bg-terracotta text-crema px-8 py-4 md:px-10 md:py-5 rounded-full hover:bg-terracotta-600 transition-colors">
+                  {RETE2[lang].cta} <ArrowRight className="imk-march w-5 h-5" />
+                </Link>
+                {/* Freccia a mano (specchiata) che scende sulla CTA */}
+                <Scribble variant="arrow" color="text-limone" draw={false} className="hidden md:block absolute -top-14 -right-24 w-24 h-16 -scale-x-100 rotate-6" />
+              </div>
             </div>
-          </div>
-          <div className="hidden lg:flex justify-center">
-            <div className="relative -rotate-6 grid place-items-center text-center w-52 h-52 rounded-full bg-crema text-terracotta-600 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.5)]">
-              <span aria-hidden="true" className="absolute inset-3 rounded-full border-2 border-dashed border-terracotta/40" />
-              <Bollino className="w-24" />
-              <span className="sr-only">{RETE2[lang].bollino}</span>
+            {/* Il bollino grande su piatto crema: visibile anche su mobile */}
+            <div className="flex justify-center lg:justify-end">
+              <div className="relative -rotate-6 grid place-items-center w-56 h-56 md:w-72 md:h-72 lg:w-80 lg:h-80 rounded-full bg-crema shadow-[0_30px_70px_-28px_rgba(0,0,0,0.55)]">
+                <span aria-hidden="true" className="absolute inset-4 rounded-full border-2 border-dashed border-alga/40" />
+                <Bollino className="w-28 md:w-36 lg:w-40" />
+                <Scribble variant="star" color="text-limone" draw={false} className="absolute -top-4 -right-2 w-12 h-12 rotate-12" />
+                <span className="sr-only">{RETE2[lang].bollino}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -502,6 +535,11 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
       {/* ===== GLI ARTICOLI — le notizie dei comuni, al posto delle zone.
            (L'onda piena della sezione rete introduce già questo blocco ink.) ===== */}
       <section id="settimana" className="relative overflow-hidden bg-ink text-crema">
+        {/* La bacheca continua anche sull'ink: polaroid chiara + ghirigoro limone */}
+        <div aria-hidden="true" className="hidden lg:block absolute top-14 right-[4%] w-52 z-0 pointer-events-none">
+          <PostItNote photo={{ src: '/zone/vita-mercato-coperto-ventimiglia.webp', alt: '', caption: 'Il mercato coperto di Ventimiglia' }} tilt={4} aspect="aspect-[4/3]" />
+        </div>
+        <Scribble variant="scribble" color="text-limone" draw={false} className="hidden md:block absolute bottom-12 right-[9%] w-28 z-0 -rotate-6" />
         <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-5xl">
           <div className="max-w-2xl mb-9">
             <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-limone mb-2">{copy.weekEyebrow}</p>

@@ -66,6 +66,9 @@ export default function AderisciPage() {
 
           <div className="grid md:grid-cols-[1fr_auto] gap-10 items-center">
             <Reveal>
+              {/* Su mobile il bollino grande di fianco è nascosto: qui una
+                  versione compatta, appoggiata con una leggera rotazione. */}
+              <Bollino className="md:hidden w-24 rotate-2 mb-6" />
               <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-4">
                 Per chi tiene banco · da Ventimiglia a Diano
               </p>

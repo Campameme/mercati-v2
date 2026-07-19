@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Search, CalendarDays, BadgeCheck, MessageCircle, ArrowRight } from 'lucide-react'
 import BancoAvatar from '@/components/BancoAvatar'
+import Bollino from '@/components/Bollino'
 import { PostItNote } from '@/components/motion/PostItCollage'
 import { useLang } from '@/lib/i18n/useLang'
 import { UI_I18N } from '@/lib/i18n/ui'
@@ -97,21 +98,28 @@ export default function OperatoriHubPage() {
           Sul lato, un post-it che galleggia: il banco com'è dal vivo. */}
       <section className="relative bg-crema-2 border-b border-[#e0d7c1] overflow-hidden">
         <div className="relative z-10 container mx-auto px-4 md:px-6 pt-12 pb-10 md:pt-16 md:pb-12 max-w-6xl">
-          <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-2">{ui.operatoriEyebrow}</p>
-          <div className="flex items-end justify-between gap-4 flex-wrap">
-            <h1 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">
-              {ui.operatoriTitleLead} <span className="text-terracotta">{ui.operatoriTitleAccent}</span>
-            </h1>
-            {!loading && operators.length > 0 && (
-              <p className="font-alt text-sm font-semibold text-ink-soft">
-                <span className="font-display font-extrabold tracking-tight text-2xl text-ink">{operators.length}</span>{' '}
-                {operators.length === 1 ? ui.operatoriCount.one : ui.operatoriCount.many}
+          {/* Il bollino della rete a lato del titolo: qui non c'è il logo
+              esteso, quindi la targa circolare presidia la pagina dei banchi. */}
+          <div className="flex items-start justify-between gap-6">
+            <div className="min-w-0 flex-1">
+              <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-2">{ui.operatoriEyebrow}</p>
+              <div className="flex items-end justify-between gap-4 flex-wrap">
+                <h1 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">
+                  {ui.operatoriTitleLead} <span className="text-terracotta">{ui.operatoriTitleAccent}</span>
+                </h1>
+                {!loading && operators.length > 0 && (
+                  <p className="font-alt text-sm font-semibold text-ink-soft">
+                    <span className="font-display font-extrabold tracking-tight text-2xl text-ink">{operators.length}</span>{' '}
+                    {operators.length === 1 ? ui.operatoriCount.one : ui.operatoriCount.many}
+                  </p>
+                )}
+              </div>
+              <p className="text-base text-ink-soft mt-4 max-w-xl leading-relaxed">
+                {ui.operatoriLead}
               </p>
-            )}
+            </div>
+            <Bollino className="hidden sm:block w-24 lg:w-28 rotate-3 flex-shrink-0" />
           </div>
-          <p className="text-base text-ink-soft mt-4 max-w-xl leading-relaxed">
-            {ui.operatoriLead}
-          </p>
         </div>
         {/* La trama di questa pagina è la tenda in testa: niente ondina insieme. */}
         <div aria-hidden="true" className="hidden lg:block absolute right-10 -bottom-9 w-44 z-0 pointer-events-none">

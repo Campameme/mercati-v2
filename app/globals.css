@@ -211,17 +211,37 @@ body {
 }
 /* Onda PIENA e LIQUIDA (merge col blocco successivo): la tinta è quella della
    prossima sezione, e il profilo si DEFORMA lentamente (morph della `d`) invece
-   di scorrere — un bordo fluido, non un nastro. */
-.imk-wave-divider.is-fill { height: 46px; margin-bottom: -1px; overflow: visible; }
+   di scorrere — un bordo fluido, non un nastro. Due strati: quello davanti
+   (imk-wave-morph, 4 forme, 12s) e uno retrostante a mezza opacità
+   (imk-wave-morph-back, altro profilo e durata) per la profondità dell'acqua.
+   margin-bottom:-1px + chiusura del path su L1440,120 L0,120 Z = nessuna riga
+   di cucitura con la sezione dopo. */
+.imk-wave-divider.is-fill { height: 100px; margin-bottom: -1px; overflow: visible; }
 .imk-wave-divider.is-fill svg { width: 100%; height: 100%; animation: none; }
+@media (max-width: 767px) {
+  .imk-wave-divider.is-fill { height: 64px; }
+}
 .imk-wave-fluid {
-  animation: imk-wave-morph 9s ease-in-out infinite;
+  animation: imk-wave-morph 12s ease-in-out infinite;
   will-change: d;
 }
+.imk-wave-fluid-back {
+  animation: imk-wave-morph-back 17s ease-in-out infinite;
+  will-change: d;
+}
+/* Anse volutamente asimmetriche (creste che si spostano E cambiano altezza):
+   liquido, non pattern. Stessa struttura di comandi in tutte le forme (M + 4C),
+   altrimenti il morph della `d` non interpola. */
 @keyframes imk-wave-morph {
-  0%, 100% { d: path('M0,28 C180,14 300,14 480,30 C660,44 780,44 960,28 C1140,14 1260,16 1440,30 L1440,60 L0,60 Z'); }
-  33%      { d: path('M0,32 C180,44 300,44 480,30 C660,16 780,16 960,32 C1140,46 1260,42 1440,28 L1440,60 L0,60 Z'); }
-  66%      { d: path('M0,26 C180,20 300,40 480,34 C660,20 780,14 960,26 C1140,38 1260,40 1440,30 L1440,60 L0,60 Z'); }
+  0%, 100% { d: path('M0,70 C120,30 260,22 420,52 C560,78 640,96 800,66 C930,42 1010,26 1140,44 C1240,58 1330,84 1440,58 L1440,120 L0,120 Z'); }
+  25%      { d: path('M0,48 C150,86 300,96 460,60 C590,32 700,18 860,46 C980,68 1090,88 1210,64 C1310,44 1370,30 1440,74 L1440,120 L0,120 Z'); }
+  50%      { d: path('M0,86 C110,52 240,24 400,38 C540,50 660,74 820,86 C960,96 1060,48 1180,28 C1290,12 1370,50 1440,44 L1440,120 L0,120 Z'); }
+  75%      { d: path('M0,56 C140,18 280,44 440,76 C580,102 680,58 840,34 C970,16 1080,42 1200,72 C1300,96 1380,70 1440,52 L1440,120 L0,120 Z'); }
+}
+@keyframes imk-wave-morph-back {
+  0%, 100% { d: path('M0,40 C160,74 320,90 480,64 C640,38 760,18 920,40 C1060,58 1160,82 1280,66 C1360,54 1400,36 1440,32 L1440,120 L0,120 Z'); }
+  30%      { d: path('M0,76 C140,42 300,22 470,44 C620,64 760,88 930,72 C1070,58 1170,28 1290,26 C1360,24 1410,52 1440,66 L1440,120 L0,120 Z'); }
+  65%      { d: path('M0,52 C150,82 310,62 480,34 C630,14 780,30 940,60 C1080,84 1180,76 1300,48 C1370,32 1410,42 1440,50 L1440,120 L0,120 Z'); }
 }
 
 /* --- Evidenziatore limone del titolo hero (stile V2 "mercato centrale"):
@@ -234,31 +254,26 @@ body {
   box-decoration-break: clone;
 }
 
-/* --- Cornice a ONDA del video hero: due nastri d'onda (sopra alga, sotto
-   terracotta) che scorrono lungo i bordi lunghi del riquadro. Reduced-motion
-   safe (lo scorrimento si ferma, l'onda resta come cornice ferma). --- */
-.imk-videoframe { position: relative; }
-.imk-videoframe .imk-vwave {
+/* --- Bordi FLUIDI del video hero: due onde piene color crema (il fondo
+   pagina), DENTRO il riquadro (overflow-hidden), che morphano come i divisori
+   di sezione. Sopra l'onda è capovolta (scaleY(-1)): il video "galleggia"
+   nella crema con bordi liquidi. Reduced-motion: profili fermi (coperto dalle
+   regole di .imk-wave-fluid / .imk-wave-fluid-back qui sotto). --- */
+.imk-wave-divider.is-fill.imk-vframe-wave {
   position: absolute;
-  left: -2%;
-  width: 104%;
-  height: 22px;
-  color: #46683B;
-  overflow: hidden;
+  left: 0;
+  right: 0;
+  height: 44px;
+  margin: 0;
   pointer-events: none;
   z-index: 2;
 }
-.imk-videoframe .imk-vwave svg {
-  display: block;
-  width: 200%;
-  height: 100%;
-  animation: imk-wave-slide 11s linear infinite;
-}
-.imk-videoframe .imk-vwave.bottom { transform: scaleY(-1); }
-.imk-videoframe .imk-vwave.bottom svg { animation-duration: 13s; animation-direction: reverse; }
-@media (prefers-reduced-motion: reduce) {
-  .imk-videoframe .imk-vwave svg { animation: none !important; }
-}
+.imk-wave-divider.is-fill.imk-vframe-wave.top { top: -1px; transform: scaleY(-1); }
+.imk-wave-divider.is-fill.imk-vframe-wave.bottom { bottom: -1px; }
+/* L'onda in alto con un ritmo un filo diverso da quella in basso, così i due
+   bordi non respirano all'unisono (sempre transform/opacity/d — ok motion). */
+.imk-vframe-wave.top .imk-wave-fluid { animation-duration: 14s; animation-delay: -6s; }
+.imk-vframe-wave.top .imk-wave-fluid-back { animation-delay: -9s; }
 
 /* --- Line-draw per accenti SVG (es. WaveTaglia, Arco): il tratto si
    "disegna" una volta all'ingresso. Da abbinare a .imk-draw sull'<svg>. --- */
@@ -288,7 +303,8 @@ body {
   .imk-sun { animation: none !important; }
   .imk-float { animation: none !important; transform: rotate(var(--tilt, 0deg)); }
   .imk-wave-divider svg { animation: none !important; }
-  .imk-wave-fluid { animation: none !important; }
+  .imk-wave-fluid,
+  .imk-wave-fluid-back { animation: none !important; }
   .imk-draw path {
     animation: none !important;
     stroke-dashoffset: 0 !important;

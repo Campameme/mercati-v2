@@ -100,8 +100,9 @@ export default function MappaExperience(props: Props) {
     <div className="bg-crema">
       {/* 1. Header compatto: titolo + una riga, poi SUBITO la vista unica.
           (Via la pila di foto: la mappa e il calendario devono emergere.) */}
-      <section id="mappa" className="relative overflow-hidden bg-crema-2 scroll-mt-2">
-        <div aria-hidden="true" className="mz-band absolute top-0 inset-x-0" />
+      {/* Niente mz-band qui: header pulito, senza tende (feedback proprietario).
+          Niente overflow-hidden: romperebbe la colonna filtri sticky. */}
+      <section id="mappa" className="relative bg-crema-2 scroll-mt-2">
         <div className="relative z-10 container mx-auto px-4 md:px-6 pt-7 pb-4 max-w-6xl flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
           <div>
             <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-1.5">{c.eyebrow}</p>
@@ -121,7 +122,10 @@ export default function MappaExperience(props: Props) {
           </div>
         </div>
         {view === 'map' ? (
-          <MarketExplorer {...props} heightClass="md:h-[84svh]" />
+          /* Variante "booking": colonna filtri sticky a sinistra, card risultato
+             a destra, mappa a tutta altezza solo su richiesta ("Vedi su mappa").
+             Il calendario resta raggiungibile anche dalla colonna filtri. */
+          <MarketExplorer {...props} variant="booking" onOpenCalendar={() => setView('cal')} />
         ) : (
           <MarketCalendar />
         )}

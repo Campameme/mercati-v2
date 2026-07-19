@@ -1,6 +1,7 @@
 // Logotipo "I Mercati della Riviera dei Fiori" (sistema Nodo × Mezzogiorno):
 // il NODO — un tratto calligrafico che si annoda, col capo in terracotta —
-// + lockup "I Mercati" (display 800) / "della Riviera dei Fiori" (italic).
+// + lockup tutto in display: "I Mercati" (800) / "della Riviera dei Fiori"
+// (700, alga — mai corsivo, mai un font diverso: scelta del proprietario).
 // Il tratto eredita `currentColor` (ink su chiaro, crema su scuro); il capo
 // resta terracotta. Nelle riduzioni piccole (monogramma/favicon) solo il tratto.
 
@@ -66,7 +67,7 @@ export default function Logo({ className = '', inline = false, markClassName = '
         <LogoMark className={`w-8 h-[1.65rem] flex-shrink-0 ${markClassName}`} draw />
         <span className="leading-none whitespace-nowrap">
           <span className="font-display font-extrabold tracking-tight text-[1.06em]">I Mercati</span>{' '}
-          <span className="font-alt italic text-[0.92em] text-alga">della Riviera dei Fiori</span>
+          <span className="font-display font-bold tracking-tight text-[0.92em] text-alga">della Riviera dei Fiori</span>
         </span>
       </span>
     )
@@ -76,7 +77,7 @@ export default function Logo({ className = '', inline = false, markClassName = '
       <LogoMark className={`w-16 h-[3.35rem] ${markClassName}`} draw />
       <span className="mt-2 leading-tight">
         <span className="block font-display font-extrabold tracking-tight text-[1.3em]">I Mercati</span>
-        <span className="block font-alt italic text-[0.95em] text-alga">della Riviera dei Fiori</span>
+        <span className="block font-display font-bold tracking-tight text-[0.95em] text-alga">della Riviera dei Fiori</span>
       </span>
     </span>
   )

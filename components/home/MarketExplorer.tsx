@@ -1,12 +1,13 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { Search, Crosshair, Navigation as NavIcon, ChevronDown, Check, History, X, MapPin } from 'lucide-react'
+import Link from 'next/link'
+import { Search, Crosshair, Navigation as NavIcon, ChevronDown, Check, History, X, MapPin, CalendarDays, ArrowRight, Clock, SlidersHorizontal } from 'lucide-react'
 import UnifiedMapClient from '@/components/UnifiedMapClient'
 import type { UnifiedMapPin } from '@/components/UnifiedMap'
 import MarketPanel from './MarketPanel'
 import type { MarketPin, MarketSession } from './types'
-import { HOME_I18N, LANGS, type Lang } from '@/lib/i18n/home'
+import { HOME_I18N, MAPPA_I18N, LANGS, type Lang } from '@/lib/i18n/home'
 import { useLang } from '@/lib/i18n/useLang'
 import { marketStatus, weekdaysOf, occursOn, fmtHour, type MarketStatus } from '@/lib/markets/hours'
 import { classifyMany, categoryLabelI18n, CATEGORY_COLOR, CATEGORY_ORDER, type ScheduleCategory } from '@/lib/schedules/classify'
@@ -56,6 +57,18 @@ function pinWeekdays(pin: MarketPin): Set<number> {
   const set = new Set<number>()
   for (const s of pin.sessions) for (const d of weekdaysOf(s.giorno)) set.add(d)
   return set
+}
+
+// "Cosa trovi": settori unici del mercato, per le card risultato (variante booking).
+function settoriOf(pin: MarketPin): string[] {
+  return Array.from(
+    new Set(
+      pin.sessions
+        .flatMap((s) => (s.settori ?? '').split(/[·,/]/))
+        .map((t) => t.trim())
+        .filter(Boolean),
+    ),
+  ).slice(0, 4)
 }
 
 // --- Dropdown filtro multi-selezione (chiude su click-fuori / Esc) ----------
@@ -133,9 +146,17 @@ interface Props {
   initialNear?: boolean
   /** altezza del blocco mappa+lista; ridotta quando è incorporata in una pagina con contenuti sopra/sotto */
   heightClass?: string
+  /**
+   * 'split'   = layout storico: lista + mappa affiancate, sempre visibili (home).
+   * 'booking' = pagina /mappa: colonna filtri a sinistra, risultati a destra,
+   *             mappa a tutta altezza solo su richiesta ("Vedi su mappa").
+   */
+  variant?: 'split' | 'booking'
+  /** variante booking: apre la vista Calendario (vive nel genitore MappaExperience) */
+  onOpenCalendar?: () => void
 }
 
-export default function MarketExplorer({ pins: allPins, initialQuery = '', initialZone = 'all', initialToday = false, initialDays = [], initialNear = false, heightClass = 'md:h-[calc(100svh-4rem)]' }: Props) {
+export default function MarketExplorer({ pins: allPins, initialQuery = '', initialZone = 'all', initialToday = false, initialDays = [], initialNear = false, heightClass = 'md:h-[calc(100svh-4rem)]', variant = 'split', onOpenCalendar }: Props) {
   const [lang, setLang] = useLang()
   const [days, setDays] = useState<number[]>(initialDays)
   const [today, setToday] = useState(initialToday)
@@ -153,10 +174,28 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
   const [operators, setOperators] = useState<HubOperator[]>([])
   // Su mobile si vede una vista alla volta: la LISTA dei risultati o la MAPPA.
   const [mobileView, setMobileView] = useState<'list' | 'map'>('list')
+  // Variante booking: la mappa è un pannello a tutta altezza aperto su richiesta.
+  const [mapOpen, setMapOpen] = useState(false)
+  // Variante booking, mobile: i filtri secondari stanno dietro un bottone "Filtri".
+  const [filtersOpen, setFiltersOpen] = useState(false)
   const didAuto = useRef(false)
 
   const dict = HOME_I18N[lang]
+  const mdict = MAPPA_I18N[lang]
   const typedPlaceholder = useTypewriter(HOME_COPY[lang].searchExamples)
+
+  // Pannello mappa aperto: blocca lo scroll della pagina e chiudi con Esc.
+  useEffect(() => {
+    if (!mapOpen) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMapOpen(false) }
+    document.addEventListener('keydown', onKey)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prev
+    }
+  }, [mapOpen])
 
   useEffect(() => {
     // ricerche recenti: memorizzate in locale per ri-proporle al focus
@@ -282,6 +321,27 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
     [listItems, meta],
   )
 
+  // Quanti mercati ricorrono in ciascun giorno della settimana (per le opzioni
+  // del selettore giorno della variante booking).
+  const weekdayCounts = useMemo(() => {
+    const c = Array(7).fill(0) as number[]
+    for (const p of pins) for (const d of pinWeekdays(p)) c[d]++
+    return c
+  }, [pins])
+
+  // Riquadro dell'anteprima mini-mappa (variante booking): i confini geografici
+  // di TUTTI i pin, così la cornice resta ferma anche quando i filtri cambiano.
+  const miniBounds = useMemo(() => {
+    let minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity
+    for (const p of pins) {
+      if (p.lat < minLat) minLat = p.lat
+      if (p.lat > maxLat) maxLat = p.lat
+      if (p.lng < minLng) minLng = p.lng
+      if (p.lng > maxLng) maxLng = p.lng
+    }
+    return { minLat, maxLat, latSpan: maxLat - minLat || 1, minLng, maxLng, lngSpan: maxLng - minLng || 1 }
+  }, [pins])
+
   const selected = useMemo(() => pins.find((p) => p.id === selectedId) ?? null, [pins, selectedId])
   const selectedSession = selected ? pickSession(selected, now) : null
   const selectedStatus = selected ? statuses.get(selected.id) : undefined
@@ -320,8 +380,463 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
   function toggleDay(d: number) {
     setDays((s) => (s.includes(d) ? s.filter((x) => x !== d) : [...s, d]))
   }
+  // Variante booking: il giorno è UNA scelta sola (tendina grande): tutti /
+  // oggi / un giorno della settimana. Mappa sulla coppia di stati (today, days).
+  const dayChoice = today ? 'today' : days.length > 0 ? String(days[0]) : 'all'
+  function setDayChoice(v: string) {
+    if (v === 'all') { setToday(false); setDays([]) }
+    else if (v === 'today') { setToday(true); setDays([]) }
+    else { setToday(false); setDays([Number(v)]) }
+  }
   function toggleCat(c: ScheduleCategory) {
     setCats((s) => (s.includes(c) ? s.filter((x) => x !== c) : [...s, c]))
+  }
+
+  // ==========================================================================
+  // VARIANTE BOOKING (pagina /mappa): colonna filtri a sinistra (sticky su
+  // desktop), risultati come card orizzontali a destra, mappa a tutta altezza
+  // SOLO su richiesta ("Vedi su mappa") con i pin già filtrati.
+  // La home continua a usare la variante 'split' qui sotto, invariata.
+  // ==========================================================================
+  if (variant === 'booking') {
+    const todayWd = now ? now.getDay() : null
+    // filtri "secondari" attivi (per il badge del bottone Filtri su mobile)
+    const activeExtra = (zone !== 'all' ? 1 : 0) + cats.length + (openNow ? 1 : 0)
+    const anyFilter = activeExtra > 0 || dayChoice !== 'all' || isSearching || sort === 'near'
+    const fieldLabelCls = 'font-alt text-xs font-bold uppercase tracking-[0.14em] text-alga mb-1.5 block'
+
+    return (
+      <div className="bg-crema">
+        <div className="container mx-auto px-4 md:px-6 py-5 md:py-7 max-w-6xl">
+          <div className="lg:grid lg:grid-cols-[320px_minmax(0,1fr)] lg:gap-7 lg:items-start">
+
+            {/* ===== Colonna filtri (sticky su desktop) ===== */}
+            <aside className="lg:sticky lg:top-24 mb-5 lg:mb-0 space-y-4">
+              {/* Mini-anteprima mappa cliccabile: i puntini sono i risultati
+                  CORRENTI (già filtrati), disegnati in un riquadro fermo.
+                  Leaflet NON viene caricato qui: solo quando si apre la mappa. */}
+              <button
+                type="button"
+                onClick={() => setMapOpen(true)}
+                aria-label={dict.seeOnMap}
+                className="hidden lg:block group relative w-full h-40 rounded-2xl overflow-hidden border border-[#e0d7c1] bg-[#e9efe1] shadow-[0_14px_30px_-22px_rgba(38,36,30,0.55)]"
+              >
+                <svg viewBox="0 0 100 60" preserveAspectRatio="none" className="absolute inset-0 w-full h-full" aria-hidden="true">
+                  {/* filo di costa stilizzato, fermo (niente sfondi animati) */}
+                  <path d="M0 46 C 20 40, 38 48, 55 44 S 86 50, 100 42 L 100 60 L 0 60 Z" fill="#d7e3f0" opacity="0.9" />
+                  {listItems.map(({ pin: p }) => (
+                    <circle
+                      key={p.id}
+                      cx={8 + ((p.lng - miniBounds.minLng) / miniBounds.lngSpan) * 84}
+                      cy={52 - ((p.lat - miniBounds.minLat) / miniBounds.latSpan) * 44}
+                      r={meta.get(p.id)?.category === 'generale' ? 2 : 1.5}
+                      fill={CATEGORY_COLOR[meta.get(p.id)?.category ?? 'generale']}
+                      stroke="#FBF6EC"
+                      strokeWidth="0.5"
+                    />
+                  ))}
+                </svg>
+                <span className="absolute inset-0 grid place-items-center">
+                  <span className="inline-flex items-center gap-2 font-alt font-semibold text-sm bg-white text-ink border border-[#e0d7c1] rounded-full px-4 py-2 shadow-lg group-hover:bg-terracotta group-hover:text-crema group-hover:border-terracotta transition-colors">
+                    <MapPin className="w-4 h-4" aria-hidden="true" /> {dict.seeOnMap}
+                  </span>
+                </span>
+              </button>
+
+              <div className="bg-white border border-[#e0d7c1] rounded-2xl p-4 shadow-[0_14px_30px_-24px_rgba(38,36,30,0.55)] space-y-5">
+                <h2 className="font-display font-extrabold tracking-tight text-lg text-ink leading-none">{mdict.refine}</h2>
+
+                {/* Ricerca ampia: filtra la lista dal vivo; Invio memorizza la ricerca */}
+                <form
+                  onSubmit={(e) => { e.preventDefault(); saveRecent(query) }}
+                  role="search"
+                  className="relative bg-white border border-[#e0d7c1] rounded-xl focus-within:border-alga"
+                >
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-muted" aria-hidden="true" />
+                  <input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder={typedPlaceholder}
+                    aria-label={dict.searchPlaceholder}
+                    enterKeyHint="search"
+                    className="w-full pl-10 pr-9 py-3 bg-transparent rounded-xl text-[15px] focus:outline-none"
+                  />
+                  {query && (
+                    <button
+                      type="button"
+                      onClick={() => setQuery('')}
+                      aria-label={RESET_LABEL[lang]}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 grid place-items-center w-7 h-7 rounded-full text-ink-muted hover:bg-ink/5 hover:text-ink"
+                    >
+                      <X className="w-4 h-4" aria-hidden="true" />
+                    </button>
+                  )}
+                </form>
+
+                {/* Il giorno: UNA tendina grande, ben visibile; oggi in evidenza */}
+                <label className="block">
+                  <span className={fieldLabelCls}>{mdict.dayLabel}</span>
+                  <div className="relative">
+                    <select
+                      value={dayChoice}
+                      onChange={(e) => setDayChoice(e.target.value)}
+                      className="w-full appearance-none bg-alga text-crema font-display font-extrabold tracking-tight text-lg leading-none pl-4 pr-11 py-3.5 rounded-xl border-0 shadow-[0_16px_32px_-22px_rgba(53,80,44,0.85)] cursor-pointer focus:outline-none focus:ring-4 focus:ring-limone/60"
+                    >
+                      <option value="all" className="font-sans text-base bg-white text-ink">{mdict.allDays}</option>
+                      {todayWd !== null && (
+                        <option value="today" className="font-sans text-base bg-white text-ink">
+                          {dict.filters.today} — {WD_FULL[lang][todayWd]}
+                        </option>
+                      )}
+                      {WD_ORDER.map((d) => (
+                        <option key={d} value={String(d)} disabled={weekdayCounts[d] === 0} className="font-sans text-base bg-white text-ink">
+                          {WD_FULL[lang][d]}
+                          {todayWd === d ? ` · ${dict.filters.today.toLowerCase()}` : ''}
+                          {weekdayCounts[d] > 0 ? ` · ${weekdayCounts[d]}` : ''}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-limone" aria-hidden="true" />
+                  </div>
+                </label>
+
+                {/* Su mobile i filtri restanti stanno dietro un bottone unico */}
+                <button
+                  type="button"
+                  onClick={() => setFiltersOpen((o) => !o)}
+                  aria-expanded={filtersOpen}
+                  className="lg:hidden w-full inline-flex items-center justify-center gap-2 font-alt font-semibold text-sm border-[1.5px] border-alga/60 text-alga-600 rounded-xl px-4 py-2.5 hover:border-alga transition-colors"
+                >
+                  <SlidersHorizontal className="w-4 h-4" aria-hidden="true" />
+                  {mdict.filtersBtn}
+                  {activeExtra > 0 && (
+                    <span className="grid place-items-center min-w-[1.2rem] h-[1.2rem] px-1 rounded-full bg-limone text-ink text-[11px] leading-none">{activeExtra}</span>
+                  )}
+                  <ChevronDown className={`w-4 h-4 transition-transform ${filtersOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+                </button>
+
+                <div className={`${filtersOpen ? 'block' : 'hidden'} lg:block space-y-5`}>
+                  {/* La zona */}
+                  <label className="block">
+                    <span className={fieldLabelCls}>{dict.filterZone}</span>
+                    <div className="relative">
+                      <select
+                        value={zone}
+                        onChange={(e) => setZone(e.target.value)}
+                        className={`w-full appearance-none font-alt font-semibold text-[15px] pl-4 pr-10 py-3 rounded-xl border-[1.5px] cursor-pointer focus:outline-none focus:border-alga transition-colors ${
+                          zone !== 'all' ? 'bg-alga-50 text-alga-600 border-alga' : 'bg-white text-ink border-[#e0d7c1]'
+                        }`}
+                      >
+                        <option value="all">{dict.allZones}</option>
+                        {ZONES.filter((z) => (IMPERIA_ZONE_SLUGS as readonly string[]).includes(z.slug)).map((z) => (
+                          <option key={z.slug} value={z.slug}>{z.name}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted" aria-hidden="true" />
+                    </div>
+                  </label>
+
+                  {/* Le tipologie, in due famiglie: i settimanali (l'esperienza)
+                      e i mercati d'autore (vintage/artigianato, la nicchia) */}
+                  <div>
+                    <span className={fieldLabelCls}>{mdict.typesTitle}</span>
+                    <div className="rounded-xl border border-[#e0d7c1] divide-y divide-[#e0d7c1] overflow-hidden">
+                      <div className="p-2">
+                        <p className="px-2.5 pt-1 font-alt text-[13px] font-bold text-ink">{mdict.weeklyGroup}</p>
+                        <p className="px-2.5 pb-1 text-xs text-ink-muted leading-snug">{mdict.weeklyHint}</p>
+                        {(['generale', 'alimentare'] as ScheduleCategory[]).map((c) => (
+                          <CheckRow key={c} checked={cats.includes(c)} onClick={() => toggleCat(c)} label={categoryLabelI18n(c, lang)} color={CATEGORY_COLOR[c]} />
+                        ))}
+                      </div>
+                      <div className="p-2">
+                        <p className="px-2.5 pt-1 font-alt text-[13px] font-bold text-ink">{mdict.autoreGroup}</p>
+                        <p className="px-2.5 pb-1 text-xs text-ink-muted leading-snug">{mdict.autoreHint}</p>
+                        {(['antiquariato', 'artigianato'] as ScheduleCategory[]).map((c) => (
+                          <CheckRow key={c} checked={cats.includes(c)} onClick={() => toggleCat(c)} label={categoryLabelI18n(c, lang)} color={CATEGORY_COLOR[c]} />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* "Sono le HH:MM · N aperti adesso": filtro cliccabile */}
+                  {now && (
+                    <button
+                      type="button"
+                      onClick={() => setOpenNow((v) => !v)}
+                      aria-pressed={openNow}
+                      className={`w-full inline-flex items-center justify-center gap-1.5 font-alt text-sm font-semibold px-3 py-2.5 rounded-xl border-[1.5px] transition-colors ${
+                        openNow ? 'bg-alga text-crema border-alga' : 'bg-white text-ink-soft border-[#e0d7c1] hover:border-alga'
+                      }`}
+                    >
+                      <span className={`w-2 h-2 rounded-full ${openNow ? 'bg-crema' : 'bg-terracotta'}`} aria-hidden="true" />
+                      {nowText} · <b className={openNow ? 'text-crema' : 'text-alga-600'}>{openCount}</b>{' '}
+                      {openCount > 0 ? dict.openSuffix : dict.noneOpen}
+                    </button>
+                  )}
+
+                  {/* Vicino a me: chiede la posizione e ordina per distanza */}
+                  <button
+                    type="button"
+                    onClick={locateNearest}
+                    disabled={locating}
+                    aria-pressed={sort === 'near'}
+                    className={`w-full inline-flex items-center justify-center gap-2 font-alt font-semibold text-sm rounded-xl px-4 py-2.5 border-[1.5px] transition-colors disabled:opacity-60 ${
+                      sort === 'near' ? 'bg-alga text-crema border-alga' : 'bg-white text-ink border-[#e0d7c1] hover:border-alga hover:text-alga-600'
+                    }`}
+                  >
+                    <Crosshair className="w-4 h-4" aria-hidden="true" />
+                    {locating ? dict.loading : dict.sortNear}
+                  </button>
+
+                  {/* Il calendario, a portata di colonna */}
+                  {onOpenCalendar && (
+                    <button
+                      type="button"
+                      onClick={onOpenCalendar}
+                      className="w-full inline-flex items-center justify-center gap-2 font-alt font-semibold text-sm rounded-xl px-4 py-2.5 border-[1.5px] border-alga/60 text-alga-600 bg-white hover:border-alga transition-colors"
+                    >
+                      <CalendarDays className="w-4 h-4" aria-hidden="true" />
+                      {mdict.openCalendar}
+                    </button>
+                  )}
+
+                  {anyFilter && (
+                    <button
+                      type="button"
+                      onClick={() => { setZone('all'); setDays([]); setToday(false); setOpenNow(false); setCats([]); setQuery(''); setSort('az') }}
+                      className="w-full text-center font-alt text-xs font-semibold text-ink-muted hover:text-ink underline underline-offset-2"
+                    >
+                      {RESET_LABEL[lang]}
+                    </button>
+                  )}
+
+                  {/* Le 4 lingue del pubblico */}
+                  <div className="flex justify-center gap-1 pt-1">
+                    {LANGS.map((l) => (
+                      <button
+                        key={l}
+                        onClick={() => setLang(l)}
+                        aria-pressed={lang === l}
+                        className={`text-xs font-bold uppercase px-2 py-1 rounded-md border-2 transition-colors ${lang === l ? 'bg-ink text-crema border-ink' : 'text-ink border-ink/20 hover:border-ink'}`}
+                      >
+                        {l}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </aside>
+
+            {/* ===== Risultati: lista verticale di card orizzontali ===== */}
+            <section aria-live="polite">
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <p className="font-alt text-sm text-ink-soft">
+                  <span className="font-display font-extrabold text-lg text-ink">{mdict.found(listItems.length)}</span>
+                  {isSearching && (
+                    <span className="block text-xs text-ink-muted mt-0.5">
+                      {dict.whyShown}: <span className="text-ink font-semibold">«{query.trim()}»</span>
+                    </span>
+                  )}
+                </p>
+                {sort === 'near' && userLoc && !isSearching && (
+                  <button
+                    type="button"
+                    onClick={() => setSort('az')}
+                    className="flex-shrink-0 font-alt text-xs font-semibold px-3 py-1.5 rounded-full border-[1.5px] border-[#e0d7c1] bg-white text-ink-soft hover:border-alga hover:text-alga-600 transition-colors"
+                  >
+                    {dict.sortAZ}
+                  </button>
+                )}
+              </div>
+
+              {listItems.length === 0 ? (
+                <div className="bg-white border border-[#e0d7c1] rounded-2xl px-6 py-14 text-center">
+                  <Search className="w-8 h-8 text-alga/60 mx-auto mb-3" aria-hidden="true" />
+                  <p className="text-ink-soft">{isSearching ? dict.noResults : dict.listEmpty}</p>
+                </div>
+              ) : (
+                <ul className="space-y-3 pb-20 lg:pb-0">
+                  {listItems.map(({ pin: p, reasons }) => {
+                    const cat = meta.get(p.id)?.category ?? 'generale'
+                    const st = statuses.get(p.id)
+                    const session = pickSession(p, now)
+                    const dist = sort === 'near' && userLoc ? haversineMeters(userLoc, p) : null
+                    const settori = settoriOf(p)
+                    const href = `/${p.marketSlug}/c/${p.comuneSlug}`
+                    return (
+                      <li key={p.id}>
+                        <article className="flex bg-white rounded-2xl border border-[#e0d7c1] overflow-hidden shadow-[0_12px_26px_-22px_rgba(38,36,30,0.55)] hover:border-alga/60 transition-colors">
+                          {/* filo colorato della tipologia, alla booking */}
+                          <span className="w-1.5 flex-shrink-0" style={{ background: CATEGORY_COLOR[cat] }} aria-hidden="true" />
+                          <div className="flex-1 min-w-0 p-4 sm:p-5">
+                            <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                              <span
+                                className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-alt font-bold uppercase tracking-wider text-crema"
+                                style={{ background: CATEGORY_COLOR[cat] }}
+                              >
+                                {categoryLabelI18n(cat, lang)}
+                              </span>
+                              {st && st.state === 'open' && (
+                                <span className="text-[11px] font-semibold rounded-full px-2 py-0.5 bg-alga text-crema">
+                                  {dict.openUntil} {fmtHour(st.hour ?? 0)}
+                                </span>
+                              )}
+                              {st && st.state === 'opens' && (
+                                <span className="text-[11px] font-semibold rounded-full px-2 py-0.5 bg-terracotta-50 text-terracotta-600">
+                                  {dict.opensAt} {fmtHour(st.hour ?? 0)}
+                                </span>
+                              )}
+                              {dist !== null && (
+                                <span className="inline-flex items-center gap-1 text-[11px] text-ink-muted">
+                                  <NavIcon className="w-3 h-3" aria-hidden="true" />
+                                  {dist < 1000 ? `${Math.round(dist)} m` : `${(dist / 1000).toFixed(1)} km`}
+                                </span>
+                              )}
+                            </div>
+                            <h3 className="font-display font-extrabold tracking-tight text-xl text-ink leading-tight">
+                              <Link href={href} className="hover:text-alga-600 transition-colors">{p.comune}</Link>
+                            </h3>
+                            <p className="text-sm text-ink-soft mt-0.5 truncate">
+                              {p.marketName}
+                              {p.luogo ? ` · ${p.luogo}` : ''}
+                            </p>
+                            {session.giorno && (
+                              <p className="mt-1.5 inline-flex items-center gap-1.5 text-sm text-ink">
+                                <Clock className="w-4 h-4 text-alga flex-shrink-0" aria-hidden="true" />
+                                <span className="font-semibold">{session.giorno}</span>
+                                {session.orario && <span className="text-ink-soft tabular-nums">· {session.orario}</span>}
+                              </p>
+                            )}
+                            {/* Cosa ci trovi */}
+                            {settori.length > 0 && (
+                              <p className="mt-2 flex flex-wrap gap-1.5">
+                                {settori.map((s) => (
+                                  <span key={s} className="text-xs font-semibold text-alga-600 bg-alga-50 rounded-full px-2.5 py-0.5">{s}</span>
+                                ))}
+                              </p>
+                            )}
+                            {/* Il "perché" del risultato quando c'è una ricerca attiva */}
+                            {reasons.length > 0 && (
+                              <p className="mt-2 flex flex-wrap gap-1.5">
+                                {reasons.slice(0, 2).map((reason, i) => (
+                                  <span key={i} className="inline-flex items-center gap-1 text-[11px] bg-terracotta-50 text-terracotta-600 rounded-full px-2 py-0.5">
+                                    <b className="font-semibold">{reason.field}:</b> {reason.value}
+                                  </span>
+                                ))}
+                              </p>
+                            )}
+                            {/* CTA su mobile, in coda alla card */}
+                            <div className="mt-3 flex sm:hidden items-center gap-2">
+                              <Link
+                                href={href}
+                                className="flex-1 inline-flex items-center justify-center gap-2 font-alt font-semibold text-sm bg-terracotta text-crema px-4 py-2.5 rounded-full hover:bg-terracotta-600 transition-colors"
+                              >
+                                {mdict.discover} <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                              </Link>
+                              <button
+                                type="button"
+                                onClick={() => { setSelectedId(p.id); setMapOpen(true) }}
+                                aria-label={dict.seeOnMap}
+                                className="grid place-items-center w-10 h-10 rounded-full border-[1.5px] border-[#e0d7c1] text-ink-soft hover:border-alga hover:text-alga-600 transition-colors"
+                              >
+                                <MapPin className="w-4 h-4" aria-hidden="true" />
+                              </button>
+                            </div>
+                          </div>
+                          {/* Colonna azioni su desktop */}
+                          <div className="hidden sm:flex flex-col items-end justify-between gap-3 p-4 sm:p-5 flex-shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => { setSelectedId(p.id); setMapOpen(true) }}
+                              aria-label={dict.seeOnMap}
+                              title={dict.seeOnMap}
+                              className="grid place-items-center w-9 h-9 rounded-full border-[1.5px] border-[#e0d7c1] text-ink-soft hover:border-alga hover:text-alga-600 transition-colors"
+                            >
+                              <MapPin className="w-4 h-4" aria-hidden="true" />
+                            </button>
+                            <Link
+                              href={href}
+                              className="imk-lift inline-flex items-center gap-2 font-alt font-semibold text-sm bg-terracotta text-crema px-5 py-2.5 rounded-full hover:bg-terracotta-600 transition-colors"
+                            >
+                              {mdict.discover} <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                            </Link>
+                          </div>
+                        </article>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+            </section>
+          </div>
+        </div>
+
+        {/* CTA fissa su mobile: apre la mappa con i risultati correnti */}
+        {!mapOpen && (
+          <div className="lg:hidden fixed bottom-5 inset-x-0 z-[950] flex justify-center pointer-events-none">
+            <button
+              type="button"
+              onClick={() => setMapOpen(true)}
+              className="pointer-events-auto inline-flex items-center gap-2 font-alt font-semibold text-sm bg-ink text-crema px-5 py-3 rounded-full shadow-2xl hover:bg-alga transition-colors"
+            >
+              <MapPin className="w-4 h-4" aria-hidden="true" />
+              {dict.seeOnMap} · {listItems.length}
+            </button>
+          </div>
+        )}
+
+        {/* ===== Pannello mappa a tutta altezza, SOLO su richiesta =====
+            Leaflet si carica qui la prima volta (UnifiedMapClient è dynamic). */}
+        {mapOpen && (
+          <div className="fixed inset-0 z-[1200] bg-crema flex flex-col" role="dialog" aria-label={dict.seeOnMap} data-lenis-prevent>
+            <div className="flex-shrink-0 flex items-center justify-between gap-3 px-4 md:px-6 py-3 border-b border-[#e0d7c1] bg-crema">
+              <p className="font-alt text-sm text-ink-soft min-w-0 truncate">
+                <span className="font-display font-extrabold text-base text-ink">{mdict.found(listItems.length)}</span>
+                {isSearching && <span className="text-ink-muted"> · «{query.trim()}»</span>}
+              </p>
+              <button
+                type="button"
+                onClick={() => setMapOpen(false)}
+                className="flex-shrink-0 inline-flex items-center gap-2 font-alt font-semibold text-sm bg-ink text-crema px-4 py-2 rounded-full hover:bg-alga transition-colors"
+              >
+                <X className="w-4 h-4" aria-hidden="true" />
+                {mdict.backToList}
+              </button>
+            </div>
+            <div className="relative flex-1 bg-ink overflow-hidden">
+              <div className="absolute inset-0">
+                <UnifiedMapClient
+                  pins={mapPins}
+                  height="100%"
+                  bare
+                  onPinClick={(p) => setSelectedId(p.id)}
+                  selectedId={selectedId}
+                  panToSelected
+                  userLocation={userLoc}
+                  maxZoom={14}
+                />
+              </div>
+              {!selected && (
+                <div className="absolute left-1/2 bottom-3 -translate-x-1/2 z-[900] pointer-events-none">
+                  <span className="font-alt font-semibold text-sm text-crema bg-ink/55 backdrop-blur-sm px-4 py-2 rounded-full">{dict.hint}</span>
+                </div>
+              )}
+              {selected && selectedSession && selectedStatus && (
+                <MarketPanel
+                  key={selected.id}
+                  pin={selected}
+                  session={selectedSession}
+                  status={selectedStatus}
+                  lang={lang}
+                  dict={dict}
+                  onClose={() => setSelectedId(null)}
+                />
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    )
   }
 
   return (

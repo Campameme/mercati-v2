@@ -10,7 +10,7 @@ export default function Loading() {
         <LogoMark className="w-16 h-[3.3rem] text-ink" draw />
         <span className="text-center leading-snug">
           <span className="block font-display font-extrabold tracking-tight text-lg">I Mercati</span>
-          <span className="block font-alt italic text-sm text-alga">della Riviera dei Fiori</span>
+          <span className="block font-display font-bold tracking-tight text-sm text-alga">della Riviera dei Fiori</span>
         </span>
         <span className="imk-skel h-1.5 w-40" aria-hidden="true" />
         <span className="sr-only">Caricamento…</span>

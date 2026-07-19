@@ -1,26 +1,34 @@
 // Divisore d'onda tra due sezioni.
 //
-//  - fill (default per il "merge"): un'onda PIENA e LIQUIDA che si deforma
-//    lentamente (morph CSS della `d`, non uno scorrimento). currentColor = tinta
-//    della sezione SUCCESSIVA, così il blocco dopo sembra salire e fondersi in
-//    questo. Va messa in fondo alla sezione corrente. Reduced-motion: l'onda si
-//    ferma su una forma d'appoggio (il path scritto nell'attributo `d`).
-//  - stroke: una linea d'onda che scorre — usata come cornice del video hero
-//    (classe .imk-vwave). Decoro, non merge.
+//  - fill (default per il "merge"): un'onda PIENA e LIQUIDA a due strati che si
+//    deforma lentamente (morph CSS della `d`, non uno scorrimento).
+//    currentColor = tinta della sezione SUCCESSIVA, così il blocco dopo sembra
+//    salire e fondersi in questo. Il path retrostante (opacità ridotta) ha
+//    profilo, fase e durata diversi: dà la profondità dell'acqua. Va messa in
+//    fondo alla sezione corrente. Reduced-motion: entrambe le onde si fermano
+//    sulla forma d'appoggio (il path scritto nell'attributo `d`).
+//  - stroke: una linea d'onda che scorre — decoro leggero, non merge.
 //
-// Le tre forme del morph vivono in globals.css (@keyframes imk-wave-morph);
-// il path qui sotto è la forma-base (fallback + reduced-motion).
+// Le forme del morph vivono in globals.css (@keyframes imk-wave-morph e
+// imk-wave-morph-back, 4 forme chiave ciascuna); i path qui sotto sono le
+// forme-base (fallback + reduced-motion). Le anse sono volutamente IRREGOLARI
+// (ampiezze e larghezze diverse): deve sembrare liquido, non un pattern.
 
 const WAVE_STROKE = 'M0 13 q30 -10 60 0' + ' t60 0'.repeat(47)
-// Forma-base dell'onda piena (coincide col keyframe 0% in globals.css).
+// Forma-base dell'onda piena in primo piano (coincide col keyframe 0%).
 const WAVE_FILL_BASE =
-  'M0,28 C180,14 300,14 480,30 C660,44 780,44 960,28 C1140,14 1260,16 1440,30 L1440,60 L0,60 Z'
+  'M0,70 C120,30 260,22 420,52 C560,78 640,96 800,66 C930,42 1010,26 1140,44 C1240,58 1330,84 1440,58 L1440,120 L0,120 Z'
+// Forma-base dell'onda retrostante (keyframe 0% di imk-wave-morph-back).
+const WAVE_FILL_BACK =
+  'M0,40 C160,74 320,90 480,64 C640,38 760,18 920,40 C1060,58 1160,82 1280,66 C1360,54 1400,36 1440,32 L1440,120 L0,120 Z'
 
 export default function WaveDivider({ className = '', fill = false }: { className?: string; fill?: boolean }) {
   if (fill) {
     return (
       <span aria-hidden="true" className={`imk-wave-divider is-fill ${className}`}>
-        <svg viewBox="0 0 1440 60" preserveAspectRatio="none" fill="none">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none" fill="none">
+          {/* strato retrostante: stessa acqua, mezza opacità, altro ritmo */}
+          <path className="imk-wave-fluid-back" d={WAVE_FILL_BACK} fill="currentColor" opacity="0.45" />
           <path className="imk-wave-fluid" d={WAVE_FILL_BASE} fill="currentColor" />
         </svg>
       </span>

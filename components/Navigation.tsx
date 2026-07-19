@@ -16,8 +16,6 @@ export default function Navigation() {
   const marketSlug = useMarketSlug()
   const [role, setRole] = useState<UserRole | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
-  const isHome = pathname === '/'
-  const [pastHero, setPastHero] = useState(false)
 
   // I link di recupero password di Supabase atterrano sulla Site URL (root):
   // da qualunque pagina, portiamo l'utente al form "nuova password".
@@ -60,25 +58,12 @@ export default function Navigation() {
     return () => { active = false }
   }, [pathname])
 
-  // Sulla home la barra è nascosta finché si sta fermi sull'hero (che ha il
-  // suo logo) e scivola dentro appena si scrolla: la "bussola di ritorno".
-  useEffect(() => {
-    if (!isHome) { setPastHero(false); return }
-    const onScroll = () => setPastHero(window.scrollY > 80)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [isHome])
-
+  // La barra è visibile SUBITO su tutte le pagine, home compresa: logo, voci
+  // e pulsanti si vedono appena la pagina carica (richiesta del proprietario;
+  // il vecchio "menu su scroll" della home è stato rimosso).
   return (
     <>
-      <nav
-        className={`bg-crema/95 backdrop-blur border-b border-ink/10 z-50 ${
-          isHome
-            ? `fixed inset-x-0 top-0 transition-transform duration-300 ${pastHero ? 'translate-y-0 visible' : '-translate-y-full pointer-events-none invisible'}`
-            : 'sticky top-0'
-        }`}
-      >
+      <nav className="sticky top-0 bg-crema/95 backdrop-blur border-b border-ink/10 z-50">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between h-16">
             {/* Left: logo */}
