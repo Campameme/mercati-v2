@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { ArrowRight, Map as MapIcon, CalendarDays } from 'lucide-react'
 import MarketExplorer from '@/components/home/MarketExplorer'
-import PhotoStack, { type StackPhoto } from '@/components/motion/PhotoStack'
 import Bollino from '@/components/Bollino'
 import { LogoMark } from '@/components/Logo'
 import type { MarketPin } from '@/components/home/types'
@@ -24,14 +23,6 @@ const VIEW_LABEL: Record<Lang, { map: string; cal: string }> = {
   de: { map: 'Karte', cal: 'Kalender' },
   en: { map: 'Map', cal: 'Calendar' },
 }
-
-const INTRO_PHOTOS: StackPhoto[] = [
-  { src: '/zone/vita-mercato-lungomare.webp', alt: 'Il mercato settimanale sul lungomare, tra i banchi e le palme', caption: 'Sul lungomare' },
-  { src: '/zone/vita-banchi-piazza.webp', alt: 'I banchi del mercato stretti tra le case della piazza', caption: 'In piazza' },
-  { src: '/zone/vita-artigianato-borse.webp', alt: 'Borse e ceste artigianali appese ai banchi, sotto l’ulivo', caption: 'L’artigianato' },
-  { src: '/zone/vita-antiquariato-cornici.webp', alt: 'Cornici dorate accatastate al banco del rigattiere', caption: 'L’antiquariato' },
-  { src: '/zone/vita-banco-ortofrutta-ombrelloni.webp', alt: 'Pomodori e carciofi sui banchi, sotto gli ombrelloni verdi', caption: 'La spesa di stagione' },
-]
 
 interface Copy {
   eyebrow: string
@@ -107,28 +98,19 @@ export default function MappaExperience(props: Props) {
 
   return (
     <div className="bg-crema">
-      {/* 1. Concept — impersonale, a beneficio di chi cerca il mercato */}
-      <section className="relative overflow-hidden bg-crema-2">
+      {/* 1. Header compatto: titolo + una riga, poi SUBITO la vista unica.
+          (Via la pila di foto: la mappa e il calendario devono emergere.) */}
+      <section id="mappa" className="relative overflow-hidden bg-crema-2 scroll-mt-2">
         <div aria-hidden="true" className="mz-band absolute top-0 inset-x-0" />
-        <div className="relative z-10 container mx-auto px-4 md:px-6 py-8 md:py-10 max-w-6xl flex flex-col sm:flex-row items-center gap-6 sm:gap-10">
-          <div className="flex-1">
-            <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-3">{c.eyebrow}</p>
-            <h1 className="font-display font-extrabold tracking-[-0.02em] text-ink text-[8.5vw] leading-[1.05] md:text-5xl lg:text-[3.4rem]">
+        <div className="relative z-10 container mx-auto px-4 md:px-6 pt-7 pb-4 max-w-6xl flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+          <div>
+            <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-1.5">{c.eyebrow}</p>
+            <h1 className="font-display font-extrabold tracking-[-0.02em] text-ink text-[7vw] leading-[1.02] sm:text-4xl lg:text-[2.8rem]">
               {c.title} <span className="text-alga">{c.titleAccent}</span>
             </h1>
-            <p className="mt-4 max-w-xl text-base md:text-lg text-ink-soft leading-relaxed">{c.lead}</p>
+            <p className="mt-2 max-w-2xl text-sm md:text-base text-ink-soft leading-snug">{c.lead}</p>
           </div>
-          {/* Una piccola pila di foto come accento: la mappa è subito sotto.
-              (Qui la trama è la tenda in testa: niente ondina nella stessa pagina.) */}
-          <div className="w-[8.5rem] sm:w-[9.5rem] flex-shrink-0">
-            <PhotoStack photos={INTRO_PHOTOS} aspect="aspect-[4/5]" />
-          </div>
-        </div>
-      </section>
-
-      {/* 2. Vista unica: Mappa ⇄ Calendario */}
-      <section id="mappa" className="scroll-mt-4">
-        <div className="container mx-auto px-4 md:px-6 pt-6 pb-1">
+          {/* Toggle Mappa ⇄ Calendario, allineato al titolo */}
           <div className="inline-flex rounded-full border border-[#e0d7c1] bg-white p-1 shadow-[0_10px_22px_-16px_rgba(38,36,30,0.5)]">
             <button type="button" onClick={() => setView('map')} aria-pressed={view === 'map'} className={tabCls(view === 'map')}>
               <MapIcon className="w-4 h-4" aria-hidden="true" /> {v.map}
@@ -139,7 +121,7 @@ export default function MappaExperience(props: Props) {
           </div>
         </div>
         {view === 'map' ? (
-          <MarketExplorer {...props} heightClass="md:h-[82svh]" />
+          <MarketExplorer {...props} heightClass="md:h-[84svh]" />
         ) : (
           <MarketCalendar />
         )}

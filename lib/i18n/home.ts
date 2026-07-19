@@ -31,6 +31,7 @@ export interface HomeDict {
   parking: string
   searchPlaceholder: string
   results: string
+  seeOnMap: string
   noResults: string
   list: string
   youAreHere: string
@@ -85,6 +86,7 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
     parking: 'Parcheggi vicini',
     searchPlaceholder: 'Cerca: mercato, artigianato, una zona, un ambulante…',
     results: 'Risultati',
+    seeOnMap: 'Vedi su mappa',
     noResults: 'Nessun risultato',
     list: 'Mercati',
     youAreHere: 'Sei qui',
@@ -147,6 +149,7 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
     parking: 'Parkings proches',
     searchPlaceholder: 'Cherchez : marché, artisanat, une zone, un marchand…',
     results: 'Résultats',
+    seeOnMap: 'Voir sur la carte',
     noResults: 'Aucun résultat',
     list: 'Marchés',
     youAreHere: 'Vous êtes ici',
@@ -209,6 +212,7 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
     parking: 'Parkplätze in der Nähe',
     searchPlaceholder: 'Suche: Markt, Handwerk, eine Zone, einen Händler…',
     results: 'Ergebnisse',
+    seeOnMap: 'Auf der Karte',
     noResults: 'Keine Ergebnisse',
     list: 'Märkte',
     youAreHere: 'Du bist hier',
@@ -271,6 +275,7 @@ export const HOME_I18N: Record<Lang, HomeDict> = {
     parking: 'Parking nearby',
     searchPlaceholder: 'Search: market, crafts, a zone, a vendor…',
     results: 'Results',
+    seeOnMap: 'See on map',
     noResults: 'No results',
     list: 'Markets',
     youAreHere: 'You are here',

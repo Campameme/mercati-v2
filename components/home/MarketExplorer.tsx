@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { Search, Crosshair, Navigation as NavIcon, ChevronDown, Check, History, X } from 'lucide-react'
+import { Search, Crosshair, Navigation as NavIcon, ChevronDown, Check, History, X, MapPin } from 'lucide-react'
 import UnifiedMapClient from '@/components/UnifiedMapClient'
 import type { UnifiedMapPin } from '@/components/UnifiedMap'
 import MarketPanel from './MarketPanel'
@@ -14,7 +14,7 @@ import { ZONES, ZONE_BY_SLUG, IMPERIA_ZONE_SLUGS } from '@/lib/markets/zones'
 import { haversineMeters } from '@/lib/markets/geo'
 import { HOME_COPY } from '@/lib/i18n/homeCopy'
 import { useTypewriter } from '@/lib/useTypewriter'
-import { searchMarkets, type SearchOperatorLite } from '@/lib/markets/search'
+import { searchMarkets, type SearchOperatorLite, type SearchReason } from '@/lib/markets/search'
 
 const WD_FULL: Record<Lang, string[]> = {
   it: ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'],
@@ -151,6 +151,8 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
   const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(null)
   const [locating, setLocating] = useState(false)
   const [operators, setOperators] = useState<HubOperator[]>([])
+  // Su mobile si vede una vista alla volta: la LISTA dei risultati o la MAPPA.
+  const [mobileView, setMobileView] = useState<'list' | 'map'>('list')
   const didAuto = useRef(false)
 
   const dict = HOME_I18N[lang]
@@ -233,6 +235,20 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
     [query, pins, operatorsLite, lang, userLoc],
   )
 
+  // La ricerca guida la LISTA (non solo il dropdown): cercando "mais vicino al
+  // mare" la lista mostra i mercati che hanno un banco che matcha, col "perché".
+  // Fuori ricerca, la lista è l'elenco filtrato dai chip.
+  const isSearching = query.trim().length >= 2
+  const listItems = useMemo<{ pin: MarketPin; reasons: SearchReason[] }[]>(() => {
+    if (isSearching) {
+      const allowed = new Set(filteredPins.map((p) => p.id))
+      return searchResults
+        .filter((r) => allowed.has(r.pin.id))
+        .map((r) => ({ pin: r.pin, reasons: r.reasons }))
+    }
+    return sortedPins.map((p) => ({ pin: p, reasons: [] as SearchReason[] }))
+  }, [isSearching, searchResults, filteredPins, sortedPins])
+
   // Auto-selezione dal q iniziale (una volta): seleziona il miglior risultato.
   useEffect(() => {
     if (didAuto.current) return
@@ -255,13 +271,15 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
     return n
   }, [pins, zone, meta, statuses, now])
 
+  // La mappa mostra ESATTAMENTE i risultati della lista (in ricerca = solo i
+  // mercati che matchano; fuori ricerca = i filtrati). "Vedi su mappa" = questi.
   const mapPins = useMemo<UnifiedMapPin[]>(
     () =>
-      filteredPins.map((p) => ({
+      listItems.map(({ pin: p }) => ({
         id: p.id, lat: p.lat, lng: p.lng, kind: 'market' as const,
         title: p.comune, subtitle: p.luogo ?? p.marketName, category: meta.get(p.id)?.category,
       })),
-    [filteredPins, meta],
+    [listItems, meta],
   )
 
   const selected = useMemo(() => pins.find((p) => p.id === selectedId) ?? null, [pins, selectedId])
@@ -512,34 +530,52 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
         </div>
       </div>
 
+      {/* Toggle mobile: LISTA dei risultati ⇄ MAPPA (su desktop stanno affiancate) */}
+      <div className="md:hidden flex-shrink-0 border-b border-[#e0d7c1] bg-crema px-3 py-2 flex items-center gap-2">
+        <div className="inline-flex rounded-full border border-[#e0d7c1] bg-white p-0.5">
+          <button onClick={() => setMobileView('list')} aria-pressed={mobileView === 'list'}
+            className={`font-alt text-xs font-semibold px-3.5 py-1.5 rounded-full transition-colors ${mobileView === 'list' ? 'bg-alga text-crema' : 'text-ink-soft'}`}>
+            {listItems.length} {dict.list}
+          </button>
+          <button onClick={() => setMobileView('map')} aria-pressed={mobileView === 'map'}
+            className={`inline-flex items-center gap-1.5 font-alt text-xs font-semibold px-3.5 py-1.5 rounded-full transition-colors ${mobileView === 'map' ? 'bg-alga text-crema' : 'text-ink-soft'}`}>
+            <MapPin className="w-3.5 h-3.5" /> {dict.seeOnMap}
+          </button>
+        </div>
+      </div>
+
       {/* ===== Lista + Mappa (riempiono l'altezza rimanente, scroll interni) ===== */}
       <div className="flex-1 flex flex-col md:flex-row md:min-h-0">
         <aside
-          className="order-2 md:order-1 w-full md:w-[340px] md:flex-shrink-0 bg-crema border-t md:border-t-0 md:border-r border-[#e0d7c1] h-[42svh] md:h-auto md:min-h-0 overflow-y-auto imk-scroll"
+          className={`order-2 md:order-1 w-full md:w-[360px] md:flex-shrink-0 bg-crema border-t md:border-t-0 md:border-r border-[#e0d7c1] md:h-auto md:min-h-0 overflow-y-auto imk-scroll ${mobileView === 'list' ? 'flex-1 min-h-0' : 'hidden md:block'}`}
           data-lenis-prevent
         >
           <div className="sticky top-0 bg-crema/95 backdrop-blur-sm px-4 py-2.5 border-b border-[#e0d7c1] flex items-center justify-between gap-2 z-10">
             <span className="font-alt text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted">
-              <span className="font-display font-extrabold text-sm text-ink">{sortedPins.length}</span> {dict.list}
+              <span className="font-display font-extrabold text-sm text-ink">{listItems.length}</span>{' '}
+              {isSearching ? dict.results : dict.list}
             </span>
-            <button
-              onClick={() => setSort('az')}
-              aria-pressed={sort === 'az'}
-              className={`text-xs font-semibold px-2 py-1 rounded-md ${sort === 'az' ? 'bg-alga text-crema' : 'text-ink-soft hover:bg-ink/5'}`}
-            >
-              {dict.sortAZ}
-            </button>
+            {!isSearching && (
+              <button
+                onClick={() => setSort('az')}
+                aria-pressed={sort === 'az'}
+                className={`text-xs font-semibold px-2 py-1 rounded-md ${sort === 'az' ? 'bg-alga text-crema' : 'text-ink-soft hover:bg-ink/5'}`}
+              >
+                {dict.sortAZ}
+              </button>
+            )}
           </div>
 
-          {sortedPins.length === 0 ? (
-            <p className="px-4 py-6 text-sm text-ink-muted">{dict.listEmpty}</p>
+          {listItems.length === 0 ? (
+            <p className="px-4 py-6 text-sm text-ink-muted">{isSearching ? dict.noResults : dict.listEmpty}</p>
           ) : (
             <ul className="p-3 space-y-2">
-              {sortedPins.map((p) => {
+              {listItems.map(({ pin: p, reasons }) => {
                 const cat = meta.get(p.id)?.category ?? 'generale'
                 const st = statuses.get(p.id)
                 const dist = sort === 'near' && userLoc ? haversineMeters(userLoc, p) : null
                 const isSel = p.id === selectedId
+                const session = pickSession(p, now)
                 return (
                   <li key={p.id}>
                     <button
@@ -552,7 +588,9 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
                       <span className="min-w-0 flex-1">
                         <span className="font-display font-extrabold tracking-tight text-[15px] text-ink leading-tight block truncate">{p.comune}</span>
                         {p.luogo && <span className="block text-xs text-ink-muted truncate">{p.luogo}</span>}
-                        <span className="mt-1 flex items-center gap-2 flex-wrap">
+                        {/* riga di servizio: giorno del mercato */}
+                        {session.giorno && <span className="block text-[12px] text-ink-soft mt-0.5">{session.giorno}</span>}
+                        <span className="mt-1.5 flex items-center gap-2 flex-wrap">
                           {st && st.state === 'open' && (
                             <span className="text-[11px] font-semibold rounded-full px-2 py-0.5 bg-alga text-crema">
                               {dict.openUntil} {fmtHour(st.hour ?? 0)}
@@ -570,6 +608,16 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
                             </span>
                           )}
                         </span>
+                        {/* il "perché" del risultato: es. «Vende: mais — banco di Antonio» */}
+                        {reasons.length > 0 && (
+                          <span className="mt-1.5 flex flex-wrap gap-1">
+                            {reasons.slice(0, 2).map((reason, i) => (
+                              <span key={i} className="inline-flex items-center gap-1 text-[11px] bg-terracotta-50 text-terracotta-600 rounded-full px-2 py-0.5">
+                                <b className="font-semibold">{reason.field}:</b> {reason.value}
+                              </span>
+                            ))}
+                          </span>
+                        )}
                       </span>
                     </button>
                   </li>
@@ -581,7 +629,7 @@ export default function MarketExplorer({ pins: allPins, initialQuery = '', initi
 
         {/* z-0: crea uno stacking context così mappa E card mercato restano
             SOTTO la barra filtri sticky (z-30), senza clippare i suoi menu. */}
-        <div className="order-1 md:order-2 relative z-0 flex-1 h-[55svh] md:h-auto min-h-[420px] overflow-hidden bg-ink">
+        <div className={`order-1 md:order-2 relative z-0 flex-1 md:h-auto min-h-[420px] overflow-hidden bg-ink ${mobileView === 'map' ? 'flex-1 min-h-0' : 'hidden md:block'}`}>
           <div className="absolute inset-0">
             <UnifiedMapClient
               pins={mapPins}
