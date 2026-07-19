@@ -16,12 +16,14 @@ export default function Bollino({ className = '', spin = true }: { className?: s
           <textPath href="#bollino-ring" startOffset="2%">I MERCATI DELLA RIVIERA DEI FIORI · RETE DEI BANCHI ·</textPath>
         </text>
       </g>
-      <g transform="translate(43,58) scale(0.95)">
+      {/* Nodo al centro, con aria attorno rispetto all'anello bianco (scala
+          ridotta e ricentrata: prima riempiva quasi tutto il cerchio). */}
+      <g transform="translate(62,66) scale(0.7)">
         <path
           d="M14 68 C 2 52, 12 26, 36 26 C 62 26, 60 62, 40 62 C 24 62, 26 38, 48 33 C 74 27, 96 40, 100 66"
-          fill="none" stroke="#FBF6EC" strokeWidth="8" strokeLinecap="round"
+          fill="none" stroke="#FBF6EC" strokeWidth="9" strokeLinecap="round"
         />
-        <path d="M36 26 C 62 26, 60 62, 40 62" fill="none" stroke="#EAC54F" strokeWidth="8" strokeLinecap="round" />
+        <path d="M36 26 C 62 26, 60 62, 40 62" fill="none" stroke="#EAC54F" strokeWidth="9" strokeLinecap="round" />
       </g>
     </svg>
   )

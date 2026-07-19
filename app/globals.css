@@ -194,7 +194,9 @@ body {
   display: block;
   width: 100%;
   height: 18px;
-  color: #46683B; /* alga; override via text-* */
+  /* NIENTE color di default: la tinta arriva SEMPRE da una classe text-* (di
+     solito il colore della sezione successiva). Un default qui vincerebbe
+     sull'utility Tailwind per pari specificità → onde sempre verdi (bug). */
   overflow: hidden;
 }
 .imk-wave-divider svg {
@@ -207,10 +209,20 @@ body {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
-/* Onda PIENA (merge col blocco successivo): più alta e ferma (niente scorrimento,
-   il path pieno non è un tile perfetto). La tinta è quella della prossima sezione. */
-.imk-wave-divider.is-fill { height: 34px; margin-bottom: -1px; }
-.imk-wave-divider.is-fill svg { width: 100%; animation: none; }
+/* Onda PIENA e LIQUIDA (merge col blocco successivo): la tinta è quella della
+   prossima sezione, e il profilo si DEFORMA lentamente (morph della `d`) invece
+   di scorrere — un bordo fluido, non un nastro. */
+.imk-wave-divider.is-fill { height: 46px; margin-bottom: -1px; overflow: visible; }
+.imk-wave-divider.is-fill svg { width: 100%; height: 100%; animation: none; }
+.imk-wave-fluid {
+  animation: imk-wave-morph 9s ease-in-out infinite;
+  will-change: d;
+}
+@keyframes imk-wave-morph {
+  0%, 100% { d: path('M0,28 C180,14 300,14 480,30 C660,44 780,44 960,28 C1140,14 1260,16 1440,30 L1440,60 L0,60 Z'); }
+  33%      { d: path('M0,32 C180,44 300,44 480,30 C660,16 780,16 960,32 C1140,46 1260,42 1440,28 L1440,60 L0,60 Z'); }
+  66%      { d: path('M0,26 C180,20 300,40 480,34 C660,20 780,14 960,26 C1140,38 1260,40 1440,30 L1440,60 L0,60 Z'); }
+}
 
 /* --- Evidenziatore limone del titolo hero (stile V2 "mercato centrale"):
    una pennellata dietro le parole chiave, con angoli morbidi. --- */
@@ -276,6 +288,7 @@ body {
   .imk-sun { animation: none !important; }
   .imk-float { animation: none !important; transform: rotate(var(--tilt, 0deg)); }
   .imk-wave-divider svg { animation: none !important; }
+  .imk-wave-fluid { animation: none !important; }
   .imk-draw path {
     animation: none !important;
     stroke-dashoffset: 0 !important;

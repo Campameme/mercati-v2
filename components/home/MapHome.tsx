@@ -11,6 +11,8 @@ import WaterCard from '@/components/motion/WaterCard'
 import BancoAvatar from '@/components/BancoAvatar'
 import WaveDivider from '@/components/motion/WaveDivider'
 import VideoWaveFrame from '@/components/motion/VideoWaveFrame'
+import Scribble from '@/components/motion/Scribble'
+import { PostItNote } from '@/components/motion/PostItCollage'
 import { occursOn, isNonWeekly } from '@/lib/markets/hours'
 import { categoryLabel } from '@/lib/i18n/home'
 import { UI_I18N } from '@/lib/i18n/ui'
@@ -334,6 +336,11 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
       {/* ===== BELIN, C'È IL MERCATO — i giorni speciali come mercati d'autore,
            piccoli e di nicchia. Band limone (l'onda sopra l'ha annunciata). ===== */}
       <section id="tipici" className="relative overflow-hidden bg-limone">
+        {/* Decori sparsi: un post-it che galleggia e uno scarabocchio, per dare movimento */}
+        <div aria-hidden="true" className="hidden lg:block absolute -top-6 right-[7%] w-36 rotate-6 z-0 pointer-events-none">
+          <PostItNote photo={{ src: '/zone/vita-antiquariato-cornici.webp', alt: '' }} tilt={6} aspect="aspect-[4/3]" />
+        </div>
+        <Scribble variant="spiral" color="text-terracotta/60" draw={false} className="hidden md:block absolute bottom-8 right-[10%] w-16 h-16 z-0 -rotate-12" />
         <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-14 md:py-20 max-w-6xl">
           <div className="max-w-2xl mb-9">
             <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-terracotta-600 mb-2">{TIPICI2[lang].eyebrow}</p>
@@ -382,10 +389,17 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
 
       {/* ===== LE PERSONE DEL MERCATO — il box bianco besugo + le card in riga ===== */}
       <section id="banchi" className="relative overflow-hidden bg-crema">
+        {/* Un post-it appoggiato e uno scarabocchio: aria di bacheca */}
+        <div aria-hidden="true" className="hidden xl:block absolute top-16 right-6 w-40 -rotate-3 z-0 pointer-events-none">
+          <PostItNote photo={{ src: '/zone/vita-mercato-sanremo-banchi.webp', alt: '' }} tilt={-4} aspect="aspect-[4/3]" />
+        </div>
         <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-14 md:py-20 max-w-6xl">
           <div className="max-w-2xl mb-8">
             <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-terracotta mb-2">{BANCHI2[lang].eyebrow}</p>
-            <h2 className="font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">{BANCHI2[lang].title}</h2>
+            <h2 className="relative inline-block font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">
+              {BANCHI2[lang].title}
+              <Scribble variant="underline" color="text-limone" draw={false} className="absolute -bottom-3 left-0 w-full h-4" />
+            </h2>
             <p className="mt-3 text-ink-soft">{BANCHI2[lang].sub}</p>
           </div>
 
