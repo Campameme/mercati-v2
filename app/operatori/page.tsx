@@ -10,6 +10,19 @@ import { useLang } from '@/lib/i18n/useLang'
 import { UI_I18N } from '@/lib/i18n/ui'
 import { categoryLabel } from '@/lib/i18n/home'
 
+// FOTO TEMPORANEE per le card dei banchi (come in home): scene di mercato
+// vere, assegnate in modo stabile per indice, finché non ci sono foto proprie.
+const TEMP_OP_PHOTOS = [
+  '/zone/vita-banco-verdure.webp',
+  '/zone/vita-sapori.webp',
+  '/zone/vita-banco-ortofrutta-ombrelloni.webp',
+  '/zone/vita-artigianato-borse.webp',
+  '/zone/vita-banchi-piazza.webp',
+  '/zone/vita-mercato-sanremo-banchi.webp',
+  '/zone/vita-antiquariato-banco.webp',
+  '/zone/vita-mercato-lungomare.webp',
+]
+
 interface HubOperator {
   id: string
   name: string
@@ -182,7 +195,7 @@ export default function OperatoriHubPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filtered.map((op) => {
+          {filtered.map((op, opIdx) => {
             const sessions = op.schedules ?? []
             const preview = sessions.slice(0, 3)
             const more = sessions.length - preview.length
@@ -193,6 +206,12 @@ export default function OperatoriHubPage() {
                 href={href}
                 className="imk-lift group flex flex-col bg-white border border-[#e0d7c1] rounded-xl overflow-hidden hover:border-terracotta transition-colors"
               >
+                {/* Foto di mercato TEMPORANEA (stabile per indice) finché il
+                    banco non carica la propria */}
+                <div className="relative aspect-[16/7] overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={TEMP_OP_PHOTOS[opIdx % TEMP_OP_PHOTOS.length]} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                </div>
                 <span aria-hidden="true" className="mz-band" style={{ ['--band' as string]: '#C4593C' }} />
                 <div className="p-4 md:p-5 flex-1 flex flex-col">
                   <div className="flex items-start gap-3.5">

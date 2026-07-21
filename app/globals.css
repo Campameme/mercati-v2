@@ -266,10 +266,11 @@ body {
   45%      { d: path('M30,0 C14,90 12,190 28,290 C44,390 46,480 30,570 C16,660 18,760 32,835 C36,862 30,884 26,900 L0,900 L0,0 Z'); }
 }
 
-/* --- Evidenziatore limone del titolo hero (stile V2 "mercato centrale"):
-   una pennellata dietro le parole chiave, con angoli morbidi. --- */
+/* --- Evidenziatore del titolo hero: pennellata ALGA (richiesta 2026-07-20,
+   era limone) dietro le parole chiave, testo in crema per il contrasto. --- */
 .imk-mark {
-  background: #EAC54F;
+  background: #46683B;
+  color: #FBF6EC;
   padding: 0 0.12em;
   border-radius: 6px;
   -webkit-box-decoration-break: clone;
@@ -308,13 +309,22 @@ body {
   z-index: 2;
 }
 
-/* --- Line-draw per accenti SVG (es. WaveTaglia, Arco): il tratto si
-   "disegna" una volta all'ingresso. Da abbinare a .imk-draw sull'<svg>. --- */
+/* --- Line-draw per accenti SVG (es. Scribble, nodo del logo): il tratto si
+   "disegna" una volta all'ingresso. Da abbinare a .imk-draw sull'<svg>.
+   .imk-draw-wait = tratto invisibile in attesa che lo scarabocchio entri in
+   vista (l'IntersectionObserver di Scribble scambia wait → draw). --- */
+.imk-draw-wait path {
+  stroke-dasharray: 240;
+  stroke-dashoffset: 240;
+}
 .imk-draw path {
   stroke-dasharray: 240;
   stroke-dashoffset: 240;
   animation: imk-draw-stroke 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+/* Il secondo tratto (es. la punta della freccia) parte quando l'asta è quasi
+   finita: il gesto sembra davvero "scritto" in due tempi. */
+.imk-draw path + path { animation-delay: 0.75s; }
 @keyframes imk-draw-stroke {
   to { stroke-dashoffset: 0; }
 }
@@ -340,7 +350,8 @@ body {
   .imk-wave-fluid-back,
   .imk-wave-fluid-v,
   .imk-wave-fluid-v-back { animation: none !important; }
-  .imk-draw path {
+  .imk-draw path,
+  .imk-draw-wait path {
     animation: none !important;
     stroke-dashoffset: 0 !important;
   }
@@ -433,15 +444,6 @@ body {
 /* --- Bordi irregolari "a mano" --- */
 .imk-edge   { border-radius: 16px 20px 17px 22px / 20px 16px 22px 17px; }
 .imk-edge-2 { border-radius: 22px 15px 24px 17px / 17px 22px 15px 24px; }
-
-/* --- Evidenziatore (marker) dietro al testo (sole) --- */
-.imk-mark {
-  background-image: linear-gradient(120deg, rgba(244, 182, 44, 0.5), rgba(244, 182, 44, 0.5));
-  background-repeat: no-repeat;
-  background-position: 0 82%;
-  background-size: 100% 38%;
-  padding: 0 0.05em;
-}
 
 /* --- Leggere rotazioni "imperfette" --- */
 .imk-tilt-l { transform: rotate(-1.4deg); }

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { gsap } from '@/lib/motion/gsap'
-import { Search, ArrowRight, CalendarDays, ChevronDown, Newspaper, MessageCircle } from 'lucide-react'
+import { Search, ArrowRight, CalendarDays, ChevronDown, Newspaper, MessageCircle, LocateFixed } from 'lucide-react'
 import Bollino from '@/components/Bollino'
 import WaterCard from '@/components/motion/WaterCard'
 import BancoAvatar from '@/components/BancoAvatar'
@@ -53,6 +53,19 @@ const PROJECT_PHOTOS = [
 
 
 const TIPICI_CTA: Record<Lang, string> = { it: 'Tutti i mercati tipici', fr: 'Tous les marchés typiques', de: 'Alle typischen Märkte', en: 'All the special markets' }
+
+// FOTO TEMPORANEE per le card dei banchi (finché gli operatori non caricano le
+// proprie): scene di mercato vere, assegnate in modo stabile per indice.
+const TEMP_OP_PHOTOS = [
+  '/zone/vita-banco-verdure.webp',
+  '/zone/vita-sapori.webp',
+  '/zone/vita-banco-ortofrutta-ombrelloni.webp',
+  '/zone/vita-artigianato-borse.webp',
+  '/zone/vita-banchi-piazza.webp',
+  '/zone/vita-mercato-sanremo-banchi.webp',
+  '/zone/vita-antiquariato-banco.webp',
+  '/zone/vita-mercato-lungomare.webp',
+]
 // Video dell'hero: la passeggiata tra i banchi (dal mare alla piazza), già
 // ritagliato 4:5 e compresso. Poster = il suo primo fotogramma; per rimetterci
 // una foto basta azzerare HERO_VIDEO.
@@ -62,11 +75,14 @@ const HERO_PHOTO = { src: '/zone/vita-mercato-lungomare.webp', alt: 'Il mercato 
 
 // ===== Copy V2 "Mercato Centrale" (adottato su richiesta 2026-07-18) =====
 // Voce ligure con i footnote che traducono per chi arriva da fuori.
-const HERO2: Record<Lang, { eyebrow: string; tPre: string; tEm: string; tMid: string; tMark: string; sub: string; ctaFind: string; ctaBanchi: string; zone: string; comuni: string; quasi: string }> = {
-  it: { eyebrow: 'Riviera dei Fiori · da Ventimiglia a Diano', tPre: 'La spesa', tEm: 'vera', tMid: 'è ancora', tMark: 'in piazza.', sub: 'Un mercato quasi ogni giorno, gente che conosci per nome, cose buone di stagione. Belin, che bello tornare al mercato.', ctaFind: 'Trova il mercato', ctaBanchi: 'Conosci i banchi', zone: 'zone', comuni: 'comuni con mercato', quasi: 'quasi ogni giorno' },
-  fr: { eyebrow: 'Riviera dei Fiori · de Vintimille à Diano', tPre: 'Les vraies', tEm: 'courses', tMid: 'sont encore', tMark: 'sur la place.', sub: 'Un marché presque chaque jour, des gens qu’on connaît par leur nom, de bonnes choses de saison. Quel plaisir de retourner au marché.', ctaFind: 'Trouver le marché', ctaBanchi: 'Découvrir les étals', zone: 'zones', comuni: 'communes avec marché', quasi: 'presque chaque jour' },
-  de: { eyebrow: 'Riviera dei Fiori · von Ventimiglia bis Diano', tPre: 'Der echte', tEm: 'Einkauf', tMid: 'ist noch', tMark: 'auf dem Platz.', sub: 'Fast jeden Tag ein Markt, Leute, die man beim Namen kennt, gute Sachen der Saison. Schön, wieder auf den Markt zu gehen.', ctaFind: 'Markt finden', ctaBanchi: 'Die Stände kennenlernen', zone: 'Zonen', comuni: 'Orte mit Markt', quasi: 'fast jeden Tag' },
-  en: { eyebrow: 'Riviera dei Fiori · from Ventimiglia to Diano', tPre: 'Real', tEm: 'shopping', tMid: 'still happens', tMark: 'in the square.', sub: 'A market almost every day, people you know by name, good things in season. So good to be back at the market.', ctaFind: 'Find the market', ctaBanchi: 'Meet the stalls', zone: 'zones', comuni: 'towns with a market', quasi: 'almost every day' },
+// Titolo hero 2026-07-20: l'esperienza del mercato come QUALITÀ ("il meglio
+// della Riviera"), evidenziato in alga su "al mercato", e la via d'azione
+// doppia: cerca + "più vicini a me".
+const HERO2: Record<Lang, { eyebrow: string; tPre: string; tEm: string; tMid: string; tMark: string; sub: string; ctaFind: string; ctaNear: string; ctaBanchi: string; zone: string; comuni: string; quasi: string }> = {
+  it: { eyebrow: 'Riviera dei Fiori · da Ventimiglia a Diano', tPre: 'Il meglio', tEm: 'della Riviera', tMid: 'lo trovi', tMark: 'al mercato.', sub: 'Banchi curati, prodotti di stagione, facce che conosci. Cerca il mercato più vicino a te e vacci: il resto si scopre in piazza.', ctaFind: 'Trova il mercato', ctaNear: 'Più vicini a me', ctaBanchi: 'Conosci i banchi', zone: 'zone', comuni: 'comuni con mercato', quasi: 'quasi ogni giorno' },
+  fr: { eyebrow: 'Riviera dei Fiori · de Vintimille à Diano', tPre: 'Le meilleur', tEm: 'de la Riviera', tMid: 'se trouve', tMark: 'au marché.', sub: 'Des étals soignés, des produits de saison, des visages connus. Cherche le marché le plus proche et vas-y : le reste se découvre sur la place.', ctaFind: 'Trouver le marché', ctaNear: 'Les plus proches', ctaBanchi: 'Découvrir les étals', zone: 'zones', comuni: 'communes avec marché', quasi: 'presque chaque jour' },
+  de: { eyebrow: 'Riviera dei Fiori · von Ventimiglia bis Diano', tPre: 'Das Beste', tEm: 'der Riviera', tMid: 'findest du', tMark: 'auf dem Markt.', sub: 'Gepflegte Stände, Saisonware, bekannte Gesichter. Such den Markt in deiner Nähe und geh hin: der Rest zeigt sich auf dem Platz.', ctaFind: 'Markt finden', ctaNear: 'In meiner Nähe', ctaBanchi: 'Die Stände kennenlernen', zone: 'Zonen', comuni: 'Orte mit Markt', quasi: 'fast jeden Tag' },
+  en: { eyebrow: 'Riviera dei Fiori · from Ventimiglia to Diano', tPre: 'The best', tEm: 'of the Riviera', tMid: 'is found', tMark: 'at the market.', sub: 'Well-kept stalls, seasonal produce, familiar faces. Find the market nearest you and go: the rest you discover in the square.', ctaFind: 'Find the market', ctaNear: 'Nearest to me', ctaBanchi: 'Meet the stalls', zone: 'zones', comuni: 'towns with a market', quasi: 'almost every day' },
 }
 // Il copy di "A due passi da casa" [0] e "Le otto zone" [1]: dal 2026-07-19
 // non più due card affiancate ma due SEZIONI piene, in quest'ordine.
@@ -249,7 +265,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
           <div className="container mx-auto px-4 md:px-6 py-12 w-full">
             <div className="max-w-2xl md:max-w-[50vw]">
               <p data-anim className="font-alt text-xs font-bold uppercase tracking-[0.2em] text-terracotta mb-6">{HERO2[lang].eyebrow}</p>
-              {/* Titolo V2: "vera" in corsivo terracotta, "in piazza." evidenziato limone */}
+              {/* Titolo: "della Riviera" in corsivo terracotta, "al mercato." evidenziato ALGA */}
               <h1 className="font-display font-extrabold tracking-[-0.03em] text-ink text-[12vw] leading-[1.02] md:text-[4.6rem]">
                 <span className="inline-block overflow-hidden align-bottom pr-[0.14em]"><span data-word className="imk-word inline-block">{HERO2[lang].tPre}</span></span>{' '}
                 <span className="inline-block overflow-hidden align-bottom pr-[0.14em]"><span data-word className="imk-word inline-block italic text-terracotta">{HERO2[lang].tEm}</span></span>
@@ -269,6 +285,12 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
                   {HERO2[lang].ctaFind} <ArrowRight className="imk-march w-4 h-4" />
                 </button>
               </form>
+              {/* La seconda via: i mercati più vicini a me (geolocalizzata su /mappa) */}
+              <div data-anim className="mt-3">
+                <Link href="/mappa?vicino=1" className="inline-flex items-center gap-2 font-alt font-semibold text-sm text-alga border-[1.5px] border-alga/50 bg-crema/60 px-5 py-2.5 rounded-full hover:bg-alga hover:text-crema hover:border-alga transition-colors">
+                  <LocateFixed className="w-4 h-4" aria-hidden="true" /> {HERO2[lang].ctaNear}
+                </Link>
+              </div>
               {/* Pillbar (al posto della selezione giorni + aperti ora): numeri reali */}
               <div data-anim className="mt-8 flex flex-wrap gap-x-9 gap-y-3 py-4 border-t border-b border-[#e0d7c1] max-w-xl">
                 <div className="font-alt text-sm text-ink-soft"><b className="font-display font-extrabold text-2xl text-terracotta mr-2">{heroStats.zone}</b>{HERO2[lang].zone}</div>
@@ -281,9 +303,10 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
                   <b className="font-display font-extrabold text-2xl text-terracotta mr-2">7/7</b>{HERO2[lang].quasi}
                 </div>
               </div>
-              {/* Su mobile il video non c'è: una polaroid vera sotto i numeri, per dare vita */}
-              <div aria-hidden="true" className="md:hidden mt-7 w-44 pointer-events-none">
-                <PostItNote photo={{ src: '/zone/vita-banchi-piazza.webp', alt: '', caption: 'I banchi in piazza, la mattina' }} tilt={3} aspect="aspect-[4/3]" />
+              {/* Su mobile il video non c'è: polaroid + bollino sotto i numeri, per dare vita */}
+              <div aria-hidden="true" className="md:hidden mt-7 flex items-end gap-4 pointer-events-none">
+                <div className="w-48"><PostItNote photo={{ src: '/zone/vita-banchi-piazza.webp', alt: '', caption: 'I banchi in piazza, la mattina' }} tilt={3} aspect="aspect-[4/3]" /></div>
+                <Bollino className="w-20 flex-shrink-0 -rotate-6 mb-2" />
               </div>
             </div>
 
@@ -293,7 +316,9 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
         {/* Video dell'hero: SENZA box, appoggiato al margine destro della pagina
             (ne "esce"), la crema lo lambisce con onde fluide su alto, basso e
             fianco sinistro (VideoWaveFrame). Su mobile non c'è: polaroid inline. */}
-        <div data-anim className="hidden md:block absolute inset-y-0 right-0 w-[45vw] lg:w-[42vw] z-0">
+        {/* Fermo, senza ingresso animato: deve stare a filo con l'header (niente
+            transform residui da data-anim) */}
+        <div className="hidden md:block absolute inset-y-0 right-0 w-[45vw] lg:w-[42vw] z-0">
           <VideoWaveFrame>
             {HERO_VIDEO ? (
               <video
@@ -314,8 +339,12 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
             )}
           </VideoWaveFrame>
           {/* Polaroid appoggiata sul fianco del video: primo bigliettino della bacheca */}
-          <div aria-hidden="true" className="absolute bottom-16 -left-8 w-44 lg:w-52 z-20 pointer-events-none">
+          <div aria-hidden="true" className="absolute bottom-16 -left-10 w-48 lg:w-60 z-20 pointer-events-none">
             <PostItNote photo={{ src: '/zone/vita-mercato-lungomare.webp', alt: '', caption: 'Il mercato sul lungomare' }} tilt={-5} aspect="aspect-[4/3]" />
+          </div>
+          {/* Il bollino della rete, come un sigillo sull'angolo alto del video */}
+          <div className="absolute top-8 -left-12 z-20 w-24 lg:w-28 rotate-6">
+            <Bollino className="w-full drop-shadow-[0_16px_28px_rgba(38,36,30,0.35)]" />
           </div>
         </div>
 
@@ -335,17 +364,24 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
       <section id="tipici" className="relative bg-limone">
         {/* La bacheca: polaroid media appoggiata in alto a destra (con didascalia
             vera) + spirale grande, tratto pieno — devono vedersi */}
-        <div aria-hidden="true" className="hidden md:block absolute top-8 right-[3%] w-48 lg:w-60 z-0 pointer-events-none">
+        <div aria-hidden="true" className="hidden md:block absolute top-8 right-[3%] w-52 lg:w-64 z-0 pointer-events-none">
           <PostItNote photo={{ src: '/zone/vita-antiquariato-banco.webp', alt: '', caption: 'L’antiquariato sotto i portici' }} tilt={6} aspect="aspect-[4/3]" />
         </div>
-        <Scribble variant="spiral" color="text-alga" draw={false} className="hidden md:block absolute bottom-10 right-[8%] w-24 h-24 z-0 -rotate-12" />
+        {/* Postcard anche sul LATO sinistro, che spunta tra hero e band limone */}
+        <div aria-hidden="true" className="hidden lg:block absolute -top-14 left-[2%] w-52 z-20 pointer-events-none">
+          <PostItNote photo={{ src: '/zone/vita-antiquariato-piazza.webp', alt: '', caption: 'La piazza dell’antiquariato' }} tilt={-4} aspect="aspect-[4/3]" />
+        </div>
         <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-14 md:py-20 max-w-6xl">
           <div className="max-w-2xl mb-9">
             <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-terracotta-600 mb-2">{TIPICI2[lang].eyebrow}</p>
             <h2 className="relative font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">
-              {/* Cerchio a mano attorno alla prima parola del titolo */}
-              <Scribble variant="loop" color="text-terracotta" draw={false} className="hidden md:block absolute -left-4 -top-3 w-40 h-[4.6rem]" />
-              {TIPICI2[lang].title}<span className="text-terracotta">{TIPICI2[lang].star}</span>
+              {/* Cerchio a mano attorno a TUTTA la prima parola (stretch: si
+                  allarga quanto la parola, in ogni lingua) */}
+              <span className="relative inline-block">
+                <Scribble variant="loop" color="text-terracotta" stretch className="hidden md:block absolute -left-[0.35em] -top-[0.18em] w-[calc(100%+0.7em)] h-[calc(100%+0.36em)]" />
+                {TIPICI2[lang].title.split(' ')[0]}
+              </span>{' '}
+              {TIPICI2[lang].title.split(' ').slice(1).join(' ')}<span className="text-terracotta">{TIPICI2[lang].star}</span>
             </h2>
             <p className="mt-3 text-ink/80 leading-relaxed">{TIPICI2[lang].lead}</p>
             <p className="mt-2 text-[13px] italic text-limone-t">{TIPICI2[lang].foot}</p>
@@ -391,7 +427,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
            vecchia prima sezione (racconto a sinistra + collage di polaroid a
            destra) e il copy dei blocchi. ===== */}
       <section id="perche" className="relative bg-crema">
-        <Scribble variant="scribble" color="text-terracotta" draw={false} className="hidden md:block absolute top-6 right-[6%] w-28 z-0 rotate-3" />
+        <Scribble variant="scribble" color="text-terracotta" className="hidden md:block absolute top-6 right-[6%] w-28 z-0 rotate-3" />
         <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-6xl">
           <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-16 items-center">
             <div>
@@ -406,7 +442,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
                   {PBLOCKS[lang][0].cta} <ArrowRight className="imk-march w-4 h-4" />
                 </Link>
                 {/* Freccia a mano che scende sulla CTA */}
-                <Scribble variant="arrow" color="text-alga" draw={false} className="hidden md:block absolute -top-12 -right-20 w-20 h-14 -scale-x-100 rotate-6" />
+                <Scribble variant="arrow" color="text-alga" className="hidden md:block absolute -top-12 -right-20 w-20 h-14 -scale-x-100 rotate-6" />
               </div>
             </div>
             <div className="home-reveal mb-6 lg:mb-0">
@@ -415,7 +451,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
           </div>
         </div>
         {/* Polaroid che spunta TRA le sezioni (niente overflow-hidden: non si taglia) */}
-        <div aria-hidden="true" className="absolute -bottom-10 left-[5%] w-40 md:w-52 z-20 pointer-events-none">
+        <div aria-hidden="true" className="absolute -bottom-10 left-[5%] w-44 md:w-60 z-20 pointer-events-none">
           <PostItNote photo={{ src: '/zone/vita-banco-verdure.webp', alt: '', caption: 'Il banco delle verdure' }} tilt={-6} aspect="aspect-[4/3]" />
         </div>
         <WaveDivider fill className="relative z-10 text-crema-2" />
@@ -423,12 +459,15 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
 
       {/* ===== LE OTTO ZONE — da Ventimiglia a Diano, ognuna col suo carattere ===== */}
       <section id="zone" className="relative bg-crema-2">
-        <Scribble variant="star" color="text-terracotta" draw={false} className="hidden md:block absolute top-10 left-[4%] w-12 h-12 z-0 rotate-12" />
+        {/* Postcard sul LATO destro, che spunta verso la sezione banchi */}
+        <div aria-hidden="true" className="hidden lg:block absolute -bottom-12 right-[3%] w-52 z-20 pointer-events-none">
+          <PostItNote photo={{ src: '/zone/vita-mercato-ventimiglia.webp', alt: '', caption: 'Ventimiglia, il venerdì' }} tilt={5} aspect="aspect-[4/3]" />
+        </div>
         <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-14 md:py-20 max-w-6xl grid lg:grid-cols-[0.95fr_1.05fr] gap-10 lg:gap-14 items-center">
           <div className="relative order-last lg:order-first">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/zone/vita-mercato-ventimiglia-borgo.webp" alt="Il mercato ai piedi della città vecchia di Ventimiglia" loading="lazy" className="w-full aspect-[4/3] object-cover rounded-[22px] shadow-[0_24px_54px_-32px_rgba(38,36,30,0.6)]" />
-            <Scribble variant="loop" color="text-limone" draw={false} className="hidden md:block absolute -top-5 -left-4 w-24 h-16 -rotate-6" />
+            <Scribble variant="loop" color="text-limone" className="hidden md:block absolute -top-5 -left-4 w-24 h-16 -rotate-6" />
           </div>
           <div>
             <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-alga mb-3">{PBLOCKS[lang][1].eyebrow}</p>
@@ -456,7 +495,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
       {/* ===== LE PERSONE DEL MERCATO — il box bianco besugo + le card in riga ===== */}
       <section id="banchi" className="relative bg-crema">
         {/* Polaroid media appoggiata accanto al titolo: aria di bacheca */}
-        <div aria-hidden="true" className="hidden md:block absolute top-10 right-[2%] w-52 xl:w-64 z-0 pointer-events-none">
+        <div aria-hidden="true" className="hidden md:block absolute top-10 right-[2%] w-56 xl:w-72 z-0 pointer-events-none">
           <PostItNote photo={{ src: '/zone/vita-mercato-sanremo-banchi.webp', alt: '', caption: 'Sanremo, i banchi del martedì' }} tilt={-4} aspect="aspect-[4/3]" />
         </div>
         <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-14 md:py-20 max-w-6xl">
@@ -464,7 +503,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
             <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-terracotta mb-2">{BANCHI2[lang].eyebrow}</p>
             <h2 className="relative inline-block font-display font-extrabold tracking-tight text-4xl md:text-5xl leading-[1.04] text-ink">
               {BANCHI2[lang].title}
-              <Scribble variant="underline" color="text-limone" draw={false} className="absolute -bottom-3.5 left-0 w-full h-5" />
+              <Scribble variant="underline" color="text-limone" className="absolute -bottom-3.5 left-0 w-full h-5" />
             </h2>
             <p className="mt-3 text-ink-soft">{BANCHI2[lang].sub}</p>
           </div>
@@ -472,7 +511,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
           {/* Il box bianco grande: la battuta del besugo (col footnote che traduce) */}
           <div className="relative bg-white border-2 border-ink rounded-[22px] p-7 md:p-9 flex flex-wrap items-center justify-between gap-6">
             {/* Freccia a mano che scende sulla CTA */}
-            <Scribble variant="arrow" color="text-terracotta" draw={false} className="hidden lg:block absolute -top-9 right-40 w-24 h-16 rotate-[18deg]" />
+            <Scribble variant="arrow" color="text-terracotta" className="hidden lg:block absolute -top-9 right-40 w-24 h-16 rotate-[18deg]" />
             <p className="font-display font-extrabold tracking-tight text-2xl md:text-[2.1rem] leading-[1.12] max-w-[26ch] text-ink">
               {BANCHI2[lang].q1}<em className="italic text-terracotta">{BANCHI2[lang].em}</em>{BANCHI2[lang].q2}<u className="decoration-limone decoration-[5px] underline-offset-2">{BANCHI2[lang].u}</u>{BANCHI2[lang].q3}
               <small className="block font-alt text-[13px] font-medium italic text-ink-soft mt-2.5">{BANCHI2[lang].foot}</small>
@@ -485,7 +524,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
           {/* Le card dei banchi IN RIGA, scorrevoli (5-6), con WhatsApp e Vai al mercato */}
           {operators.length > 0 && (
             <div className="mt-8 -mx-4 px-4 md:mx-0 md:px-0 flex gap-4 overflow-x-auto snap-x pb-4 imk-scroll">
-              {operators.slice(0, 8).map((op) => {
+              {operators.slice(0, 8).map((op, opIdx) => {
                 const wa = op.socialLinks?.whatsapp
                 const chips = (op.schedules ?? []).slice(0, 2)
                 const marketHref = op.market ? `/${op.market.slug}` : '/mappa'
@@ -494,8 +533,11 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
                     <Link href={`/operatori/${op.id}`} className="group block">
                       <div className="relative aspect-[4/3] overflow-hidden bg-white">
                         <span className="absolute top-3 left-3 z-10 -rotate-3 font-alt text-[11px] font-bold uppercase tracking-wide text-crema bg-terracotta rounded-md px-2.5 py-1">{categoryLabel(op.category, lang)}</span>
-                        <div className="absolute inset-0 grid place-items-center">
-                          <BancoAvatar name={op.name} size={72} className="border border-[#e0d7c1]" />
+                        {/* Foto di mercato TEMPORANEA (stabile per indice) + avatar del banco */}
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={TEMP_OP_PHOTOS[opIdx % TEMP_OP_PHOTOS.length]} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                        <div className="absolute bottom-3 left-3">
+                          <BancoAvatar name={op.name} size={52} className="border-2 border-white shadow-md" />
                         </div>
                       </div>
                     </Link>
@@ -542,7 +584,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
            senza piatto, i 3 requisiti numerati e la CTA in crema. ===== */}
       <section id="rete" className="relative bg-terracotta text-crema flex flex-col min-h-[85svh]">
         {/* Polaroid storica che spunta tra questa sezione e le notizie */}
-        <div aria-hidden="true" className="absolute -bottom-10 left-[4%] w-32 md:w-48 z-20 pointer-events-none">
+        <div aria-hidden="true" className="absolute -bottom-10 left-[4%] w-40 md:w-56 z-20 pointer-events-none">
           <PostItNote photo={{ src: '/zone/vita-fiori-sanremo-1962.webp', alt: '', caption: 'Sanremo, il mercato dei fiori — 1962' }} tilt={-5} aspect="aspect-[4/3]" />
         </div>
         <div className="home-reveal relative z-10 flex-1 flex items-center container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-6xl">
@@ -565,7 +607,7 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
                   {RETE2[lang].cta} <ArrowRight className="imk-march w-5 h-5" />
                 </Link>
                 {/* Freccia a mano (specchiata) che scende sulla CTA */}
-                <Scribble variant="arrow" color="text-limone" draw={false} className="hidden md:block absolute -top-14 -right-24 w-24 h-16 -scale-x-100 rotate-6" />
+                <Scribble variant="arrow" color="text-limone" className="hidden md:block absolute -top-14 -right-24 w-24 h-16 -scale-x-100 rotate-6" />
               </div>
             </div>
             {/* Il bollino verde, grande, senza piatto: il logo respira da solo
@@ -573,7 +615,6 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
             <div className="flex justify-center lg:justify-end">
               <div className="relative -rotate-6">
                 <Bollino className="w-56 md:w-72 lg:w-80 drop-shadow-[0_30px_45px_rgba(0,0,0,0.35)]" />
-                <Scribble variant="star" color="text-limone" draw={false} className="absolute -top-5 -right-3 w-14 h-14 rotate-12" />
                 <span className="sr-only">{RETE2[lang].bollino}</span>
               </div>
             </div>
@@ -586,10 +627,10 @@ export default function MapHome({ pins }: { pins: MarketPin[] }) {
            (L'onda piena della sezione rete introduce già questo blocco ink.) ===== */}
       <section id="settimana" className="relative bg-ink text-crema">
         {/* La bacheca continua anche sull'ink: polaroid chiara + ghirigoro limone */}
-        <div aria-hidden="true" className="hidden lg:block absolute top-14 right-[4%] w-52 z-0 pointer-events-none">
+        <div aria-hidden="true" className="hidden lg:block absolute top-14 right-[4%] w-56 z-0 pointer-events-none">
           <PostItNote photo={{ src: '/zone/vita-mercato-coperto-ventimiglia.webp', alt: '', caption: 'Il mercato coperto di Ventimiglia' }} tilt={4} aspect="aspect-[4/3]" />
         </div>
-        <Scribble variant="scribble" color="text-limone" draw={false} className="hidden md:block absolute bottom-12 right-[9%] w-28 z-0 -rotate-6" />
+        <Scribble variant="scribble" color="text-limone" className="hidden md:block absolute bottom-12 right-[9%] w-28 z-0 -rotate-6" />
         <div className="home-reveal relative z-10 container mx-auto px-4 md:px-6 py-16 md:py-24 max-w-5xl">
           <div className="max-w-2xl mb-9">
             <p className="font-alt text-xs font-bold uppercase tracking-[0.16em] text-limone mb-2">{copy.weekEyebrow}</p>
